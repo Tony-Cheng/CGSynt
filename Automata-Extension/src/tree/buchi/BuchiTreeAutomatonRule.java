@@ -5,12 +5,19 @@ import java.util.List;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import de.uni_freiburg.informatik.ultimate.util.HashUtils;
 
-public class BuchiTreeAutomationRule<LETTER extends IRankedLetter, STATE> {
+/**
+ * Rule of a 
+ * @author tonycheng
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
+public class BuchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE> {
 	private final LETTER mLetter;
 	private final STATE mSrc;
 	private final List<STATE> mDest;
 
-	public BuchiTreeAutomationRule(final LETTER letter, final STATE src, final List<STATE> dest) {
+	public BuchiTreeAutomatonRule(final LETTER letter, final STATE src, final List<STATE> dest) {
 		assert letter.getRank() == dest.size();
 		this.mLetter = letter;
 		this.mSrc = src;
@@ -35,11 +42,11 @@ public class BuchiTreeAutomationRule<LETTER extends IRankedLetter, STATE> {
 	
 	@Override
 	public boolean equals(final Object x) {
-		if (!(x instanceof BuchiTreeAutomationRule)) {
+		if (!(x instanceof BuchiTreeAutomatonRule)) {
 			return false;
 		}
 		@SuppressWarnings("unchecked")
-		final BuchiTreeAutomationRule<LETTER, STATE> t = (BuchiTreeAutomationRule<LETTER, STATE>) x;
+		final BuchiTreeAutomatonRule<LETTER, STATE> t = (BuchiTreeAutomatonRule<LETTER, STATE>) x;
 		if (!mSrc.equals(t.mSrc) || !mLetter.equals(t.mLetter) || t.mDest.size() != mDest.size()) {
 			return false;
 		}
