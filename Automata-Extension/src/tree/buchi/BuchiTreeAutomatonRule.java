@@ -6,17 +6,23 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import de.uni_freiburg.informatik.ultimate.util.HashUtils;
 
 /**
- * Rule of a 
+ * Rule of a BuchiTreeAutomaton.
  * @author tonycheng
  *
- * @param <LETTER>
- * @param <STATE>
+ * @param <LETTER> Letters of the automation.
+ * @param <STATE> States of the automation.
  */
 public class BuchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE> {
 	private final LETTER mLetter;
 	private final STATE mSrc;
 	private final List<STATE> mDest;
 
+	/**
+	 * Construct a rule: letter(src) -> dest
+	 * @param letter
+	 * @param src
+	 * @param dest
+	 */
 	public BuchiTreeAutomatonRule(final LETTER letter, final STATE src, final List<STATE> dest) {
 		assert letter.getRank() == dest.size();
 		this.mLetter = letter;
@@ -38,6 +44,11 @@ public class BuchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE> {
 
 	public int getArity() {
 		return mLetter.getRank();
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + mSrc.toString() + " | " + mLetter.toString() + " | " + mDest.toString() + ")";
 	}
 	
 	@Override
