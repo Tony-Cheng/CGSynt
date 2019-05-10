@@ -28,7 +28,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	private final Set<BuchiTreeAutomatonRule<LETTER, STATE>> mRules;
 	private final Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mSourceMap;
 	private final Set<STATE> mStates;
-	private final Set<STATE> mInitState;
+	private final Set<STATE> mInitStates;
 
 	/**
 	 * Create a BuchiTreeAutomaton.
@@ -42,7 +42,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		mRules = new HashSet<>();
 		mFinalStates = new HashSet<>();
 		mStates = new HashSet<>();
-		mInitState = new HashSet<>();
+		mInitStates = new HashSet<>();
 	}
 
 	@Override
@@ -187,7 +187,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	@Override
 	public Iterable<BuchiTreeAutomatonRule<LETTER, STATE>> getSuccessors(LETTER letter) {
 		// TODO Auto-generated method stub
-		return null;
+		return mLettersMap.get(letter);
 	}
 
 	@Override
@@ -216,7 +216,23 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	 * @param state an initial state
 	 */
 	public void addInitState(final STATE state) {
-		mInitState.add(state);
+		mInitStates.add(state);
+	}
+	
+	/**
+	 * Return the initial states.
+	 * @return the initial states
+	 */
+	public Set<STATE> getInitStates() {
+		return mInitStates;
 	}
 
+	public Set<STATE> getFinalStates() {
+		return mFinalStates;
+	}
+	
+	public Set<BuchiTreeAutomatonRule<LETTER, STATE>> getRules() {
+		return mRules;
+		
+	}
 }
