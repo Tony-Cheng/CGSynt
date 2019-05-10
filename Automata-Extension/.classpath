@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-Automata"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateUtil"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateModel"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
