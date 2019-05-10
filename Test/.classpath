@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateTest"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateModel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/AutomatonDeltaDebugger"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Automata-Extension"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

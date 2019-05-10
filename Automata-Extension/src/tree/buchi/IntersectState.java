@@ -1,6 +1,11 @@
 package tree.buchi;
 
 public class IntersectState<STATE> {
+	@Override
+	public String toString() {
+		return "IntersectState [state1=" + state1 + ", state2=" + state2 + ", mode=" + mode + "]";
+	}
+
 	private final STATE state1;
 	private final STATE state2;
 	private final int mode;

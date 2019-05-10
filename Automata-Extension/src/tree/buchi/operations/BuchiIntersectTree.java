@@ -85,7 +85,7 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 					for (STATE destState1 : dest1) {
 						for (STATE destState2 : dest2) {
 							IntersectState<STATE> newState1 = new IntersectState<>(destState1, destState2, 1);
-							IntersectState<STATE> newState2 = new IntersectState<>(destState1, destState2, 1);
+							IntersectState<STATE> newState2 = new IntersectState<>(destState1, destState2, 2);
 							destResultMode1.add(newState1);
 							destResultMode2.add(newState2);
 						}
