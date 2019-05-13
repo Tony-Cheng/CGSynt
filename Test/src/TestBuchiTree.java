@@ -18,7 +18,7 @@ public class TestBuchiTree {
 		AutomataLibraryServices service = new AutomataLibraryServices(mock);
 
 		System.out.println("Automaton 1");
-		BuchiTreeAutomaton<TestRankedAlphabet, String> aut1 = new BuchiTreeAutomaton<>();
+		BuchiTreeAutomaton<TestRankedAlphabet, String> aut1 = new BuchiTreeAutomaton<>(2);
 		aut1.addState("q0");
 		aut1.addState("q1");
 		aut1.addState("q2");
@@ -63,7 +63,7 @@ public class TestBuchiTree {
 		}
 
 		System.out.println("\n\nAutomaton 2");
-		BuchiTreeAutomaton<TestRankedAlphabet, String> aut2 = new BuchiTreeAutomaton<>();
+		BuchiTreeAutomaton<TestRankedAlphabet, String> aut2 = new BuchiTreeAutomaton<>(2);
 		aut2.addState("q0");
 		aut2.addState("q1");
 		aut2.addState("q2");

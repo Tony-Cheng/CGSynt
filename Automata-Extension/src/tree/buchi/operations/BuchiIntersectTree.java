@@ -31,7 +31,8 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 	public BuchiIntersectTree(BuchiTreeAutomaton<LETTER, STATE> tree1, BuchiTreeAutomaton<LETTER, STATE> tree2) {
 		this.tree1 = tree1;
 		this.tree2 = tree2;
-		result = new BuchiTreeAutomaton<LETTER, IntersectState<STATE>>();
+		assert tree1.getRank() == tree2.getRank();
+		result = new BuchiTreeAutomaton<LETTER, IntersectState<STATE>>(tree1.getRank());
 	}
 
 	/**
