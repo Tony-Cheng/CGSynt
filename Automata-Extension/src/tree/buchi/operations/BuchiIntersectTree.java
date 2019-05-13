@@ -9,8 +9,9 @@ import tree.buchi.BuchiTreeAutomaton;
 import tree.buchi.BuchiTreeAutomatonRule;
 import tree.buchi.IntersectState;
 
-/** 
+/**
  * A class for computing the intersection of two Buchi tree.
+ * 
  * @param <LETTER>
  * @param <STATE>
  */
@@ -21,8 +22,11 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 
 	/**
 	 * Create a new BuchiIntersectTree that intersects tree1 and tree2.
-	 * @param tree1 a Buchi tree
-	 * @param tree2 a Buchi tree
+	 * 
+	 * @param tree1
+	 *            a Buchi tree
+	 * @param tree2
+	 *            a Buchi tree
 	 */
 	public BuchiIntersectTree(BuchiTreeAutomaton<LETTER, STATE> tree1, BuchiTreeAutomaton<LETTER, STATE> tree2) {
 		this.tree1 = tree1;
@@ -46,6 +50,7 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 
 	/**
 	 * Compute the states of the resulting automaton.
+	 * Currently not used.
 	 */
 	private void computeState() {
 		Set<STATE> states1 = tree1.getStates();
@@ -107,13 +112,11 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 					List<STATE> dest2 = rule2.getDest();
 					List<IntersectState<STATE>> destResultMode1 = new ArrayList<>();
 					List<IntersectState<STATE>> destResultMode2 = new ArrayList<>();
-					for (STATE destState1 : dest1) {
-						for (STATE destState2 : dest2) {
-							IntersectState<STATE> newState1 = new IntersectState<>(destState1, destState2, 1);
-							IntersectState<STATE> newState2 = new IntersectState<>(destState1, destState2, 2);
-							destResultMode1.add(newState1);
-							destResultMode2.add(newState2);
-						}
+					for (int i = 0; i < dest1.size(); i++) {
+						IntersectState<STATE> newState1 = new IntersectState<>(dest1.get(i), dest2.get(i), 1);
+						IntersectState<STATE> newState2 = new IntersectState<>(dest1.get(i), dest2.get(i), 2);
+						destResultMode1.add(newState1);
+						destResultMode2.add(newState2);
 					}
 					if (tree1.isFinalState(source1)) {
 						IntersectState<STATE> newSource = new IntersectState<>(source1, source2, 1);
@@ -146,11 +149,11 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 
 	/**
 	 * Return the resulting automaton.
+	 * 
 	 * @return the intersection of two Buchi automata.
 	 */
 	public BuchiTreeAutomaton<LETTER, IntersectState<STATE>> computeResult() {
 		computeAlphabet();
-		computeState();
 		computeInitState();
 		computeFinalState();
 		computeTransitions();
