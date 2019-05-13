@@ -14,6 +14,7 @@ import de.uni_freiburg.informatik.ultimate.core.model.models.IElement;
 
 /**
  * A buchi tree automaton.
+ * 
  * @author
  *
  * @param <LETTER>
@@ -27,7 +28,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	private final Map<STATE, Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>>> mParentsMap;
 	private final Set<BuchiTreeAutomatonRule<LETTER, STATE>> mRules;
 	private final int rank;
-	
+
 	// Currently not implemented.
 	private final Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mSourceMap;
 	private final Set<STATE> mStates;
@@ -95,7 +96,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		for (final STATE state : dest) {
 			addState(state);
 		}
-		
+
 		// children
 		if (!mChildrenMap.containsKey(dest)) {
 			mChildrenMap.put(dest, new HashMap<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>>());
@@ -104,10 +105,10 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		if (!childLetter.containsKey(letter)) {
 			childLetter.put(letter, new HashSet<BuchiTreeAutomatonRule<LETTER, STATE>>());
 		}
-		final HashSet<BuchiTreeAutomatonRule<LETTER, STATE>> children =  (HashSet<BuchiTreeAutomatonRule<LETTER, STATE>>) childLetter
+		final HashSet<BuchiTreeAutomatonRule<LETTER, STATE>> children = (HashSet<BuchiTreeAutomatonRule<LETTER, STATE>>) childLetter
 				.get(letter);
 		children.add(rule);
-		
+
 		// parents
 		if (!mParentsMap.containsKey(src)) {
 			mParentsMap.put(src, new HashMap<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>>());
@@ -119,15 +120,15 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		final Set<BuchiTreeAutomatonRule<LETTER, STATE>> parents = (Set<BuchiTreeAutomatonRule<LETTER, STATE>>) parentLetter
 				.get(letter);
 		parents.add(rule);
-		
+
 		// LettersMap
 		if (!mLettersMap.containsKey(letter)) {
 			mLettersMap.put(letter, new HashSet<>());
 		}
-		final HashSet<BuchiTreeAutomatonRule<LETTER, STATE>> rulesByLetter = (HashSet<BuchiTreeAutomatonRule<LETTER, STATE>>) mLettersMap
+		HashSet<BuchiTreeAutomatonRule<LETTER, STATE>> rulesByLetter = (HashSet<BuchiTreeAutomatonRule<LETTER, STATE>>) mLettersMap
 				.get(letter);
 		rulesByLetter.add(rule);
-		
+
 		// SourceRules
 		for (final STATE st : dest) {
 			if (!mSourceMap.containsKey(st)) {
@@ -141,7 +142,9 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 
 	/**
 	 * Add a state to this automaton.
-	 * @param state a state in this automaton
+	 * 
+	 * @param state
+	 *            a state in this automaton
 	 */
 	public void addState(STATE state) {
 		// TODO Auto-generated method stub
@@ -150,7 +153,9 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 
 	/**
 	 * Add a letter to the alphabet.
-	 * @param letter a letter in the alphabet.
+	 * 
+	 * @param letter
+	 *            a letter in the alphabet.
 	 */
 	public void addLetter(LETTER letter) {
 		// TODO Auto-generated method stub
@@ -206,26 +211,31 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		// TODO Auto-generated method stub
 		return mFinalStates.contains(state);
 	}
-	
+
 	/**
 	 * Add a state the set of final states.
-	 * @param state a final state.
+	 * 
+	 * @param state
+	 *            a final state.
 	 */
 	public void addFinalState(final STATE state) {
 		mFinalStates.add(state);
 		addState(state);
 	}
-	
+
 	/**
 	 * Add a state to the set of initial states.
-	 * @param state an initial state
+	 * 
+	 * @param state
+	 *            an initial state
 	 */
 	public void addInitState(final STATE state) {
 		mInitStates.add(state);
 	}
-	
+
 	/**
 	 * Return the initial states.
+	 * 
 	 * @return the initial states
 	 */
 	public Set<STATE> getInitStates() {
@@ -235,11 +245,11 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	public Set<STATE> getFinalStates() {
 		return mFinalStates;
 	}
-	
+
 	public Set<BuchiTreeAutomatonRule<LETTER, STATE>> getRules() {
 		return mRules;
 	}
-	
+
 	public int getRank() {
 		return rank;
 	}
