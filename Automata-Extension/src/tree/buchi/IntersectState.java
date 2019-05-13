@@ -1,15 +1,43 @@
 package tree.buchi;
 
+/**
+ * A state in the intersection of two Buchi trees.
+ * 
+ * @param <STATE>
+ */
 public class IntersectState<STATE> {
 	@Override
 	public String toString() {
 		return "IntersectState [state1=" + state1 + ", state2=" + state2 + ", mode=" + mode + "]";
 	}
 
+	/**
+	 * A state in the first Buchi tree.
+	 */
 	private final STATE state1;
+	/**
+	 * A state in the second Buchi tree.
+	 */
 	private final STATE state2;
+	/**
+	 * mode = 1 if the automaton is looking for a final state in the first Buchi
+	 * tree. mode = 2 if the automaton is looking for a final state in the second
+	 * Buchi tree.
+	 */
 	private final int mode;
-	
+
+	/**
+	 * Create a state in the intersection of two Buchi trees.
+	 * 
+	 * @param state1
+	 *            a state in the first Buchi tree
+	 * @param state2
+	 *            a state in the second Buchi tree
+	 * @param mode
+	 *            1 if the automaton is looking for a final state in the first tree
+	 *            and 2 if the automaton is looking for a final state in the second
+	 *            tree
+	 */
 	public IntersectState(STATE state1, STATE state2, int mode) {
 		this.state1 = state1;
 		this.state2 = state2;
@@ -21,7 +49,8 @@ public class IntersectState<STATE> {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + mode;
-		result = prime * result + ((state1 == null) ? 0 : state1.hashCode()) + ((state2 == null) ? 0 : state2.hashCode());
+		result = prime * result + ((state1 == null) ? 0 : state1.hashCode())
+				+ ((state2 == null) ? 0 : state2.hashCode());
 		result = prime * result + ((state2 == null) ? 0 : state2.hashCode());
 		return result;
 	}

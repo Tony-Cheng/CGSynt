@@ -9,17 +9,30 @@ import tree.buchi.BuchiTreeAutomaton;
 import tree.buchi.BuchiTreeAutomatonRule;
 import tree.buchi.IntersectState;
 
+/** 
+ * A class for computing the intersection of two Buchi tree.
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 	private final BuchiTreeAutomaton<LETTER, STATE> tree1;
 	private final BuchiTreeAutomaton<LETTER, STATE> tree2;
 	private final BuchiTreeAutomaton<LETTER, IntersectState<STATE>> result;
 
+	/**
+	 * Create a new BuchiIntersectTree that intersects tree1 and tree2.
+	 * @param tree1 a Buchi tree
+	 * @param tree2 a Buchi tree
+	 */
 	public BuchiIntersectTree(BuchiTreeAutomaton<LETTER, STATE> tree1, BuchiTreeAutomaton<LETTER, STATE> tree2) {
 		this.tree1 = tree1;
 		this.tree2 = tree2;
 		result = new BuchiTreeAutomaton<LETTER, IntersectState<STATE>>();
 	}
 
+	/**
+	 * Compute the alphabet of the resulting automaton.
+	 */
 	private void computeAlphabet() {
 		Set<LETTER> alpha1 = tree1.getAlphabet();
 		Set<LETTER> alpha2 = tree2.getAlphabet();
@@ -31,6 +44,9 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 		}
 	}
 
+	/**
+	 * Compute the states of the resulting automaton.
+	 */
 	private void computeState() {
 		Set<STATE> states1 = tree1.getStates();
 		Set<STATE> states2 = tree2.getStates();
@@ -44,6 +60,9 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 		}
 	}
 
+	/**
+	 * Compute the initial states of the resulting automaton.
+	 */
 	private void computeInitState() {
 		Set<STATE> initStates1 = tree1.getInitStates();
 		Set<STATE> initStates2 = tree2.getInitStates();
@@ -55,6 +74,9 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 		}
 	}
 
+	/**
+	 * Compute the final states of the resulting automaton.
+	 */
 	private void computeFinalState() {
 		Set<STATE> states1 = tree1.getStates();
 		Set<STATE> finalStates2 = tree2.getFinalStates();
@@ -66,6 +88,9 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 		}
 	}
 
+	/**
+	 * Compute the transitions of the resulting automaton.
+	 */
 	private void computeTransitions() {
 		for (LETTER letter : tree1.getAlphabet()) {
 			Iterable<BuchiTreeAutomatonRule<LETTER, STATE>> rules1 = tree1.getSuccessors(letter);
@@ -119,6 +144,10 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 
 	}
 
+	/**
+	 * Return the resulting automaton.
+	 * @return the intersection of two Buchi automata.
+	 */
 	public BuchiTreeAutomaton<LETTER, IntersectState<STATE>> computeResult() {
 		computeAlphabet();
 		computeState();
