@@ -27,12 +27,10 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	private final Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mLettersMap;
 	private final Map<STATE, Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>>> mParentsMap;
 	private final Set<BuchiTreeAutomatonRule<LETTER, STATE>> mRules;
-	private final int rank;
-
-	// Currently not implemented.
 	private final Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mSourceMap;
 	private final Set<STATE> mStates;
 	private final Set<STATE> mInitStates;
+	private final int rank;
 
 	/**
 	 * Create a BuchiTreeAutomaton.
