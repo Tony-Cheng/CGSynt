@@ -10,6 +10,7 @@ import java.util.Set;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataOperationCanceledException;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
+import de.uni_freiburg.informatik.ultimate.automata.tree.TreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.core.model.models.IElement;
 
 /**
@@ -145,7 +146,6 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	 *            a state in this automaton
 	 */
 	public void addState(STATE state) {
-		// TODO Auto-generated method stub
 		mStates.add(state);
 	}
 
@@ -156,13 +156,11 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	 *            a letter in the alphabet.
 	 */
 	public void addLetter(LETTER letter) {
-		// TODO Auto-generated method stub
 		mAlphabet.add(letter);
 	}
 
 	@Override
 	public int getAmountOfRules() {
-		// TODO Auto-generated method stub
 		return mRules.size();
 	}
 
@@ -181,7 +179,6 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 
 	@Override
 	public Set<STATE> getStates() {
-		// TODO Auto-generated method stub
 		return mStates;
 	}
 
@@ -206,7 +203,6 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 
 	@Override
 	public boolean isFinalState(STATE state) {
-		// TODO Auto-generated method stub
 		return mFinalStates.contains(state);
 	}
 
@@ -250,5 +246,15 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 
 	public int getRank() {
 		return rank;
+	}
+	
+
+	/**
+	 * Get rule by source.
+	 * @param
+	 * @return
+	 */
+	public Iterable<BuchiTreeAutomatonRule<LETTER, STATE>> getRulesBySource(final STATE src) {
+		return mSourceMap.get(src);
 	}
 }
