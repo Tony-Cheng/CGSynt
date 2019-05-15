@@ -2,6 +2,7 @@ package test.fsa.operations;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -14,6 +15,7 @@ import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 import dfa.operations.DfaToLta;
 import test.fsa.FsaFactory;
 import tree.buchi.BuchiTreeAutomaton;
+import tree.buchi.BuchiTreeAutomatonRule;
 import tree.buchi.lta.LtaBool;
 
 class TestDfaToLta {
@@ -37,10 +39,15 @@ class TestDfaToLta {
 		
 		BuchiTreeAutomaton<LtaBool, String> lta = op.getResult();
 		
-		Set<String> initialStates = dfa.getInitialStates();
-		Set<String> finalStates = dfa.getFinalStates();
-		
-		
+		Set<String> states = dfa.getStates();
+		for (String state : states) {
+			Collection<BuchiTreeAutomatonRule<LtaBool, String>> rules = lta.getRulesBySource(state);
+				
+			if (dfa.isFinal(state))
+				assertEquals(rules.size(), 2);
+			else
+				assertEquals(rules.size(), 1);
+		}
 	}
 
 }
