@@ -29,6 +29,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	private final Map<STATE, Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>>> mParentsMap;
 	private final Set<BuchiTreeAutomatonRule<LETTER, STATE>> mRules;
 	private final Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mSourceMap;
+	private final Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mChildMap;
 	private final Set<STATE> mStates;
 	private final Set<STATE> mInitStates;
 	private final int rank;
@@ -47,6 +48,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		mStates = new HashSet<>();
 		mInitStates = new HashSet<>();
 		this.rank = rank;
+		mChildMap = new HashMap<>();
 	}
 
 	@Override
@@ -136,6 +138,14 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 			final HashSet<BuchiTreeAutomatonRule<LETTER, STATE>> rulesBySource = (HashSet<BuchiTreeAutomatonRule<LETTER, STATE>>) mSourceMap
 					.get(st);
 			rulesBySource.add(rule);
+		}
+		
+		// mRulesContainChildren
+		for (STATE child : rule.getDest()) {
+			if (!mChildMap.containsKey(child)) {
+				mChildMap.put(child, new HashSet<>());
+			}
+			mChildMap.get(child).add(rule);
 		}
 	}
 
@@ -256,6 +266,14 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	 */
 	public Collection<BuchiTreeAutomatonRule<LETTER, STATE>> getRulesBySource(final STATE src) {
 		return mSourceMap.get(src);
+	}
+	
+	public Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> getSourceMap() {
+		return mSourceMap;
+	}
+	
+	public Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> getChildMap() {
+		return mChildMap;
 	}
 
 	/**
