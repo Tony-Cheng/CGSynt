@@ -44,7 +44,6 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		}
 		if (visited.contains(curState)) {
 			isValidTree.put(curState, false);
-			toDelete.add(curState);
 			return false;
 		}
 		Collection<BuchiTreeAutomatonRule<LETTER, STATE>> rules = mtree.getRulesBySource(curState);
@@ -116,6 +115,8 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 					}
 				}
 				toDelete.clear();
+				visited.clear();
+				isValidTree.clear();
 			}
 		}
 		return true;
