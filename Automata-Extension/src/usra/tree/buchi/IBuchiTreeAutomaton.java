@@ -1,4 +1,4 @@
-package tree.buchi;
+package usra.tree.buchi;
 
 import java.util.List;
 import java.util.Set;

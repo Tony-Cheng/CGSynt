@@ -1,4 +1,4 @@
-package dfa.operations;
+package usra.dfa.operations;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,9 +7,9 @@ import java.util.Set;
 
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
-import tree.buchi.BuchiTreeAutomaton;
-import tree.buchi.BuchiTreeAutomatonRule;
-import tree.buchi.lta.LtaBool;
+import usra.tree.buchi.BuchiTreeAutomaton;
+import usra.tree.buchi.BuchiTreeAutomatonRule;
+import usra.tree.buchi.lta.LtaBool;
 
 
 public class DfaToLta<LETTER, STATE> {

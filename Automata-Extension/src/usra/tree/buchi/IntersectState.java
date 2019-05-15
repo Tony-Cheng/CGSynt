@@ -1,4 +1,4 @@
-package tree.buchi;
+package usra.tree.buchi;
 
 /**
  * A state in the intersection of two Buchi trees.

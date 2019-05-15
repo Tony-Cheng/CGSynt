@@ -12,11 +12,11 @@ import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
-import dfa.operations.DfaToLta;
+import usra.dfa.operations.DfaToLta;
 import test.fsa.FsaFactory;
-import tree.buchi.BuchiTreeAutomaton;
-import tree.buchi.BuchiTreeAutomatonRule;
-import tree.buchi.lta.LtaBool;
+import usra.tree.buchi.BuchiTreeAutomaton;
+import usra.tree.buchi.BuchiTreeAutomatonRule;
+import usra.tree.buchi.lta.LtaBool;
 
 class TestDfaToLta {
 	private static IUltimateServiceProvider mock;

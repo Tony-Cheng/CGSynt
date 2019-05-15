@@ -1,13 +1,13 @@
-package tree.buchi.operations;
+package usra.tree.buchi.operations;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
-import tree.buchi.BuchiTreeAutomaton;
-import tree.buchi.BuchiTreeAutomatonRule;
-import tree.buchi.IntersectState;
+import usra.tree.buchi.BuchiTreeAutomaton;
+import usra.tree.buchi.BuchiTreeAutomatonRule;
+import usra.tree.buchi.IntersectState;
 
 /**
  * A class for computing the intersection of two Buchi tree.

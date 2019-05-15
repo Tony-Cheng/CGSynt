@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import test.tree.buchi.BuchiTreeAutomatonFactory;
 import test.tree.buchi.RankedLetter;
-import tree.buchi.BuchiTreeAutomaton;
-import tree.buchi.operations.EmptinessCheck;
+import usra.tree.buchi.BuchiTreeAutomaton;
+import usra.tree.buchi.operations.EmptinessCheck;
 
 class EmptinessCheckTest {
 

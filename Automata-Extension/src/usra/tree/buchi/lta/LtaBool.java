@@ -1,4 +1,4 @@
-package tree.buchi.lta;
+package usra.tree.buchi.lta;
 
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 

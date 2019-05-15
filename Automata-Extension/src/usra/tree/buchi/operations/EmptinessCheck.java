@@ -1,4 +1,4 @@
-package tree.buchi.operations;
+package usra.tree.buchi.operations;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
-import tree.buchi.BuchiTreeAutomaton;
-import tree.buchi.BuchiTreeAutomatonRule;
+import usra.tree.buchi.BuchiTreeAutomaton;
+import usra.tree.buchi.BuchiTreeAutomatonRule;
 
 public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
