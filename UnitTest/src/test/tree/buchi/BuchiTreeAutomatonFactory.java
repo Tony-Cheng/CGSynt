@@ -3,8 +3,8 @@ package test.tree.buchi;
 import java.util.ArrayList;
 import java.util.List;
 
-import tree.buchi.BuchiTreeAutomaton;
-import tree.buchi.BuchiTreeAutomatonRule;
+import usra.tree.buchi.BuchiTreeAutomaton;
+import usra.tree.buchi.BuchiTreeAutomatonRule;
 
 public class BuchiTreeAutomatonFactory {
 	public static final RankedLetter LETTERA = new RankedLetter('a', 2);
