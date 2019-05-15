@@ -1,4 +1,4 @@
-package tree.buchi.operations;
+package dfa.operations;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,9 +18,9 @@ public class DfaToLta<LETTER, STATE> {
 	
 	private final int mArity;
 	
-	/*
+	/**
 	 * Convert A DFA to an LTA that accepts all subsets of the language
-	 * of the DFA
+	 * of the DFA.
 	 *
 	 * @param dfa
 	 * 		The DFA to Convert
@@ -34,6 +34,10 @@ public class DfaToLta<LETTER, STATE> {
 		this.compute();
 	}
 	
+	/**
+	 * Set the set of initial states in the LTA to be the set of initial
+	 * states in the DFA.
+	 */
 	private void computeInitialStates() {
 		final Set<STATE> intialStates = this.mDfa.getInitialStates();
 		
@@ -42,6 +46,11 @@ public class DfaToLta<LETTER, STATE> {
 		}
 	}
 	
+	/**
+	 * Add the new transition rules. For a given state, if it was a final state
+	 * in the DFA, add a transition rule with the letter false, and the letter true,
+	 * otherwise only add a transition rule with the letter false.
+	 */
 	private void computeTransitions() {
 		final Set<STATE> states = this.mDfa.getStates();
 		
@@ -66,6 +75,10 @@ public class DfaToLta<LETTER, STATE> {
 		}
 	}
 	
+	/**
+	 * Set the set of final states in the LTA to be the set of final
+	 * states in the DFA.
+	 */
 	private void computeFinalStates() {
 		final Set<STATE> states = this.mDfa.getFinalStates();
 		
@@ -74,12 +87,20 @@ public class DfaToLta<LETTER, STATE> {
 		}
 	}
 	
+	/**
+	 * Compute the result of this operation.
+	 */
 	private void compute() {
 		this.computeInitialStates();
 		this.computeTransitions();
 		this.computeFinalStates();
 	}
 	
+	/**
+	 * Gets the result of the operation.
+	 * 
+	 * @return The result of the operation.
+	 */
 	public BuchiTreeAutomaton<LtaBool, STATE> getResult(){
 		return this.mResult;
 	}

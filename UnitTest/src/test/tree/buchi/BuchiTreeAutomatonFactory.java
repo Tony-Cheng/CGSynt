@@ -10,7 +10,11 @@ public class BuchiTreeAutomatonFactory {
 	public static final RankedLetter LETTERA = new RankedLetter('a', 2);
 	public static final RankedLetter LETTERB = new RankedLetter('b', 2);
 	public static final RankedLetter LETTERC = new RankedLetter('c', 2);
-
+	
+	/*
+	 * Creates a new BuchiTree Automaton that has one state that is both the initial and 
+	 * final state. It's only transition rule points back to itself along two edges.
+	 */
 	public static BuchiTreeAutomaton<RankedLetter, String> single() {
 		BuchiTreeAutomaton<RankedLetter, String> machine = new BuchiTreeAutomaton<>(2);
 		List<String> list1 = new ArrayList<>();
