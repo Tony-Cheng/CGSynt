@@ -9,20 +9,27 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomat
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 import tree.buchi.BuchiTreeAutomaton;
 import tree.buchi.BuchiTreeAutomatonRule;
-import tree.buchi.IBuchiTreeAutomaton;
-import tree.buchi.lta.LTABool;
+import tree.buchi.lta.LtaBool;
 
-public class DFAToLTA<LETTER, STATE> {
+
+public class DfaToLta<LETTER, STATE> {
 	private final NestedWordAutomaton<LETTER, STATE> mDfa;
-	private final BuchiTreeAutomaton<LTABool, STATE> mResult;
+	private final BuchiTreeAutomaton<LtaBool, STATE> mResult;
 	
 	private final int mArity;
 	
-	public DFAToLTA(final NestedWordAutomaton<LETTER, STATE> dfa) {
+	/*
+	 * Convert A DFA to an LTA that accepts all subsets of the language
+	 * of the DFA
+	 *
+	 * @param dfa
+	 * 		The DFA to Convert
+	 */
+	public DfaToLta(final NestedWordAutomaton<LETTER, STATE> dfa) {
 		this.mDfa = dfa;
 		this.mArity = dfa.getAlphabet().size();
 		
-		this.mResult = new BuchiTreeAutomaton<LTABool, STATE>(mArity);	
+		this.mResult = new BuchiTreeAutomaton<LtaBool, STATE>(mArity);	
 		
 		this.compute();
 	}
@@ -49,12 +56,12 @@ public class DFAToLTA<LETTER, STATE> {
 			assert destStates.size() == this.mArity;
 			
 			if (this.mDfa.isFinal(state)) {
-				final BuchiTreeAutomatonRule<LTABool, STATE> trueRule = new BuchiTreeAutomatonRule<>(new LTABool(true), state, destStates);
+				final BuchiTreeAutomatonRule<LtaBool, STATE> trueRule = new BuchiTreeAutomatonRule<>(new LtaBool(true), state, destStates);
 				
 				this.mResult.addRule(trueRule);
 			}
 			
-			final BuchiTreeAutomatonRule<LTABool, STATE> falseRule = new BuchiTreeAutomatonRule<>(new LTABool(false), state, destStates);
+			final BuchiTreeAutomatonRule<LtaBool, STATE> falseRule = new BuchiTreeAutomatonRule<>(new LtaBool(false), state, destStates);
 			this.mResult.addRule(falseRule);
 		}
 	}
@@ -73,7 +80,7 @@ public class DFAToLTA<LETTER, STATE> {
 		this.computeFinalStates();
 	}
 	
-	public IBuchiTreeAutomaton<LTABool, STATE> getResult(){
+	public BuchiTreeAutomaton<LtaBool, STATE> getResult(){
 		return this.mResult;
 	}
 }

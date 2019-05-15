@@ -2,10 +2,10 @@ package tree.buchi.lta;
 
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
-public class LTABool implements IRankedLetter{
+public class LtaBool implements IRankedLetter{
 	private final boolean mLetter;
 	
-	public LTABool(final boolean letter) {
+	public LtaBool(final boolean letter) {
 		this.mLetter = letter;
 	}
 	
@@ -30,7 +30,7 @@ public class LTABool implements IRankedLetter{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		LTABool other = (LTABool) obj;
+		LtaBool other = (LtaBool) obj;
 		if (this.mLetter != other.mLetter)
 			return false;
 		return true;
