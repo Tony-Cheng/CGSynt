@@ -247,14 +247,34 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	public int getRank() {
 		return rank;
 	}
-	
 
 	/**
 	 * Get rule by source.
+	 * 
 	 * @param
 	 * @return
 	 */
-	public Iterable<BuchiTreeAutomatonRule<LETTER, STATE>> getRulesBySource(final STATE src) {
+	public Collection<BuchiTreeAutomatonRule<LETTER, STATE>> getRulesBySource(final STATE src) {
 		return mSourceMap.get(src);
+	}
+
+	/**
+	 * Make a copy of this automaton.
+	 * 
+	 * @return
+	 */
+	public BuchiTreeAutomaton<LETTER, STATE> mkcpy() {
+		BuchiTreeAutomaton<LETTER, STATE> copy = new BuchiTreeAutomaton<>(rank);
+		copy.mChildrenMap.putAll(mChildrenMap);
+		copy.mParentsMap.putAll(mParentsMap);
+		copy.mAlphabet.addAll(mAlphabet);
+		copy.mLettersMap.putAll(mLettersMap);
+		copy.mSourceMap.putAll(mSourceMap);
+		copy.mRules.addAll(mRules);
+		copy.mFinalStates.addAll(mFinalStates);
+		copy.mStates.addAll(mStates);
+		copy.mInitStates.addAll(mInitStates);
+		return copy;
+
 	}
 }
