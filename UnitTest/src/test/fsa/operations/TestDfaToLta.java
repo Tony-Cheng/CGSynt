@@ -23,7 +23,7 @@ class TestDfaToLta {
 	private static AutomataLibraryServices service;
 	
 	@BeforeAll
-	public void init() {
+	public static void init() {
 		mock = UltimateMocks.createUltimateServiceProviderMock();
 		service = new AutomataLibraryServices(mock);
 	}

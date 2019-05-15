@@ -7,8 +7,6 @@ import de.uni_freiburg.informatik.ultimate.automata.IAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
 /**
- * @author weiszben
- *
  * @param <LETTER>
  * 			is the type of alphabet.
  * @param <STATE>
