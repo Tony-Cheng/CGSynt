@@ -12,12 +12,32 @@ import tree.buchi.operations.EmptinessCheck;
 class EmptinessCheckTest {
 
 	@Test
-	void test() {
+	void testSingleNonEmpty() {
 		BuchiTreeAutomaton<RankedLetter, String> single = BuchiTreeAutomatonFactory.single();
-		
+
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(single);
-		
+
 		assertFalse(empty.getResult());
+	}
+
+	@Test
+	void testDoubleEmpty() {
+		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.doubleEmpty();
+
+		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
+
+		assertTrue(empty.getResult());
+
+	}
+
+	@Test
+	void testComplexNonEmpty() {
+		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.complexNonEmpty();
+
+		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
+
+		assertFalse(empty.getResult());
+
 	}
 
 }
