@@ -39,5 +39,15 @@ class EmptinessCheckTest {
 		assertFalse(empty.getResult());
 
 	}
+	
+	@Test 
+	void testComplexEmpty() {
+		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.complexEmpty();
+
+		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
+
+		assertTrue(empty.getResult());
+
+	}
 
 }

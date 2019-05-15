@@ -10,10 +10,11 @@ public class BuchiTreeAutomatonFactory {
 	public static final RankedLetter LETTERA = new RankedLetter('a', 2);
 	public static final RankedLetter LETTERB = new RankedLetter('b', 2);
 	public static final RankedLetter LETTERC = new RankedLetter('c', 2);
-	
-	/*
-	 * Creates a new BuchiTree Automaton that has one state that is both the initial and 
-	 * final state. It's only transition rule points back to itself along two edges.
+
+	/**
+	 * Creates a new BuchiTree Automaton that has one state that is both the initial
+	 * and final state. It's only transition rule points back to itself along two
+	 * edges.
 	 */
 	public static BuchiTreeAutomaton<RankedLetter, String> single() {
 		BuchiTreeAutomaton<RankedLetter, String> machine = new BuchiTreeAutomaton<>(2);
@@ -61,7 +62,6 @@ public class BuchiTreeAutomatonFactory {
 		aut.addInitState("q5");
 		aut.addFinalState("q1");
 		aut.addFinalState("q2");
-		aut.addFinalState("q3");
 
 		List<String> list1 = new ArrayList<>();
 		list1.add("q0");
@@ -117,4 +117,46 @@ public class BuchiTreeAutomatonFactory {
 
 	}
 
+	public static BuchiTreeAutomaton<RankedLetter, String> complexEmpty() {
+		BuchiTreeAutomaton<RankedLetter, String> aut = new BuchiTreeAutomaton<>(2);
+
+		aut.addInitState("q0");
+		aut.addInitState("q4");
+		aut.addFinalState("q1");
+
+		List<String> list1 = new ArrayList<>();
+		list1.add("q1");
+		list1.add("q2");
+
+		List<String> list2 = new ArrayList<>();
+		list2.add("q3");
+		list2.add("q4");
+
+		List<String> list3 = new ArrayList<>();
+		list3.add("q0");
+		list3.add("q4");
+
+		List<String> list4 = new ArrayList<>();
+		list4.add("q1");
+		list4.add("q4");
+
+		List<String> list5 = new ArrayList<>();
+		list5.add("q1");
+		list5.add("q2");
+
+		BuchiTreeAutomatonRule<RankedLetter, String> rule1 = new BuchiTreeAutomatonRule<>(LETTERA, "q0", list1);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule2 = new BuchiTreeAutomatonRule<>(LETTERB, "q1", list2);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule3 = new BuchiTreeAutomatonRule<>(LETTERC, "q2", list3);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule4 = new BuchiTreeAutomatonRule<>(LETTERA, "q3", list4);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule5 = new BuchiTreeAutomatonRule<>(LETTERB, "q4", list5);
+
+		aut.addRule(rule1);
+		aut.addRule(rule2);
+		aut.addRule(rule3);
+		aut.addRule(rule4);
+		aut.addRule(rule5);
+
+		return aut;
+
+	}
 }
