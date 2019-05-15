@@ -10,14 +10,14 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import tree.buchi.BuchiTreeAutomaton;
 import tree.buchi.BuchiTreeAutomatonRule;
 
-public class EmptynessCheck<LETTER extends IRankedLetter, STATE> {
+public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	private BuchiTreeAutomaton<LETTER, STATE> mtree;
 	private Map<STATE, Boolean> isValidTree;
 	private Set<STATE> visited;
 	private Set<STATE> toDelete;
 
-	public EmptynessCheck(BuchiTreeAutomaton<LETTER, STATE> mtree) {
+	public EmptinessCheck(BuchiTreeAutomaton<LETTER, STATE> mtree) {
 		this.mtree = mtree.mkcpy();
 		isValidTree = new HashMap<>();
 		visited = new HashSet<>();

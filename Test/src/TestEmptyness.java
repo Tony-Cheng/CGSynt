@@ -3,7 +3,7 @@ import java.util.List;
 
 import tree.buchi.BuchiTreeAutomaton;
 import tree.buchi.BuchiTreeAutomatonRule;
-import tree.buchi.operations.EmptynessCheck;
+import tree.buchi.operations.EmptinessCheck;
 
 public class TestEmptyness {
 
@@ -26,7 +26,7 @@ public class TestEmptyness {
 		aut1.addInitState("q0");
 		aut1.addFinalState("q0");
 
-		EmptynessCheck<TestRankedAlphabet, String> emptynessChecker = new EmptynessCheck<>(aut1);
+		EmptinessCheck<TestRankedAlphabet, String> emptynessChecker = new EmptinessCheck<>(aut1);
 		System.out.println(emptynessChecker.getResult());
 
 		BuchiTreeAutomaton<TestRankedAlphabet, String> aut2 = new BuchiTreeAutomaton<>(2);
@@ -43,7 +43,7 @@ public class TestEmptyness {
 		aut2.addFinalState("q0");
 		aut2.addInitState("q0");
 
-		emptynessChecker = new EmptynessCheck<>(aut2);
+		emptynessChecker = new EmptinessCheck<>(aut2);
 		System.out.println(emptynessChecker.getResult());
 
 	}

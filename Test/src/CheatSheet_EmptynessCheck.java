@@ -3,7 +3,7 @@ import java.util.List;
 
 import tree.buchi.BuchiTreeAutomaton;
 import tree.buchi.BuchiTreeAutomatonRule;
-import tree.buchi.operations.EmptynessCheck;
+import tree.buchi.operations.EmptinessCheck;
 
 public class CheatSheet_EmptynessCheck {
 
@@ -63,7 +63,7 @@ public class CheatSheet_EmptynessCheck {
 	 * @param aut
 	 */
 	public static void checkAndPrintEmptyness(BuchiTreeAutomaton<TestRankedAlphabet, String> aut) {
-		EmptynessCheck<TestRankedAlphabet, String> emptynessChecker = new EmptynessCheck<>(aut);
+		EmptinessCheck<TestRankedAlphabet, String> emptynessChecker = new EmptinessCheck<>(aut);
 		System.out.println(emptynessChecker.getResult());
 	}
 
