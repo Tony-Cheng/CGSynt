@@ -1,4 +1,4 @@
-package tree.buchi.operations;
+package dfa.operations;
 
 import java.util.ArrayList;
 import java.util.Iterator;
