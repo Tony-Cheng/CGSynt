@@ -7,7 +7,6 @@ import de.uni_freiburg.informatik.ultimate.util.HashUtils;
 
 /**
  * Rule of a BuchiTreeAutomaton.
- * @author tonycheng
  *
  * @param <LETTER> Letters of the automation.
  * @param <STATE> States of the automation.

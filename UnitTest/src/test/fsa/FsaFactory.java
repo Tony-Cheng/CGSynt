@@ -23,7 +23,7 @@ public class FsaFactory {
 	 * 		A NestedWordAutomaton that represents a DFA.
 	 */
 	public static NestedWordAutomaton<Character, String> fiveStateDFA(AutomataLibraryServices service){
-		VpAlphabet<Character> alpha = alphabet('a', 'b', 'c');
+		VpAlphabet<Character> alpha = alphabet('a', 'b');
 		
 		NestedWordAutomaton<Character, String> dfa = new NestedWordAutomaton<>(service, alpha, new StringFactory());
 		

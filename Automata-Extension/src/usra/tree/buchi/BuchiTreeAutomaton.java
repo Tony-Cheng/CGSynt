@@ -14,8 +14,6 @@ import de.uni_freiburg.informatik.ultimate.core.model.models.IElement;
 
 /**
  * A buchi tree automaton.
- * 
- * @author
  *
  * @param <LETTER>
  * @param <STATE>

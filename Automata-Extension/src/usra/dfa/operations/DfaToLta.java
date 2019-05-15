@@ -11,7 +11,6 @@ import usra.tree.buchi.BuchiTreeAutomaton;
 import usra.tree.buchi.BuchiTreeAutomatonRule;
 import usra.tree.buchi.lta.LtaBool;
 
-
 public class DfaToLta<LETTER, STATE> {
 	private final NestedWordAutomaton<LETTER, STATE> mDfa;
 	private final BuchiTreeAutomaton<LtaBool, STATE> mResult;

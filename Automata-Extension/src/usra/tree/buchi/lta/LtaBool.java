@@ -2,6 +2,9 @@ package usra.tree.buchi.lta;
 
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ *	A Boolean wrapper class that implements IRankedLetter. 
+ */
 public class LtaBool implements IRankedLetter{
 	private final boolean mLetter;
 	
