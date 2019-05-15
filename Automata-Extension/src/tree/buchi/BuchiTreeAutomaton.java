@@ -147,6 +147,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 			}
 			mChildMap.get(child).add(rule);
 		}
+		
 	}
 
 	/**
@@ -235,6 +236,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	 */
 	public void addInitState(final STATE state) {
 		mInitStates.add(state);
+		addState(state);
 	}
 
 	/**
