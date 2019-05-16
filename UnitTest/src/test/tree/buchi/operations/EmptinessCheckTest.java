@@ -39,8 +39,8 @@ class EmptinessCheckTest {
 		assertFalse(empty.computeResult());
 
 	}
-	
-	@Test 
+
+	@Test
 	void testComplexEmpty() {
 		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.complexEmpty();
 
@@ -53,10 +53,28 @@ class EmptinessCheckTest {
 	@Test
 	void testOrderNonempty() {
 		BuchiTreeAutomaton<RankedLetter, String> machine = BuchiTreeAutomatonFactory.orderNonEmpty();
-		
+
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(machine);
-		
-		assert(!empty.computeResult());
+
+		assert (!empty.computeResult());
 	}
-	
+
+	@Test
+	void testAnthonyEmpty() {
+		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.anthonyEmpty();
+
+		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
+
+		assertTrue(empty.computeResult());
+
+	}
+
+	@Test
+	void testAnthonyNonEmpty() {
+		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.anthonyNonEmpty();
+
+		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
+
+		assertFalse(empty.computeResult());
+	}
 }
