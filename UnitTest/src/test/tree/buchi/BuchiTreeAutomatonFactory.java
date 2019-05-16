@@ -231,7 +231,6 @@ public class BuchiTreeAutomatonFactory {
 		List<String> t7 = destList("q5", "q5");
 		List<String> t8 = destList("q0", "q0");
 
-
 		BuchiTreeAutomatonRule<RankedLetter, String> r0 = new BuchiTreeAutomatonRule<>(LETTERA, "q0", t0);
 		BuchiTreeAutomatonRule<RankedLetter, String> r1 = new BuchiTreeAutomatonRule<>(LETTERA, "q1", t1);
 		BuchiTreeAutomatonRule<RankedLetter, String> r2 = new BuchiTreeAutomatonRule<>(LETTERB, "q2", t2);
@@ -242,60 +241,60 @@ public class BuchiTreeAutomatonFactory {
 		BuchiTreeAutomatonRule<RankedLetter, String> r7 = new BuchiTreeAutomatonRule<>(LETTERA, "q7", t7);
 		BuchiTreeAutomatonRule<RankedLetter, String> r8 = new BuchiTreeAutomatonRule<>(LETTERA, "q0", t8);
 
-
 		addRules(aut, r0, r1, r2, r3, r4, r5, r6, r7, r8);
 
 		return aut;
 
 	}
-	
-	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedEmpty(int n){
+
+	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedEmpty(int n) {
 		BuchiTreeAutomaton<RankedLetter, String> machine = new BuchiTreeAutomaton<>(2);
-		
+
 		assert n != 0;
 		machine.addInitState("q0");
-		for (int i = 0; i < (int)Math.pow(2, n) - 1; i++) {
+		for (int i = 0; i < (int) Math.pow(2, n) - 1; i++) {
 			machine.addFinalState("q" + i);
 		}
-		
-		for (int i = 0; i < (int)Math.pow(2, n - 1); i++) {
+
+		for (int i = 0; i < (int) Math.pow(2, n - 1); i++) {
 			List<String> t = destList("q" + ((i * 2) + 1), "q" + ((i * 2) + 2));
 			BuchiTreeAutomatonRule<RankedLetter, String> rule = new BuchiTreeAutomatonRule<>(LETTERA, "q" + i, t);
 			machine.addRule(rule);
 		}
-		
+
 		return machine;
 	}
-	
-	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedNonEmpty(int n){
+
+	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedNonEmpty(int n) {
 		BuchiTreeAutomaton<RankedLetter, String> machine = new BuchiTreeAutomaton<>(2);
-		
+
 		assert n != 0;
 		machine.addInitState("q0");
-		for (int i = 0; i < (int)Math.pow(2, n) - 1; i++) {
+		for (int i = 0; i < (int) Math.pow(2, n) - 1; i++) {
 			machine.addFinalState("q" + i);
 		}
-		
-		for (int i = 0; i < (int)Math.pow(2, n - 1); i++) {
+
+		for (int i = 0; i < (int) Math.pow(2, n - 1); i++) {
 			List<String> t = destList("q" + ((i * 2) + 1), "q" + ((i * 2) + 2));
 			BuchiTreeAutomatonRule<RankedLetter, String> rule = new BuchiTreeAutomatonRule<>(LETTERA, "q" + i, t);
 			machine.addRule(rule);
 		}
-		
-		for (int i = (int)Math.pow(2, n - 1) - 1; i < (int)Math.pow(2, n) - 1; i++) {
+
+		for (int i = (int) Math.pow(2, n - 1) - 1; i < (int) Math.pow(2, n) - 1; i++) {
 			List<String> t = destList("q0", "q0");
 			BuchiTreeAutomatonRule<RankedLetter, String> rule = new BuchiTreeAutomatonRule<>(LETTERA, "q" + i, t);
 			machine.addRule(rule);
 		}
-		
+
 		return machine;
 	}
 
 	/**
 	 * Create a destination ArrayList based on the input strings.
 	 * 
-	 * @param dests The array of Destination Strings
-	 * @return destinations	The ArrayList of Destinations.
+	 * @param dests
+	 *            The array of Destination Strings
+	 * @return destinations The ArrayList of Destinations.
 	 */
 	private static ArrayList<String> destList(String... dests) {
 		ArrayList<String> destination = new ArrayList<>();
@@ -309,8 +308,11 @@ public class BuchiTreeAutomatonFactory {
 
 	/**
 	 * Add the specified rules to the BTA.
-	 * @param bta The BTA that the rules should be added to.
-	 * @param automatonRules The array of BTA rules that are to be added.
+	 * 
+	 * @param bta
+	 *            The BTA that the rules should be added to.
+	 * @param automatonRules
+	 *            The array of BTA rules that are to be added.
 	 */
 	@SafeVarargs
 	private static void addRules(BuchiTreeAutomaton<RankedLetter, String> bta,
