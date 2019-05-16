@@ -14,11 +14,13 @@ class EmptinessCheckTest {
 
 	private static BuchiTreeAutomaton<RankedLetter, String> emptyParameterized;
 	private static BuchiTreeAutomaton<RankedLetter, String> nonEmptyParameterized;
+	private static BuchiTreeAutomaton<RankedLetter, String> nonEmptyParameterizedWithRandom;
 	
 	@BeforeAll
 	static void init() {
 		emptyParameterized = BuchiTreeAutomatonFactory.parameterizedEmpty(19);				// 2^19 - 1 states
 		nonEmptyParameterized = BuchiTreeAutomatonFactory.parameterizedNonEmpty(19);		// 2^19 - 1 states
+		nonEmptyParameterizedWithRandom = BuchiTreeAutomatonFactory.parameterizedNonEmptyWithRandom(15, 1000);
 	}
 	
 	@Test
@@ -103,6 +105,15 @@ class EmptinessCheckTest {
 
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
 
+		assertFalse(empty.computeResult());
+	}
+	
+	@Test
+	void testParameterizedNonEmptyWithRandom() {
+		BuchiTreeAutomaton<RankedLetter, String> machine = nonEmptyParameterizedWithRandom;
+		
+		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(machine);
+		
 		assertFalse(empty.computeResult());
 	}
 }
