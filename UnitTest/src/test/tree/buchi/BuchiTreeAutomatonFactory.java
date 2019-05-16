@@ -159,4 +159,52 @@ public class BuchiTreeAutomatonFactory {
 		return aut;
 
 	}
+	
+	public static BuchiTreeAutomaton<RankedLetter, String> orderNonEmpty(){
+		BuchiTreeAutomaton<RankedLetter, String> machine = new BuchiTreeAutomaton<>(2);
+		
+		machine.addInitState("qz");
+		machine.addFinalState("q0");
+		machine.addFinalState("q1");
+		machine.addFinalState("q2");
+		
+		List<String> tz = destList("qx", "q0");
+		List<String> ty = destList("qx", "qx");
+		List<String> tx1 = destList("qy", "q2");
+		List<String> tx2 = destList("q0", "q2");
+		
+		List<String> t0 = destList("q1", "q2");
+		List<String> t1 = destList("q0", "q2");
+		List<String> t2 = destList("q0", "q1");
+		
+		BuchiTreeAutomatonRule<RankedLetter, String> rz = new BuchiTreeAutomatonRule<>(LETTERA, "qz", tz);
+		BuchiTreeAutomatonRule<RankedLetter, String> ry = new BuchiTreeAutomatonRule<>(LETTERB, "qy", ty);
+		BuchiTreeAutomatonRule<RankedLetter, String> rx1 = new BuchiTreeAutomatonRule<>(LETTERC, "qx", tx1);
+		BuchiTreeAutomatonRule<RankedLetter, String> rx2 = new BuchiTreeAutomatonRule<>(LETTERA, "qx", tx2);
+		
+		BuchiTreeAutomatonRule<RankedLetter, String> r0 = new BuchiTreeAutomatonRule<>(LETTERA, "q0", t0);
+		BuchiTreeAutomatonRule<RankedLetter, String> r1 = new BuchiTreeAutomatonRule<>(LETTERB, "q1", t1);
+		BuchiTreeAutomatonRule<RankedLetter, String> r2 = new BuchiTreeAutomatonRule<>(LETTERC, "q2", t2);
+		
+		addRules(machine, rz, rx1, rx2, ry, r0, r1, r2);
+		
+		return machine;
+	}
+	
+	private static ArrayList<String> destList(String... dests) {
+		ArrayList<String> destination = new ArrayList<>();
+		
+		for (String dest : dests) {
+			destination.add(dest);
+		}
+		
+		return destination;
+	}
+	
+	@SafeVarargs
+	private static void addRules(BuchiTreeAutomaton<RankedLetter, String> bta, BuchiTreeAutomatonRule<RankedLetter, String>... automatonRules) {
+		for (BuchiTreeAutomatonRule<RankedLetter, String> rule : automatonRules) {
+			bta.addRule(rule);
+		}
+	}
 }

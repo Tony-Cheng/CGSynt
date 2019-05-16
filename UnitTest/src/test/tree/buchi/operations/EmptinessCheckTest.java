@@ -50,4 +50,13 @@ class EmptinessCheckTest {
 
 	}
 
+	@Test
+	void testOrderNonempty() {
+		BuchiTreeAutomaton<RankedLetter, String> machine = BuchiTreeAutomatonFactory.orderNonEmpty();
+		
+		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(machine);
+		
+		assert(!empty.computeResult());
+	}
+	
 }
