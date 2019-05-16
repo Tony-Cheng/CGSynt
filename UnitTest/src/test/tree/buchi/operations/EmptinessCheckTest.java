@@ -17,7 +17,7 @@ class EmptinessCheckTest {
 
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(single);
 
-		assertFalse(empty.getResult());
+		assertFalse(empty.computeResult());
 	}
 
 	@Test
@@ -26,7 +26,7 @@ class EmptinessCheckTest {
 
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
 
-		assertTrue(empty.getResult());
+		assertTrue(empty.computeResult());
 
 	}
 
@@ -36,7 +36,7 @@ class EmptinessCheckTest {
 
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
 
-		assertFalse(empty.getResult());
+		assertFalse(empty.computeResult());
 
 	}
 	
@@ -46,7 +46,7 @@ class EmptinessCheckTest {
 
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
 
-		assertTrue(empty.getResult());
+		assertTrue(empty.computeResult());
 
 	}
 
