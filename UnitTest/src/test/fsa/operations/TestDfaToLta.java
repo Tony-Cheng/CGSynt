@@ -32,8 +32,46 @@ class TestDfaToLta {
 	 * Check that converting the five state DFA to an LTA works.
 	 */
 	@Test
-	void testDfaToLta() {
+	void testDfaToLtaOnFiveStateDfa() {
 		NestedWordAutomaton<Character, String> dfa = FsaFactory.fiveStateDFA(service);
+		
+		DfaToLta<Character, String> op = new DfaToLta<>(dfa);
+		
+		BuchiTreeAutomaton<LtaBool, String> lta = op.getResult();
+		
+		Set<String> states = dfa.getStates();
+		for (String state : states) {
+			Collection<BuchiTreeAutomatonRule<LtaBool, String>> rules = lta.getRulesBySource(state);
+				
+			if (dfa.isFinal(state))
+				assertEquals(rules.size(), 2);
+			else
+				assertEquals(rules.size(), 1);
+		}
+	}
+	
+	@Test
+	void testDfaToLtaOnEmptyDfa() {
+		NestedWordAutomaton<Character, String> dfa = FsaFactory.emptyDfa(service);
+		
+		DfaToLta<Character, String> op = new DfaToLta<>(dfa);
+		
+		BuchiTreeAutomaton<LtaBool, String> lta = op.getResult();
+		
+		Set<String> states = dfa.getStates();
+		for (String state : states) {
+			Collection<BuchiTreeAutomatonRule<LtaBool, String>> rules = lta.getRulesBySource(state);
+				
+			if (dfa.isFinal(state))
+				assertEquals(rules.size(), 2);
+			else
+				assertEquals(rules.size(), 1);
+		}
+	}
+	
+	@Test
+	void testDfaToLtaOnSingleStateDfa() {
+		NestedWordAutomaton<Character, String> dfa = FsaFactory.oneStateDfa(service);
 		
 		DfaToLta<Character, String> op = new DfaToLta<>(dfa);
 		
