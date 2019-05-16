@@ -290,6 +290,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		copy.mFinalStates.addAll(mFinalStates);
 		copy.mStates.addAll(mStates);
 		copy.mInitStates.addAll(mInitStates);
+		copy.mChildMap.putAll(mChildMap);
 		return copy;
 
 	}
