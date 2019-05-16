@@ -265,24 +265,32 @@ public class BuchiTreeAutomatonFactory {
 		return machine;
 	}
 
-	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedNonEmpty(int n) {
-		BuchiTreeAutomaton<RankedLetter, String> machine = new BuchiTreeAutomaton<>(2);
-
-		assert n != 0;
-		machine.addInitState("q0");
-		for (int i = 0; i < (int) Math.pow(2, n) - 1; i++) {
-			machine.addFinalState("q" + i);
-		}
-
-		for (int i = 0; i < (int) Math.pow(2, n - 1); i++) {
-			List<String> t = destList("q" + ((i * 2) + 1), "q" + ((i * 2) + 2));
+	
+	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedNonEmpty(int n){
+		BuchiTreeAutomaton<RankedLetter, String> machine = parameterizedEmpty(n);
+		
+		for (int i = (int)Math.pow(2, n - 1) - 1; i < (int)Math.pow(2, n) - 1; i++) {
+			List<String> t = destList("q0", "q0");
 			BuchiTreeAutomatonRule<RankedLetter, String> rule = new BuchiTreeAutomatonRule<>(LETTERA, "q" + i, t);
 			machine.addRule(rule);
 		}
-
-		for (int i = (int) Math.pow(2, n - 1) - 1; i < (int) Math.pow(2, n) - 1; i++) {
-			List<String> t = destList("q0", "q0");
-			BuchiTreeAutomatonRule<RankedLetter, String> rule = new BuchiTreeAutomatonRule<>(LETTERA, "q" + i, t);
+		
+		return machine;
+	}
+	
+	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedNonEmptyWithRandom(int n, int m){
+		BuchiTreeAutomaton<RankedLetter, String> machine = parameterizedNonEmpty(10);
+		
+		int numNodes = (int)Math.pow(2, n);
+		
+		for (int i = 0; i < m; i++) {
+			int s = (int)(Math.random() * numNodes);
+			
+			int d1 = (int)(Math.random() * numNodes);
+			int d2 = (int)(Math.random() * numNodes);
+			
+			List<String> t = destList("q" + d1, "q" + d2);
+			BuchiTreeAutomatonRule<RankedLetter, String> rule = new BuchiTreeAutomatonRule<>(LETTERA, "q" + s, t);
 			machine.addRule(rule);
 		}
 
