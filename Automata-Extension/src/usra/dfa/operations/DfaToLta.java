@@ -64,12 +64,12 @@ public class DfaToLta<LETTER, STATE> {
 			assert destStates.size() == this.mArity;
 			
 			if (this.mDfa.isFinal(state)) {
-				final BuchiTreeAutomatonRule<LtaBool, STATE> trueRule = new BuchiTreeAutomatonRule<>(new LtaBool(true), state, destStates);
+				final BuchiTreeAutomatonRule<LtaBool, STATE> trueRule = new BuchiTreeAutomatonRule<>(new LtaBool(true, this.mArity), state, destStates);
 				
 				this.mResult.addRule(trueRule);
 			}
 			
-			final BuchiTreeAutomatonRule<LtaBool, STATE> falseRule = new BuchiTreeAutomatonRule<>(new LtaBool(false), state, destStates);
+			final BuchiTreeAutomatonRule<LtaBool, STATE> falseRule = new BuchiTreeAutomatonRule<>(new LtaBool(false, this.mArity), state, destStates);
 			this.mResult.addRule(falseRule);
 		}
 	}

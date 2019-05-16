@@ -7,9 +7,11 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
  */
 public class LtaBool implements IRankedLetter{
 	private final boolean mLetter;
+	private final int mRank;
 	
-	public LtaBool(final boolean letter) {
+	public LtaBool(final boolean letter, final int rank) {
 		this.mLetter = letter;
+		this.mRank = rank;
 	}
 	
 	@Override
@@ -40,6 +42,6 @@ public class LtaBool implements IRankedLetter{
 	}
 	
 	public int getRank() {
-		return 2;
+		return this.mRank;
 	}
 }

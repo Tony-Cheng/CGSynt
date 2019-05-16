@@ -1,6 +1,9 @@
 package test.fsa;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
@@ -33,20 +36,46 @@ public class FsaFactory {
 		dfa.addState(false, true, "q3");
 		dfa.addState(false, false, "q4");
 		
-		dfa.addInternalTransition("q0", 'a', "q1");
-		dfa.addInternalTransition("q0", 'b', "q3");
+		addTransitionForAll(dfa, alpha, "q0", "q1", "q3");
+		addTransitionForAll(dfa, alpha, "q1", "q0", "q2");
+		addTransitionForAll(dfa, alpha, "q2", "q1", "q4");
+		addTransitionForAll(dfa, alpha, "q3", "q1", "q4");
+		addTransitionForAll(dfa, alpha, "q4", "q3", "q1");
 		
-		dfa.addInternalTransition("q1", 'a', "q0");
-		dfa.addInternalTransition("q1", 'b', "q2");
+		return dfa;
+	}
+	
+	/**
+	 * Creates an empty DFA.
+	 * 
+	 * @param service The service used by the Automaton Library.
+	 * 
+	 * @return dfa
+	 * 		A NestedWordAutomaton that represents a DFA.
+	 */
+	public static NestedWordAutomaton<Character, String> emptyDfa(AutomataLibraryServices service){
+		VpAlphabet<Character> alpha = alphabet();
 		
-		dfa.addInternalTransition("q2", 'a', "q1");
-		dfa.addInternalTransition("q2", 'b', "q4");
+		NestedWordAutomaton<Character, String> dfa = new NestedWordAutomaton<>(service, alpha, new StringFactory());
+	
+		return dfa;
+	}
+	
+	/**
+	 * Creates a DFA with one state.
+	 * 
+	 * @param service the service used by the Automaton Library.
+	 * 
+	 * @return dfa
+	 * 	A NestedWordAutomaton that represents a DFA.
+	 */
+	public static NestedWordAutomaton<Character, String> oneStateDfa(AutomataLibraryServices service){
+		VpAlphabet<Character> alpha = alphabet('a');
 		
-		dfa.addInternalTransition("q3", 'a', "q1");
-		dfa.addInternalTransition("q3", 'b', "q4");
-		
-		dfa.addInternalTransition("q4", 'a', "q3");
-		dfa.addInternalTransition("q4", 'b', "q1");
+		NestedWordAutomaton<Character, String> dfa = new NestedWordAutomaton<>(service, alpha, new StringFactory());
+	
+		dfa.addState(true, true, "q0");
+		addTransitionForAll(dfa, alpha, "q0", "q0");
 		
 		return dfa;
 	}
@@ -66,5 +95,22 @@ public class FsaFactory {
 		}
 		
 		return new VpAlphabet<Character>(letterSet);
+	}
+	
+	private static void addTransitionForAll(NestedWordAutomaton<Character, String> fsa, VpAlphabet<Character> alpha, String src, String... dests) {
+		Set<Character> alphabet = alpha.getInternalAlphabet();
+		assert alphabet.size() == dests.length;
+		
+		List<String> letters = Arrays.asList(dests);
+		
+		Iterator<Character> letterIterator = alphabet.iterator();
+		Iterator<String> stateIterator = letters.iterator();
+		
+		while (letterIterator.hasNext() && stateIterator.hasNext()) {
+			Character letter = letterIterator.next();
+			String state = stateIterator.next();
+			
+			fsa.addInternalTransition(src, letter, state);
+		}
 	}
 }
