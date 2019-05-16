@@ -50,23 +50,6 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 	}
 
 	/**
-	 * Compute the states of the resulting automaton.
-	 * Currently not used.
-	 */
-	private void computeState() {
-		Set<STATE> states1 = tree1.getStates();
-		Set<STATE> states2 = tree2.getStates();
-		for (STATE state1 : states1) {
-			for (STATE state2 : states2) {
-				IntersectState<STATE> newState1 = new IntersectState<>(state1, state2, 1);
-				IntersectState<STATE> newState2 = new IntersectState<>(state1, state2, 2);
-				result.addState(newState1);
-				result.addState(newState2);
-			}
-		}
-	}
-
-	/**
 	 * Compute the initial states of the resulting automaton.
 	 */
 	private void computeInitState() {
