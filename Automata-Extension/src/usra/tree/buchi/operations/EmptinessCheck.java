@@ -11,14 +11,26 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import usra.tree.buchi.BuchiTreeAutomaton;
 import usra.tree.buchi.BuchiTreeAutomatonRule;
 
+/**
+ * Check whether or not a Buchi tree is empty.
+ * 
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	private BuchiTreeAutomaton<LETTER, STATE> mtree;
+
+	/**
+	 * A set of final states.
+	 */
 	private Set<STATE> finalStates;
+
 	/**
 	 * States that are the roots of good subtree embedded.
 	 */
 	private Set<STATE> goodStates;
+
 	/**
 	 * Transitions whose destination is a list consists of all acceptance states or
 	 * roots of some good subtree embedded.
@@ -32,6 +44,10 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		goodTransitions = new Stack<>();
 	}
 
+	/**
+	 * Add all transitions whose destination is a list consists of all acceptance
+	 * states or roots of some good subtree embedded to the stack goodTransitions.
+	 */
 	private void initializeGoodTransitions() {
 		Set<BuchiTreeAutomatonRule<LETTER, STATE>> allRules = mtree.getRules();
 		for (BuchiTreeAutomatonRule<LETTER, STATE> rule : allRules) {
@@ -48,6 +64,10 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		}
 	}
 
+	/**
+	 * Add all states that are the roots of some good subtree embedded to the set
+	 * goodStates.
+	 */
 	private void findAllGoodStates() {
 		while (!goodTransitions.isEmpty()) {
 			BuchiTreeAutomatonRule<LETTER, STATE> nextRule = goodTransitions.pop();
@@ -74,7 +94,8 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	}
 
 	/**
-	 * Return true if a final state is removed and false otherwise.
+	 * Return true if a final state is removed and false otherwise. Also, remove
+	 * initial or final states that are not the roots of some good subtree embedded.
 	 * 
 	 * @return
 	 */
@@ -101,6 +122,11 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		return finalStateRemoved;
 	}
 
+	/**
+	 * Remove the state s and its transitions from the tree.
+	 * 
+	 * @param s
+	 */
 	private void removeState(STATE s) {
 		Collection<BuchiTreeAutomatonRule<LETTER, STATE>> rulesToS = mtree.getChildMap().get(s);
 		if (rulesToS != null) {
@@ -133,6 +159,11 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		}
 	}
 
+	/**
+	 * Return true if the tree is empty and false otherwise.
+	 * 
+	 * @return
+	 */
 	public boolean computeResult() {
 		initializeGoodTransitions();
 		findAllGoodStates();
