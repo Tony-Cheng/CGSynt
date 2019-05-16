@@ -56,7 +56,7 @@ class EmptinessCheckTest {
 
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(machine);
 
-		assert (!empty.computeResult());
+		assertFalse(empty.computeResult());
 	}
 
 	@Test
@@ -76,5 +76,14 @@ class EmptinessCheckTest {
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
 
 		assertFalse(empty.computeResult());
+	}
+	
+	@Test
+	void testParameterized100Empty() {
+		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.parameterizedEmpty(100);
+
+		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
+
+		assertTrue(empty.computeResult());
 	}
 }
