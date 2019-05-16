@@ -266,6 +266,30 @@ public class BuchiTreeAutomatonFactory {
 		
 		return machine;
 	}
+	
+	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedNonEmpty(int n){
+		BuchiTreeAutomaton<RankedLetter, String> machine = new BuchiTreeAutomaton<>(2);
+		
+		assert n != 0;
+		machine.addInitState("q0");
+		for (int i = 0; i < (int)Math.pow(2, n) - 1; i++) {
+			machine.addFinalState("q" + i);
+		}
+		
+		for (int i = 0; i < (int)Math.pow(2, n - 1); i++) {
+			List<String> t = destList("q" + ((i * 2) + 1), "q" + ((i * 2) + 2));
+			BuchiTreeAutomatonRule<RankedLetter, String> rule = new BuchiTreeAutomatonRule<>(LETTERA, "q" + i, t);
+			machine.addRule(rule);
+		}
+		
+		for (int i = (int)Math.pow(2, n - 1) - 1; i < (int)Math.pow(2, n) - 1; i++) {
+			List<String> t = destList("q0", "q0");
+			BuchiTreeAutomatonRule<RankedLetter, String> rule = new BuchiTreeAutomatonRule<>(LETTERA, "q" + i, t);
+			machine.addRule(rule);
+		}
+		
+		return machine;
+	}
 
 	/**
 	 * Create a destination ArrayList based on the input strings.
