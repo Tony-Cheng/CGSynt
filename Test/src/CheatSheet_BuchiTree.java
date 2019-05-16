@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import tree.buchi.BuchiTreeAutomaton;
-import tree.buchi.BuchiTreeAutomatonRule;
-import tree.buchi.IntersectState;
-import tree.buchi.operations.BuchiIntersectTree;
+import usra.tree.buchi.BuchiTreeAutomaton;
+import usra.tree.buchi.BuchiTreeAutomatonRule;
+import usra.tree.buchi.IntersectState;
+import usra.tree.buchi.operations.BuchiIntersectTree;
 
 public class CheatSheet_BuchiTree {
 
@@ -70,14 +70,14 @@ public class CheatSheet_BuchiTree {
 		return intersect.computeResult();
 
 	}
-	
+
 	public static void printAutomaton(BuchiTreeAutomaton aut) {
-		
+
 		System.out.println("Print Transitions");
 		for (Object rule : aut.getRules()) {
 			System.out.println(rule);
 		}
-		
+
 	}
 
 	public static void main(String[] args) {
@@ -85,25 +85,25 @@ public class CheatSheet_BuchiTree {
 
 		// Create a Buchi tree automaton.
 		BuchiTreeAutomaton<TestRankedAlphabet, String> aut1 = createFirstBuchiTree();
-		
+
 		// Create another Buchi tree automaton;
 		BuchiTreeAutomaton<TestRankedAlphabet, String> aut2 = createSecondBuchiTree();
-		
+
 		// Intersect two Buchi tree automata.
-		BuchiTreeAutomaton<TestRankedAlphabet, IntersectState<String>> intersectAut = computeIntersect(aut1, aut2); 
+		BuchiTreeAutomaton<TestRankedAlphabet, IntersectState<String>> intersectAut = computeIntersect(aut1, aut2);
 
 		// Print the transition rules of the first automaton
 		System.out.println("Automaton 1");
 		printAutomaton(aut1);
-		
+
 		// Print the transition rules of the second automaton
 		System.out.println("\nAutomaton 2");
 		printAutomaton(aut2);
-		
+
 		// Print the transition rules of the intersected automaton.
 		System.out.println("\nIntersect of Automaton 1 and Automaton 2");
 		printAutomaton(intersectAut);
-		
+
 	}
 
 }

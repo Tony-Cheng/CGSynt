@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import tree.buchi.BuchiTreeAutomaton;
-import tree.buchi.BuchiTreeAutomatonRule;
-import tree.buchi.operations.EmptinessCheck;
+import usra.tree.buchi.BuchiTreeAutomaton;
+import usra.tree.buchi.BuchiTreeAutomatonRule;
+import usra.tree.buchi.operations.EmptinessCheck;
 
 public class CheatSheet_EmptynessCheck {
 
@@ -64,7 +64,7 @@ public class CheatSheet_EmptynessCheck {
 	 */
 	public static void checkAndPrintEmptyness(BuchiTreeAutomaton<TestRankedAlphabet, String> aut) {
 		EmptinessCheck<TestRankedAlphabet, String> emptynessChecker = new EmptinessCheck<>(aut);
-		System.out.println(emptynessChecker.getResult());
+		System.out.println(emptynessChecker.computeResult());
 	}
 
 	public static void main(String[] args) {
