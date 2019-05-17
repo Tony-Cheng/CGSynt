@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import tree.buchi.BuchiTreeAutomaton;
-import tree.buchi.BuchiTreeAutomatonRule;
-import tree.buchi.operations.EmptinessCheck;
+import usra.tree.buchi.BuchiTreeAutomaton;
+import usra.tree.buchi.BuchiTreeAutomatonRule;
+import usra.tree.buchi.operations.EmptinessCheck;
 
 public class TestEmptyness {
 
@@ -13,8 +13,6 @@ public class TestEmptyness {
 		BuchiTreeAutomaton<TestRankedAlphabet, String> aut1 = new BuchiTreeAutomaton<>(2);
 
 		TestRankedAlphabet letter1 = new TestRankedAlphabet('a');
-		TestRankedAlphabet letter2 = new TestRankedAlphabet('b');
-		TestRankedAlphabet letter3 = new TestRankedAlphabet('c');
 
 		List<String> list1 = new ArrayList<>();
 		list1.add("q0");
@@ -27,7 +25,7 @@ public class TestEmptyness {
 		aut1.addFinalState("q0");
 
 		EmptinessCheck<TestRankedAlphabet, String> emptynessChecker = new EmptinessCheck<>(aut1);
-		System.out.println(emptynessChecker.getResult());
+		System.out.println(emptynessChecker.computeResult());
 
 		BuchiTreeAutomaton<TestRankedAlphabet, String> aut2 = new BuchiTreeAutomaton<>(2);
 
@@ -44,7 +42,7 @@ public class TestEmptyness {
 		aut2.addInitState("q0");
 
 		emptynessChecker = new EmptinessCheck<>(aut2);
-		System.out.println(emptynessChecker.getResult());
+		System.out.println(emptynessChecker.computeResult());
 
 	}
 

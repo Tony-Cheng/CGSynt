@@ -12,10 +12,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Accept
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.IDeterminizeStateFactory;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
-import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
-import de.uni_freiburg.informatik.ultimate.plugins.analysis.automatondeltadebugger.factories.NestedWordAutomatonFactory;
-import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateServiceProviderMock;;
 
 public class TestNWA {
 
@@ -44,8 +41,7 @@ public class TestNWA {
 
 		INestedWordAutomaton<Character, String> dfa = null;
 		try {
-			Determinize<Character, String> det = new Determinize<>(service,
-					(IDeterminizeStateFactory) nwa.getStateFactory(), nwa);
+			Determinize<Character, String> det = new Determinize<>(service, (IDeterminizeStateFactory) nwa.getStateFactory(), nwa);
 			dfa = det.getResult();
 			for (String state: dfa.getStates()) {
 				System.out.println(state);

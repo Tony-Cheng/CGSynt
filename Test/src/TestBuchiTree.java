@@ -1,21 +1,15 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
-import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
-import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
-import tree.buchi.BuchiTreeAutomaton;
-import tree.buchi.BuchiTreeAutomatonRule;
-import tree.buchi.IntersectState;
-import tree.buchi.operations.BuchiIntersectTree;
+import usra.tree.buchi.BuchiTreeAutomaton;
+import usra.tree.buchi.BuchiTreeAutomatonRule;
+import usra.tree.buchi.IntersectState;
+import usra.tree.buchi.operations.BuchiIntersectTree;
 
 public class TestBuchiTree {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
-		IUltimateServiceProvider mock = UltimateMocks.createUltimateServiceProviderMock();
-		AutomataLibraryServices service = new AutomataLibraryServices(mock);
 
 		System.out.println("Automaton 1");
 		BuchiTreeAutomaton<TestRankedAlphabet, String> aut1 = new BuchiTreeAutomaton<>(2);

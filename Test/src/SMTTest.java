@@ -1,22 +1,23 @@
 import de.uni_freiburg.informatik.ultimate.logic.Assignments;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
-import de.uni_freiburg.informatik.ultimate.logic.NoopScript;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Script.LBool;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.*;
 
 public class SMTTest {
 	public SMTTest() {
-		Script script = new NoopScript();
-		script.setOption(":produce-assignment", true);
-		script.setLogic(Logics.QF_NIA);
+		Script script = new SMTInterpol(new DefaultLogger());
+		script.setOption(":produce-assignments", true);
+		script.setLogic(Logics.QF_UFLIA);
 		
 		declareVars(script);
 		
 		Term x = script.term("x");
-		Term twoXPlusTwo = script.term("+", script.term("*", script.term("2"), x), script.term("2"));
-		Term threeXPlusThree = script.term("+", script.term("*", script.term("3"), x), script.term("3"));
+		Term twoXPlusTwo = script.term("+", script.term("*", script.numeral("2"), x), script.numeral("2"));
+		Term threeXPlusThree = script.term("+", script.term("*", script.numeral("3"), x), script.numeral("3"));
 		
 		Term eq = script.term("=", twoXPlusTwo, threeXPlusThree);
 		
