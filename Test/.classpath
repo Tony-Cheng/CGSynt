@@ -7,5 +7,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateModel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/AutomatonDeltaDebugger"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Automata-Extension"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Library-SMTLIB"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SMTInterpol"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
