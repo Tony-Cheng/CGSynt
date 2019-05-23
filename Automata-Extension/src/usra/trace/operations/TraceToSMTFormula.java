@@ -11,17 +11,16 @@ import usra.trace.FormulaInterface;
 import usra.trace.Token;
 import usra.trace.TraceInterface;
 
-public class TraceToInterpolant {
+public class TraceToSMTFormula {
 	private TraceInterface mTrace;
 	private Script mScript;
-	private Term[] mInterpolants;
 	
 	/**
-	 * Operation to calculate the Interpolant's for a trace.
+	 * Operation to convert a Trace into an SMT Script
 	 * @param trace 
-	 * 		The trace who's interpolant's to calculate.
+	 * 		The trace to convert.
 	 */
-	public TraceToInterpolant(TraceInterface trace) {
+	public TraceToSMTFormula(TraceInterface trace) {
 		this.mTrace = trace;
 		
 		this.compute();
@@ -29,15 +28,15 @@ public class TraceToInterpolant {
 	
 	/**
 	 * Return the result of the operation.
-	 * @return mInterpolants
-	 * 		The list of interpolant's for this trace.
+	 * @return mScript
+	 * 		The converted SMT Script
 	 */
-	public Term[] getResult() {
-		return mInterpolants;
+	public Script getResult() {
+		return mScript;
 	}
 	
 	/**
-	 * Compute the interpolant's for the given trace.
+	 * Convert the Trace to an SMT Script
 	 */
 	private void compute() {
 		mScript = new SMTInterpol(new DefaultLogger());
@@ -57,15 +56,6 @@ public class TraceToInterpolant {
 			
 			stNum++;
 		}
-		
-		int numberOfStatements = mTrace.getFormulas().size();
-		Term[] annotations = new Term[numberOfStatements];
-		
-		for (int i = 0; i < numberOfStatements; i++) {
-			annotations[i] = mScript.term("s_" + i);
-		}
-		
-		mInterpolants = mScript.getInterpolants(annotations);
 	}
 	
 	/**
@@ -124,7 +114,7 @@ public class TraceToInterpolant {
 			cur = mScript.term("and", cur, oldEq);
 		}
 		
-		for (int i = 0; i < mTrace.getNames(); i++) {
+		for (int i = 1; i < mTrace.getNames() + 1; i++) {
 			if (i != compVarNum) {
 				String nameWOStNum = "v_" + i + "_";
 				
