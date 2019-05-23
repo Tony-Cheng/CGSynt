@@ -7,7 +7,7 @@ public interface FormulaInterface {
 	 * 
 	 * @return
 	 */
-	public int getV1();
+	public Token getV1();
 
 	/**
 	 * Return the name of the operation.

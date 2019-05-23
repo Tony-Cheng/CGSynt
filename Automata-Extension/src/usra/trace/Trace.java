@@ -31,8 +31,20 @@ public class Trace implements TraceInterface {
 	 */
 	public void addFormula(FormulaInterface formula) {
 		formulas.add(formula);
-		if (formula.getV1() > names)
-			names = formula.getV1();
+		incrementName(formula);
+	}
+
+	/**
+	 * Increment the variable names if necessary.
+	 * 
+	 * @param formula
+	 */
+	private void incrementName(FormulaInterface formula) {
+		if (formula.getV1().getType() == Token.VARIABLE && formula.getV1().getValue() > names)
+			names = formula.getV1().getValue();
+		if (formula.getV2() != null) {
+			incrementName(formula.getV2());
+		}
 	}
 
 	@Override

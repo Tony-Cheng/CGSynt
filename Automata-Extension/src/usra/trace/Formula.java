@@ -5,7 +5,7 @@ public class Formula implements FormulaInterface {
 	/**
 	 * The variable on the left hand side of the formula.
 	 */
-	private int v1;
+	private Token v1;
 
 	/**
 	 * The name of the operation.
@@ -27,7 +27,7 @@ public class Formula implements FormulaInterface {
 	 * @param v2
 	 *            the variable on the right hand side of the formula.
 	 */
-	public Formula(int v1, String operation, Formula v2) {
+	public Formula(Token v1, String operation, Formula v2) {
 		this.v1 = v1;
 		this.operation = operation;
 		this.v2 = v2;
@@ -39,14 +39,14 @@ public class Formula implements FormulaInterface {
 	 * @param v1
 	 *            The name of that variable.
 	 */
-	public Formula(int v1) {
+	public Formula(Token v1) {
 		this.v1 = v1;
 		this.operation = null;
 		this.v2 = null;
 	}
 
 	@Override
-	public int getV1() {
+	public Token getV1() {
 		return v1;
 	}
 
