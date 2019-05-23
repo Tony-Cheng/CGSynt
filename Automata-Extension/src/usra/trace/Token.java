@@ -55,4 +55,14 @@ public class Token {
 	public int getValue() {
 		return value;
 	}
+
+	@Override
+	public String toString() {
+		if (type == NUMERICAL) {
+			return "" + value;
+		}
+		else {
+			return "v_" + value;
+		}
+	}
 }

@@ -18,4 +18,11 @@ public interface TraceInterface {
 	 * @return
 	 */
 	public List<FormulaInterface> getFormulas();
+
+	/**
+	 * Make a copy of this trace.
+	 * 
+	 * @return
+	 */
+	public TraceInterface mkcpy();
 }

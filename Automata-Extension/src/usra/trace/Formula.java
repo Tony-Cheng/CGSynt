@@ -59,5 +59,17 @@ public class Formula implements FormulaInterface {
 	public FormulaInterface getV2() {
 		return v2;
 	}
+	
+	@Override
+	public String toString() {
+		String res = "";
+		if (operation == null) {
+			res = res + v1;
+		}
+		else {
+			res = res + v1 + operation + v2;
+		}
+		return res;
+	}
 
 }

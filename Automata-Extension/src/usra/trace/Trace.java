@@ -57,4 +57,22 @@ public class Trace implements TraceInterface {
 		return formulas;
 	}
 
+	@Override
+	public TraceInterface mkcpy() {
+		Trace copy = new Trace();
+		copy.names = this.names;
+		copy.formulas.addAll(formulas);
+		return copy;
+	}
+
+	@Override
+	public String toString() {
+		String res = "";
+		for (int i = 0; i < formulas.size(); i++) {
+			res = res + formulas.get(i).toString() + " | ";
+		}
+		return res;
+
+	}
+
 }

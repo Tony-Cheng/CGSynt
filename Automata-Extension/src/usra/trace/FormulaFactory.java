@@ -76,4 +76,16 @@ public class FormulaFactory {
 		Formula ass = new Formula(x, "==", new Formula(y));
 		return ass;
 	}
+
+	/**
+	 * Return the formula that represents x==y.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Formula assume(Token x, int y) {
+		Formula ass = new Formula(x, "==", new Formula(numericalFactory.createNumerical(y)));
+		return ass;
+	}
 }
