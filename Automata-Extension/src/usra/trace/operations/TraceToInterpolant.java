@@ -11,21 +11,34 @@ import usra.trace.FormulaInterface;
 import usra.trace.Token;
 import usra.trace.TraceInterface;
 
-public class TraceToSMT {
+public class TraceToInterpolant {
 	private TraceInterface mTrace;
 	private Script mScript;
 	private Term[] mInterpolants;
 	
-	public TraceToSMT(TraceInterface trace) {
+	/**
+	 * Operation to calculate the Interpolant's for a trace.
+	 * @param trace 
+	 * 		The trace who's interpolant's to calculate.
+	 */
+	public TraceToInterpolant(TraceInterface trace) {
 		this.mTrace = trace;
 		
 		this.compute();
 	}
 	
+	/**
+	 * Return the result of the operation.
+	 * @return mInterpolants
+	 * 		The list of interpolant's for this trace.
+	 */
 	public Term[] getResult() {
 		return mInterpolants;
 	}
 	
+	/**
+	 * Compute the interpolant's for the given trace.
+	 */
 	private void compute() {
 		mScript = new SMTInterpol(new DefaultLogger());
 		mScript.setOption(":produce-proofs", true);
@@ -55,6 +68,14 @@ public class TraceToSMT {
 		mInterpolants = mScript.getInterpolants(annotations);
 	}
 	
+	/**
+	 * Process a formula recursively, if the flag is set then the stNum of the variables used for 
+	 * calculating an assignment value will remain the same.
+	 * @param form	The formula that is to be processed.
+	 * @param stNum	The statement number of the given variable.
+	 * @param flag	The flag for whether or not to decrease the stNum.
+	 * @return
+	 */
 	private Term processFormula(FormulaInterface form, int stNum, int flag) {		
 		if (form.getV2() == null) {
 			Token v1 = form.getV1();
@@ -82,9 +103,11 @@ public class TraceToSMT {
 	}
 	
 	/**
-	 * Assume that the top level operation type is a comparison
-	 * @param stTerm
-	 * @return
+	 * Ensure that after a statement is entered all the unchanged 
+	 * variables have the same values as before.
+	 * @param form	 The current statement.
+	 * @param stTerm The term that is to be modified.
+	 * @return		 The modified term.
 	 */
 	private Term andUnChangedVars(FormulaInterface form, Term stTerm) {
 		Term cur = stTerm;
@@ -115,6 +138,9 @@ public class TraceToSMT {
 		return cur;
 	}
 	
+	/**
+	 * Define all the SMT variables that will be used.
+	 */
 	private void defineVariables() {
 		for (int v = 0; v < mTrace.getNames(); v++) {
 			for (int stNum = 0; stNum < mTrace.getFormulas().size(); stNum++) {
