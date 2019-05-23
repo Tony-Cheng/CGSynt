@@ -25,13 +25,15 @@ public class Trace implements TraceInterface {
 	}
 
 	/**
-	 * Add a formula to the trace.
+	 * Add formulas to the trace.
 	 * 
-	 * @param formula
+	 * @param formulas
 	 */
-	public void addFormula(FormulaInterface formula) {
-		formulas.add(formula);
-		incrementName(formula);
+	public void addFormulas(Formula... forms) {
+		for (Formula formula : forms) {
+			formulas.add(formula);
+			incrementName(formula);
+		}
 	}
 
 	/**

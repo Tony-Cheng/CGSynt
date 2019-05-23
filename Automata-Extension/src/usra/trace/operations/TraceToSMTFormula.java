@@ -1,5 +1,9 @@
 package usra.trace.operations;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
@@ -41,6 +45,7 @@ public class TraceToSMTFormula {
 	private void compute() {
 		mScript = new SMTInterpol(new DefaultLogger());
 		mScript.setOption(":produce-proofs", true);
+		mScript.setOption(":interactive-mode", true);
 		mScript.setLogic(Logics.QF_LIA);
 		
 		this.defineVariables();
@@ -84,7 +89,10 @@ public class TraceToSMTFormula {
 			Token v1 = form.getV1();
 			String varName = "v_" + v1.getValue() + "_" + stNum;
 			
-			Term cur = mScript.term(form.getOperation(), mScript.term(varName), sub);
+			Term cur;
+			if (!form.getOperation().equals("=="))
+				cur = mScript.term(form.getOperation(), mScript.term(varName), sub);
+			else cur = mScript.term("=", mScript.term(varName), sub);
 			
 			return cur;
 		}
@@ -132,7 +140,7 @@ public class TraceToSMTFormula {
 	 * Define all the SMT variables that will be used.
 	 */
 	private void defineVariables() {
-		for (int v = 0; v < mTrace.getNames(); v++) {
+		for (int v = 1; v < mTrace.getNames() + 1; v++) {
 			for (int stNum = 0; stNum < mTrace.getFormulas().size(); stNum++) {
 				mScript.declareFun("v_" + v + "_" + stNum, new Sort[0], mScript.sort("Int"));
 			}
