@@ -11,12 +11,12 @@ import usra.trace.FormulaInterface;
 import usra.trace.Token;
 import usra.trace.TraceInterface;
 
-public class TraceToSMT {
+public class TraceToInterpolant {
 	private TraceInterface mTrace;
 	private Script mScript;
 	private Term[] mInterpolants;
 	
-	public TraceToSMT(TraceInterface trace) {
+	public TraceToInterpolant(TraceInterface trace) {
 		this.mTrace = trace;
 		
 		this.compute();
