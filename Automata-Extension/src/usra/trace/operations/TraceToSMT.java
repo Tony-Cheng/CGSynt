@@ -3,6 +3,7 @@ package usra.trace.operations;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
+import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
@@ -28,8 +29,10 @@ public class TraceToSMT {
 		script.setOption(":produce-proofs", true);
 		script.setLogic(Logics.QF_LIA);
 		
+		this.defineVariables();
+		
 		int stNum = 0;
-		for (FormulaInterface form : this.mTrace.getFormulas()) {
+		for (FormulaInterface form : mTrace.getFormulas()) {
 			Term stTerm = this.processFormula(form, stNum);
 			Term stAnnotated = script.annotate(stTerm, new Annotation(":named", "s_" + stNum));
 			
@@ -42,6 +45,19 @@ public class TraceToSMT {
 	}
 	
 	private Term processFormula(FormulaInterface form, int stNum) {
+		// 
+		if (form.getV2() == null) {
+			return mScript.term("v_" + form.getV1() + "_" + stNum);
+		}
 		
+		return null;
+	}
+	
+	private void defineVariables() {
+		for (int v = 0; v < mTrace.getNames(); v++) {
+			for (int stNum = 0; stNum < mTrace.getFormulas().size(); stNum++) {
+				mScript.declareFun("v_" + v + "_" + stNum, new Sort[0], mScript.sort("Int"));
+			}
+		}
 	}
 }
