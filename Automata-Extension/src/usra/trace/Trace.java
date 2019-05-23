@@ -21,7 +21,7 @@ public class Trace implements TraceInterface {
 
 	public Trace() {
 		this.formulas = new ArrayList<>();
-		this.names = -1;
+		this.names = 0;
 	}
 
 	/**
