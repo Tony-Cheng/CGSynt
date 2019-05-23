@@ -45,6 +45,7 @@ public class TraceToSMTFormula {
 	private void compute() {
 		mScript = new SMTInterpol(new DefaultLogger());
 		mScript.setOption(":produce-proofs", true);
+		mScript.setOption(":interactive-mode", true);
 		mScript.setLogic(Logics.QF_LIA);
 		
 		this.defineVariables();
@@ -139,7 +140,7 @@ public class TraceToSMTFormula {
 	 * Define all the SMT variables that will be used.
 	 */
 	private void defineVariables() {
-		for (int v = 0; v < mTrace.getNames(); v++) {
+		for (int v = 1; v < mTrace.getNames() + 1; v++) {
 			for (int stNum = 0; stNum < mTrace.getFormulas().size(); stNum++) {
 				mScript.declareFun("v_" + v + "_" + stNum, new Sort[0], mScript.sort("Int"));
 			}
