@@ -5,5 +5,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-Automata"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateUtil"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateModel"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Library-SMTLIB"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SMTInterpol"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
