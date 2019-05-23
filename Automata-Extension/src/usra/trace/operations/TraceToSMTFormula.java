@@ -1,5 +1,9 @@
 package usra.trace.operations;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
@@ -84,7 +88,10 @@ public class TraceToSMTFormula {
 			Token v1 = form.getV1();
 			String varName = "v_" + v1.getValue() + "_" + stNum;
 			
-			Term cur = mScript.term(form.getOperation(), mScript.term(varName), sub);
+			Term cur;
+			if (!form.getOperation().equals("=="))
+				cur = mScript.term(form.getOperation(), mScript.term(varName), sub);
+			else cur = mScript.term("=", mScript.term(varName), sub);
 			
 			return cur;
 		}
