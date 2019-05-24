@@ -10,7 +10,7 @@ public class TraceScriptToInterpolants {
 	public TraceScriptToInterpolants(Script script, int numberOfStatements) {
 		this.mScript = script;
 		
-		this.mInterpolants = new Term[numberOfStatements - 1];
+		this.mInterpolants = new Term[numberOfStatements];
 		
 		this.compute();
 	}
@@ -20,10 +20,11 @@ public class TraceScriptToInterpolants {
 	}
 	
 	private void compute() {
-		Term[] annotations = new Term[mInterpolants.length + 1];
+		mScript.checkSat();
+		Term[] annotations = new Term[mInterpolants.length];
 		
 		for (int i = 0; i < mInterpolants.length; i++) {
-			annotations[i] = mScript.term("s_" + i);
+			annotations[i] = mScript.term("s_" + (i + 1));
 		}
 		
 		mInterpolants = mScript.getInterpolants(annotations);
