@@ -74,7 +74,10 @@ public class Trace implements TraceInterface {
 			res = res + formulas.get(i).toString() + " | ";
 		}
 		return res;
-
+	}
+	
+	public int size() {
+		return formulas.size();
 	}
 
 }

@@ -41,10 +41,17 @@ public class GenerateTracesFromDFA {
 			Script s = op.getResult();
 
 			Term[] terms = s.getAssertions();
-						
+
 			System.out.println(trace);
 
 			for (Term term : terms) {
+				System.out.println(term);
+			}
+			System.out.println();
+
+			TraceScriptToInterpolants inter = new TraceScriptToInterpolants(s, trace.size());
+			Term[] interpolants = inter.getResult();
+			for (Term term : interpolants) {
 				System.out.println(term);
 			}
 			System.out.println();
