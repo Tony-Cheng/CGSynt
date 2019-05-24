@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateTest"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateUtil"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="src" path="/Library-SMTLIB"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
