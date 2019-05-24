@@ -27,7 +27,7 @@ public class DFAToTraceBFS {
 				for (Formula form : nwa.getAlphabet()) {
 					for (String next : nwa.succInternal(state, form)) {
 						Trace newTrace = (Trace) trace.mkcpy();
-						trace.addFormula(form);
+						newTrace.addFormulas(form);
 						Node newNode = new Node(next, newTrace);
 						nextNodes.add(newNode);
 					}

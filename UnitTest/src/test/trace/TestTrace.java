@@ -25,7 +25,7 @@ public class TestTrace {
 		Formula one = new Formula(factory.createNumerical(1));
 		Formula assignX = new Formula(factory.createVariable(), "=", one);
 		Trace trace = new Trace();
-		trace.addFormula(assignX);
+		trace.addFormulas(assignX);
 		assertEquals(trace.getNames(), 1);
 		List<FormulaInterface> formulas = trace.getFormulas();
 		assertEquals(formulas.size(), 1);
@@ -38,7 +38,7 @@ public class TestTrace {
 		Formula one = new Formula(factory.createVariable());
 		Formula assignX = new Formula(factory.createVariable(), "=", one);
 		Trace trace = new Trace();
-		trace.addFormula(assignX);
+		trace.addFormulas(assignX);
 		assertEquals(trace.getNames(), 2);
 		List<FormulaInterface> formulas = trace.getFormulas();
 		assertEquals(formulas.size(), 1);
@@ -56,10 +56,10 @@ public class TestTrace {
 		Formula third = new Formula(x, "=", new Formula(x, "+", new Formula(factory.createNumerical(1))));
 		Formula fourth = new Formula(x, "==", new Formula(factory.createNumerical(-1)));
 		Trace trace = new Trace();
-		trace.addFormula(first);
-		trace.addFormula(second);
-		trace.addFormula(third);
-		trace.addFormula(fourth);
+		trace.addFormulas(first);
+		trace.addFormulas(second);
+		trace.addFormulas(third);
+		trace.addFormulas(fourth);
 		assertEquals(trace.getNames(), 2);
 		List<FormulaInterface> formulas = trace.getFormulas();
 		assertEquals(formulas.size(), 4);
