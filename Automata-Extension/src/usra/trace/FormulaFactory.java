@@ -42,7 +42,7 @@ public class FormulaFactory {
 	}
 
 	/**
-	 * Return a formula that assigns x to the formula y.
+	 * Return the formula x = y.
 	 * 
 	 * @param x
 	 * @param y
@@ -54,7 +54,7 @@ public class FormulaFactory {
 	}
 
 	/**
-	 * Return a formula that assigns x to the integer y.
+	 * Return the formula x = y.
 	 * 
 	 * @param x
 	 * @param y
@@ -66,7 +66,7 @@ public class FormulaFactory {
 	}
 
 	/**
-	 * Return the formula that represents x==y.
+	 * Return the formula that represents x == y.
 	 * 
 	 * @param x
 	 * @param y
@@ -78,7 +78,7 @@ public class FormulaFactory {
 	}
 
 	/**
-	 * Return the formula that represents x==y.
+	 * Return the formula that represents x == y.
 	 * 
 	 * @param x
 	 * @param y
@@ -88,4 +88,77 @@ public class FormulaFactory {
 		Formula ass = new Formula(x, "==", new Formula(numericalFactory.createNumerical(y)));
 		return ass;
 	}
+
+	/**
+	 * Return the formula x > y.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Formula gt(Token x, Token y) {
+		Formula gt = new Formula(x, ">", new Formula(y));
+		return gt;
+	}
+
+	/**
+	 * Return x > y.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Formula gt(Token x, int y) {
+		Formula gt = new Formula(x, ">", new Formula(numericalFactory.createNumerical(y)));
+		return gt;
+	}
+
+	/**
+	 * Return the formula x >= y.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Formula geq(Token x, Token y) {
+		Formula geq = new Formula(x, ">=", new Formula(y));
+		return geq;
+	}
+
+	/**
+	 * Return the formula x >= y.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Formula geq(Token x, int y) {
+		Formula geq = new Formula(x, ">=", new Formula(numericalFactory.createNumerical(y)));
+		return geq;
+	}
+
+	/**
+	 * Return the formula x * y.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Formula mult(Token x, Token y) {
+		Formula mult = new Formula(x, "*", new Formula(y));
+		return mult;
+	}
+
+	/**
+	 * Return the formula x * y.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Formula mult(Token x, int y) {
+		Formula mult = new Formula(x, "*", new Formula(numericalFactory.createNumerical(y)));
+		return mult;
+	}
+
 }
