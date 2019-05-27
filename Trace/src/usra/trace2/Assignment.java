@@ -18,5 +18,9 @@ public class Assignment extends Statement {
 	public Term getTerm(Script script, int id) {
 		return script.term("=", script.term(variable.getName() + "_" + id), formula.getTerm(script, id - 1));
 	}
+	
+	public Variable getVariable() {
+		return variable;
+	}
 
 }
