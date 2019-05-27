@@ -6,10 +6,10 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 public class StandardFormula extends Formula {
 
 	private final Variable var1;
-	private final Variable var2;
+	private final Token var2;
 	private final String operator;
 
-	public StandardFormula(String operator, Variable var1, Variable var2) {
+	public StandardFormula(String operator, Variable var1, Token var2) {
 		this.var1 = var1;
 		this.var2 = var2;
 		this.operator = operator;
@@ -17,7 +17,7 @@ public class StandardFormula extends Formula {
 
 	@Override
 	public Term getTerm(Script script, int id) {
-		return script.term(operator, script.term(var1.getName(id)), script.term(var2.getName(id)));
+		return script.term(operator, var1.getTerm(script, id), var2.getTerm(script, id));
 	}
 
 }

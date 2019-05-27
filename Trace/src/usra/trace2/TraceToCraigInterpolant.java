@@ -52,7 +52,7 @@ public class TraceToCraigInterpolant {
 		String name = assignmentVariable.getName();
 		for (Variable var : trace.getVariables()) {
 			if (!var.getName().equals(name)) {
-				script.assertTerm(script.term("=", script.term(var.getName(id)), script.term(var.getName(id))));
+				script.assertTerm(script.term("=", var.getTerm(script, id), var.getTerm(script, id - 1)));
 			}
 		}
 	}

@@ -16,7 +16,7 @@ public class Assignment extends Statement {
 
 	@Override
 	public Term getTerm(Script script, int id) {
-		return script.term("=", script.term(variable.getName(id)), formula.getTerm(script, id - 1));
+		return script.term("=", variable.getTerm(script, id), formula.getTerm(script, id - 1));
 	}
 	
 	public Variable getVariable() {
