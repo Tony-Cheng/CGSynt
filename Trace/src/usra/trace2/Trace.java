@@ -12,12 +12,10 @@ public class Trace implements Iterable<Statement> {
 
 	private final List<Statement> trace;
 	private final Set<Variable> variables;
-	private final Script script;
 
-	public Trace(Script script) {
+	public Trace() {
 		trace = new ArrayList<Statement>();
 		variables = new HashSet<Variable>();
-		this.script = script;
 	}
 
 	public void addStatement(Statement statement) {
@@ -37,8 +35,5 @@ public class Trace implements Iterable<Statement> {
 		return trace.iterator();
 	}
 	
-	public Script getScript() {
-		return script;
-	}
 
 }

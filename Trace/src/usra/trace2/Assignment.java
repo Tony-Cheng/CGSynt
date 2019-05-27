@@ -7,18 +7,16 @@ public class Assignment extends Statement {
 
 	private final Variable variable;
 	private final Formula formula;
-	private final Script script;
 
-	public Assignment(Script script, Variable variable, Formula formula) {
+	public Assignment(Variable variable, Formula formula) {
 		super(true);
 		this.variable = variable;
 		this.formula = formula;
-		this.script = script;
 	}
 
 	@Override
-	public Term getTerm(int id) {
-		return script.term("=", script.term(variable.getName() + "_" + id), formula.getTerm(id - 1));
+	public Term getTerm(Script script, int id) {
+		return script.term("=", script.term(variable.getName() + "_" + id), formula.getTerm(script, id - 1));
 	}
 
 }

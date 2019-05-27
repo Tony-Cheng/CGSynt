@@ -4,13 +4,13 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 public class CraigInterpolant {
 
-	private final Term interpolant;
+	private final Term[] interpolant;
 	
-	public CraigInterpolant(Term interpolant) {
+	public CraigInterpolant(Term[] interpolant) {
 		this.interpolant = interpolant;
 	}
 	
-	public Term getTerm() {
+	public Term[] getTerms() {
 		return interpolant;
 	}
 }
