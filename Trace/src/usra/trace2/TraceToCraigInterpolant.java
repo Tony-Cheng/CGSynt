@@ -19,13 +19,18 @@ public class TraceToCraigInterpolant {
 		int nStatements = 0;
 		declareVariables(id);
 		for (Statement statement : trace) {
+			Term combinedTerm = null;
 			if (statement.isAssignment()) {
 				id++;
 				declareVariables(id);
-				updateVariables(((Assignment) statement).getVariable(), id);
+				combinedTerm = updateVariables(((Assignment) statement).getVariable(), id);
 			}
-			script.assertTerm(
-					script.annotate(statement.getTerm(script, id), new Annotation(":named", "s" + nStatements)));
+			if (combinedTerm == null) {
+				combinedTerm = statement.getTerm(script, id);
+			} else {
+				combinedTerm = script.term("and", combinedTerm, statement.getTerm(script, id));
+			}
+			script.assertTerm(script.annotate(combinedTerm, new Annotation(":named", "s" + nStatements)));
 			nStatements++;
 		}
 		script.checkSat();
@@ -48,12 +53,19 @@ public class TraceToCraigInterpolant {
 		return terms;
 	}
 
-	private void updateVariables(Variable assignmentVariable, int id) {
+	private Term updateVariables(Variable assignmentVariable, int id) {
 		String name = assignmentVariable.getName();
+		Term combinedTerm = null;
 		for (Variable var : trace.getVariables()) {
 			if (!var.getName().equals(name)) {
-				script.assertTerm(script.term("=", var.getTerm(script, id), var.getTerm(script, id - 1)));
+				Term next = script.term("=", var.getTerm(script, id), var.getTerm(script, id - 1));
+				if (combinedTerm == null) {
+					combinedTerm = next;
+				} else {
+					combinedTerm = script.term("and", combinedTerm, next);
+				}
 			}
 		}
+		return combinedTerm;
 	}
 }

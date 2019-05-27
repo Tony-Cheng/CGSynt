@@ -8,7 +8,7 @@ public class Assume extends Statement {
 	private final Formula formula;
 
 	public Assume(Formula formula) {
-		super(true);
+		super(false);
 		this.formula = formula;
 	}
 
@@ -16,5 +16,7 @@ public class Assume extends Statement {
 	public Term getTerm(Script script, int id) {
 		return formula.getTerm(script, id);
 	}
+	
+	
 
 }
