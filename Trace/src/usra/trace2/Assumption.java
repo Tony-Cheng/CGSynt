@@ -3,11 +3,11 @@ package usra.trace2;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
-public class Assume extends Statement {
+public class Assumption extends Statement {
 
 	private final Formula formula;
 
-	public Assume(Formula formula) {
+	public Assumption(Formula formula) {
 		super(false);
 		this.formula = formula;
 	}

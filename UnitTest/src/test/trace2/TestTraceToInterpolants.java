@@ -13,7 +13,7 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
 import usra.trace.Token;
 import usra.trace.TokenFactory;
 import usra.trace2.Assignment;
-import usra.trace2.Assume;
+import usra.trace2.Assumption;
 import usra.trace2.CraigInterpolant;
 import usra.trace2.Formula;
 import usra.trace2.Numerical;
@@ -40,7 +40,7 @@ public class TestTraceToInterpolants {
 		Statement s1 = new Assignment(x, form1);
 		Statement s2 = new Assignment(y, form2);
 		Statement s3 = new Assignment(x, form3);
-		Statement s4 = new Assume(form4);
+		Statement s4 = new Assumption(form4);
 
 		Trace trace = new Trace();
 		trace.addVariable(x);
@@ -78,9 +78,9 @@ public class TestTraceToInterpolants {
 		Statement s1 = new Assignment(x, form1);
 		Statement s2 = new Assignment(x, form2);
 		Statement s3 = new Assignment(x, form3);
-		Statement s4 = new Assume(form4);
-		Statement s5 = new Assume(form5);
-		Statement s6 = new Assume(form6);
+		Statement s4 = new Assumption(form4);
+		Statement s5 = new Assumption(form5);
+		Statement s6 = new Assumption(form6);
 
 		Trace trace = new Trace();
 		trace.addVariable(x);
@@ -128,7 +128,7 @@ public class TestTraceToInterpolants {
 		Statement s5 = new Assignment(y, form5);
 		Statement s6 = new Assignment(z, form6);
 		Statement s7 = new Assignment(x, form7);
-		Statement s8 = new Assume(form8);
+		Statement s8 = new Assumption(form8);
 
 		Trace trace = new Trace();
 		trace.addVariable(x);
