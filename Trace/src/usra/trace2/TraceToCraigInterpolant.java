@@ -22,7 +22,7 @@ public class TraceToCraigInterpolant {
 			if (statement.isAssignment()) {
 				id++;
 				declareVariables(id);
-				updateVariables(((Assignment)statement).getVariable(), id);
+				updateVariables(((Assignment) statement).getVariable(), id);
 			}
 			script.assertTerm(
 					script.annotate(statement.getTerm(script, id), new Annotation(":named", "s" + nStatements)));
@@ -52,8 +52,7 @@ public class TraceToCraigInterpolant {
 		String name = assignmentVariable.getName();
 		for (Variable var : trace.getVariables()) {
 			if (!var.getName().equals(name)) {
-				script.assertTerm(script.term("=", script.term(var.getName() + "_" + id),
-						script.term(var.getName() + "_" + (id - 1))));
+				script.assertTerm(script.term("=", script.term(var.getName(id)), script.term(var.getName(id))));
 			}
 		}
 	}

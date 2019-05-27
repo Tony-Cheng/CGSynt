@@ -17,7 +17,7 @@ public class StandardFormula extends Formula {
 
 	@Override
 	public Term getTerm(Script script, int id) {
-		return script.term(operator, script.term(var1.getName() + "_" + id), script.term(var2.getName() + "_" + id));
+		return script.term(operator, script.term(var1.getName(id)), script.term(var2.getName(id)));
 	}
 
 }
