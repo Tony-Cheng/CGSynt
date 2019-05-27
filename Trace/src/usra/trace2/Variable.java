@@ -4,6 +4,10 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
+/**
+ * A variable in the trace.
+ *
+ */
 public class Variable extends Token {
 
 	private final String name;
@@ -16,10 +20,17 @@ public class Variable extends Token {
 		this.resultSort = resultSort;
 	}
 
+	@Override
 	public String getName(int id) {
 		return name + "_" + id;
 	}
 
+	/**
+	 * Declare this variable.
+	 * 
+	 * @param script
+	 * @param id
+	 */
 	public void declareVariable(Script script, int id) {
 		script.declareFun(getName(id), paramSorts, script.sort(resultSort));
 	}

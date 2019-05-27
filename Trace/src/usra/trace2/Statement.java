@@ -11,10 +11,20 @@ public abstract class Statement {
 		this.isAssignment = isAssignment;
 	}
 
+	/**
+	 * Return true if the statement is an assignment statement and false otherwise.
+	 * @return
+	 */
 	public boolean isAssignment() {
 		return isAssignment;
 	}
 
+	/**
+	 * Return a term that represents this statement.
+	 * @param script
+	 * @param id
+	 * @return
+	 */
 	public abstract Term getTerm(Script script, int id);
 
 }

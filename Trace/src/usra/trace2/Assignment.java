@@ -18,7 +18,12 @@ public class Assignment extends Statement {
 	public Term getTerm(Script script, int id) {
 		return script.term("=", variable.getTerm(script, id), formula.getTerm(script, id - 1));
 	}
-	
+
+	/**
+	 * Return the variable that is on the left hand side of the equation.
+	 * 
+	 * @return
+	 */
 	public Variable getVariable() {
 		return variable;
 	}

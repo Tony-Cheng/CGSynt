@@ -18,14 +18,29 @@ public class Trace implements Iterable<Statement> {
 		variables = new HashSet<Variable>();
 	}
 
+	/**
+	 * Add a statement to this trace.
+	 * 
+	 * @param statement
+	 */
 	public void addStatement(Statement statement) {
 		trace.add(statement);
 	}
 
+	/**
+	 * Add a variable to this term.
+	 * 
+	 * @param variable
+	 */
 	public void addVariable(Variable variable) {
 		variables.add(variable);
 	}
-	
+
+	/**
+	 * Return all of the variables used in the trace.
+	 * 
+	 * @return
+	 */
 	public Set<Variable> getVariables() {
 		return variables;
 	}
@@ -34,6 +49,5 @@ public class Trace implements Iterable<Statement> {
 	public Iterator<Statement> iterator() {
 		return trace.iterator();
 	}
-	
 
 }

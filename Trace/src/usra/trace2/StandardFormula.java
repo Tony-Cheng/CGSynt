@@ -3,6 +3,10 @@ package usra.trace2;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
+/**
+ * A formula that has two variables and one operator.
+ *
+ */
 public class StandardFormula extends Formula {
 
 	private final Token var1;

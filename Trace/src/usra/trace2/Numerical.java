@@ -3,6 +3,10 @@ package usra.trace2;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
+/**
+ * A number in the trace.
+ *
+ */
 public class Numerical extends Token {
 
 	private final String num;

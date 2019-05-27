@@ -4,6 +4,9 @@ import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 
+/**
+ * Compute the interpolants of a trace.
+ */
 public class TraceToCraigInterpolant {
 
 	private final Trace trace;
@@ -14,6 +17,11 @@ public class TraceToCraigInterpolant {
 		this.script = script;
 	}
 
+	/**
+	 * Return the interpolants of a trace.
+	 * 
+	 * @return
+	 */
 	public CraigInterpolant computeResult() {
 		int id = 0;
 		int nStatements = 0;
@@ -39,12 +47,23 @@ public class TraceToCraigInterpolant {
 
 	}
 
+	/**
+	 * Declare all the variables of a particular id.
+	 * 
+	 * @param id
+	 */
 	private void declareVariables(int id) {
 		for (Variable var : trace.getVariables()) {
 			var.declareVariable(script, id);
 		}
 	}
 
+	/**
+	 * Return all the named equation in the trace.
+	 * 
+	 * @param nStatements
+	 * @return
+	 */
 	private Term[] generateNamedTerms(int nStatements) {
 		Term[] terms = new Term[nStatements];
 		for (int i = 0; i < nStatements; i++) {
@@ -53,6 +72,13 @@ public class TraceToCraigInterpolant {
 		return terms;
 	}
 
+	/**
+	 * Return a term that updates all names of the variables.
+	 * 
+	 * @param assignmentVariable
+	 * @param id
+	 * @return
+	 */
 	private Term updateVariables(Variable assignmentVariable, int id) {
 		String name = assignmentVariable.getName();
 		Term combinedTerm = null;
