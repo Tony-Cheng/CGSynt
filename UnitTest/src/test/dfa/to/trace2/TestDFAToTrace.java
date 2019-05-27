@@ -1,0 +1,60 @@
+package test.dfa.to.trace2;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
+import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.logic.Logics;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
+import de.uni_freiburg.informatik.ultimate.logic.Sort;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
+import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
+import usra.trace2.Assignment;
+import usra.trace2.Assumption;
+import usra.trace2.CraigInterpolant;
+import usra.trace2.Formula;
+import usra.trace2.Numerical;
+import usra.trace2.StandardFormula;
+import usra.trace2.Statement;
+import usra.trace2.Trace;
+import usra.trace2.TraceToCraigInterpolant;
+import usra.trace2.Variable;
+
+public class TestDFAToTrace {
+
+	private static AutomataLibraryServices service;
+
+	@BeforeAll
+	static void init() {
+		IUltimateServiceProvider mock = UltimateMocks.createUltimateServiceProviderMock();
+		service = new AutomataLibraryServices(mock);
+	}
+
+	@Test
+	void test1() {
+		// x:=0 y:=0 x++ x==-1
+		final Script s = new SMTInterpol(new DefaultLogger());
+		s.setOption(":produce-proofs", true);
+		s.setLogic(Logics.QF_LIA);
+		Trace trace = new Trace();
+		Variable x = new Variable("x", new Sort[0], "Int");
+		Variable y = new Variable("y", new Sort[0], "Int");
+		trace.addVariable(x);
+		trace.addVariable(y);
+		NestedWordAutomaton<Statement, String> dfa = ConstructDFA.dfa1(service, x, y);
+		trace = DFAToTrace2BFS.bfs(dfa, trace, 4);
+
+		TraceToCraigInterpolant ttc = new TraceToCraigInterpolant(trace, s);
+
+		CraigInterpolant interpolants = ttc.computeResult();
+
+		for (Term term : interpolants.getTerms()) {
+			System.out.println(term);
+		}
+
+	}
+}

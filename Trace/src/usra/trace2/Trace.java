@@ -49,5 +49,12 @@ public class Trace implements Iterable<Statement> {
 	public Iterator<Statement> iterator() {
 		return trace.iterator();
 	}
+	
+	public Trace mkcpy() {
+		Trace trace = new Trace();
+		trace.trace.addAll(this.trace);
+		trace.variables.addAll(this.variables);
+		return trace;
+	}
 
 }
