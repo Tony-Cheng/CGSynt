@@ -14,6 +14,6 @@ public abstract class Statement {
 		return isAssignment;
 	}
 	
-	public abstract Term generateTerm(int id);
+	public abstract Term getTerm(int id);
 	
 }
