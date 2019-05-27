@@ -51,10 +51,48 @@ public class TestDFAToTrace {
 		TraceToCraigInterpolant ttc = new TraceToCraigInterpolant(trace, s);
 
 		CraigInterpolant interpolants = ttc.computeResult();
-
+		
+		for (Statement statement : trace) {
+			System.out.println(statement);
+		}
+		
+		System.out.println();
 		for (Term term : interpolants.getTerms()) {
 			System.out.println(term);
 		}
+		
+		System.out.println("\n");
+
+	}
+	
+	@Test
+	void test2() {
+		
+		final Script s = new SMTInterpol(new DefaultLogger());
+		s.setOption(":produce-proofs", true);
+		s.setLogic(Logics.QF_LIA);
+		Trace trace = new Trace();
+		Variable x = new Variable("x", new Sort[0], "Int");
+		trace.addVariable(x);
+		NestedWordAutomaton<Statement, String> dfa = ConstructDFA.dfa2(service, x);
+		trace = DFAToTrace2BFS.bfs(dfa, trace, 3);
+
+		TraceToCraigInterpolant ttc = new TraceToCraigInterpolant(trace, s);
+
+		CraigInterpolant interpolants = ttc.computeResult();
+
+		for(Statement statement : trace) {
+			System.out.println(statement);
+		}
+		
+		System.out.println();
+		
+		for (Term term : interpolants.getTerms()) {
+			System.out.println(term);
+		}
+		
+		System.out.println();
+		System.out.println();
 
 	}
 }

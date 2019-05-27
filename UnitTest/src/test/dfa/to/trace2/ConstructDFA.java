@@ -57,5 +57,40 @@ public class ConstructDFA {
 
 	}
 	
-	
+	public static NestedWordAutomaton<Statement, String> dfa2(AutomataLibraryServices service, Variable x) {
+		// (x:=0)(y:=0)(x++)*(x==-1)
+
+		Formula form1 = new StandardFormula("+", new Numerical("3"), new Numerical("0"));
+		Formula form2 = new StandardFormula("*", x, new Numerical("3"));
+		Formula form3 = new StandardFormula(">", x, new Numerical("1000"));
+		Formula form4 = new StandardFormula("<", x, new Numerical("1"));
+
+		Statement s1 = new Assignment(x, form1);
+		Statement s2 = new Assignment(x, form2);
+		Statement s3 = new Assumption(form3);
+		Statement s4 = new Assumption(form4);
+
+		Set<Statement> letters = new HashSet<>();
+		letters.add(s1);
+		letters.add(s2);
+		letters.add(s3);
+		letters.add(s4);
+
+		VpAlphabet<Statement> alpha = new VpAlphabet<>(letters);
+
+		NestedWordAutomaton<Statement, String> nwa = new NestedWordAutomaton<>(service, alpha, new StringFactory());
+
+		nwa.addState(true, false, "q0");
+		nwa.addState(false, false, "q1");
+		nwa.addState(false, false, "q2");
+		nwa.addState(false, true, "q3");
+
+		nwa.addInternalTransition("q0", s1, "q1");
+		nwa.addInternalTransition("q1", s2, "q2");
+		nwa.addInternalTransition("q2", s3, "q1");
+		nwa.addInternalTransition("q2", s4, "q3");
+
+		return nwa;
+
+	}
 }
