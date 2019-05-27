@@ -5,11 +5,11 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 
 public class Assignment extends Statement {
 
-	private final String variable;
+	private final Variable variable;
 	private final Formula formula;
 	private final Script script;
 
-	public Assignment(Script script, String variable, Formula formula) {
+	public Assignment(Script script, Variable variable, Formula formula) {
 		super(true);
 		this.variable = variable;
 		this.formula = formula;
@@ -18,7 +18,7 @@ public class Assignment extends Statement {
 
 	@Override
 	public Term getTerm(int id) {
-		return script.term("=", script.term(variable + "_" + id), formula.getTerm(id - 1));
+		return script.term("=", script.term(variable.getName() + "_" + id), formula.getTerm(id - 1));
 	}
 
 }
