@@ -17,6 +17,10 @@ public class Assumption extends Statement {
 		return formula.getTerm(script, id);
 	}
 	
+	@Override
+	public String toString() {
+		return formula.toString() + super.toString();
+	}
 	
 
 }

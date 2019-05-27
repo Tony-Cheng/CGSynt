@@ -24,4 +24,10 @@ public class StandardFormula extends Formula {
 		return script.term(operator, var1.getTerm(script, id), var2.getTerm(script, id));
 	}
 
+	@Override
+	public String toString() {
+		return var1.toString() + operator + var2.toString();
+
+	}
+
 }

@@ -30,4 +30,9 @@ public class Numerical extends Token {
 		return script.numeral(num);
 	}
 
+	@Override
+	public String toString() {
+		return num;
+	}
+
 }

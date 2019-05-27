@@ -27,4 +27,8 @@ public abstract class Statement {
 	 */
 	public abstract Term getTerm(Script script, int id);
 
+	@Override
+	public String toString() {
+		return "";
+	}
 }

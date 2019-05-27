@@ -44,5 +44,10 @@ public class Variable extends Token {
 	public Term getTerm(Script script, int id) {
 		return script.term(getName(id));
 	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
 
 }

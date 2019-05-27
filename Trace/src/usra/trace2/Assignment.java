@@ -28,4 +28,9 @@ public class Assignment extends Statement {
 		return variable;
 	}
 
+	@Override
+	public String toString() {
+		return variable.toString() + ":=" + formula.toString() + super.toString();
+	}
+
 }
