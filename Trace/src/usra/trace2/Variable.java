@@ -7,9 +7,9 @@ public class Variable {
 
 	private final String name;
 	private final Sort[] paramSorts;
-	private final Sort resultSort;
+	private final String resultSort;
 
-	public Variable(String name, Sort[] paramSorts, Sort resultSort) {
+	public Variable(String name, Sort[] paramSorts, String resultSort) {
 		this.name = name;
 		this.paramSorts = paramSorts;
 		this.resultSort = resultSort;
@@ -20,7 +20,7 @@ public class Variable {
 	}
 
 	public void declareVariable(Script script, int id) {
-		script.declareFun(name + "_" + id, paramSorts, resultSort);
+		script.declareFun(name + "_" + id, paramSorts, script.sort(resultSort));
 	}
 
 }
