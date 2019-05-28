@@ -11,20 +11,20 @@ import usra.tree.buchi.BuchiTreeAutomaton;
 import usra.tree.buchi.BuchiTreeAutomatonRule;
 import usra.tree.buchi.lta.LtaBool;
 
-public class DfaToLta<LETTER, STATE> {
+public class DfaToLtaLanguage<LETTER, STATE> {
 	private final NestedWordAutomaton<LETTER, STATE> mDfa;
 	private final BuchiTreeAutomaton<LtaBool, STATE> mResult;
 	
 	private final int mArity;
 	
 	/**
-	 * Convert A DFA to an LTA that accepts all subsets of the language
+	 * Convert A DFA to an LTA that the language of the DFA
 	 * of the DFA.
 	 *
 	 * @param dfa
 	 * 		The DFA to Convert
 	 */
-	public DfaToLta(final NestedWordAutomaton<LETTER, STATE> dfa) {
+	public DfaToLtaLanguage(final NestedWordAutomaton<LETTER, STATE> dfa) {
 		this.mDfa = dfa;
 		this.mArity = dfa.getAlphabet().size();
 		
@@ -47,7 +47,7 @@ public class DfaToLta<LETTER, STATE> {
 	
 	/**
 	 * Add the new transition rules. For a given state, if it was a final state
-	 * in the DFA, add a transition rule with the letter false, and the letter true,
+	 * in the DFA, add a transition rule with the letter true,
 	 * otherwise only add a transition rule with the letter false.
 	 */
 	private void computeTransitions() {
@@ -63,14 +63,9 @@ public class DfaToLta<LETTER, STATE> {
 			
 			assert destStates.size() == this.mArity;
 			
-			if (this.mDfa.isFinal(state)) {
-				final BuchiTreeAutomatonRule<LtaBool, STATE> trueRule = new BuchiTreeAutomatonRule<>(new LtaBool(true, this.mArity), state, destStates);
-				
-				this.mResult.addRule(trueRule);
-			}
-			
-			final BuchiTreeAutomatonRule<LtaBool, STATE> falseRule = new BuchiTreeAutomatonRule<>(new LtaBool(false, this.mArity), state, destStates);
-			this.mResult.addRule(falseRule);
+			boolean truth = this.mDfa.isFinal(state);
+			final BuchiTreeAutomatonRule<LtaBool, STATE> rule = new BuchiTreeAutomatonRule<>(new LtaBool(truth, this.mArity), state, destStates);
+			this.mResult.addRule(rule);
 		}
 	}
 	

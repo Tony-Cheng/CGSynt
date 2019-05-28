@@ -10,12 +10,12 @@ import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 import usra.tree.buchi.BuchiTreeAutomaton;
 import usra.tree.buchi.BuchiTreeAutomatonRule;
 import usra.tree.buchi.lta.LtaBool;
-import usra.dfa.operations.DfaToLta;
+import usra.dfa.operations.DfaToLtaPowerSet;
 
 public class TestDfaToLta {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static BuchiTreeAutomaton testDFAToLTA(NestedWordAutomaton dfa) {
-		DfaToLta op = new DfaToLta(dfa);
+		DfaToLtaPowerSet op = new DfaToLtaPowerSet(dfa);
 		
 		return op.getResult();
 	}

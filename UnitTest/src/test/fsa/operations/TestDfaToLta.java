@@ -12,7 +12,7 @@ import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
-import usra.dfa.operations.DfaToLta;
+import usra.dfa.operations.DfaToLtaPowerSet;
 import test.fsa.FsaFactory;
 import usra.tree.buchi.BuchiTreeAutomaton;
 import usra.tree.buchi.BuchiTreeAutomatonRule;
@@ -35,7 +35,7 @@ class TestDfaToLta {
 	void testDfaToLtaOnFiveStateDfa() {
 		NestedWordAutomaton<Character, String> dfa = FsaFactory.fiveStateDFA(service);
 		
-		DfaToLta<Character, String> op = new DfaToLta<>(dfa);
+		DfaToLtaPowerSet<Character, String> op = new DfaToLtaPowerSet<>(dfa);
 		
 		BuchiTreeAutomaton<LtaBool, String> lta = op.getResult();
 		
@@ -54,7 +54,7 @@ class TestDfaToLta {
 	void testDfaToLtaOnEmptyDfa() {
 		NestedWordAutomaton<Character, String> dfa = FsaFactory.emptyDfa(service);
 		
-		DfaToLta<Character, String> op = new DfaToLta<>(dfa);
+		DfaToLtaPowerSet<Character, String> op = new DfaToLtaPowerSet<>(dfa);
 		
 		BuchiTreeAutomaton<LtaBool, String> lta = op.getResult();
 		
@@ -73,7 +73,7 @@ class TestDfaToLta {
 	void testDfaToLtaOnSingleStateDfa() {
 		NestedWordAutomaton<Character, String> dfa = FsaFactory.oneStateDfa(service);
 		
-		DfaToLta<Character, String> op = new DfaToLta<>(dfa);
+		DfaToLtaPowerSet<Character, String> op = new DfaToLtaPowerSet<>(dfa);
 		
 		BuchiTreeAutomaton<LtaBool, String> lta = op.getResult();
 		
