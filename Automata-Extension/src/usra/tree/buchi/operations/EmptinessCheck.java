@@ -1,5 +1,6 @@
 package usra.tree.buchi.operations;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,6 +21,7 @@ import usra.tree.buchi.BuchiTreeAutomatonRule;
 public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	private BuchiTreeAutomaton<LETTER, STATE> mtree;
+	private BuchiTreeAutomaton<LETTER, STATE> mtree2;
 
 	/**
 	 * A set of final states.
@@ -31,6 +33,8 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	 */
 	private Set<STATE> goodStates;
 
+	private Set<STATE> visitedStates;
+
 	/**
 	 * Transitions whose destination is a list consists of all acceptance states or
 	 * roots of some good subtree embedded.
@@ -39,6 +43,7 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	public EmptinessCheck(BuchiTreeAutomaton<LETTER, STATE> mtree) {
 		this.mtree = mtree.mkcpy();
+		this.mtree2 = mtree.mkcpy();
 		finalStates = mtree.getFinalStates();
 		goodStates = new HashSet<STATE>();
 		goodTransitions = new Stack<>();
@@ -185,5 +190,50 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 			}
 		}
 		return true;
+	}
+
+	private Set<List> explore(STATE s, List alphabet) {
+		if (visitedStates.contains(s) || goodStates.contains(s)) {
+			return new HashSet<>();
+		} else if (!mtree2.getRulesBySource(s).isEmpty()) {
+			Set<List> allS = new HashSet<>();
+			allS.add(new ArrayList<>());
+			return allS;
+		} else {
+			Set<List> allS = new HashSet<>();
+			visitedStates.add(s);
+			for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mtree2.getRulesBySource(s)) {
+				List<STATE> states = rule.getDest();
+				for (int i = 0; i < rule.getArity(); i++) {
+					STATE q = states.get(i);
+					if (q != null) {
+						Set<List> S = explore(q, alphabet);
+						if (!S.isEmpty()) {
+							for (List list : S) {
+								list.add(alphabet.get(i));
+							}
+							allS.addAll(S);
+							break;
+						}
+					}
+				}
+			}
+			visitedStates.remove(s);
+			return allS;
+		}
+	}
+
+	/**
+	 * Return a set of counterexamples.
+	 * @param alphabet
+	 * @return
+	 */
+	public Set<List> findCounterExamples(List alphabet) {
+		visitedStates = new HashSet<>();
+		Set<List> allS = new HashSet<>();
+		for (STATE state : mtree2.getInitStates()) {
+			allS.addAll(explore(state, alphabet));
+		}
+		return allS;
 	}
 }
