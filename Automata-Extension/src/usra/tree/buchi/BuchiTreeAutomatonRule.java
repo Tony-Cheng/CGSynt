@@ -23,7 +23,9 @@ public class BuchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE> {
 	 * @param dest
 	 */
 	public BuchiTreeAutomatonRule(final LETTER letter, final STATE src, final List<STATE> dest) {
-		assert letter.getRank() == dest.size();
+		if (letter.getRank() != dest.size()) {
+			throw new Error();
+		}
 		this.mLetter = letter;
 		this.mSrc = src;
 		this.mDest = dest;
