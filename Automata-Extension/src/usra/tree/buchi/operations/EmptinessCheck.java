@@ -11,6 +11,7 @@ import java.util.Stack;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import usra.tree.buchi.BuchiTreeAutomaton;
 import usra.tree.buchi.BuchiTreeAutomatonRule;
+import usra.tree.buchi.BüchiTreeAutomatonRule;
 
 /**
  * Check whether or not a Buchi tree is empty.
@@ -225,6 +226,7 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	/**
 	 * Return a set of counterexamples.
+	 * 
 	 * @param alphabet
 	 * @return
 	 */
@@ -233,6 +235,46 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		Set<List> allS = new HashSet<>();
 		for (STATE state : mtree2.getInitStates()) {
 			allS.addAll(explore(state, alphabet));
+		}
+		return allS;
+	}
+
+	private <ALPHA> Set<List<ALPHA>> explore(STATE s) {
+		if (visitedStates.contains(s) || goodStates.contains(s)) {
+			return new HashSet<>();
+		} else if (!mtree2.getRulesBySource(s).isEmpty()) {
+			Set<List<ALPHA>> allS = new HashSet<>();
+			allS.add(new ArrayList<>());
+			return allS;
+		} else {
+			Set<List<ALPHA>> allS = new HashSet<>();
+			visitedStates.add(s);
+			for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mtree2.getRulesBySource(s)) {
+				BüchiTreeAutomatonRule<LETTER, STATE, ALPHA> advancedRule = (BüchiTreeAutomatonRule<LETTER, STATE, ALPHA>) rule;
+				for (ALPHA alpha : advancedRule.getAlphabet()) {
+					STATE q = advancedRule.getState(alpha);
+					if (q != null) {
+						Set<List<ALPHA>> S = explore(q);
+						if (!S.isEmpty()) {
+							for (List<ALPHA> list : S) {
+								list.add(alpha);
+							}
+							allS.addAll(S);
+							break;
+						}
+					}
+				}
+			}
+			visitedStates.remove(s);
+			return allS;
+		}
+	}
+
+	public <ALPHA> Set<List<ALPHA>> findCounterExamples() {
+		visitedStates = new HashSet<>();
+		Set<List<ALPHA>> allS = new HashSet<>();
+		for (STATE state : mtree2.getInitStates()) {
+			allS.addAll(explore(state));
 		}
 		return allS;
 	}

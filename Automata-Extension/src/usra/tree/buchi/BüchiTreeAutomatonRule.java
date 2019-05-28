@@ -24,4 +24,8 @@ public class BüchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE, ALPHA>
 	public STATE getState(ALPHA alpha) {
 		return transitions.get(alpha);
 	}
+	
+	public List<ALPHA> getAlphabet() {
+		return alpha;
+	}
 }
