@@ -63,8 +63,9 @@ public class CheatSheet_EmptynessCheck {
 	 * @param aut
 	 */
 	public static void checkAndPrintEmptyness(BuchiTreeAutomaton<TestRankedAlphabet, String> aut) {
-		EmptinessCheck<TestRankedAlphabet, String> emptynessChecker = new EmptinessCheck<>(aut);
-		System.out.println(emptynessChecker.computeResult());
+		EmptinessCheck<TestRankedAlphabet, String> emptinessChecker = new EmptinessCheck<>(aut);
+		emptinessChecker.computeResult();
+		System.out.println(emptinessChecker.getResult());
 	}
 
 	public static void main(String[] args) {
