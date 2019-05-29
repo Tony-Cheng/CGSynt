@@ -55,17 +55,18 @@ public class LTAEmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	private Set<STATE> removeTransitions(STATE state) {
 		Set<STATE> newLeaves = new HashSet<STATE>();
-		for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mtree.getChildMap().get(state)) {
-			if (mtree.getSourceMap().get(rule.getSource()) != null
-					&& mtree.getSourceMap().get(rule.getSource()).contains(rule)) {
-				mtree.getSourceMap().get(rule.getSource()).remove(rule);
-				if (mtree.getSourceMap().get(rule.getSource()).isEmpty() && !visitedLeaves.contains(rule.getSource())
-						&& !newLeaves.contains(rule.getSource())) {
-					newLeaves.add(rule.getSource());
-					visitedLeaves.add(rule.getSource());
+		if (mtree.getChildMap().get(state) != null)
+			for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mtree.getChildMap().get(state)) {
+				if (mtree.getSourceMap().get(rule.getSource()) != null
+						&& mtree.getSourceMap().get(rule.getSource()).contains(rule)) {
+					mtree.getSourceMap().get(rule.getSource()).remove(rule);
+					if (mtree.getSourceMap().get(rule.getSource()).isEmpty()
+							&& !visitedLeaves.contains(rule.getSource()) && !newLeaves.contains(rule.getSource())) {
+						newLeaves.add(rule.getSource());
+						visitedLeaves.add(rule.getSource());
+					}
 				}
 			}
-		}
 		return newLeaves;
 
 	}
