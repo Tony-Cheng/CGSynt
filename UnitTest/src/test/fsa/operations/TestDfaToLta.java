@@ -12,6 +12,7 @@ import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
+import usra.dfa.operations.DfaToLtaLanguage;
 import usra.dfa.operations.DfaToLtaPowerSet;
 import test.fsa.FsaFactory;
 import usra.tree.buchi.BuchiTreeAutomaton;
@@ -32,7 +33,7 @@ class TestDfaToLta {
 	 * Check that converting the five state DFA to an LTA works.
 	 */
 	@Test
-	void testDfaToLtaOnFiveStateDfa() {
+	void testDfaToLtaOnFiveStateDfaSubSet() {
 		NestedWordAutomaton<Character, String> dfa = FsaFactory.fiveStateDFA(service);
 		
 		DfaToLtaPowerSet<Character, String> op = new DfaToLtaPowerSet<>(dfa);
@@ -51,7 +52,7 @@ class TestDfaToLta {
 	}
 	
 	@Test
-	void testDfaToLtaOnEmptyDfa() {
+	void testDfaToLtaOnEmptyDfaSubSet() {
 		NestedWordAutomaton<Character, String> dfa = FsaFactory.emptyDfa(service);
 		
 		DfaToLtaPowerSet<Character, String> op = new DfaToLtaPowerSet<>(dfa);
@@ -70,7 +71,7 @@ class TestDfaToLta {
 	}
 	
 	@Test
-	void testDfaToLtaOnSingleStateDfa() {
+	void testDfaToLtaOnSingleStateDfaSubSet() {
 		NestedWordAutomaton<Character, String> dfa = FsaFactory.oneStateDfa(service);
 		
 		DfaToLtaPowerSet<Character, String> op = new DfaToLtaPowerSet<>(dfa);
@@ -88,4 +89,54 @@ class TestDfaToLta {
 		}
 	}
 
+	/**
+	 * Check that converting the five state DFA to an LTA works.
+	 */
+	@Test
+	void testDfaToLtaOnFiveStateDfaFull() {
+		NestedWordAutomaton<Character, String> dfa = FsaFactory.fiveStateDFA(service);
+		
+		DfaToLtaLanguage<Character, String> op = new DfaToLtaLanguage<>(dfa);
+		
+		BuchiTreeAutomaton<LtaBool, String> lta = op.getResult();
+		
+		Set<String> states = dfa.getStates();
+		for (String state : states) {
+			Collection<BuchiTreeAutomatonRule<LtaBool, String>> rules = lta.getRulesBySource(state);
+				
+			assertEquals(rules.size(), 1);
+		}
+	}
+	
+	@Test
+	void testDfaToLtaOnEmptyDfaFull() {
+		NestedWordAutomaton<Character, String> dfa = FsaFactory.emptyDfa(service);
+		
+		DfaToLtaLanguage<Character, String> op = new DfaToLtaLanguage<>(dfa);
+		
+		BuchiTreeAutomaton<LtaBool, String> lta = op.getResult();
+		
+		Set<String> states = dfa.getStates();
+		for (String state : states) {
+			Collection<BuchiTreeAutomatonRule<LtaBool, String>> rules = lta.getRulesBySource(state);
+				
+			assertEquals(rules.size(), 1);
+		}
+	}
+	
+	@Test
+	void testDfaToLtaOnSingleStateDfaFull() {
+		NestedWordAutomaton<Character, String> dfa = FsaFactory.oneStateDfa(service);
+		
+		DfaToLtaLanguage<Character, String> op = new DfaToLtaLanguage<>(dfa);
+		
+		BuchiTreeAutomaton<LtaBool, String> lta = op.getResult();
+		
+		Set<String> states = dfa.getStates();
+		for (String state : states) {
+			Collection<BuchiTreeAutomatonRule<LtaBool, String>> rules = lta.getRulesBySource(state);
+				
+			assertEquals(rules.size(), 1);
+		}
+	}
 }
