@@ -72,6 +72,12 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public void addRules(BuchiTreeAutomatonRule<LETTER, STATE>... rules) {
+		for(BuchiTreeAutomatonRule<LETTER, STATE> rule : rules) {
+			addRule(rule);
+		}
+	}
 
 	@Override
 	public void addRule(BuchiTreeAutomatonRule<LETTER, STATE> rule) {
