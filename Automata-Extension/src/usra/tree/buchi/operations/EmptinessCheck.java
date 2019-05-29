@@ -24,6 +24,9 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	private BuchiTreeAutomaton<LETTER, STATE> mtree;
 	private BuchiTreeAutomaton<LETTER, STATE> mtree2;
 
+	private boolean result;
+	private boolean resultComputed;
+
 	/**
 	 * A set of final states.
 	 */
@@ -48,6 +51,7 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		finalStates = mtree.getFinalStates();
 		goodStates = new HashSet<STATE>();
 		goodTransitions = new Stack<>();
+		resultComputed = false;
 	}
 
 	/**
@@ -166,23 +170,29 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	}
 
 	/**
-	 * Return true if the tree is empty and false otherwise.
-	 * 
-	 * @return
+	 * Compute whether or not the automaton is empty.
 	 */
-	public boolean computeResult() {
+	public void computeResult() {
+		if (resultComputed)
+			return;
 		initializeGoodTransitions();
 		findAllGoodStates();
 		while (!goodStates.isEmpty()) {
 			if (!removeNotGoodStates()) {
 				if (mtree.getInitStates().isEmpty()) {
-					return true;
+					resultComputed = true;
+					result = true;
+					return;
 				} else {
-					return false;
+					resultComputed = true;
+					result = false;
+					return;
 				}
 			} else {
 				if (mtree.getInitStates().isEmpty()) {
-					return true;
+					resultComputed = true;
+					result = true;
+					return;
 				}
 				goodStates.clear();
 				goodTransitions.clear();
@@ -190,7 +200,18 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 				findAllGoodStates();
 			}
 		}
-		return true;
+		resultComputed = true;
+		result = true;
+		return;
+	}
+
+	/**
+	 * Return the true if the automaton is empty and false otherwise.
+	 * 
+	 * @return
+	 */
+	public boolean getResult() {
+		return result;
 	}
 
 	private <ALPHA> Set<List<ALPHA>> explore(STATE s, List<ALPHA> alphabet) {
