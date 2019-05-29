@@ -193,24 +193,24 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		return true;
 	}
 
-	private Set<List> explore(STATE s, List alphabet) {
+	private <ALPHA> Set<List<ALPHA>> explore(STATE s, List<ALPHA> alphabet) {
 		if (visitedStates.contains(s) || goodStates.contains(s)) {
 			return new HashSet<>();
 		} else if (!mtree2.getRulesBySource(s).isEmpty()) {
-			Set<List> allS = new HashSet<>();
+			Set<List<ALPHA>> allS = new HashSet<>();
 			allS.add(new ArrayList<>());
 			return allS;
 		} else {
-			Set<List> allS = new HashSet<>();
+			Set<List<ALPHA>> allS = new HashSet<>();
 			visitedStates.add(s);
 			for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mtree2.getRulesBySource(s)) {
 				List<STATE> states = rule.getDest();
 				for (int i = 0; i < rule.getArity(); i++) {
 					STATE q = states.get(i);
 					if (q != null) {
-						Set<List> S = explore(q, alphabet);
+						Set<List<ALPHA>> S = explore(q, alphabet);
 						if (!S.isEmpty()) {
-							for (List list : S) {
+							for (List<ALPHA> list : S) {
 								list.add(alphabet.get(i));
 							}
 							allS.addAll(S);
@@ -230,9 +230,9 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	 * @param alphabet
 	 * @return
 	 */
-	public Set<List> findCounterExamples(List alphabet) {
+	public <ALPHA> Set<List<ALPHA>> findCounterExamples(List<ALPHA> alphabet) {
 		visitedStates = new HashSet<>();
-		Set<List> allS = new HashSet<>();
+		Set<List<ALPHA>> allS = new HashSet<>();
 		for (STATE state : mtree2.getInitStates()) {
 			allS.addAll(explore(state, alphabet));
 		}
