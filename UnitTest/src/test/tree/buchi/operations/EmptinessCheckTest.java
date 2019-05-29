@@ -73,7 +73,7 @@ class EmptinessCheckTest {
 
 	@Test
 	void testAnthonyEmpty() {
-		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.anthonyEmpty();
+		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.emptyBuchiTree();
 
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
 		empty.computeResult();
@@ -83,7 +83,7 @@ class EmptinessCheckTest {
 
 	@Test
 	void testAnthonyNonEmpty() {
-		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.anthonyNonEmpty();
+		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.nonEmptyBuchiTree();
 
 		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
 		empty.computeResult();

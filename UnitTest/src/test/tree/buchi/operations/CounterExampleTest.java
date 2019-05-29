@@ -41,7 +41,7 @@ public class CounterExampleTest {
 		}
 		System.out.println();
 	}
-	
+
 	@Test
 	void testMultiCounterExamples() {
 		System.out.println("testMultiCounterExamples");
@@ -81,4 +81,25 @@ public class CounterExampleTest {
 		}
 		System.out.println();
 	}
+	
+	@Test
+	void testMultiInitCounterExample() {
+		System.out.println("testMultiInitCounterExample");
+		BuchiTreeAutomaton<RankedLetter, String> aut = BuchiTreeAutomatonFactory.complexEmptyLTA();
+		EmptinessCheck<RankedLetter, String> empty = new EmptinessCheck<>(aut);
+		empty.computeResult();
+		List<String> alphabet = new ArrayList<>();
+		alphabet.add("a");
+		alphabet.add("b");
+		Set<List<String>> counterExamples = empty.findCounterExamples(alphabet);
+
+		for (List<String> word : counterExamples) {
+			for (String letter : word) {
+				System.out.print(letter);
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
+
 }
