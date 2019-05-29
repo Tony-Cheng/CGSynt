@@ -72,9 +72,9 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	public void addRules(BuchiTreeAutomatonRule<LETTER, STATE>... rules) {
-		for(BuchiTreeAutomatonRule<LETTER, STATE> rule : rules) {
+		for (BuchiTreeAutomatonRule<LETTER, STATE> rule : rules) {
 			addRule(rule);
 		}
 	}
@@ -280,6 +280,9 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		return mChildMap;
 	}
 
+	/**
+	 * Make every state in this automaton a final state.
+	 */
 	public void setAllStatesFinal() {
 		mFinalStates.addAll(mStates);
 	}

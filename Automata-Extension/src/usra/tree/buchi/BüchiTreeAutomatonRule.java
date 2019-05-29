@@ -10,6 +10,9 @@ public class BüchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE, ALPHA>
 		extends BuchiTreeAutomatonRule<LETTER, STATE> {
 
 	private List<ALPHA> alpha;
+	/**
+	 * A map that maps a letter in sigma to a destination state.
+	 */
 	private Map<ALPHA, STATE> transitions;
 
 	public BüchiTreeAutomatonRule(LETTER letter, STATE src, List<STATE> dest, List<ALPHA> alpha) {
@@ -21,10 +24,17 @@ public class BüchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE, ALPHA>
 		}
 	}
 
+	/**
+	 * Given a letter in sigma, return the destination state.
+	 * 
+	 * @param alpha
+	 *            a letter in sigma
+	 * @return
+	 */
 	public STATE getState(ALPHA alpha) {
 		return transitions.get(alpha);
 	}
-	
+
 	public List<ALPHA> getAlphabet() {
 		return alpha;
 	}

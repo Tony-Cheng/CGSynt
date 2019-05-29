@@ -215,6 +215,13 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		return result;
 	}
 
+	/**
+	 * Return a set counter examples rooted at s.
+	 * 
+	 * @param s
+	 * @param alphabet
+	 * @return
+	 */
 	private <ALPHA> Set<List<ALPHA>> explore(STATE s, List<ALPHA> alphabet) {
 		if (visitedStates.contains(s) || goodStates.contains(s)) {
 			return new HashSet<>();
@@ -247,7 +254,7 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	}
 
 	/**
-	 * Return a set of counterexamples.
+	 * Return a set of counterexamples root at the initial state.
 	 * 
 	 * @param alphabet
 	 * @return
@@ -264,6 +271,12 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		return allS;
 	}
 
+	/**
+	 * Return a set of counter example root at s.
+	 * 
+	 * @param s
+	 * @return
+	 */
 	private <ALPHA> Set<List<ALPHA>> explore(STATE s) {
 		if (visitedStates.contains(s) || goodStates.contains(s)) {
 			return new HashSet<>();
@@ -295,6 +308,11 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		}
 	}
 
+	/**
+	 * Return a set of counter examples rooted at the initial states.
+	 * 
+	 * @return
+	 */
 	public <ALPHA> Set<List<ALPHA>> findCounterExamples() {
 		visitedStates = new HashSet<>();
 		Set<List<ALPHA>> allS = new HashSet<>();
