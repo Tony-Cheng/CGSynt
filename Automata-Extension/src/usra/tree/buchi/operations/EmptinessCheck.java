@@ -2,6 +2,7 @@ package usra.tree.buchi.operations;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -217,7 +218,7 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	private <ALPHA> Set<List<ALPHA>> explore(STATE s, List<ALPHA> alphabet) {
 		if (visitedStates.contains(s) || goodStates.contains(s)) {
 			return new HashSet<>();
-		} else if (!mtree2.getRulesBySource(s).isEmpty()) {
+		} else if (mtree2.getRulesBySource(s) == null) {
 			Set<List<ALPHA>> allS = new HashSet<>();
 			allS.add(new ArrayList<>());
 			return allS;
@@ -256,6 +257,9 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		Set<List<ALPHA>> allS = new HashSet<>();
 		for (STATE state : mtree2.getInitStates()) {
 			allS.addAll(explore(state, alphabet));
+		}
+		for (List<ALPHA> list : allS) {
+			Collections.reverse(list);
 		}
 		return allS;
 	}
@@ -296,6 +300,9 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		Set<List<ALPHA>> allS = new HashSet<>();
 		for (STATE state : mtree2.getInitStates()) {
 			allS.addAll(explore(state));
+		}
+		for (List<ALPHA> list : allS) {
+			Collections.reverse(list);
 		}
 		return allS;
 	}

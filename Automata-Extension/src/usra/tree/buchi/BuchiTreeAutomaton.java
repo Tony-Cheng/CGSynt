@@ -274,6 +274,10 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		return mChildMap;
 	}
 
+	public void setAllStatesFinal() {
+		mFinalStates.addAll(mStates);
+	}
+
 	/**
 	 * Make a copy of this automaton.
 	 * 
@@ -285,7 +289,10 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		copy.mParentsMap.putAll(mParentsMap);
 		copy.mAlphabet.addAll(mAlphabet);
 		copy.mLettersMap.putAll(mLettersMap);
-		copy.mSourceMap.putAll(mSourceMap);
+		for (STATE state : mSourceMap.keySet()) {
+			copy.mSourceMap.put(state, new HashSet<>());
+			copy.mSourceMap.get(state).addAll(mSourceMap.get(state));
+		}
 		copy.mRules.addAll(mRules);
 		copy.mFinalStates.addAll(mFinalStates);
 		copy.mStates.addAll(mStates);

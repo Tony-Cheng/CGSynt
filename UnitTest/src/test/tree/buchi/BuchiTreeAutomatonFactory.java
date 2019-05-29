@@ -54,6 +54,27 @@ public class BuchiTreeAutomatonFactory {
 		return aut;
 	}
 
+	public static BuchiTreeAutomaton<RankedLetter, String> LTATripleEmpty() {
+		BuchiTreeAutomaton<RankedLetter, String> aut = new BuchiTreeAutomaton<>(2);
+		List<String> list1 = new ArrayList<>();
+		list1.add("q1");
+		list1.add("q2");
+
+		List<String> list2 = new ArrayList<>();
+		list2.add("q0");
+		list2.add("q2");
+
+		BuchiTreeAutomatonRule<RankedLetter, String> rule1 = new BuchiTreeAutomatonRule<>(LETTERA, "q0", list1);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule2 = new BuchiTreeAutomatonRule<>(LETTERA, "q1", list2);
+
+		aut.addRule(rule1);
+		aut.addRule(rule2);
+		aut.addInitState("q0");
+		aut.setAllStatesFinal();
+
+		return aut;
+	}
+
 	public static BuchiTreeAutomaton<RankedLetter, String> complexNonEmpty() {
 		BuchiTreeAutomaton<RankedLetter, String> aut = new BuchiTreeAutomaton<>(2);
 
@@ -265,30 +286,29 @@ public class BuchiTreeAutomatonFactory {
 		return machine;
 	}
 
-	
-	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedNonEmpty(int n){
+	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedNonEmpty(int n) {
 		BuchiTreeAutomaton<RankedLetter, String> machine = parameterizedEmpty(n);
-		
-		for (int i = (int)Math.pow(2, n - 1) - 1; i < (int)Math.pow(2, n) - 1; i++) {
+
+		for (int i = (int) Math.pow(2, n - 1) - 1; i < (int) Math.pow(2, n) - 1; i++) {
 			List<String> t = destList("q0", "q0");
 			BuchiTreeAutomatonRule<RankedLetter, String> rule = new BuchiTreeAutomatonRule<>(LETTERA, "q" + i, t);
 			machine.addRule(rule);
 		}
-		
+
 		return machine;
 	}
-	
-	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedNonEmptyWithRandom(int n, int m){
+
+	public static BuchiTreeAutomaton<RankedLetter, String> parameterizedNonEmptyWithRandom(int n, int m) {
 		BuchiTreeAutomaton<RankedLetter, String> machine = parameterizedNonEmpty(10);
-		
-		int numNodes = (int)Math.pow(2, n);
-		
+
+		int numNodes = (int) Math.pow(2, n);
+
 		for (int i = 0; i < m; i++) {
-			int s = (int)(Math.random() * numNodes);
-			
-			int d1 = (int)(Math.random() * numNodes);
-			int d2 = (int)(Math.random() * numNodes);
-			
+			int s = (int) (Math.random() * numNodes);
+
+			int d1 = (int) (Math.random() * numNodes);
+			int d2 = (int) (Math.random() * numNodes);
+
 			List<String> t = destList("q" + d1, "q" + d2);
 			BuchiTreeAutomatonRule<RankedLetter, String> rule = new BuchiTreeAutomatonRule<>(LETTERA, "q" + s, t);
 			machine.addRule(rule);
