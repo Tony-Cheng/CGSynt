@@ -1,6 +1,7 @@
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
@@ -13,6 +14,8 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOld
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.DefaultIcfgSymbolTable;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.IIcfgSymbolTable;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.BasicInternalAction;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IAction;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.ProgramVarUtils;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SmtSortUtils;
@@ -28,7 +31,7 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
-public class TrestInterpolatingTraceCheckCraig {
+public class TestInterpolatingTraceCheckCraig {
 
 	private BoogieNonOldVar constructProgramVar(ManagedScript mMgdScript, final String identifier) {
 		BoogieOldVar oldVar;
@@ -80,11 +83,12 @@ public class TrestInterpolatingTraceCheckCraig {
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		IPredicate precondition = factory.newEmptyStackPredicate();
 		IPredicate postcondition = factory.newEmptyStackPredicate();
-		InterpolatingTraceCheckCraig c;
+		NestedWord<IAction> trace = new NestedWord<>();
+		BasicInternalAction addOne = new BasicInternalAction();
 	}
 
 	public static void main(String[] args) {
-		new TrestInterpolatingTraceCheckCraig();
+		new TestInterpolatingTraceCheckCraig();
 	}
 
 }
