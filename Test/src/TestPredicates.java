@@ -1,3 +1,4 @@
+import java.util.HashSet;
 import java.util.Set;
 
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
@@ -5,6 +6,7 @@ import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieOldVar;
@@ -18,6 +20,7 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SmtUtils.XnfCon
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicate;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.PredicateUtils;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
@@ -32,9 +35,17 @@ public class TestPredicates {
 		
 		mMgdScript = new ManagedScript(mock, script);
 		
-		
+		Set<IProgramVar> vars = new HashSet<>();
 		BoogieNonOldVar x = constructProgramVar("x");
 		BoogieNonOldVar y = constructProgramVar("y");
+		
+		vars.add(x);
+		vars.add(y);
+		
+		Term formula = script.term(">", x.getTermVariable(), y.getTermVariable());
+		Term closedFormula = PredicateUtils.computeClosedFormula(formula, vars, script);
+		BasicPredicate pred1 = 
+				new BasicPredicate(0, null, formula, vars, closedFormula);
 	}
 	
 	public BoogieNonOldVar constructProgramVar(final String identifier) {
