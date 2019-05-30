@@ -9,5 +9,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Automata-Extension"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-SMTLIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SMTInterpol"/>
+	<classpathentry kind="src" path="/Library-ModelCheckerUtils"/>
+	<classpathentry kind="src" path="/TraceAbstraction"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
