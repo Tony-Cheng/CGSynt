@@ -272,7 +272,7 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	}
 
 	/**
-	 * Return a set of counter example root at s.
+	 * Return a counterexample for the subtree rooted at s.
 	 * 
 	 * @param s
 	 * @return
@@ -309,7 +309,7 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	}
 
 	/**
-	 * Return a set of counter examples rooted at the initial states.
+	 * Return a counterexample.
 	 * 
 	 * @return
 	 */

@@ -11,6 +11,12 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import usra.tree.buchi.BuchiTreeAutomaton;
 import usra.tree.buchi.BuchiTreeAutomatonRule;
 
+/**
+ * Check whether or not a LTA is empty.
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class LTAEmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	private BuchiTreeAutomaton<LETTER, STATE> mtree;
@@ -20,6 +26,12 @@ public class LTAEmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	private Set<STATE> visitedLeaves;
 	private Set<STATE> visitedStates;
 
+	/**
+	 * Create a new LTAEmptinessCheck object.
+	 * 
+	 * @param mtree
+	 *            the LTA
+	 */
 	public LTAEmptinessCheck(BuchiTreeAutomaton<LETTER, STATE> mtree) {
 		this.mtree = mtree.mkcpy();
 		this.mtree2 = mtree.mkcpy();
@@ -27,6 +39,11 @@ public class LTAEmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		resultComputed = false;
 	}
 
+	/**
+	 * Return the set of leaves in the automaton.
+	 * 
+	 * @return
+	 */
 	public Set<STATE> computeInitLeaves() {
 		Set<STATE> leaves = new HashSet<>();
 		for (STATE state : mtree.getStates()) {
@@ -38,6 +55,9 @@ public class LTAEmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	}
 
+	/**
+	 * Check if the LTA is empty and store the result in the variable result.
+	 */
 	public void computeResult() {
 		if (resultComputed)
 			return;
@@ -59,6 +79,12 @@ public class LTAEmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		return;
 	}
 
+	/**
+	 * Remove all transitions that have state as a destination.
+	 * 
+	 * @param state
+	 * @return
+	 */
 	private Set<STATE> removeTransitions(STATE state) {
 		Set<STATE> newLeaves = new HashSet<STATE>();
 		if (mtree.getChildMap().get(state) != null)
@@ -77,12 +103,17 @@ public class LTAEmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	}
 
+	/**
+	 * Return true if the LTA is empty and false otherwise.
+	 * 
+	 * @return
+	 */
 	public boolean getResult() {
 		return result;
 	}
 
 	/**
-	 * Return a set counter examples rooted at s.
+	 * Return a counterexample for the subtree rooted at s.
 	 * 
 	 * @param s
 	 * @param alphabet
@@ -120,7 +151,7 @@ public class LTAEmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	}
 
 	/**
-	 * Return a set of counterexamples root at the initial state.
+	 * Return a counterexample.
 	 * 
 	 * @param alphabet
 	 * @return
