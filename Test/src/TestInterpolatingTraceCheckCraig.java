@@ -1,4 +1,8 @@
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
@@ -16,6 +20,9 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.DefaultIcfgSymb
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.IIcfgSymbolTable;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.BasicInternalAction;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IAction;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.TransFormulaBuilder;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula.Infeasibility;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.ProgramVarUtils;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SmtSortUtils;
@@ -66,25 +73,40 @@ public class TestInterpolatingTraceCheckCraig {
 	public void TrestInterpolatingTraceCheckCraig() {
 		final Script mScript = new SMTInterpol(new DefaultLogger());
 		IUltimateServiceProvider mServices = UltimateMocks.createUltimateServiceProviderMock(LogLevel.INFO);
-		ManagedScript mMgdScript = new ManagedScript(mServices, mScript);
+		ManagedScript mgdScript = new ManagedScript(mServices, mScript);
 		mScript.setOption(":produce-proofs", true);
 		mScript.setLogic(Logics.QF_LIA);
 		Set<IProgramVar> vars = new HashSet<>();
-		BoogieNonOldVar a = constructProgramVar(mMgdScript, "a");
-		Term preconditionFormula = mScript.term("=", a.getTermVariable(), mScript.numeral("1"));
+		BoogieNonOldVar a = constructProgramVar(mgdScript, "a");
 		IIcfgSymbolTable symbolTable = new DefaultIcfgSymbolTable();
+		PredicateFactory factory = new PredicateFactory(mServices, mgdScript, symbolTable, SimplificationTechnique.NONE,
+				XnfConversionTechnique.BDD_BASED);
+		IPredicate precondition = factory.newEmptyStackPredicate();
+		IPredicate postcondition = factory.newEmptyStackPredicate();
+		Map<IProgramVar, TermVariable> inVars = new HashMap<>();
+		Map<IProgramVar, TermVariable> outVars = new HashMap<>();
+		inVars.put(a, a.getTermVariable());
+		outVars.put(a, a.getTermVariable());
+		List<IProgramVar> lhs = new ArrayList<>();
+		List<Term> rhs = new ArrayList<>();
+		rhs.add(mScript.term("+", a.getTerm(), mScript.numeral("1")));
+		UnmodifiableTransFormula formula = TransFormulaBuilder.constructAssignment(lhs, rhs, symbolTable, mgdScript);
+		BasicInternalAction addOne = new BasicInternalAction("", "", formula);
+		NestedWord<IAction> trace = new NestedWord<>(addOne, NestedWord.INTERNAL_POSITION);
+		InterpolatingTraceCheckCraig<IAction> interpolator = new InterpolatingTraceCheckCraig<>(precondition,
+				postcondition, null, trace, null, mServices, null, mgdScript, factory, null, null, false, false, null,
+				false, null, null, false);
+	}
+
+	private void unusedStatements() {
+		// Term preconditionFormula = mScript.term("=", a.getTermVariable(),
+		// mScript.numeral("1"));
 		// IPredicate precondition = new BasicPredicate(1, new String[0],
 		// preconditionFormula, vars,
 		// PredicateUtils.computeClosedFormula(preconditionFormula, vars, mScript));
 		// IPredicate postcondition = new BasicPredicate(2, new String[0],
 		// preconditionFormula, vars,
 		// PredicateUtils.computeClosedFormula(preconditionFormula, vars, mScript));
-		PredicateFactory factory = new PredicateFactory(mServices, mMgdScript, symbolTable,
-				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
-		IPredicate precondition = factory.newEmptyStackPredicate();
-		IPredicate postcondition = factory.newEmptyStackPredicate();
-		NestedWord<IAction> trace = new NestedWord<>();
-		BasicInternalAction addOne = new BasicInternalAction();
 	}
 
 	public static void main(String[] args) {
