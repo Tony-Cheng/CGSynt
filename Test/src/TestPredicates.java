@@ -44,8 +44,13 @@ public class TestPredicates {
 		
 		Term formula = script.term(">", x.getTermVariable(), y.getTermVariable());
 		Term closedFormula = PredicateUtils.computeClosedFormula(formula, vars, script);
-		BasicPredicate pred1 = 
+		BasicPredicate pred = 
 				new BasicPredicate(0, null, formula, vars, closedFormula);
+		
+		Term extractedTerm = pred.getClosedFormula();
+		
+		script.assertTerm(extractedTerm);
+		script.checkSat();
 	}
 	
 	public BoogieNonOldVar constructProgramVar(final String identifier) {
