@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/SMTInterpol"/>
 	<classpathentry kind="src" path="/Library-ModelCheckerUtils"/>
 	<classpathentry kind="src" path="/TraceAbstraction"/>
+	<classpathentry kind="src" path="/CodeCheck"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
