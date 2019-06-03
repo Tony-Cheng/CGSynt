@@ -70,11 +70,33 @@ public class TestLTAEmptinessCheck {
 	
 	@Test
 	void test3() {
-		// MultiLetter LTA
+		// MultiLetter nonempty LTA
 		BuchiTreeAutomaton<RankedLetter, String> aut = LTAFactory.nonEmptyMultiLetterLTA();
 		LTAEmptinessCheck<RankedLetter, String> isEmpty = new LTAEmptinessCheck<>(aut);
 		isEmpty.computeResult();
 		assertFalse(isEmpty.getResult());
+	}
+	
+	@Test
+	void test4() {
+		// MultiLetter empty LTA
+		BuchiTreeAutomaton<RankedLetter, String> aut = LTAFactory.emptyMultiLetterLTA();
+		LTAEmptinessCheck<RankedLetter, String> isEmpty = new LTAEmptinessCheck<>(aut);
+		isEmpty.computeResult();
+		assertTrue(isEmpty.getResult());
+		System.out.println("Test 4 counterexamples:");
+		printCounterExamples(generateCounterExamples(isEmpty));
+	}
+	
+	@Test
+	void test5() {
+		// Empty NLTA
+		BuchiTreeAutomaton<RankedLetter, String> aut = LTAFactory.emptyNLTA();
+		LTAEmptinessCheck<RankedLetter, String> isEmpty = new LTAEmptinessCheck<>(aut);
+		isEmpty.computeResult();
+		assertTrue(isEmpty.getResult());
+		System.out.println("Test 5 counterexamples:");
+		printCounterExamples(generateCounterExamples(isEmpty));
 	}
 
 	private List<String> generateDefaultLetters() {
