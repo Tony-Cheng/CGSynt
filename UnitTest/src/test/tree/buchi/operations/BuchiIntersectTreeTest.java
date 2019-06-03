@@ -16,7 +16,7 @@ import test.tree.buchi.RankedLetter;
 class BuchiIntersectTreeTest {
 
 	@Test
-	void testOneTwoIntersect() {
+	void test2() {
 		BuchiTreeAutomaton<RankedLetter, String> single = BuchiTreeAutomatonFactory.single();
 		BuchiTreeAutomaton<RankedLetter, String> doubleAut = BuchiTreeAutomatonFactory.doubleEmpty();
 
@@ -29,6 +29,20 @@ class BuchiIntersectTreeTest {
 		assertEquals(intersectedState.getInitStates().size(), 1);
 		assertTrue(intersectedState.getInitStates().contains(new IntersectState<String>("q0", "q0", 1)));
 		assertTrue(intersectedState.getRank() == 2);
+		System.out.println("Test2");
+		System.out.println(intersectedState);
 
+	}
+	
+	@Test
+	void test1() {
+		BuchiTreeAutomaton<RankedLetter, String> aut1 = BuchiTreeAutomatonFactory.single();
+		BuchiTreeAutomaton<RankedLetter, String> aut2 = BuchiTreeAutomatonFactory.single();
+		BuchiIntersectTree<RankedLetter, String> intersect = new BuchiIntersectTree<>(aut1, aut2);
+		BuchiTreeAutomaton<RankedLetter, IntersectState<String>> intersectAut = intersect.computeResult();
+		assertEquals(intersectAut.getFinalStates().size(), 1);
+		assertEquals(intersectAut.getStates().size(), 2);
+		System.out.println("Test1\n");
+		System.out.println(intersectAut);
 	}
 }
