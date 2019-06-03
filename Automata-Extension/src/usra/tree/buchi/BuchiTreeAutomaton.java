@@ -29,7 +29,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	private final Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mChildMap;
 	private final Set<STATE> mStates;
 	private final Set<STATE> mInitStates;
-	private final int rank;	
+	private final int rank;
 
 	/**
 	 * Create a BuchiTreeAutomaton.
@@ -308,6 +308,50 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		copy.mInitStates.addAll(mInitStates);
 		copy.mChildMap.putAll(mChildMap);
 		return copy;
+
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		
+		result.append("States:\n");
+		for (STATE state : mStates) {
+			result.append(state.toString());
+			result.append("\n");
+		}
+		result.append("\n");
+
+		result.append("Initial States:\n");
+		for (STATE state : mInitStates) {
+			result.append(state.toString());
+			result.append("\n");
+		}
+		result.append("\n");
+		
+		result.append("Final States:\n");
+		for (STATE state : mFinalStates) {
+			result.append(state.toString());
+			result.append("\n");
+		}
+		result.append("\n");
+		
+		result.append("Alphabet:\n");
+		for (LETTER letter : mAlphabet) {
+			result.append(letter.toString());
+			result.append("\n");
+		}
+		result.append("\n");
+		
+		result.append("Transitions:\n");
+		for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mRules) {
+			result.append(rule.toString());
+			result.append("\n");
+		}
+		result.append("\n");
+		
+		result.append("\n");
+		return result.toString();
 
 	}
 }
