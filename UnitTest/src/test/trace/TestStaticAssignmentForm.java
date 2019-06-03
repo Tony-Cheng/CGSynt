@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import cgsynt.FormulaFactory;
+import cgsynt.Token;
+import cgsynt.TokenFactory;
+import cgsynt.Trace;
+import cgsynt.trace.operations.TraceToSMTFormula;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-import usra.trace.FormulaFactory;
-import usra.trace.Token;
-import usra.trace.TokenFactory;
-import usra.trace.Trace;
-import usra.trace.operations.TraceToSMTFormula;
 
 public class TestStaticAssignmentForm {
 

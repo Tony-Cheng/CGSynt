@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import usra.tree.buchi.BuchiTreeAutomaton;
-import usra.tree.buchi.BuchiTreeAutomatonRule;
-import usra.tree.buchi.IntersectState;
-import usra.tree.buchi.operations.BuchiIntersectTree;
+import cgsynt.tree.buchi.BuchiTreeAutomaton;
+import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
+import cgsynt.tree.buchi.IntersectState;
+import cgsynt.tree.buchi.operations.BuchiIntersectTree;
 
 public class TestBuchiTree {
 

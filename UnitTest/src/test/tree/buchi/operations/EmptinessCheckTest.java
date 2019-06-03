@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import cgsynt.tree.buchi.BuchiTreeAutomaton;
+import cgsynt.tree.buchi.operations.EmptinessCheck;
 import test.tree.buchi.BuchiTreeAutomatonFactory;
 import test.tree.buchi.RankedLetter;
-import usra.tree.buchi.BuchiTreeAutomaton;
-import usra.tree.buchi.operations.EmptinessCheck;
 
 class EmptinessCheckTest {
 

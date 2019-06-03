@@ -1,11 +1,11 @@
+import cgsynt.Formula;
+import cgsynt.FormulaFactory;
+import cgsynt.Token;
+import cgsynt.TokenFactory;
+import cgsynt.Trace;
+import cgsynt.trace.operations.TraceToSMTFormula;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-import usra.trace.Formula;
-import usra.trace.FormulaFactory;
-import usra.trace.Token;
-import usra.trace.TokenFactory;
-import usra.trace.Trace;
-import usra.trace.operations.TraceToSMTFormula;
 
 public class TestTraceOp {
 	public static void main(String args[]) {

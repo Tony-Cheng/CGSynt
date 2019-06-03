@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+import cgsynt.tree.buchi.BuchiTreeAutomaton;
+import cgsynt.tree.buchi.operations.LTAEmptinessCheck;
 import test.tree.buchi.RankedLetter;
 import test.tree.lta.LTAFactory;
-import usra.tree.buchi.BuchiTreeAutomaton;
-import usra.tree.buchi.operations.LTAEmptinessCheck;
 
 public class TestLTAEmptinessCheck {
 

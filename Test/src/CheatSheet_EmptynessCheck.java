@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import usra.tree.buchi.BuchiTreeAutomaton;
-import usra.tree.buchi.BuchiTreeAutomatonRule;
-import usra.tree.buchi.operations.EmptinessCheck;
+import cgsynt.tree.buchi.BuchiTreeAutomaton;
+import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
+import cgsynt.tree.buchi.operations.EmptinessCheck;
 
 public class CheatSheet_EmptynessCheck {
 

@@ -7,11 +7,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import usra.trace.Formula;
-import usra.trace.FormulaInterface;
-import usra.trace.Token;
-import usra.trace.TokenFactory;
-import usra.trace.Trace;
+import cgsynt.Formula;
+import cgsynt.FormulaInterface;
+import cgsynt.Token;
+import cgsynt.TokenFactory;
+import cgsynt.Trace;
 
 public class TestTrace {
 
