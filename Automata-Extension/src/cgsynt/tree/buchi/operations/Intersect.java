@@ -15,7 +15,7 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
  * @param <LETTER>
  * @param <STATE>
  */
-public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
+public class Intersect<LETTER extends IRankedLetter, STATE> {
 	private final BuchiTreeAutomaton<LETTER, STATE> tree1;
 	private final BuchiTreeAutomaton<LETTER, STATE> tree2;
 	private final BuchiTreeAutomaton<LETTER, IntersectState<STATE>> result;
@@ -28,7 +28,7 @@ public class BuchiIntersectTree<LETTER extends IRankedLetter, STATE> {
 	 * @param tree2
 	 *            a Buchi tree
 	 */
-	public BuchiIntersectTree(BuchiTreeAutomaton<LETTER, STATE> tree1, BuchiTreeAutomaton<LETTER, STATE> tree2) {
+	public Intersect(BuchiTreeAutomaton<LETTER, STATE> tree1, BuchiTreeAutomaton<LETTER, STATE> tree2) {
 		this.tree1 = tree1;
 		this.tree2 = tree2;
 		assert tree1.getRank() == tree2.getRank();
