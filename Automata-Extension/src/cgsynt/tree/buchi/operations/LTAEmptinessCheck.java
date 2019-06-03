@@ -44,7 +44,7 @@ public class LTAEmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	 * 
 	 * @return
 	 */
-	public Set<STATE> computeInitLeaves() {
+	private Set<STATE> computeInitLeaves() {
 		Set<STATE> leaves = new HashSet<>();
 		for (STATE state : mtree.getStates()) {
 			if (mtree.getRulesBySource(state) == null || mtree.getRulesBySource(state).isEmpty()) {
