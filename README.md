@@ -1,4 +1,4 @@
-# USRA
+# CGSynt (Counterexample Guided Synthesis)
 -------------------------------------
 ## Prerequisites
 To set up the prerequisites please follow the steps outlined on https://github.com/ultimate-pa/ultimate/wiki/Installation up to and including the "Create Ultimate workspace" heading. This will help you install all the libraries need.
