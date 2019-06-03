@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="res"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-Automata"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateTest"/>
@@ -12,5 +13,6 @@
 	<classpathentry kind="src" path="/Library-ModelCheckerUtils"/>
 	<classpathentry kind="src" path="/TraceAbstraction"/>
 	<classpathentry kind="src" path="/CodeCheck"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/BoogiePLParser"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
