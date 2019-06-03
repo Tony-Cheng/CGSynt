@@ -7,18 +7,18 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import cgsynt.Formula;
+import cgsynt.Token;
+import cgsynt.TokenFactory;
+import cgsynt.Trace;
+import cgsynt.trace.operations.TraceScriptToInterpolants;
+import cgsynt.trace.operations.TraceToSMTFormula;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
-import usra.trace.Formula;
-import usra.trace.Token;
-import usra.trace.TokenFactory;
-import usra.trace.Trace;
-import usra.trace.operations.TraceScriptToInterpolants;
-import usra.trace.operations.TraceToSMTFormula;
 
 public class GenerateTracesFromDFA {
 

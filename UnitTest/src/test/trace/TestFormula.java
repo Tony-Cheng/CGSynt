@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import usra.trace.Formula;
-import usra.trace.Token;
-import usra.trace.TokenFactory;
+import cgsynt.Formula;
+import cgsynt.Token;
+import cgsynt.TokenFactory;
 
 public class TestFormula {
 

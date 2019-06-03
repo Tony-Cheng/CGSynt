@@ -3,9 +3,9 @@ package test.dfa.to.trace2;
 import java.util.HashSet;
 import java.util.Set;
 
+import cgsynt.trace2.Statement;
+import cgsynt.trace2.Trace;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
-import usra.trace2.Statement;
-import usra.trace2.Trace;
 
 public class DFAToTrace2BFS {
 

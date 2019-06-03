@@ -3,18 +3,18 @@ package test.dfa.to.trace2;
 import java.util.HashSet;
 import java.util.Set;
 
+import cgsynt.trace2.Assignment;
+import cgsynt.trace2.Assumption;
+import cgsynt.trace2.Formula;
+import cgsynt.trace2.Numerical;
+import cgsynt.trace2.StandardFormula;
+import cgsynt.trace2.Statement;
+import cgsynt.trace2.Variable;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
-import usra.trace2.Assignment;
-import usra.trace2.Assumption;
-import usra.trace2.Formula;
-import usra.trace2.Numerical;
-import usra.trace2.StandardFormula;
-import usra.trace2.Statement;
-import usra.trace2.Variable;
 
 public class ConstructDFA {
 

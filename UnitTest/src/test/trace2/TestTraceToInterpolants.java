@@ -4,24 +4,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import cgsynt.Token;
+import cgsynt.TokenFactory;
+import cgsynt.trace2.Assignment;
+import cgsynt.trace2.Assumption;
+import cgsynt.trace2.CraigInterpolant;
+import cgsynt.trace2.Formula;
+import cgsynt.trace2.Numerical;
+import cgsynt.trace2.StandardFormula;
+import cgsynt.trace2.Statement;
+import cgsynt.trace2.Trace;
+import cgsynt.trace2.TraceToCraigInterpolant;
+import cgsynt.trace2.Variable;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
-import usra.trace.Token;
-import usra.trace.TokenFactory;
-import usra.trace2.Assignment;
-import usra.trace2.Assumption;
-import usra.trace2.CraigInterpolant;
-import usra.trace2.Formula;
-import usra.trace2.Numerical;
-import usra.trace2.StandardFormula;
-import usra.trace2.Statement;
-import usra.trace2.Trace;
-import usra.trace2.TraceToCraigInterpolant;
-import usra.trace2.Variable;
 
 public class TestTraceToInterpolants {
 

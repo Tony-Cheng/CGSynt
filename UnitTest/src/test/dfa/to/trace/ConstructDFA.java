@@ -3,13 +3,13 @@ package test.dfa.to.trace;
 import java.util.HashSet;
 import java.util.Set;
 
+import cgsynt.Formula;
+import cgsynt.FormulaFactory;
+import cgsynt.Token;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
-import usra.trace.Formula;
-import usra.trace.FormulaFactory;
-import usra.trace.Token;
 
 public class ConstructDFA {
 

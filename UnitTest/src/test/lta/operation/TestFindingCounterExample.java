@@ -8,11 +8,11 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import cgsynt.tree.buchi.BuchiTreeAutomaton;
+import cgsynt.tree.buchi.operations.EmptinessCheck;
 import test.tree.buchi.BuchiTreeAutomatonFactory;
 import test.tree.buchi.RankedLetter;
 import test.tree.lta.LTAFactory;
-import usra.tree.buchi.BuchiTreeAutomaton;
-import usra.tree.buchi.operations.EmptinessCheck;
 
 public class TestFindingCounterExample {
 

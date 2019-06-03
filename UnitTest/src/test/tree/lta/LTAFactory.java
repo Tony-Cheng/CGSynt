@@ -3,9 +3,9 @@ package test.tree.lta;
 import java.util.ArrayList;
 import java.util.List;
 
+import cgsynt.tree.buchi.BuchiTreeAutomaton;
+import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import test.tree.buchi.RankedLetter;
-import usra.tree.buchi.BuchiTreeAutomaton;
-import usra.tree.buchi.BuchiTreeAutomatonRule;
 
 public class LTAFactory {
 
