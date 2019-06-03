@@ -17,6 +17,7 @@ class BuchiIntersectTreeTest {
 
 	@Test
 	void test2() {
+		// Test intersecting an automaton with multiple transitions.
 		BuchiTreeAutomaton<RankedLetter, String> single = BuchiTreeAutomatonFactory.single();
 		BuchiTreeAutomaton<RankedLetter, String> doubleAut = BuchiTreeAutomatonFactory.doubleEmpty();
 
@@ -36,13 +37,20 @@ class BuchiIntersectTreeTest {
 	
 	@Test
 	void test1() {
+		//Test intersecting two single state buchi tree automaton.
 		BuchiTreeAutomaton<RankedLetter, String> aut1 = BuchiTreeAutomatonFactory.single();
 		BuchiTreeAutomaton<RankedLetter, String> aut2 = BuchiTreeAutomatonFactory.single();
 		BuchiIntersectTree<RankedLetter, String> intersect = new BuchiIntersectTree<>(aut1, aut2);
 		BuchiTreeAutomaton<RankedLetter, IntersectState<String>> intersectAut = intersect.computeResult();
 		assertEquals(intersectAut.getFinalStates().size(), 1);
 		assertEquals(intersectAut.getStates().size(), 2);
-		System.out.println("Test1\n");
+		System.out.println("Test1");
 		System.out.println(intersectAut);
+	}
+	
+	@Test
+	void test3() {
+		BuchiTreeAutomaton<RankedLetter, String> aut1 = BuchiTreeAutomatonFactory.single();
+		
 	}
 }

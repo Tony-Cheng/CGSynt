@@ -74,6 +74,22 @@ public class BuchiTreeAutomatonFactory {
 
 		return aut;
 	}
+	
+	public static BuchiTreeAutomaton<RankedLetter, String> SingleMultiLetter() {
+		BuchiTreeAutomaton<RankedLetter, String> aut = new BuchiTreeAutomaton<>(2);
+		List<String> list1 = new ArrayList<>();
+		list1.add("q0");
+		list1.add("q0");
+		
+		BuchiTreeAutomatonRule<RankedLetter, String> rule1 = new BuchiTreeAutomatonRule<>(LETTERA, "q0", list1);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule2 = new BuchiTreeAutomatonRule<>(LETTERB, "q0", list1);
+		
+		aut.addRule(rule1);
+		aut.addRule(rule2);
+
+		return aut;
+		
+	}
 
 	public static BuchiTreeAutomaton<RankedLetter, String> LTAMultiLetter() {
 		BuchiTreeAutomaton<RankedLetter, String> aut = new BuchiTreeAutomaton<>(2);
