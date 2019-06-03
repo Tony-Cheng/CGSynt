@@ -13,7 +13,7 @@ import cgsynt.tree.buchi.operations.Intersect;
 import test.tree.buchi.BuchiTreeAutomatonFactory;
 import test.tree.buchi.RankedLetter;
 
-class BuchiIntersectTreeTest {
+class IntersectionTest {
 
 	@Test
 	void test2() {
@@ -50,11 +50,34 @@ class BuchiIntersectTreeTest {
 
 	@Test
 	void test3() {
+		// Test intersecting with multiple letters in the alphabet
 		BuchiTreeAutomaton<RankedLetter, String> aut1 = BuchiTreeAutomatonFactory.SingleMultiLetter();
 		BuchiTreeAutomaton<RankedLetter, String> aut2 = BuchiTreeAutomatonFactory.SingleMultiLetter();
 		Intersect<RankedLetter, String> intersect = new Intersect<>(aut1, aut2);
 		BuchiTreeAutomaton<RankedLetter, IntersectState<String>> intersectAut = intersect.computeResult();
 		System.out.println("Test 3");
+		System.out.println(intersectAut);
+	}
+
+	@Test
+	void test4() {
+		// Test intersecting automatons with multiple initial states.
+		BuchiTreeAutomaton<RankedLetter, String> aut1 = BuchiTreeAutomatonFactory.MultiInitStates1();
+		BuchiTreeAutomaton<RankedLetter, String> aut2 = BuchiTreeAutomatonFactory.MultiInitStates2();
+		Intersect<RankedLetter, String> intersect = new Intersect<>(aut1, aut2);
+		BuchiTreeAutomaton<RankedLetter, IntersectState<String>> intersectAut = intersect.computeResult();
+		System.out.println("Test 4");
+		System.out.println(intersectAut);
+	}
+	
+	@Test
+	void test5() {
+		// Test intersecting automatons with multiple final states
+		BuchiTreeAutomaton<RankedLetter, String> aut1 = BuchiTreeAutomatonFactory.MultiFinalStates1();
+		BuchiTreeAutomaton<RankedLetter, String> aut2 = BuchiTreeAutomatonFactory.MultiFinalStates2();
+		Intersect<RankedLetter, String> intersect = new Intersect<>(aut1, aut2);
+		BuchiTreeAutomaton<RankedLetter, IntersectState<String>> intersectAut = intersect.computeResult();
+		System.out.println("Test 5");
 		System.out.println(intersectAut);
 	}
 }
