@@ -70,7 +70,122 @@ public class LTAFactory {
 
 		return aut;
 	}
+
+	public static BuchiTreeAutomaton<RankedLetter, String> singleLeaf() {
+		BuchiTreeAutomaton<RankedLetter, String> aut = new BuchiTreeAutomaton<>(2);
+
+		List<String> list0 = new ArrayList<>();
+		list0.add("q1");
+		list0.add("q2");
+
+		List<String> list1 = new ArrayList<>();
+		list1.add("q2");
+		list1.add("q3");
+
+		List<String> list2 = new ArrayList<>();
+		list2.add("q0");
+		list2.add("q1");
+
+		List<String> list3 = new ArrayList<>();
+		list3.add("q1");
+		list3.add("q4");
+
+		BuchiTreeAutomatonRule<RankedLetter, String> rule1 = new BuchiTreeAutomatonRule<>(LETTERA, "q0", list0);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule2 = new BuchiTreeAutomatonRule<>(LETTERA, "q1", list1);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule3 = new BuchiTreeAutomatonRule<>(LETTERA, "q2", list2);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule4 = new BuchiTreeAutomatonRule<>(LETTERA, "q3", list3);
+
+		aut.addRules(rule1, rule2, rule3, rule4);
+		aut.setAllStatesFinal();
+		aut.addInitState("q0");
+
+		return aut;
+	}
+
+	public static BuchiTreeAutomaton<RankedLetter, String> nonEmptyNLTA() {
+
+		BuchiTreeAutomaton<RankedLetter, String> aut = new BuchiTreeAutomaton<>(2);
+
+		List<String> list0 = new ArrayList<>();
+		list0.add("q1");
+		list0.add("q2");
+
+		List<String> list1 = new ArrayList<>();
+		list1.add("q2");
+		list1.add("q3");
+
+		List<String> list2 = new ArrayList<>();
+		list2.add("q0");
+		list2.add("q1");
+
+		List<String> list3 = new ArrayList<>();
+		list3.add("q1");
+		list3.add("q4");
+
+		List<String> list4 = new ArrayList<>();
+		list4.add("q0");
+		list4.add("q2");
+
+		List<String> list6 = new ArrayList<>();
+		list6.add("q2");
+		list6.add("q0");
+
+		BuchiTreeAutomatonRule<RankedLetter, String> rule1 = new BuchiTreeAutomatonRule<>(LETTERA, "q0", list0);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule2 = new BuchiTreeAutomatonRule<>(LETTERA, "q1", list1);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule3 = new BuchiTreeAutomatonRule<>(LETTERA, "q2", list2);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule4 = new BuchiTreeAutomatonRule<>(LETTERA, "q3", list3);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule5 = new BuchiTreeAutomatonRule<>(LETTERA, "q0", list4);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule6 = new BuchiTreeAutomatonRule<>(LETTERA, "q2", list6);
+
+		aut.addRules(rule1, rule2, rule3, rule4, rule5, rule6);
+		aut.setAllStatesFinal();
+		aut.addInitState("q0");
+
+		return aut;
+	}
 	
+	public static BuchiTreeAutomaton<RankedLetter, String> nonEmptyMultiLetterLTA() {
+
+		BuchiTreeAutomaton<RankedLetter, String> aut = new BuchiTreeAutomaton<>(2);
+
+		List<String> list0 = new ArrayList<>();
+		list0.add("q1");
+		list0.add("q2");
+
+		List<String> list1 = new ArrayList<>();
+		list1.add("q2");
+		list1.add("q3");
+
+		List<String> list2 = new ArrayList<>();
+		list2.add("q0");
+		list2.add("q1");
+
+		List<String> list3 = new ArrayList<>();
+		list3.add("q1");
+		list3.add("q4");
+
+		List<String> list4 = new ArrayList<>();
+		list4.add("q0");
+		list4.add("q2");
+
+		List<String> list6 = new ArrayList<>();
+		list6.add("q2");
+		list6.add("q0");
+
+		BuchiTreeAutomatonRule<RankedLetter, String> rule1 = new BuchiTreeAutomatonRule<>(LETTERA, "q0", list0);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule2 = new BuchiTreeAutomatonRule<>(LETTERB, "q1", list1);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule3 = new BuchiTreeAutomatonRule<>(LETTERC, "q2", list2);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule4 = new BuchiTreeAutomatonRule<>(LETTERB, "q3", list3);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule5 = new BuchiTreeAutomatonRule<>(LETTERB, "q0", list4);
+		BuchiTreeAutomatonRule<RankedLetter, String> rule6 = new BuchiTreeAutomatonRule<>(LETTERC, "q2", list6);
+
+		aut.addRules(rule1, rule2, rule3, rule4, rule5, rule6);
+		aut.setAllStatesFinal();
+		aut.addInitState("q0");
+
+		return aut;
+	}
+
 	public static BuchiTreeAutomaton<RankedLetter, String> complexEmpty() {
 		BuchiTreeAutomaton<RankedLetter, String> aut = new BuchiTreeAutomaton<>(2);
 		List<String> list1 = new ArrayList<>();

@@ -19,6 +19,76 @@ import de.uni_freiburg.informatik.ultimate.core.model.models.IElement;
  * @param <STATE>
  */
 public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements IBuchiTreeAutomaton<LETTER, STATE> {
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((mChildMap == null) ? 0 : mChildMap.hashCode());
+		result = prime * result + ((mChildrenMap == null) ? 0 : mChildrenMap.hashCode());
+		result = prime * result + ((mFinalStates == null) ? 0 : mFinalStates.hashCode());
+		result = prime * result + ((mInitStates == null) ? 0 : mInitStates.hashCode());
+		result = prime * result + ((mLettersMap == null) ? 0 : mLettersMap.hashCode());
+		result = prime * result + ((mParentsMap == null) ? 0 : mParentsMap.hashCode());
+		result = prime * result + ((mRules == null) ? 0 : mRules.hashCode());
+		result = prime * result + ((mSourceMap == null) ? 0 : mSourceMap.hashCode());
+		result = prime * result + rank;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BuchiTreeAutomaton other = (BuchiTreeAutomaton) obj;
+		if (mChildMap == null) {
+			if (other.mChildMap != null)
+				return false;
+		} else if (!mChildMap.equals(other.mChildMap))
+			return false;
+		if (mChildrenMap == null) {
+			if (other.mChildrenMap != null)
+				return false;
+		} else if (!mChildrenMap.equals(other.mChildrenMap))
+			return false;
+		if (mFinalStates == null) {
+			if (other.mFinalStates != null)
+				return false;
+		} else if (!mFinalStates.equals(other.mFinalStates))
+			return false;
+		if (mInitStates == null) {
+			if (other.mInitStates != null)
+				return false;
+		} else if (!mInitStates.equals(other.mInitStates))
+			return false;
+		if (mLettersMap == null) {
+			if (other.mLettersMap != null)
+				return false;
+		} else if (!mLettersMap.equals(other.mLettersMap))
+			return false;
+		if (mParentsMap == null) {
+			if (other.mParentsMap != null)
+				return false;
+		} else if (!mParentsMap.equals(other.mParentsMap))
+			return false;
+		if (mRules == null) {
+			if (other.mRules != null)
+				return false;
+		} else if (!mRules.equals(other.mRules))
+			return false;
+		if (mSourceMap == null) {
+			if (other.mSourceMap != null)
+				return false;
+		} else if (!mSourceMap.equals(other.mSourceMap))
+			return false;
+		if (rank != other.rank)
+			return false;
+		return true;
+	}
+
 	private final Set<LETTER> mAlphabet;
 	private final Map<List<STATE>, Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>>> mChildrenMap;
 	private final Set<STATE> mFinalStates;
