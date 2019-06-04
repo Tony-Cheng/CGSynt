@@ -1,7 +1,5 @@
-var n: int;
-
 procedure main()
-modifies n;
 {
-  n := n + 1;
+  var x: int;
+  x := 0;
 }
