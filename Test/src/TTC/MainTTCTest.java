@@ -5,17 +5,16 @@ import java.io.IOException;
 
 import de.uni_freiburg.informatik.ultimate.boogie.ast.Unit;
 import de.uni_freiburg.informatik.ultimate.boogie.parser.BoogieParser;
+import de.uni_freiburg.informatik.ultimate.core.coreplugin.services.ToolchainStorage;
 import de.uni_freiburg.informatik.ultimate.core.model.models.IElement;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.rcfgbuilder.cfg.BoogieIcfgLocation;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.rcfgbuilder.cfg.CfgBuilder;
-import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IIcfg;
-import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
 public class MainTTCTest {
 	public MainTTCTest() {
-		IUltimateServiceProvider mock = UltimateMocks.createUltimateServiceProviderMock(LogLevel.DEBUG);
+		IUltimateServiceProvider mock = new ToolchainStorage();
 		BoogieParser bp = new BoogieParser();
 		bp.setServices(mock);
 		
