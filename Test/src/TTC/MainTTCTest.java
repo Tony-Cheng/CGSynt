@@ -7,6 +7,8 @@ import de.uni_freiburg.informatik.ultimate.boogie.ast.Unit;
 import de.uni_freiburg.informatik.ultimate.boogie.parser.BoogieParser;
 import de.uni_freiburg.informatik.ultimate.core.coreplugin.services.ToolchainStorage;
 import de.uni_freiburg.informatik.ultimate.core.model.models.IElement;
+import de.uni_freiburg.informatik.ultimate.core.model.preferences.IPreferenceProvider;
+import de.uni_freiburg.informatik.ultimate.core.model.services.IBacktranslationService;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.rcfgbuilder.cfg.BoogieIcfgLocation;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.rcfgbuilder.cfg.CfgBuilder;
@@ -14,13 +16,23 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IIcfg
 
 public class MainTTCTest {
 	public MainTTCTest() {
-		IUltimateServiceProvider mock = new ToolchainStorage();
+		IUltimateServiceProvider generator = new ToolchainStorage();
+		
+		String[] pluginIDs = new String[]{
+				de.uni_freiburg.informatik.ultimate.plugins.generator.rcfgbuilder.Activator.PLUGIN_ID,
+		};
+		
+		IUltimateServiceProvider service = generator.registerDefaultPreferenceLayer(this.getClass(), pluginIDs);
+		IPreferenceProvider pref = service.getPreferenceProvider(pluginIDs[0]);
+		pref.put("SMT solver", "Internal_SMTInterpol");
+		pref.put("Size of a code block", "SingleStatement"); // Possible options: SingleStatement, SequenceOfStatements, LoopFreeBlock
+		
 		BoogieParser bp = new BoogieParser();
-		bp.setServices(mock);
+		bp.setServices(service);
 		
 		Unit unit = (Unit)parseBoogie(bp, "res/code.bpl");
 		
-		CfgBuilder cfgBuilder = makeCfgBuilder(unit, mock);
+		CfgBuilder cfgBuilder = makeCfgBuilder(unit, service);
 		
 		IIcfg<BoogieIcfgLocation> icfg = cfgBuilder.createIcfg(unit);
 	}
