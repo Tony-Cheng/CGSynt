@@ -7,8 +7,10 @@ import de.uni_freiburg.informatik.ultimate.boogie.ast.Unit;
 import de.uni_freiburg.informatik.ultimate.boogie.parser.BoogieParser;
 import de.uni_freiburg.informatik.ultimate.core.model.models.IElement;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.rcfgbuilder.cfg.BoogieIcfgLocation;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.rcfgbuilder.cfg.CfgBuilder;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IIcfg;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
 public class MainTTCTest {
@@ -20,6 +22,8 @@ public class MainTTCTest {
 		Unit unit = (Unit)parseBoogie(bp, "res/code.bpl");
 		
 		CfgBuilder cfgBuilder = makeCfgBuilder(unit, mock);
+		
+		IIcfg<BoogieIcfgLocation> icfg = cfgBuilder.createIcfg(unit);
 	}
 	
 	private CfgBuilder makeCfgBuilder(Unit unit, IUltimateServiceProvider service) {
