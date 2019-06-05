@@ -25,8 +25,8 @@ public class TestTraceCheck {
 		IUltimateServiceProvider service = UltimateMocks.createUltimateServiceProviderMock();
 		ManagedScript managedScript = new ManagedScript(service, new SMTInterpol(new DefaultLogger()));
 		DefaultIcfgSymbolTable symbolTable = new DefaultIcfgSymbolTable();
-		IProgramVar x = new BoogieOldVar("x", BoogieType.TYPE_INT
-				managedScript.term(this, "=", ));
+//		IProgramVar x = new BoogieOldVar("x", BoogieType.TYPE_INT
+//				managedScript.term(this, "=", ));
 		symbolTable.add(null);
 		BasicPredicateFactory predicateFactory = new BasicPredicateFactory(service, managedScript, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
