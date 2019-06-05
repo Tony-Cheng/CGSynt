@@ -1,5 +1,5 @@
 procedure main()
 {
   var x: int;
-  x := 0;
+  x := 1;
 }

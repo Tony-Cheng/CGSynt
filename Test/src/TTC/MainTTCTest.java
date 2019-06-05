@@ -25,7 +25,7 @@ public class MainTTCTest {
 		IUltimateServiceProvider service = generator.registerDefaultPreferenceLayer(this.getClass(), pluginIDs);
 		IPreferenceProvider pref = service.getPreferenceProvider(pluginIDs[0]);
 		pref.put("SMT solver", "Internal_SMTInterpol");
-		pref.put("Size of a code block", "LoopFreeBlock"); // Possible options: SingleStatement, SequenceOfStatements, LoopFreeBlock
+		pref.put("Size of a code block", "SingleStatement"); // Possible options: , SequenceOfStatements, LoopFreeBlock
 		
 		BoogieParser bp = new BoogieParser();
 		bp.setServices(service);
@@ -34,6 +34,7 @@ public class MainTTCTest {
 		
 		CfgBuilder cfgBuilder = makeCfgBuilder(unit, service);
 		
+		@SuppressWarnings("unused")
 		IIcfg<BoogieIcfgLocation> icfg = cfgBuilder.createIcfg(unit);
 	}
 	
