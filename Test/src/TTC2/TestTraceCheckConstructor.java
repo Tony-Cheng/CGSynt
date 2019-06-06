@@ -64,28 +64,34 @@ public class TestTraceCheckConstructor {
 		ILogger logger = new ConsoleLogger();
 		ManagedScript managedScript = new ManagedScript(service, new SMTInterpol(new DefaultLogger()));
 		managedScript.getScript().setLogic(Logics.QF_LIA);
+		Script script = managedScript.getScript();
 
 		DefaultIcfgSymbolTable symbolTable = new DefaultIcfgSymbolTable();
-		managedScript.getScript().declareFun("var", new Sort[0], managedScript.getScript().sort("Int"));
-		managedScript.getScript().declareFun("var'", new Sort[0], managedScript.getScript().sort("Int"));
-		BoogieOldVar var1 = new BoogieOldVar("var", (IBoogieType) BoogieType.TYPE_INT,
-				managedScript.getScript().variable("var", managedScript.getScript().sort("Int")),
-				(ApplicationTerm) managedScript.getScript().term("var"),
-				(ApplicationTerm) managedScript.getScript().term("var'"));
-		BoogieNonOldVar var2 = new BoogieNonOldVar("var", (IBoogieType) BoogieType.TYPE_INT,
-				managedScript.getScript().variable("var", managedScript.getScript().sort("Int")),
-				(ApplicationTerm) managedScript.getScript().term("var"),
-				(ApplicationTerm) managedScript.getScript().term("var'"), var1);
+		managedScript.getScript().declareFun("x", new Sort[0], managedScript.getScript().sort("Int"));
+		managedScript.getScript().declareFun("x'", new Sort[0], managedScript.getScript().sort("Int"));
+		BoogieOldVar var1 = new BoogieOldVar("x", (IBoogieType) BoogieType.TYPE_INT,
+				managedScript.getScript().variable("x", managedScript.getScript().sort("Int")),
+				(ApplicationTerm) managedScript.getScript().term("x"),
+				(ApplicationTerm) managedScript.getScript().term("x'"));
+		BoogieNonOldVar var2 = new BoogieNonOldVar("x'", (IBoogieType) BoogieType.TYPE_INT,
+				managedScript.getScript().variable("x'", managedScript.getScript().sort("Int")),
+				(ApplicationTerm) managedScript.getScript().term("x"),
+				(ApplicationTerm) managedScript.getScript().term("x'"), var1);
 		var1.setNonOldVar(var2);
 		symbolTable.add(var2);
-		// TAPreferences taPref = new TAPreferences(service);
 
 		String procedure1 = "procedure1";
+		String procedure2 = "procedure2";
+		String procedure3 = "procedure3";
 		HashRelation<String, IProgramNonOldVar> mProc2Globals = new HashRelation<>();
 		mProc2Globals.addPair(procedure1, var2);
+		mProc2Globals.addPair(procedure2, var2);
+		mProc2Globals.addPair(procedure3, var2);
 		ModifiableGlobalsTable modifiableGlobalsTable = new ModifiableGlobalsTable(mProc2Globals);
 		Set<String> procedures = new HashSet<>();
 		procedures.add(procedure1);
+		procedures.add(procedure2);
+		procedures.add(procedure3);
 
 		Map<String, List<ILocalProgramVar>> inParams = new HashMap<>();
 		Map<String, List<ILocalProgramVar>> outParams = new HashMap<>();
@@ -98,15 +104,68 @@ public class TestTraceCheckConstructor {
 				inParams, outParams, icfgEdgeFactory, concurInfo, smtSymbols);
 		SortedMap<Integer, IPredicate> pendingContexts = new TreeMap<>();
 
-		TransFormulaBuilder formulaBuilder = new TransFormulaBuilder(null, null, false, null, false, null, false);
-		Term one = managedScript.getScript().numeral("1");
-		formulaBuilder.addInVar(var1, var1.getTermVariable());
-		formulaBuilder.addOutVar(var2, var2.getTermVariable());
-		formulaBuilder.setFormula(managedScript.getScript().term("=", var1.getTerm(), one));
-		formulaBuilder.setInfeasibility(Infeasibility.NOT_DETERMINED);
-		UnmodifiableTransFormula formula = formulaBuilder.finishConstruction(managedScript);
-		BasicInternalAction basicAction = new BasicInternalAction(procedure1, null, formula);
-		NestedWord<IAction> trace = new NestedWord<>(basicAction, NestedWord.INTERNAL_POSITION);
+		// TransFormulaBuilder formulaBuilder = new TransFormulaBuilder(null, null,
+		// false, null, false, null, false);
+		Term one = script.numeral("1");
+		// formulaBuilder.addOutVar(var2, var2.getTermVariable());
+		// formulaBuilder.setFormula(managedScript.getScript().term("=", var2.getTerm(),
+		// one));
+		// formulaBuilder.setInfeasibility(Infeasibility.NOT_DETERMINED);
+		// UnmodifiableTransFormula formula =
+		// formulaBuilder.finishConstruction(managedScript);
+		// BasicInternalAction basicAction = new BasicInternalAction(procedure1,
+		// procedure2, formula);
+
+		// TransFormulaBuilder formulaBuilder2 = new TransFormulaBuilder(null, null,
+		// false, null, false, null, false);
+		// formulaBuilder2.addInVar(var1, var1.getTermVariable());
+		// formulaBuilder2.addOutVar(var2, var2.getTermVariable());
+		// formulaBuilder2.setInfeasibility(Infeasibility.NOT_DETERMINED);
+		// UnmodifiableTransFormula formula2 =
+		// formulaBuilder2.finishConstruction(managedScript);
+		List<IProgramVar> lhs1 = new ArrayList<>();
+		List<Term> rhs1 = new ArrayList<>();
+		List<IProgramVar> lhs2 = new ArrayList<>();
+		List<Term> rhs2 = new ArrayList<>();
+		List<IProgramVar> lhs3 = new ArrayList<>();
+		List<Term> rhs3 = new ArrayList<>();
+		lhs1.add(var1);
+		rhs1.add(one);
+		lhs2.add(var1);
+		rhs2.add(script.term("+", var1.getTerm(), one));
+		lhs3.add(var1);
+		rhs3.add(script.numeral("2"));
+		UnmodifiableTransFormula formula1 = TransFormulaBuilder.constructAssignment(lhs1, rhs1, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula2 = TransFormulaBuilder.constructAssignment(lhs2, rhs2, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula3 = TransFormulaBuilder.constructEqualityAssumption(lhs3, rhs3, symbolTable,
+				managedScript);
+		BasicInternalAction basicAction1 = new BasicInternalAction(procedure1, procedure2, formula1);
+		BasicInternalAction basicAction2 = new BasicInternalAction(procedure2, procedure3, formula2);
+		BasicInternalAction basicAction3 = new BasicInternalAction(procedure3, null, formula3);
+
+		// TransFormulaBuilder formulaBuilder3 = new TransFormulaBuilder(null, null,
+		// false, null, false, null, false);
+		// formulaBuilder3.addInVar(var1, var1.getTermVariable());
+		// formulaBuilder3.setFormula(script.term("=", var1.getTerm(), one));
+		// formulaBuilder3.setInfeasibility(Infeasibility.NOT_DETERMINED);
+		// UnmodifiableTransFormula formula3 =
+		// formulaBuilder3.finishConstruction(managedScript);
+		// BasicInternalAction basicAction3 = new BasicInternalAction(procedure3, null,
+		// formula3);
+
+		IAction[] word = new IAction[3];
+		int[] nestingRelation = new int[3];
+		word[0] = basicAction1;
+		word[1] = basicAction2;
+		word[2] = basicAction3;
+		nestingRelation[0] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[1] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[2] = NestedWord.INTERNAL_POSITION;
+		NestedWord<IAction> trace = new NestedWord<>(word, nestingRelation);
+		// NestedWord<IAction> trace = new NestedWord<>(basicAction1,
+		// NestedWord.INTERNAL_POSITION);
 
 		BasicPredicateFactory predicateFactory = new BasicPredicateFactory(service, managedScript, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
