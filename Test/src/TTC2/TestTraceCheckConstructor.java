@@ -48,7 +48,10 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.Basi
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.PredicateUnifier;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.tracecheck.ITraceCheckPreferences.AssertCodeBlockOrder;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TAPreferences;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.InterpolationTechnique;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.singletracecheck.InterpolatingTraceCheckCraig;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.singletracecheck.TraceCheck;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
@@ -63,12 +66,16 @@ public class TestTraceCheckConstructor {
 		IUltimateServiceProvider service = UltimateMocks.createUltimateServiceProviderMock();
 		ILogger logger = new ConsoleLogger();
 		ManagedScript managedScript = new ManagedScript(service, new SMTInterpol(new DefaultLogger()));
-		managedScript.getScript().setLogic(Logics.QF_LIA);
 		Script script = managedScript.getScript();
+		script.setOption(":produce-proofs", true);
+		script.setLogic(Logics.QF_LIA);
+
 
 		DefaultIcfgSymbolTable symbolTable = new DefaultIcfgSymbolTable();
 		managedScript.getScript().declareFun("x", new Sort[0], managedScript.getScript().sort("Int"));
 		managedScript.getScript().declareFun("x'", new Sort[0], managedScript.getScript().sort("Int"));
+		managedScript.getScript().declareFun("y", new Sort[0], managedScript.getScript().sort("Int"));
+		managedScript.getScript().declareFun("y'", new Sort[0], managedScript.getScript().sort("Int"));
 		BoogieOldVar var1 = new BoogieOldVar("x", (IBoogieType) BoogieType.TYPE_INT,
 				managedScript.getScript().variable("x", managedScript.getScript().sort("Int")),
 				(ApplicationTerm) managedScript.getScript().term("x"),
@@ -77,6 +84,14 @@ public class TestTraceCheckConstructor {
 				managedScript.getScript().variable("x'", managedScript.getScript().sort("Int")),
 				(ApplicationTerm) managedScript.getScript().term("x"),
 				(ApplicationTerm) managedScript.getScript().term("x'"), var1);
+//		BoogieOldVar var3 = new BoogieOldVar("y", (IBoogieType) BoogieType.TYPE_INT,
+//				managedScript.getScript().variable("x", managedScript.getScript().sort("Int")),
+//				(ApplicationTerm) managedScript.getScript().term("x"),
+//				(ApplicationTerm) managedScript.getScript().term("x'"));
+//		BoogieNonOldVar var4 = new BoogieNonOldVar("x'", (IBoogieType) BoogieType.TYPE_INT,
+//				managedScript.getScript().variable("x'", managedScript.getScript().sort("Int")),
+//				(ApplicationTerm) managedScript.getScript().term("x"),
+//				(ApplicationTerm) managedScript.getScript().term("x'"), var1);
 		var1.setNonOldVar(var2);
 		symbolTable.add(var2);
 
@@ -134,7 +149,7 @@ public class TestTraceCheckConstructor {
 		lhs2.add(var1);
 		rhs2.add(script.term("+", var1.getTerm(), one));
 		lhs3.add(var1);
-		rhs3.add(script.numeral("2"));
+		rhs3.add(script.numeral("1"));
 		UnmodifiableTransFormula formula1 = TransFormulaBuilder.constructAssignment(lhs1, rhs1, symbolTable,
 				managedScript);
 		UnmodifiableTransFormula formula2 = TransFormulaBuilder.constructAssignment(lhs2, rhs2, symbolTable,
@@ -172,9 +187,19 @@ public class TestTraceCheckConstructor {
 		PredicateUnifier pUnifer = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 
-		TraceCheck<IAction> traceCheck = new TraceCheck<>(pUnifer.getTruePredicate(), pUnifer.getFalsePredicate(),
-				pendingContexts, trace, service, toolkit, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true);
-		traceCheck.isCorrect();
+		// TraceCheck<IAction> traceCheck = new TraceCheck<>(pUnifer.getTruePredicate(),
+		// pUnifer.getFalsePredicate(),
+		// pendingContexts, trace, service, toolkit,
+		// AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true);
+		// traceCheck.isCorrect();
+
+		List<Object> controlLocationSequence = new ArrayList<>();
+		InterpolatingTraceCheckCraig interpolate = new InterpolatingTraceCheckCraig(pUnifer.getTruePredicate(),
+				pUnifer.getFalsePredicate(), pendingContexts, trace, controlLocationSequence, service, toolkit,
+				managedScript, null, pUnifer, AssertCodeBlockOrder.NOT_INCREMENTALLY, false,
+				true, InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
+				SimplificationTechnique.NONE, false);
+		IPredicate[] preds = interpolate.getInterpolants();
 
 	}
 
