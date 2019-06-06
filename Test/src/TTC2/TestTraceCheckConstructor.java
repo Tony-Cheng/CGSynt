@@ -70,7 +70,6 @@ public class TestTraceCheckConstructor {
 		script.setOption(":produce-proofs", true);
 		script.setLogic(Logics.QF_LIA);
 
-
 		DefaultIcfgSymbolTable symbolTable = new DefaultIcfgSymbolTable();
 		managedScript.getScript().declareFun("x", new Sort[0], managedScript.getScript().sort("Int"));
 		managedScript.getScript().declareFun("x'", new Sort[0], managedScript.getScript().sort("Int"));
@@ -84,29 +83,33 @@ public class TestTraceCheckConstructor {
 				managedScript.getScript().variable("x'", managedScript.getScript().sort("Int")),
 				(ApplicationTerm) managedScript.getScript().term("x"),
 				(ApplicationTerm) managedScript.getScript().term("x'"), var1);
-//		BoogieOldVar var3 = new BoogieOldVar("y", (IBoogieType) BoogieType.TYPE_INT,
-//				managedScript.getScript().variable("x", managedScript.getScript().sort("Int")),
-//				(ApplicationTerm) managedScript.getScript().term("x"),
-//				(ApplicationTerm) managedScript.getScript().term("x'"));
-//		BoogieNonOldVar var4 = new BoogieNonOldVar("x'", (IBoogieType) BoogieType.TYPE_INT,
-//				managedScript.getScript().variable("x'", managedScript.getScript().sort("Int")),
-//				(ApplicationTerm) managedScript.getScript().term("x"),
-//				(ApplicationTerm) managedScript.getScript().term("x'"), var1);
+		BoogieOldVar var3 = new BoogieOldVar("y", (IBoogieType) BoogieType.TYPE_INT,
+				managedScript.getScript().variable("y", managedScript.getScript().sort("Int")),
+				(ApplicationTerm) managedScript.getScript().term("y"),
+				(ApplicationTerm) managedScript.getScript().term("y'"));
+		BoogieNonOldVar var4 = new BoogieNonOldVar("y'", (IBoogieType) BoogieType.TYPE_INT,
+				managedScript.getScript().variable("y'", managedScript.getScript().sort("Int")),
+				(ApplicationTerm) managedScript.getScript().term("y"),
+				(ApplicationTerm) managedScript.getScript().term("y'"), var1);
 		var1.setNonOldVar(var2);
+		var3.setNonOldVar(var4);
 		symbolTable.add(var2);
+		symbolTable.add(var4);
 
 		String procedure1 = "procedure1";
 		String procedure2 = "procedure2";
 		String procedure3 = "procedure3";
+		String procedure4 = "procedure4";
 		HashRelation<String, IProgramNonOldVar> mProc2Globals = new HashRelation<>();
 		mProc2Globals.addPair(procedure1, var2);
-		mProc2Globals.addPair(procedure2, var2);
+		mProc2Globals.addPair(procedure2, var4);
 		mProc2Globals.addPair(procedure3, var2);
 		ModifiableGlobalsTable modifiableGlobalsTable = new ModifiableGlobalsTable(mProc2Globals);
 		Set<String> procedures = new HashSet<>();
 		procedures.add(procedure1);
 		procedures.add(procedure2);
 		procedures.add(procedure3);
+		procedures.add(procedure4);
 
 		Map<String, List<ILocalProgramVar>> inParams = new HashMap<>();
 		Map<String, List<ILocalProgramVar>> outParams = new HashMap<>();
@@ -144,21 +147,29 @@ public class TestTraceCheckConstructor {
 		List<Term> rhs2 = new ArrayList<>();
 		List<IProgramVar> lhs3 = new ArrayList<>();
 		List<Term> rhs3 = new ArrayList<>();
+		List<IProgramVar> lhs4 = new ArrayList<>();
+		List<Term> rhs4 = new ArrayList<>();
 		lhs1.add(var1);
-		rhs1.add(one);
-		lhs2.add(var1);
-		rhs2.add(script.term("+", var1.getTerm(), one));
+		rhs1.add(script.numeral("0"));
+		lhs2.add(var3);
+		rhs2.add(script.numeral("0"));
 		lhs3.add(var1);
-		rhs3.add(script.numeral("1"));
+		rhs3.add(script.term("+", var1.getTerm(), one));
+		lhs4.add(var1);
+		rhs4.add(script.numeral("-1"));
 		UnmodifiableTransFormula formula1 = TransFormulaBuilder.constructAssignment(lhs1, rhs1, symbolTable,
 				managedScript);
 		UnmodifiableTransFormula formula2 = TransFormulaBuilder.constructAssignment(lhs2, rhs2, symbolTable,
 				managedScript);
-		UnmodifiableTransFormula formula3 = TransFormulaBuilder.constructEqualityAssumption(lhs3, rhs3, symbolTable,
+		UnmodifiableTransFormula formula3 = TransFormulaBuilder.constructAssignment(lhs3, rhs3, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula4 = TransFormulaBuilder.constructEqualityAssumption(lhs4, rhs4, symbolTable,
 				managedScript);
 		BasicInternalAction basicAction1 = new BasicInternalAction(procedure1, procedure2, formula1);
 		BasicInternalAction basicAction2 = new BasicInternalAction(procedure2, procedure3, formula2);
-		BasicInternalAction basicAction3 = new BasicInternalAction(procedure3, null, formula3);
+		BasicInternalAction basicAction3 = new BasicInternalAction(procedure3, procedure4, formula3);
+		BasicInternalAction basicAction4 = new BasicInternalAction(procedure4, null, formula4);
+
 
 		// TransFormulaBuilder formulaBuilder3 = new TransFormulaBuilder(null, null,
 		// false, null, false, null, false);
@@ -170,14 +181,17 @@ public class TestTraceCheckConstructor {
 		// BasicInternalAction basicAction3 = new BasicInternalAction(procedure3, null,
 		// formula3);
 
-		IAction[] word = new IAction[3];
-		int[] nestingRelation = new int[3];
+		IAction[] word = new IAction[4];
+		int[] nestingRelation = new int[4];
 		word[0] = basicAction1;
 		word[1] = basicAction2;
 		word[2] = basicAction3;
+		word[3] = basicAction4;
 		nestingRelation[0] = NestedWord.INTERNAL_POSITION;
 		nestingRelation[1] = NestedWord.INTERNAL_POSITION;
 		nestingRelation[2] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[3] = NestedWord.INTERNAL_POSITION;
+
 		NestedWord<IAction> trace = new NestedWord<>(word, nestingRelation);
 		// NestedWord<IAction> trace = new NestedWord<>(basicAction1,
 		// NestedWord.INTERNAL_POSITION);
@@ -196,8 +210,8 @@ public class TestTraceCheckConstructor {
 		List<Object> controlLocationSequence = new ArrayList<>();
 		InterpolatingTraceCheckCraig interpolate = new InterpolatingTraceCheckCraig(pUnifer.getTruePredicate(),
 				pUnifer.getFalsePredicate(), pendingContexts, trace, controlLocationSequence, service, toolkit,
-				managedScript, null, pUnifer, AssertCodeBlockOrder.NOT_INCREMENTALLY, false,
-				true, InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
+				managedScript, null, pUnifer, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
+				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
 				SimplificationTechnique.NONE, false);
 		IPredicate[] preds = interpolate.getInterpolants();
 
