@@ -29,12 +29,15 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.DefaultIcfgSymb
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.ModifiableGlobalsTable;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.SmtSymbols;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.ThreadInstance;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.BasicInternalAction;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IAction;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IIcfgForkTransitionThreadCurrent;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IIcfgJoinTransitionThreadCurrent;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgEdgeFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.TransFormulaBuilder;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula.Infeasibility;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.ILocalProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
@@ -73,6 +76,7 @@ public class TestTraceCheckConstructor {
 				managedScript.getScript().variable("var", managedScript.getScript().sort("Int")),
 				(ApplicationTerm) managedScript.getScript().term("var"),
 				(ApplicationTerm) managedScript.getScript().term("var'"), var1);
+		var1.setNonOldVar(var2);
 		symbolTable.add(var2);
 		// TAPreferences taPref = new TAPreferences(service);
 
@@ -94,13 +98,15 @@ public class TestTraceCheckConstructor {
 				inParams, outParams, icfgEdgeFactory, concurInfo, smtSymbols);
 		SortedMap<Integer, IPredicate> pendingContexts = new TreeMap<>();
 
-		NestedWord<IAction> trace = new NestedWord<>();
 		TransFormulaBuilder formulaBuilder = new TransFormulaBuilder(null, null, false, null, false, null, false);
 		Term one = managedScript.getScript().numeral("1");
-		formulaBuilder.addAuxVar((TermVariable) one);
 		formulaBuilder.addInVar(var1, var1.getTermVariable());
 		formulaBuilder.addOutVar(var2, var2.getTermVariable());
-		formulaBuilder.setFormula(managedScript.term("=", "var1", one));
+		formulaBuilder.setFormula(managedScript.getScript().term("=", var1.getTerm(), one));
+		formulaBuilder.setInfeasibility(Infeasibility.NOT_DETERMINED);
+		UnmodifiableTransFormula formula = formulaBuilder.finishConstruction(managedScript);
+		BasicInternalAction basicAction = new BasicInternalAction(procedure1, null, formula);
+		NestedWord<IAction> trace = new NestedWord<>(basicAction, NestedWord.INTERNAL_POSITION);
 
 		BasicPredicateFactory predicateFactory = new BasicPredicateFactory(service, managedScript, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
