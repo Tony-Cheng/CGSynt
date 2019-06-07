@@ -11,5 +11,8 @@
 	<classpathentry kind="src" path="/Library-SMTLIB"/>
 	<classpathentry kind="src" path="/SMTInterpol"/>
 	<classpathentry kind="src" path="/Trace"/>
+	<classpathentry kind="src" path="/Library-BoogieAST"/>
+	<classpathentry kind="src" path="/Library-ModelCheckerUtils"/>
+	<classpathentry kind="src" path="/TraceAbstraction"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
