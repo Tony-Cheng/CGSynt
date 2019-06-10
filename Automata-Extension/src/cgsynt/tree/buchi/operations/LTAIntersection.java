@@ -44,14 +44,7 @@ public class LTAIntersection<LETTER extends IRankedLetter, STATE> {
 	}
 
 	private void computeFinalState() {
-		Set<STATE> states1 = tree1.getStates();
-		Set<STATE> finalStates2 = tree2.getFinalStates();
-		for (STATE state1 : states1) {
-			for (STATE state2 : finalStates2) {
-				LTAIntersectState<STATE> newFinalState = new LTAIntersectState<>(state1, state2);
-				result.addFinalState(newFinalState);
-			}
-		}
+		result.setAllStatesFinal();
 	}
 
 	private void computeTransitions() {
@@ -87,8 +80,8 @@ public class LTAIntersection<LETTER extends IRankedLetter, STATE> {
 	public BuchiTreeAutomaton<LETTER, LTAIntersectState<STATE>> computeResult() {
 		computeAlphabet();
 		computeInitState();
-		computeFinalState();
 		computeTransitions();
+		computeFinalState();
 		return result;
 	}
 }

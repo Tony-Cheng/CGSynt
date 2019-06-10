@@ -1,19 +1,28 @@
 package cgsynt.tree.buchi;
 
 public class LTAIntersectState<STATE> {
+	@Override
+	public String toString() {
+		return "LTAIntersectState [state1=" + state1 + ", state2=" + state2 + "]";
+	}
+
 	private final STATE state1;
 	private final STATE state2;
+
 	public STATE getState1() {
 		return state1;
 	}
+
 	public STATE getState2() {
 		return state2;
 	}
+
 	public LTAIntersectState(STATE state1, STATE state2) {
 		super();
 		this.state1 = state1;
 		this.state2 = state2;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -22,6 +31,7 @@ public class LTAIntersectState<STATE> {
 		result = prime * result + ((state2 == null) ? 0 : state2.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
