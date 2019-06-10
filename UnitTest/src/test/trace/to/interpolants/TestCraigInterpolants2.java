@@ -710,10 +710,8 @@ public class TestCraigInterpolants2 {
 
 		Term xe3 = script.term("=", var2.getTerm(), script.numeral("3"));
 		Term xe8 = script.term("=", var2.getTerm(), script.numeral("10"));
-		IPredicate precondition = predicateFactory.newPredicate(xe3);
-		precondition = pUnifer.getOrConstructPredicate(precondition);
-		IPredicate postcondition = predicateFactory.newPredicate(xe8);
-		postcondition = pUnifer.getOrConstructPredicate(postcondition);
+		IPredicate precondition = pUnifer.getOrConstructPredicate(xe3);
+		IPredicate postcondition = pUnifer.getOrConstructPredicate(xe8);
 
 		List<Object> controlLocationSequence = new ArrayList<>();
 		controlLocationSequence.add(new Object());
