@@ -217,7 +217,7 @@ public class TestCraigInterpolants {
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 
 		List<Object> controlLocationSequence = new ArrayList<>();
-		InterpolatingTraceCheckCraig interpolate = new InterpolatingTraceCheckCraig(pUnifer.getTruePredicate(),
+		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(pUnifer.getTruePredicate(),
 				pUnifer.getFalsePredicate(), pendingContexts, trace, controlLocationSequence, service, toolkit,
 				managedScript, null, pUnifer, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
 				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
@@ -225,7 +225,7 @@ public class TestCraigInterpolants {
 		IPredicate[] preds = interpolate.getInterpolants();
 	}
 
-	@Test
+	//@Test
 	void assertionErrorTest() {
 		IUltimateServiceProvider service = UltimateMocks.createUltimateServiceProviderMock();
 		ILogger logger = new ConsoleLogger();
@@ -279,13 +279,13 @@ public class TestCraigInterpolants {
 		List<IProgramVar> lhs3 = new ArrayList<>();
 		List<Term> rhs3 = new ArrayList<>();
 		
-		lhs1.add(var1);
+		lhs1.add(var2);
 		rhs1.add(script.numeral("0"));
 		
-		lhs2.add(var1);
-		rhs2.add(script.term("+", var1.getTerm(), script.numeral("1")));
+		lhs2.add(var2);
+		rhs2.add(script.term("+", var2.getTerm(), script.numeral("1")));
 		
-		lhs3.add(var1);
+		lhs3.add(var2);
 		rhs3.add(script.numeral("-1"));
 		
 		UnmodifiableTransFormula formula1 = TransFormulaBuilder.constructAssignment(lhs1, rhs1, symbolTable,
@@ -315,11 +315,226 @@ public class TestCraigInterpolants {
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 
 		List<Object> controlLocationSequence = new ArrayList<>();
-		InterpolatingTraceCheckCraig interpolate = new InterpolatingTraceCheckCraig(pUnifer.getTruePredicate(),
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(pUnifer.getTruePredicate(),
 				pUnifer.getFalsePredicate(), pendingContexts, trace, controlLocationSequence, service, toolkit,
 				managedScript, null, pUnifer, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
 				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
 				SimplificationTechnique.NONE, false);
 		IPredicate[] preds = interpolate.getInterpolants();
+		
+		for (IPredicate pred : preds) {
+			System.out.println(pred);
+		}
+	}
+	
+	@Test
+	void multipleConditions() {
+		IUltimateServiceProvider service = UltimateMocks.createUltimateServiceProviderMock();
+		ILogger logger = new ConsoleLogger();
+		ManagedScript managedScript = new ManagedScript(service, new SMTInterpol(new DefaultLogger()));
+		Script script = managedScript.getScript();
+		script.setOption(":produce-proofs", true);
+		script.setLogic(Logics.QF_LIA);
+
+		DefaultIcfgSymbolTable symbolTable = new DefaultIcfgSymbolTable();
+		
+		managedScript.getScript().declareFun("x", new Sort[0], managedScript.getScript().sort("Int"));
+		managedScript.getScript().declareFun("x'", new Sort[0], managedScript.getScript().sort("Int"));
+		managedScript.getScript().declareFun("y", new Sort[0], managedScript.getScript().sort("Int"));
+		managedScript.getScript().declareFun("y'", new Sort[0], managedScript.getScript().sort("Int"));
+		BoogieOldVar var1 = new BoogieOldVar("x", (IBoogieType) BoogieType.TYPE_INT,
+				managedScript.getScript().variable("x", managedScript.getScript().sort("Int")),
+				(ApplicationTerm) managedScript.getScript().term("x"),
+				(ApplicationTerm) managedScript.getScript().term("x'"));
+		BoogieNonOldVar var2 = new BoogieNonOldVar("x'", (IBoogieType) BoogieType.TYPE_INT,
+				managedScript.getScript().variable("x'", managedScript.getScript().sort("Int")),
+				(ApplicationTerm) managedScript.getScript().term("x"),
+				(ApplicationTerm) managedScript.getScript().term("x'"), var1);
+		BoogieOldVar var3 = new BoogieOldVar("y", (IBoogieType) BoogieType.TYPE_INT,
+				managedScript.getScript().variable("y", managedScript.getScript().sort("Int")),
+				(ApplicationTerm) managedScript.getScript().term("y"),
+				(ApplicationTerm) managedScript.getScript().term("y'"));
+		BoogieNonOldVar var4 = new BoogieNonOldVar("y'", (IBoogieType) BoogieType.TYPE_INT,
+				managedScript.getScript().variable("y'", managedScript.getScript().sort("Int")),
+				(ApplicationTerm) managedScript.getScript().term("y"),
+				(ApplicationTerm) managedScript.getScript().term("y'"), var3);
+		var1.setNonOldVar(var2);
+		var3.setNonOldVar(var4);
+		symbolTable.add(var2);
+		symbolTable.add(var4);
+
+		String procedure1 = "procedure1";
+		String procedure2 = "procedure2";
+		String procedure3 = "procedure3";
+		String procedure4 = "procedure4";
+		String procedure5 = "procedure5";
+		String procedure6 = "procedure6";
+		String procedure7 = "procedure7";
+		String procedure8 = "procedure8";
+		String procedure9 = "procedure9";
+		
+		HashRelation<String, IProgramNonOldVar> mProc2Globals = new HashRelation<>();
+		//mProc2Globals.addPair(procedure1, var2);
+		//mProc2Globals.addPair(procedure2, var2);
+		mProc2Globals.addPair(procedure3, var2);
+		mProc2Globals.addPair(procedure4, var4);
+		mProc2Globals.addPair(procedure5, var2);
+		mProc2Globals.addPair(procedure6, var4);
+		mProc2Globals.addPair(procedure7, var2);
+		//mProc2Globals.addPair(procedure8, var2);
+		//mProc2Globals.addPair(procedure9, var4);
+		
+		ModifiableGlobalsTable modifiableGlobalsTable = new ModifiableGlobalsTable(mProc2Globals);
+		Set<String> procedures = new HashSet<>();
+		procedures.add(procedure1);
+		procedures.add(procedure2);
+		procedures.add(procedure3);
+		procedures.add(procedure4);
+		procedures.add(procedure5);
+		procedures.add(procedure6);
+		procedures.add(procedure7);
+		procedures.add(procedure8);
+		procedures.add(procedure9);
+
+		Map<String, List<ILocalProgramVar>> inParams = new HashMap<>();
+		Map<String, List<ILocalProgramVar>> outParams = new HashMap<>();
+		IcfgEdgeFactory icfgEdgeFactory = new IcfgEdgeFactory(new SerialProvider());
+		Map<IIcfgForkTransitionThreadCurrent<IcfgLocation>, ThreadInstance> threadInstanceMap = new HashMap<>();
+		Collection<IIcfgJoinTransitionThreadCurrent<IcfgLocation>> joinTransitions = new ArrayList<>();
+		ConcurrencyInformation concurInfo = new ConcurrencyInformation(threadInstanceMap, joinTransitions);
+		SmtSymbols smtSymbols = new SmtSymbols(managedScript.getScript());
+		CfgSmtToolkit toolkit = new CfgSmtToolkit(modifiableGlobalsTable, managedScript, symbolTable, procedures,
+				inParams, outParams, icfgEdgeFactory, concurInfo, smtSymbols);
+		SortedMap<Integer, IPredicate> pendingContexts = new TreeMap<>();
+
+		List<IProgramVar> lhs1 = new ArrayList<>();
+		List<Term> rhs1 = new ArrayList<>();
+		List<IProgramVar> lhs2 = new ArrayList<>();
+		List<Term> rhs2 = new ArrayList<>();
+		List<IProgramVar> lhs3 = new ArrayList<>();
+		List<Term> rhs3 = new ArrayList<>();
+		List<IProgramVar> lhs4 = new ArrayList<>();
+		List<Term> rhs4 = new ArrayList<>();
+		List<IProgramVar> lhs5 = new ArrayList<>();
+		List<Term> rhs5 = new ArrayList<>();
+		List<IProgramVar> lhs6 = new ArrayList<>();
+		List<Term> rhs6 = new ArrayList<>();
+		List<IProgramVar> lhs7 = new ArrayList<>();
+		List<Term> rhs7 = new ArrayList<>();
+		List<IProgramVar> lhs8 = new ArrayList<>();
+		List<Term> rhs8 = new ArrayList<>();
+		List<IProgramVar> lhs9 = new ArrayList<>();
+		List<Term> rhs9 = new ArrayList<>();
+		
+		lhs1.add(var2);
+		rhs1.add(script.numeral("0"));
+		
+		lhs2.add(var4);
+		rhs2.add(script.numeral("0"));
+		
+		lhs3.add(var2);
+		rhs3.add(script.numeral("0"));
+		
+		lhs4.add(var4);
+		rhs4.add(script.numeral("0"));
+		
+		lhs5.add(var2);
+		rhs5.add(script.term("+", var2.getTerm(), script.numeral("2")));
+		
+		lhs6.add(var4);
+		rhs6.add(script.term("+", var4.getTerm(), script.numeral("10")));
+		
+		lhs7.add(var2);
+		rhs7.add(script.term("+", script.term("*", var4.getTerm(), script.numeral("2")), var2.getTerm()));
+		
+		lhs8.add(var4);
+		rhs8.add(script.numeral("11"));
+		
+		lhs9.add(var2);
+		rhs9.add(script.term("+", script.term("*", var4.getTerm(), script.numeral("2")), script.numeral("1")));
+		
+		UnmodifiableTransFormula formula1 = TransFormulaBuilder.constructEqualityAssumption(lhs1, rhs1, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula2 = TransFormulaBuilder.constructEqualityAssumption(lhs2, rhs2, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula3 = TransFormulaBuilder.constructAssignment(lhs3, rhs3, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula4 = TransFormulaBuilder.constructAssignment(lhs4, rhs4, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula5 = TransFormulaBuilder.constructAssignment(lhs5, rhs5, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula6 = TransFormulaBuilder.constructAssignment(lhs6, rhs6, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula7 = TransFormulaBuilder.constructAssignment(lhs7, rhs7, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula8 = TransFormulaBuilder.constructEqualityAssumption(lhs8, rhs8, symbolTable,
+				managedScript);
+		UnmodifiableTransFormula formula9 = TransFormulaBuilder.constructEqualityAssumption(lhs9, rhs9, symbolTable,
+				managedScript);
+		
+		BasicInternalAction basicAction1 = new BasicInternalAction(procedure1, procedure2, formula1);
+		BasicInternalAction basicAction2 = new BasicInternalAction(procedure2, procedure3, formula2);
+		BasicInternalAction basicAction3 = new BasicInternalAction(procedure3, procedure4, formula3);
+		BasicInternalAction basicAction4 = new BasicInternalAction(procedure4, procedure5, formula4);
+		BasicInternalAction basicAction5 = new BasicInternalAction(procedure5, procedure4, formula5);
+		BasicInternalAction basicAction6 = new BasicInternalAction(procedure6, procedure7, formula6);
+		BasicInternalAction basicAction7 = new BasicInternalAction(procedure7, procedure8, formula7);
+		BasicInternalAction basicAction8 = new BasicInternalAction(procedure8, procedure9, formula8);
+		BasicInternalAction basicAction9 = new BasicInternalAction(procedure9, null, formula9);
+
+		IAction[] word = new IAction[9];
+		int[] nestingRelation = new int[9];
+		word[0] = basicAction1;
+		word[1] = basicAction2;
+		word[2] = basicAction3;
+		word[3] = basicAction4;
+		word[4] = basicAction5;
+		word[5] = basicAction6;
+		word[6] = basicAction7;
+		word[7] = basicAction8;
+		word[8] = basicAction9;
+		
+		nestingRelation[0] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[1] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[2] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[3] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[4] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[5] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[6] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[7] = NestedWord.INTERNAL_POSITION;
+		nestingRelation[8] = NestedWord.INTERNAL_POSITION;
+		
+		NestedWord<IAction> trace = new NestedWord<>(word, nestingRelation);
+
+		BasicPredicateFactory predicateFactory = new BasicPredicateFactory(service, managedScript, symbolTable,
+				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
+		PredicateUnifier pUnifer = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
+				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
+
+		List<Object> controlLocationSequence = new ArrayList<>();
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		controlLocationSequence.add(new Object());
+		
+		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(pUnifer.getTruePredicate(),
+				pUnifer.getFalsePredicate(), pendingContexts, trace, controlLocationSequence, service, toolkit,
+				managedScript, null, pUnifer, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
+				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
+				SimplificationTechnique.NONE, false);
+		IPredicate[] preds = interpolate.getInterpolants();
+		
+		for (IPredicate pred : preds)
+			System.out.println(pred);
 	}
 }

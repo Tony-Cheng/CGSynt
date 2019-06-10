@@ -14,5 +14,7 @@
 	<classpathentry kind="src" path="/TraceAbstraction"/>
 	<classpathentry kind="src" path="/CodeCheck"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BoogiePLParser"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CDTPlugin"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateCore"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
