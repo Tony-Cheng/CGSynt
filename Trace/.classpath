@@ -3,5 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="/Library-SMTLIB"/>
+	<classpathentry kind="src" path="/Library-ModelCheckerUtils"/>
+	<classpathentry kind="src" path="/Library-BoogieAST"/>
+	<classpathentry kind="src" path="/Library-UltimateModel"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
