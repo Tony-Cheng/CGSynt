@@ -8,5 +8,6 @@
 	<classpathentry kind="src" path="/Library-UltimateModel"/>
 	<classpathentry kind="src" path="/Library-Automata"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateTest"/>
+	<classpathentry kind="src" path="/CGSynt"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
