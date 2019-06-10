@@ -12,8 +12,11 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.DefaultIcfgSymbolTable;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 
+/**
+ * A factory for constructing variables used in the trace.
+ *
+ */
 public class VariableFactory {
 
 	private Set<BoogieNonOldVar> variables;
@@ -31,6 +34,11 @@ public class VariableFactory {
 		curID = 0;
 	}
 
+	/**
+	 * 
+	 * @param identifier
+	 * @return
+	 */
 	public BoogieNonOldVar getVariable(String identifier) {
 		return variablesMap.get(identifier);
 	}

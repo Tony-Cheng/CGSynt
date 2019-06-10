@@ -3,6 +3,7 @@ package cgsynt.interpol;
 import java.util.ArrayList;
 import java.util.List;
 
+import CGSynt.GlobalVariables;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
@@ -30,12 +31,11 @@ public class ScriptAssignmentStatement implements IStatement {
 	 * @param rhs
 	 *            the right hand side of the statement.
 	 */
-	public ScriptAssignmentStatement(BoogieNonOldVar lhs, Term rhs, DefaultIcfgSymbolTable symbolTable,
-			ManagedScript managedScript) {
+	public ScriptAssignmentStatement(BoogieNonOldVar lhs, Term rhs, DefaultIcfgSymbolTable symbolTable) {
 		this.lhs = lhs;
 		this.rhs = rhs;
 		this.symbolTable = symbolTable;
-		this.managedScript = managedScript;
+		this.managedScript = GlobalVariables.getGlobalVariables().getManagedScript();
 	}
 
 	@Override
