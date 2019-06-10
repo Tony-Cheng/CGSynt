@@ -74,90 +74,90 @@ public class MainTTCTest {
 	private String[] pluginIDs;
 	
 	public MainTTCTest() {
-		// Setup Controller
-		UltimateCChecker cChecker = null;
-		try {
-			cChecker = new UltimateCChecker();
-		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		CDTController cdtController;
-		try {
-			cdtController = new CDTController(cChecker);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		IUltimateServiceProvider generator = new ToolchainStorage();
-		
-		pluginIDs = new String[]{
-				de.uni_freiburg.informatik.ultimate.plugins.generator.codecheck.Activator.PLUGIN_ID
-		};
-		
-		service = generator.registerDefaultPreferenceLayer(this.getClass(), pluginIDs);
-		ILogger logger = service.getLoggingService().getControllerLogger();
-		
-		SettingsManager settingsManager = new SettingsManager(logger);
-		PluginFactory fact = new PluginFactory(settingsManager, logger);
-		ToolChainManager toolManager = new ToolChainManager();
-		
-		IPreferenceProvider pref = service.getPreferenceProvider(pluginIDs[0]);
-		pref.put("SMT solver", "Internal_SMTInterpol");
-		pref.put("Size of a code block", "SingleStatement"); // Possible options: , SequenceOfStatements, LoopFreeBlock
-		pref.put("the checking algorithm to use", "ULTIMATE");
-		pref.put("interpolation mode", "Craig_NestedInterpolation");
-		pref.put("Predicate Unification Mode", "PER_VERIFICATION");
-		pref.put("EdgeCheck Optimization Mode", "NONE");
-		pref.put("The redirection strategy for Impulse", "No_Strategy");
-		pref.put("Choose which separate solver to use for tracechecks", "Internal_SMTInterpol");
-		pref.put("Use unsat cores in FP/BP interpolation", "IGNORE");
-		
-		BoogieParser bp = new BoogieParser();
-		bp.setServices(service);
-		
-		String[] files = {"res/t6.bpl"};
-		
-		Unit unit = (Unit)parseBoogie(bp, files);
-		
-		BoogieDeclarations decs = new BoogieDeclarations(unit, logger);
-		Script script = new SMTInterpol(new DefaultLogger());
-		script.setLogic(Logics.QF_AUFLIRA);
-		ManagedScript mScript = new ManagedScript(service, script);
-		Boogie2SMT b2smt = new Boogie2SMT(mScript, decs, false, service, false);
-		BoogieIcfgContainer icfg = new BoogieIcfgContainer(service, decs, b2smt, null);
-		
-		// Setup for interpolation
-		CfgSmtToolkit toolkit = icfg.getCfgSmtToolkit();
-		
-		PredicateFactory predFact = new PredicateFactory(service, 
-				toolkit.getManagedScript(),
-				toolkit.getSymbolTable(),
-				SIMPLIFICATION_TECHNIQUE, XNF_CONVERSION_TECHNIQUE);
-		
-		IPredicateUnifier unifier = new PredicateUnifier(logger, service, toolkit.getManagedScript(),
-				predFact, toolkit.getSymbolTable(), SIMPLIFICATION_TECHNIQUE,
-				XNF_CONVERSION_TECHNIQUE);
-		
-		readPreferencePage();
-		
-		final IProgressAwareTimer timer = service.getProgressMonitorService().getChildTimer(0.2);
-		final IAbstractInterpretationResult<?, IcfgEdge, IcfgLocation> result =
-				AbstractInterpreter.runFuture(icfg, timer, service, false, logger);
-		
-		Map<IcfgLocation, Term> initialPredicates = result.getLoc2Term().entrySet().stream()
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-		
-		RTwo r2ar = new RTwo(toolkit, predFact, logger,
-				unifier.getTruePredicate(), initialPredicates);
-		
-		ImpRootNode graphRoot = r2ar.convert(icfg);
-		
-		ArrayList<AnnotatedProgramPoint> procRootsToCheck = new ArrayList<>();
-		procRootsToCheck.addAll(graphRoot.getOutgoingNodes());
-		System.out.println(procRootsToCheck.size());
+//		// Setup Controller
+//		UltimateCChecker cChecker = null;
+//		try {
+//			cChecker = new UltimateCChecker();
+//		} catch (Throwable e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		CDTController cdtController;
+//		try {
+//			cdtController = new CDTController(cChecker);
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//		IUltimateServiceProvider generator = new ToolchainStorage();
+//		
+//		pluginIDs = new String[]{
+//				de.uni_freiburg.informatik.ultimate.plugins.generator.codecheck.Activator.PLUGIN_ID
+//		};
+//		
+//		service = generator.registerDefaultPreferenceLayer(this.getClass(), pluginIDs);
+//		ILogger logger = service.getLoggingService().getControllerLogger();
+//		
+//		SettingsManager settingsManager = new SettingsManager(logger);
+//		PluginFactory fact = new PluginFactory(settingsManager, logger);
+//		ToolChainManager toolManager = new ToolChainManager();
+//		
+//		IPreferenceProvider pref = service.getPreferenceProvider(pluginIDs[0]);
+//		pref.put("SMT solver", "Internal_SMTInterpol");
+//		pref.put("Size of a code block", "SingleStatement"); // Possible options: , SequenceOfStatements, LoopFreeBlock
+//		pref.put("the checking algorithm to use", "ULTIMATE");
+//		pref.put("interpolation mode", "Craig_NestedInterpolation");
+//		pref.put("Predicate Unification Mode", "PER_VERIFICATION");
+//		pref.put("EdgeCheck Optimization Mode", "NONE");
+//		pref.put("The redirection strategy for Impulse", "No_Strategy");
+//		pref.put("Choose which separate solver to use for tracechecks", "Internal_SMTInterpol");
+//		pref.put("Use unsat cores in FP/BP interpolation", "IGNORE");
+//		
+//		BoogieParser bp = new BoogieParser();
+//		bp.setServices(service);
+//		
+//		String[] files = {"res/t6.bpl"};
+//		
+//		Unit unit = (Unit)parseBoogie(bp, files);
+//		
+//		BoogieDeclarations decs = new BoogieDeclarations(unit, logger);
+//		Script script = new SMTInterpol(new DefaultLogger());
+//		script.setLogic(Logics.QF_AUFLIRA);
+//		ManagedScript mScript = new ManagedScript(service, script);
+//		Boogie2SMT b2smt = new Boogie2SMT(mScript, decs, false, service, false);
+//		BoogieIcfgContainer icfg = new BoogieIcfgContainer(service, decs, b2smt, null);
+//		
+//		// Setup for interpolation
+//		CfgSmtToolkit toolkit = icfg.getCfgSmtToolkit();
+//		
+//		PredicateFactory predFact = new PredicateFactory(service, 
+//				toolkit.getManagedScript(),
+//				toolkit.getSymbolTable(),
+//				SIMPLIFICATION_TECHNIQUE, XNF_CONVERSION_TECHNIQUE);
+//		
+//		IPredicateUnifier unifier = new PredicateUnifier(logger, service, toolkit.getManagedScript(),
+//				predFact, toolkit.getSymbolTable(), SIMPLIFICATION_TECHNIQUE,
+//				XNF_CONVERSION_TECHNIQUE);
+//		
+//		readPreferencePage();
+//		
+//		final IProgressAwareTimer timer = service.getProgressMonitorService().getChildTimer(0.2);
+//		final IAbstractInterpretationResult<?, IcfgEdge, IcfgLocation> result =
+//				AbstractInterpreter.runFuture(icfg, timer, service, false, logger);
+//		
+//		Map<IcfgLocation, Term> initialPredicates = result.getLoc2Term().entrySet().stream()
+//				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+//		
+//		RTwo r2ar = new RTwo(toolkit, predFact, logger,
+//				unifier.getTruePredicate(), initialPredicates);
+//		
+//		ImpRootNode graphRoot = r2ar.convert(icfg);
+//		
+//		ArrayList<AnnotatedProgramPoint> procRootsToCheck = new ArrayList<>();
+//		procRootsToCheck.addAll(graphRoot.getOutgoingNodes());
+//		System.out.println(procRootsToCheck.size());
 		
 		// Interpolation
 //		InterpolatingTraceCheck<IIcfgTransition<?>> tc = new InterpolatingTraceCheckCraig<>(

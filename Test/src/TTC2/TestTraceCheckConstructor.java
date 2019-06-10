@@ -63,8 +63,9 @@ import de.uni_freiburg.informatik.ultimate.util.datastructures.relation.HashRela
 public class TestTraceCheckConstructor {
 
 	public static void main(String[] args) {
-		firstTest();
+		//firstTest();
 		// secondTest();
+		inequalityTest();
 	}
 	
 	public static void firstTest() {
@@ -546,8 +547,5 @@ public class TestTraceCheckConstructor {
 				managedScript, null, pUnifer, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
 				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
 				SimplificationTechnique.NONE, false);
-		IPredicate[] preds = interpolate.getInterpolants();
-		System.out.println(preds[0].getFormula());
-		System.out.println(preds[0].getClosedFormula());
 	}
 }
