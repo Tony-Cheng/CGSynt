@@ -39,6 +39,7 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.Tra
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula.Infeasibility;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.ILocalProgramVar;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramFunction;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SmtUtils.SimplificationTechnique;
@@ -63,9 +64,9 @@ import de.uni_freiburg.informatik.ultimate.util.datastructures.relation.HashRela
 public class TestTraceCheckConstructor {
 
 	public static void main(String[] args) {
-		//firstTest();
+		firstTest();
 		// secondTest();
-		inequalityTest();
+		//inequalityTest();
 	}
 	
 	public static void firstTest() {
@@ -220,8 +221,13 @@ public class TestTraceCheckConstructor {
 				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
 				SimplificationTechnique.NONE, false);
 		IPredicate[] preds = interpolate.getInterpolants();
-		System.out.println(preds[0].getFormula());
-		System.out.println(preds[0].getClosedFormula());
+		
+		//Set<IProgramFunction> a = preds[0].getFunctions();
+		//System.out.println(a);
+		
+		Set<IProgramVar> b = preds[0].getVars();
+		System.out.println(b);
+		
 	}
 	
 	public static void secondTest() {
@@ -547,5 +553,6 @@ public class TestTraceCheckConstructor {
 				managedScript, null, pUnifer, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
 				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
 				SimplificationTechnique.NONE, false);
+		IPredicate[] preds = interpolate.getInterpolants();
 	}
 }
