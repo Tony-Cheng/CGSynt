@@ -19,7 +19,7 @@ public class ScriptAssumptionStatement implements IStatement {
 	private Term rhs;
 	private DefaultIcfgSymbolTable symbolTable;
 	private ManagedScript managedScript;
-	String type;
+	private String type;
 
 	public ScriptAssumptionStatement(BoogieNonOldVar lhs, Term rhs, String type) {
 		lhs = this.lhs;

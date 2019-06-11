@@ -1,5 +1,7 @@
 package cgsynt.interpol;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +32,8 @@ public class VariableFactory {
 
 	public VariableFactory(Script script) {
 		symbolTable = new DefaultIcfgSymbolTable();
+		variablesMap = new HashMap<>();
+		variables = new HashSet<>();
 		this.script = script;
 		curID = 0;
 	}
@@ -40,7 +44,10 @@ public class VariableFactory {
 	 * @return
 	 */
 	public BoogieNonOldVar getVariable(String identifier) {
-		return variablesMap.get(identifier);
+		if (variablesMap.containsKey(identifier))
+			return variablesMap.get(identifier);
+		else
+			return null;
 	}
 
 	public boolean isVariable(String identifier) {
@@ -81,7 +88,6 @@ public class VariableFactory {
 		BoogieOldVar var1 = new BoogieOldVar(identifierPrime, boogieType,
 				script.variable(identifierPrime, script.sort(stringType)),
 				(ApplicationTerm) script.term(identifierPrime), (ApplicationTerm) script.term(identifier));
-
 		BoogieNonOldVar var2 = new BoogieNonOldVar(identifier, boogieType,
 				script.variable(identifier, script.sort("Int")), (ApplicationTerm) script.term(identifier),
 				(ApplicationTerm) script.term(identifierPrime), var1);
