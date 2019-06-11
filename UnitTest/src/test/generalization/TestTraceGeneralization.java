@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import org.junit.jupiter.api.Test;
 
+import cgsynt.interpol.ExtendedTransFormulaBuilder;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.VariableFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
@@ -30,6 +31,7 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IIcfg
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IIcfgJoinTransitionThreadCurrent;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgEdgeFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.ILocalProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
@@ -116,6 +118,13 @@ public class TestTraceGeneralization {
 		lhs5.add(x);
 		rhs5.add(y.getTerm());
 		
-		ExtendedTransFormulaBuilder formulaBuilder = new ExtendedTransformulaBuilder();
+		UnmodifiableTransFormula f0 = ExtendedTransFormulaBuilder.constructAssumption(lhs0, rhs0, symbolTable, managedScript, "<=");
+		UnmodifiableTransFormula f1 = ExtendedTransFormulaBuilder.constructAssignment(lhs1, rhs1, symbolTable, managedScript);
+		UnmodifiableTransFormula f2 = ExtendedTransFormulaBuilder.constructAssumption(lhs2, rhs2, symbolTable, managedScript, "<");
+		UnmodifiableTransFormula f3 = ExtendedTransFormulaBuilder.constructAssignment(lhs3, rhs3, symbolTable, managedScript);
+		UnmodifiableTransFormula f4 = ExtendedTransFormulaBuilder.constructAssumption(lhs4, rhs4, symbolTable, managedScript, "<");
+		UnmodifiableTransFormula f5 = ExtendedTransFormulaBuilder.constructAssumption(lhs5, rhs5, symbolTable, managedScript, ">=");
+		
+		
 	}
 }

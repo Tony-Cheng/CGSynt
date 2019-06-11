@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/BoogiePLParser"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CDTPlugin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateCore"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Trace"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

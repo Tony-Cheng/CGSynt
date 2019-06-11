@@ -10,5 +10,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-Automata"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-BoogieAST"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Trace"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SMTInterpol"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/TraceAbstraction"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
