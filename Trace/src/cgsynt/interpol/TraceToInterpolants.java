@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.logic.Script.LBool;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.CfgSmtToolkit;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.ConcurrencyInformation;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.DefaultIcfgSymbolTable;
@@ -87,7 +88,7 @@ public class TraceToInterpolants implements IInterpol {
 		return traceToInterpolants;
 	}
 
-	public NestedWord<IAction> buildTrace(List<IStatement> statements) {
+	private NestedWord<IAction> buildTrace(List<IStatement> statements) {
 		int len = statements.size();
 		IAction[] word = new IAction[len];
 		int[] nestingRelation = new int[len];
@@ -99,7 +100,7 @@ public class TraceToInterpolants implements IInterpol {
 		return new NestedWord<>(word, nestingRelation);
 	}
 
-	public List<Object> generateControlLocationSequence(int n) {
+	private List<Object> generateControlLocationSequence(int n) {
 		List<Object> controlLocationSequence = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
 			controlLocationSequence.add(new Object());
@@ -130,10 +131,23 @@ public class TraceToInterpolants implements IInterpol {
 		return pUnifer.getFalsePredicate();
 	}
 
+	private List<IStatement> buildStatementList(IStatement statement) {
+		List<IStatement> statements = new ArrayList<>();
+		statements.add(statement);
+		return statements;
+	}
+
 	@Override
 	public boolean checkSat(IPredicate pre, IStatement statement, IPredicate post) {
-		// TODO Auto-generated method stub
-		return false;
+		List<IStatement> statements = buildStatementList(statement);
+		List<Object> controlLocationSequence = generateControlLocationSequence(statements.size() + 2);
+		NestedWord<IAction> trace = buildTrace(statements);
+		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(
+				pUnifer.getTruePredicate(), pUnifer.getFalsePredicate(), pendingContexts, trace,
+				controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
+				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
+				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
+		return interpolate.isCorrect() == LBool.SAT;
 	}
 
 }
