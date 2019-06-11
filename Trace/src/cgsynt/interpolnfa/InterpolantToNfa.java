@@ -6,22 +6,21 @@ import cgsynt.interpol.IStatement;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
-import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
+import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;s
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
 public class InterpolantToNfa {
 	private Set<IPredicate> mInterpolants;
 	private Set<IStatement> mTraces;
-	private ManagedScript mManagedScript;
+	private TraceChecker mTraceChecker;
 	
 	private NestedWordAutomaton<IStatement, IPredicate> mInterpolantNfa;
 	
-	public InterpolantToNfa(Set<IPredicate> interpolants, Set<IStatement> traces, ManagedScript managedScript) {
+	public InterpolantToNfa(Set<IPredicate> interpolants, Set<IStatement> traces, TraceChecker traceChecker) {
 		this.mInterpolants = interpolants;
 		this.mTraces = traces;
-		this.mManagedScript = managedScript;
+		this.mTraceChecker = traceChecker;
 		
 		this.computeResult();
 	}
@@ -42,7 +41,24 @@ public class InterpolantToNfa {
 		for (IPredicate pre : this.mInterpolants) {
 			for (IStatement statement : this.mTraces) {
 				for (IPredicate post : this.mInterpolants) {
+					boolean unsat = this.mTraceChecker.checkUnsat(pre, statement, post);
 					
+					if (unsat) {
+						Set<IPredicate> states = this.mInterpolantNfa.getStates();
+						
+						if (!states.contains(pre))
+							this.mInterpolantNfa.addState(
+									pre.equals(this.mTraceChecker.getTruePredicate()),
+									pre.equals(this.mTraceChecker.getFalsePredicate()),
+									pre);
+						if (!states.contains(post))
+							this.mInterpolantNfa.addState(
+									post.equals(this.mTraceChecker.getTruePredicate()),
+									post.equals(this.mTraceChecker.getFalsePredicate()),
+									post);
+						
+						this.mInterpolantNfa.addInternalTransition(pre, statement, post);
+					}
 				}
 			}
 		}
