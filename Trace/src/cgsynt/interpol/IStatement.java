@@ -23,5 +23,5 @@ public interface IStatement {
 	 * @param nextProcedure
 	 * @return
 	 */
-	public IAction getFormula(String prevProcedure, String nextProcedure);
+	public IAction getFormula();
 }

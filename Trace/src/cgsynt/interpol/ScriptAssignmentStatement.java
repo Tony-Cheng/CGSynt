@@ -3,7 +3,6 @@ package cgsynt.interpol;
 import java.util.ArrayList;
 import java.util.List;
 
-import CGSynt.GlobalVariables;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
@@ -35,7 +34,7 @@ public class ScriptAssignmentStatement implements IStatement {
 		this.lhs = lhs;
 		this.rhs = rhs;
 		this.symbolTable = symbolTable;
-		this.managedScript = GlobalVariables.getGlobalVariables().getManagedScript();
+		this.managedScript = TraceGlobalVariables.getGlobalVariables().getManagedScript();
 	}
 
 	@Override
@@ -56,7 +55,7 @@ public class ScriptAssignmentStatement implements IStatement {
 	}
 
 	@Override
-	public IAction getFormula(String prevProcedure, String nextProcedure) {
+	public IAction getFormula() {
 		List<IProgramVar> lhs = new ArrayList<>();
 		List<Term> rhs = new ArrayList<>();
 		lhs.add(this.lhs);
@@ -64,7 +63,7 @@ public class ScriptAssignmentStatement implements IStatement {
 		UnmodifiableTransFormula formula = TransFormulaBuilder.constructAssignment(lhs, rhs, symbolTable,
 				managedScript);
 		;
-		return new BasicInternalAction(prevProcedure, nextProcedure, formula);
+		return new BasicInternalAction(null, null, formula);
 	}
 
 }
