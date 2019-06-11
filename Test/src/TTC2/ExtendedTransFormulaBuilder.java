@@ -31,11 +31,6 @@ public class ExtendedTransFormulaBuilder extends TransFormulaBuilder{
 		super(inVars, outVars, emptyNonTheoryConsts, nonTheoryConsts, emptyBranchEncoders, branchEncoders, emptyAuxVars);
 	}
 	
-	public static UnmodifiableTransFormula constructAssignment(final List<? extends IProgramVar> lhs,
-			final List<Term> rhs, final IIcfgSymbolTable symbolTable, final ManagedScript mgdScript, final String type) {
-		return constructInequality(lhs, rhs, symbolTable, mgdScript, type, false);
-	}
-	
 	public static UnmodifiableTransFormula constructAssumption(final List<? extends IProgramVar> lhs,
 			final List<Term> rhs, final IIcfgSymbolTable symbolTable, final ManagedScript mgdScript, final String type) {
 		return constructInequality(lhs, rhs, symbolTable, mgdScript, type, true);

@@ -510,7 +510,7 @@ public class TestTraceCheckConstructor {
 		lhs4.add(yNew);
 		rhs4.add(script.numeral("5"));
 		
-		UnmodifiableTransFormula formula0 = ExtendedTransFormulaBuilder.constructInequalityAssumption(lhs0, rhs0, symbolTable,
+		UnmodifiableTransFormula formula0 = ExtendedTransFormulaBuilder.constructAssumption(lhs0, rhs0, symbolTable,
 				managedScript, ">=");
 		UnmodifiableTransFormula formula1 = ExtendedTransFormulaBuilder.constructAssignment(lhs1, rhs1, symbolTable,
 				managedScript);
@@ -518,7 +518,7 @@ public class TestTraceCheckConstructor {
 				managedScript);
 		UnmodifiableTransFormula formula3 = ExtendedTransFormulaBuilder.constructAssignment(lhs3, rhs3, symbolTable,
 				managedScript);
-		UnmodifiableTransFormula formula4 = ExtendedTransFormulaBuilder.constructInequalityAssumption(lhs4, rhs4, symbolTable,
+		UnmodifiableTransFormula formula4 = ExtendedTransFormulaBuilder.constructAssumption(lhs4, rhs4, symbolTable,
 				managedScript, ">");
 		
 		BasicInternalAction basicAction0 = new BasicInternalAction(p0, p1, formula0);
