@@ -1,4 +1,4 @@
-package cgsynt.interpolnfa;
+package cgsynt.loop;
 
 import java.util.Set;
 
@@ -10,14 +10,14 @@ import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceP
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
-public class InterpolantToNfa {
+public class TraceGeneralization {
 	private Set<IPredicate> mInterpolants;
 	private Set<IStatement> mTraces;
 	private TraceChecker mTraceChecker;
 	
 	private NestedWordAutomaton<IStatement, IPredicate> mInterpolantNfa;
 	
-	public InterpolantToNfa(Set<IPredicate> interpolants, Set<IStatement> traces, TraceChecker traceChecker) {
+	public TraceGeneralization(Set<IPredicate> interpolants, Set<IStatement> traces, TraceChecker traceChecker) {
 		this.mInterpolants = interpolants;
 		this.mTraces = traces;
 		this.mTraceChecker = traceChecker;
