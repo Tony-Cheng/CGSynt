@@ -109,12 +109,6 @@ public class TraceToInterpolants implements IInterpol {
 	}
 
 	@Override
-	public boolean checkSat() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public IPredicate[] computeInterpolants(List<IStatement> statements) {
 		List<Object> controlLocationSequence = generateControlLocationSequence(statements.size() + 2);
 		NestedWord<IAction> trace = buildTrace(statements);
@@ -134,6 +128,12 @@ public class TraceToInterpolants implements IInterpol {
 	@Override
 	public IPredicate getFalsePredicate() {
 		return pUnifer.getFalsePredicate();
+	}
+
+	@Override
+	public boolean checkSat(IPredicate pre, IStatement statement, IPredicate post) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
