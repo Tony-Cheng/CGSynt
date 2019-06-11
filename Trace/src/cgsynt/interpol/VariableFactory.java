@@ -25,8 +25,8 @@ public class VariableFactory {
 	private DefaultIcfgSymbolTable symbolTable;
 	private int curID;
 
-	public static final int Int = 1;
-	public static final int Bool = 2;
+	public static final int INT = 1;
+	public static final int BOOL = 2;
 
 	public VariableFactory(Script script) {
 		symbolTable = new DefaultIcfgSymbolTable();
@@ -49,9 +49,9 @@ public class VariableFactory {
 
 	private String typeToString(int type) throws Exception {
 		switch (type) {
-		case Int:
+		case INT:
 			return "Int";
-		case Bool:
+		case BOOL:
 			return "Bool";
 		default:
 			throw new Exception("No such type");
@@ -60,9 +60,9 @@ public class VariableFactory {
 
 	private BoogiePrimitiveType typeToBoogieType(int type) throws Exception {
 		switch (type) {
-		case Int:
+		case INT:
 			return BoogieType.TYPE_INT;
-		case Bool:
+		case BOOL:
 			return BoogieType.TYPE_BOOL;
 		default:
 			throw new Exception("No such type");
