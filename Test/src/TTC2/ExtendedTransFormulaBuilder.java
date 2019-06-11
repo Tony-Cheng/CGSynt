@@ -31,8 +31,19 @@ public class ExtendedTransFormulaBuilder extends TransFormulaBuilder{
 		super(inVars, outVars, emptyNonTheoryConsts, nonTheoryConsts, emptyBranchEncoders, branchEncoders, emptyAuxVars);
 	}
 	
-	public static UnmodifiableTransFormula constructInequalityAssumption(final List<? extends IProgramVar> lhs,
+	public static UnmodifiableTransFormula constructAssignment(final List<? extends IProgramVar> lhs,
 			final List<Term> rhs, final IIcfgSymbolTable symbolTable, final ManagedScript mgdScript, final String type) {
+		return constructInequality(lhs, rhs, symbolTable, mgdScript, type, false);
+	}
+	
+	public static UnmodifiableTransFormula constructAssumption(final List<? extends IProgramVar> lhs,
+			final List<Term> rhs, final IIcfgSymbolTable symbolTable, final ManagedScript mgdScript, final String type) {
+		return constructInequality(lhs, rhs, symbolTable, mgdScript, type, true);
+	}
+	
+	private static UnmodifiableTransFormula constructInequality(final List<? extends IProgramVar> lhs,
+			final List<Term> rhs, final IIcfgSymbolTable symbolTable, final ManagedScript mgdScript, final String type, 
+			final boolean lhsAreAlsoInVars) {
 		if (lhs.size() != rhs.size()) {
 			throw new IllegalArgumentException("different number of argument on LHS and RHS");
 		}
@@ -66,7 +77,9 @@ public class ExtendedTransFormulaBuilder extends TransFormulaBuilder{
 					pv.getTermVariable().getSort());
 			substitutionMapping.put(pv.getTermVariable(), freshTv);
 			tfb.addOutVar(pv, freshTv);
-			tfb.addInVar(pv, freshTv);
+			if (lhsAreAlsoInVars) {
+				tfb.addInVar(pv, freshTv);
+			}
 			final Term renamedRightHandSide = subst.transform(rhs.get(i));
 			conjuncts.add(mgdScript.getScript().term(type, freshTv, renamedRightHandSide));
 		}
