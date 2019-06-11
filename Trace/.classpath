@@ -10,5 +10,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateTest"/>
 	<classpathentry kind="src" path="/Library-UltimateUtil"/>
 	<classpathentry kind="src" path="/SMTInterpol"/>
+	<classpathentry kind="src" path="/TraceAbstraction"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
