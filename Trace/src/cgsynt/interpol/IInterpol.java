@@ -9,4 +9,7 @@ public interface IInterpol {
 	public boolean checkSat();
 	
 	public IPredicate[] computeInterpolants(List<IStatement> statements);
+	
+	public IPredicate getTruePredicate();
+	public IPredicate getFalsePredicate();
 }

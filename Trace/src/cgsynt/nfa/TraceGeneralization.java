@@ -42,9 +42,9 @@ public class TraceGeneralization {
 		for (IPredicate pre : this.mInterpolants) {
 			for (IStatement statement : this.mTraces) {
 				for (IPredicate post : this.mInterpolants) {
-					boolean unsat = this.mInterpolator.checkUnsat(pre, statement, post);
+					boolean sat = this.mInterpolator.checkSat(pre, statement, post);
 					
-					if (unsat) {
+					if (!sat) {
 						Set<IPredicate> states = this.mInterpolantNfa.getStates();
 						
 						if (!states.contains(pre))
