@@ -22,8 +22,8 @@ public class ScriptAssumptionStatement implements IStatement {
 	private String type;
 
 	public ScriptAssumptionStatement(BoogieNonOldVar lhs, Term rhs, String type) {
-		lhs = this.lhs;
-		rhs = this.rhs;
+		this.lhs = lhs;
+		this.rhs = rhs;
 		this.type = type;
 		symbolTable = TraceGlobalVariables.getGlobalVariables().getVariableFactory().getSymbolTable();
 		managedScript = TraceGlobalVariables.getGlobalVariables().getManagedScript();
