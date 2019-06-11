@@ -1,4 +1,4 @@
-package TTC2;
+package cgsynt.interpol;
 
 import java.util.ArrayList;
 import java.util.Collection;
