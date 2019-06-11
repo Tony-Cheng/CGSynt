@@ -6,7 +6,7 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPre
 
 public interface IInterpol {
 
-	public boolean checkSat();
+	public boolean checkSat(IPredicate pre, IStatement statement, IPredicate post);
 	
 	public IPredicate[] computeInterpolants(List<IStatement> statements);
 	
