@@ -12,13 +12,13 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPre
 
 public class CounterExamplesToInterpolants {
 
-	private List<List<IStatement>> counterExamples;
+	private Set<List<IStatement>> counterExamples;
 	private boolean resultComputed;
 	private List<Set<IPredicate>> interpolants;
 	private List<Set<IStatement>> correctTraces;
 	private List<Set<IStatement>> incorrectTraces;
 
-	public CounterExamplesToInterpolants(List<List<IStatement>> counterExamples) {
+	public CounterExamplesToInterpolants(Set<List<IStatement>> counterExamples) {
 		this.counterExamples = counterExamples;
 		this.resultComputed = false;
 		interpolants = new ArrayList<>();
@@ -50,7 +50,7 @@ public class CounterExamplesToInterpolants {
 		return null;
 	}
 
-	public List<Set<IStatement>> getTraces() {
+	public List<Set<IStatement>> getCorrectTraces() {
 		if (resultComputed)
 			return correctTraces;
 		return null;
