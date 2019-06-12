@@ -1,23 +1,23 @@
-package cgsynt.tree.buchi;
+package cgsynt.tree.buchi.lta;
 
-public class LTAIntersectState<STATE> {
+public class LTAIntersectState<STATE1, STATE2> {
 	@Override
 	public String toString() {
 		return "LTAIntersectState [state1=" + state1 + ", state2=" + state2 + "]";
 	}
 
-	private final STATE state1;
-	private final STATE state2;
+	private final STATE1 state1;
+	private final STATE2 state2;
 
-	public STATE getState1() {
+	public STATE1 getState1() {
 		return state1;
 	}
 
-	public STATE getState2() {
+	public STATE2 getState2() {
 		return state2;
 	}
 
-	public LTAIntersectState(STATE state1, STATE state2) {
+	public LTAIntersectState(STATE1 state1, STATE2 state2) {
 		super();
 		this.state1 = state1;
 		this.state2 = state2;

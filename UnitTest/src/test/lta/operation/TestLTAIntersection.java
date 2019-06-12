@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.IntersectState;
-import cgsynt.tree.buchi.LTAIntersectState;
+import cgsynt.tree.buchi.lta.LTAIntersectState;
 import cgsynt.tree.buchi.operations.Intersect;
 import cgsynt.tree.buchi.operations.LTAIntersection;
 import test.tree.buchi.BuchiTreeAutomatonFactory;

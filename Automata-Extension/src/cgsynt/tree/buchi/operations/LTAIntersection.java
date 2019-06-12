@@ -6,19 +6,19 @@ import java.util.Set;
 
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
-import cgsynt.tree.buchi.LTAIntersectState;
+import cgsynt.tree.buchi.lta.LTAIntersectState;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
-public class LTAIntersection<LETTER extends IRankedLetter, STATE> {
-	private final BuchiTreeAutomaton<LETTER, STATE> tree1;
-	private final BuchiTreeAutomaton<LETTER, STATE> tree2;
-	private final BuchiTreeAutomaton<LETTER, LTAIntersectState<STATE>> result;
+public class LTAIntersection<LETTER extends IRankedLetter, STATE1, STATE2> {
+	private final BuchiTreeAutomaton<LETTER, STATE1> tree1;
+	private final BuchiTreeAutomaton<LETTER, STATE2> tree2;
+	private final BuchiTreeAutomaton<LETTER, LTAIntersectState<STATE1, STATE2>> result;
 
-	public LTAIntersection(BuchiTreeAutomaton<LETTER, STATE> tree1, BuchiTreeAutomaton<LETTER, STATE> tree2) {
+	public LTAIntersection(BuchiTreeAutomaton<LETTER, STATE1> tree1, BuchiTreeAutomaton<LETTER, STATE2> tree2) {
 		this.tree1 = tree1;
 		this.tree2 = tree2;
 		assert tree1.getRank() == tree2.getRank();
-		result = new BuchiTreeAutomaton<LETTER, LTAIntersectState<STATE>>(tree1.getRank());
+		result = new BuchiTreeAutomaton<LETTER, LTAIntersectState<STATE1, STATE2>>(tree1.getRank());
 	}
 
 	private void computeAlphabet() {
@@ -33,11 +33,11 @@ public class LTAIntersection<LETTER extends IRankedLetter, STATE> {
 	}
 
 	private void computeInitState() {
-		Set<STATE> initStates1 = tree1.getInitStates();
-		Set<STATE> initStates2 = tree2.getInitStates();
-		for (STATE state1 : initStates1) {
-			for (STATE state2 : initStates2) {
-				LTAIntersectState<STATE> newState = new LTAIntersectState<>(state1, state2);
+		Set<STATE1> initStates1 = tree1.getInitStates();
+		Set<STATE2> initStates2 = tree2.getInitStates();
+		for (STATE1 state1 : initStates1) {
+			for (STATE2 state2 : initStates2) {
+				LTAIntersectState<STATE1, STATE2> newState = new LTAIntersectState<>(state1, state2);
 				result.addInitState(newState);
 			}
 		}
@@ -49,25 +49,26 @@ public class LTAIntersection<LETTER extends IRankedLetter, STATE> {
 
 	private void computeTransitions() {
 		for (LETTER letter : tree1.getAlphabet()) {
-			Iterable<BuchiTreeAutomatonRule<LETTER, STATE>> rules1 = tree1.getSuccessors(letter);
-			Iterable<BuchiTreeAutomatonRule<LETTER, STATE>> rules2 = tree2.getSuccessors(letter);
+			Iterable<BuchiTreeAutomatonRule<LETTER, STATE1>> rules1 = tree1.getSuccessors(letter);
+			Iterable<BuchiTreeAutomatonRule<LETTER, STATE2>> rules2 = tree2.getSuccessors(letter);
 			if (rules1 == null)
 				continue;
 			if (rules2 == null)
 				continue;
-			for (BuchiTreeAutomatonRule<LETTER, STATE> rule1 : rules1) {
-				for (BuchiTreeAutomatonRule<LETTER, STATE> rule2 : rules2) {
-					STATE source1 = rule1.getSource();
-					STATE source2 = rule2.getSource();
-					List<STATE> dest1 = rule1.getDest();
-					List<STATE> dest2 = rule2.getDest();
-					List<LTAIntersectState<STATE>> destResult = new ArrayList<>();
+			for (BuchiTreeAutomatonRule<LETTER, STATE1> rule1 : rules1) {
+				for (BuchiTreeAutomatonRule<LETTER, STATE2> rule2 : rules2) {
+					STATE1 source1 = rule1.getSource();
+					STATE2 source2 = rule2.getSource();
+					List<STATE1> dest1 = rule1.getDest();
+					List<STATE2> dest2 = rule2.getDest();
+					List<LTAIntersectState<STATE1, STATE2>> destResult = new ArrayList<>();
 					for (int i = 0; i < dest1.size(); i++) {
-						LTAIntersectState<STATE> newState = new LTAIntersectState<>(dest1.get(i), dest2.get(i));
+						LTAIntersectState<STATE1, STATE2> newState = new LTAIntersectState<>(dest1.get(i),
+								dest2.get(i));
 						destResult.add(newState);
 					}
-					LTAIntersectState<STATE> newSource = new LTAIntersectState<>(source1, source2);
-					BuchiTreeAutomatonRule<LETTER, LTAIntersectState<STATE>> newRule = new BuchiTreeAutomatonRule<>(
+					LTAIntersectState<STATE1, STATE2> newSource = new LTAIntersectState<>(source1, source2);
+					BuchiTreeAutomatonRule<LETTER, LTAIntersectState<STATE1, STATE2>> newRule = new BuchiTreeAutomatonRule<>(
 							letter, newSource, destResult);
 					result.addRule(newRule);
 				}
@@ -77,7 +78,7 @@ public class LTAIntersection<LETTER extends IRankedLetter, STATE> {
 
 	}
 
-	public BuchiTreeAutomaton<LETTER, LTAIntersectState<STATE>> computeResult() {
+	public BuchiTreeAutomaton<LETTER, LTAIntersectState<STATE1, STATE2>> computeResult() {
 		computeAlphabet();
 		computeInitState();
 		computeTransitions();
