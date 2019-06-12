@@ -25,15 +25,16 @@ public class TestLTAIntersection {
 		BuchiTreeAutomaton<RankedLetter, String> doubleAut = BuchiTreeAutomatonFactory.doubleEmpty();
 		single.setAllStatesFinal();
 		doubleAut.setAllStatesFinal();
-		
-		LTAIntersection<RankedLetter, String> intersect = new LTAIntersection<>(single, doubleAut);
-		BuchiTreeAutomaton<RankedLetter, LTAIntersectState<String>> intersectedState = intersect.computeResult();
+
+		LTAIntersection<RankedLetter, String, String> intersect = new LTAIntersection<>(single, doubleAut);
+		BuchiTreeAutomaton<RankedLetter, LTAIntersectState<String, String>> intersectedState = intersect
+				.computeResult();
 
 		assertEquals(intersectedState.getFinalStates().size(), 2);
-		assertTrue(intersectedState.getFinalStates().contains(new LTAIntersectState<String>("q0", "q1")));
+		assertTrue(intersectedState.getFinalStates().contains(new LTAIntersectState<String, String>("q0", "q1")));
 		assertEquals(intersectedState.getAmountOfRules(), 2);
 		assertEquals(intersectedState.getInitStates().size(), 1);
-		assertTrue(intersectedState.getInitStates().contains(new LTAIntersectState<String>("q0", "q0")));
+		assertTrue(intersectedState.getInitStates().contains(new LTAIntersectState<String, String>("q0", "q0")));
 		assertTrue(intersectedState.getRank() == 2);
 		System.out.println("Test 2");
 		System.out.println(intersectedState);
@@ -47,8 +48,8 @@ public class TestLTAIntersection {
 		BuchiTreeAutomaton<RankedLetter, String> aut2 = BuchiTreeAutomatonFactory.single();
 		aut1.setAllStatesFinal();
 		aut2.setAllStatesFinal();
-		LTAIntersection<RankedLetter, String> intersect = new LTAIntersection<>(aut1, aut2);
-		BuchiTreeAutomaton<RankedLetter, LTAIntersectState<String>> intersectAut = intersect.computeResult();
+		LTAIntersection<RankedLetter, String, String> intersect = new LTAIntersection<>(aut1, aut2);
+		BuchiTreeAutomaton<RankedLetter, LTAIntersectState<String, String>> intersectAut = intersect.computeResult();
 		assertEquals(intersectAut.getFinalStates().size(), 1);
 		assertEquals(intersectAut.getStates().size(), 1);
 		System.out.println("Test 1");
@@ -62,8 +63,8 @@ public class TestLTAIntersection {
 		BuchiTreeAutomaton<RankedLetter, String> aut2 = BuchiTreeAutomatonFactory.SingleMultiLetter();
 		aut1.setAllStatesFinal();
 		aut2.setAllStatesFinal();
-		LTAIntersection<RankedLetter, String> intersect = new LTAIntersection<>(aut1, aut2);
-		BuchiTreeAutomaton<RankedLetter, LTAIntersectState<String>> intersectAut = intersect.computeResult();
+		LTAIntersection<RankedLetter, String, String> intersect = new LTAIntersection<>(aut1, aut2);
+		BuchiTreeAutomaton<RankedLetter, LTAIntersectState<String, String>> intersectAut = intersect.computeResult();
 		System.out.println("Test 3");
 		System.out.println(intersectAut);
 	}
@@ -75,12 +76,12 @@ public class TestLTAIntersection {
 		BuchiTreeAutomaton<RankedLetter, String> aut2 = BuchiTreeAutomatonFactory.MultiInitStates2();
 		aut1.setAllStatesFinal();
 		aut2.setAllStatesFinal();
-		LTAIntersection<RankedLetter, String> intersect = new LTAIntersection<>(aut1, aut2);
-		BuchiTreeAutomaton<RankedLetter, LTAIntersectState<String>> intersectAut = intersect.computeResult();
+		LTAIntersection<RankedLetter, String, String> intersect = new LTAIntersection<>(aut1, aut2);
+		BuchiTreeAutomaton<RankedLetter, LTAIntersectState<String, String>> intersectAut = intersect.computeResult();
 		System.out.println("Test 4");
 		System.out.println(intersectAut);
 	}
-	
+
 	@Test
 	void test5() {
 		// Test intersecting automatons with multiple final states
@@ -88,8 +89,8 @@ public class TestLTAIntersection {
 		BuchiTreeAutomaton<RankedLetter, String> aut2 = BuchiTreeAutomatonFactory.MultiFinalStates2();
 		aut1.setAllStatesFinal();
 		aut2.setAllStatesFinal();
-		LTAIntersection<RankedLetter, String> intersect = new LTAIntersection<>(aut1, aut2);
-		BuchiTreeAutomaton<RankedLetter, LTAIntersectState<String>> intersectAut = intersect.computeResult();
+		LTAIntersection<RankedLetter, String, String> intersect = new LTAIntersection<>(aut1, aut2);
+		BuchiTreeAutomaton<RankedLetter, LTAIntersectState<String, String>> intersectAut = intersect.computeResult();
 		System.out.println("Test 5");
 		System.out.println(intersectAut);
 	}
