@@ -170,7 +170,7 @@ public class TraceToInterpolants implements IInterpol {
 	}
 
 	@Override
-	public boolean checkSat(IPredicate pre, IStatement statement, IPredicate post) {
+	public boolean isCorrect(IPredicate pre, IStatement statement, IPredicate post) {
 		List<IStatement> statements = buildStatementList(statement);
 		List<Object> controlLocationSequence = generateControlLocationSequence(statements.size() + 1);
 		NestedWord<IAction> trace = buildTrace(statements);
