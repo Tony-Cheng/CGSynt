@@ -131,6 +131,9 @@ public class TraceToInterpolants implements IInterpol {
 				controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
 				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
+		if (interpolate.isCorrect() == LBool.SAT) {
+			return null;
+		}
 		return interpolate.getInterpolants();
 	}
 
@@ -175,7 +178,7 @@ public class TraceToInterpolants implements IInterpol {
 				pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
 				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
-		return interpolate.isCorrect() == LBool.SAT;
+		return interpolate.isCorrect() != LBool.SAT;
 	}
 
 }
