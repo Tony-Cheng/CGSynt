@@ -56,6 +56,8 @@ public class TraceToInterpolants implements IInterpol {
 	private SortedMap<Integer, IPredicate> pendingContexts;
 	private BasicPredicateFactory predicateFactory;
 	private PredicateUnifier pUnifer;
+	private List<IStatement> preconditions;
+	private List<IStatement> postconditions;
 
 	private static TraceToInterpolants traceToInterpolants = new TraceToInterpolants();
 
@@ -82,6 +84,8 @@ public class TraceToInterpolants implements IInterpol {
 				XnfConversionTechnique.BDD_BASED);
 		pUnifer = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
+		preconditions = new ArrayList<>();
+		postconditions = new ArrayList<>();
 	}
 
 	public static TraceToInterpolants getTraceToInterpolants() {
@@ -142,9 +146,8 @@ public class TraceToInterpolants implements IInterpol {
 		List<IStatement> statements = buildStatementList(statement);
 		List<Object> controlLocationSequence = generateControlLocationSequence(statements.size() + 1);
 		NestedWord<IAction> trace = buildTrace(statements);
-		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(
-				pUnifer.getTruePredicate(), pUnifer.getFalsePredicate(), pendingContexts, trace,
-				controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
+		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(pre, post,
+				pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
 				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
 		return interpolate.isCorrect() == LBool.SAT;
