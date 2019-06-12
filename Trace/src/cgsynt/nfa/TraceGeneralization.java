@@ -10,7 +10,6 @@ import cgsynt.interpol.TraceToInterpolants;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
-import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
@@ -21,6 +20,7 @@ public class TraceGeneralization {
 	private IInterpol mInterpolator;
 	
 	private List<String> mTransitionsAdded;
+	private final boolean DEBUG = false;
 	
 	private NestedWordAutomaton<IStatement, IPredicate> mInterpolantNfa;
 	
@@ -36,8 +36,11 @@ public class TraceGeneralization {
 		
 		this.computeResult();
 		
-		for (String s : this.mTransitionsAdded) {
-			System.out.println(s);
+		if (DEBUG) {
+			System.out.println(this.mTransitionsAdded.size() + " Transitions were created");
+			for (String s : this.mTransitionsAdded) {
+				System.out.println(s);
+			}
 		}
 	}
 	
@@ -60,8 +63,10 @@ public class TraceGeneralization {
 					boolean unsat = this.mInterpolator.isCorrect(pre, statement, post);
 					
 					if (unsat) {
-						String trans = "(" + pre.toString() + ", " + statement.ltoString() + ", " + post.toString() + ")";
-						this.mTransitionsAdded.add(trans);
+						if (DEBUG) {
+							String trans = "(" + pre.getFormula().toString() + ", " + statement.toString() + ", " + post.getFormula().toString() + ")";
+							this.mTransitionsAdded.add(trans);
+						}
 						
 						Set<IPredicate> states = this.mInterpolantNfa.getStates();
 						
