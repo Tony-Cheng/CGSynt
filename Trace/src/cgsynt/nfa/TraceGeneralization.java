@@ -4,9 +4,11 @@ import java.util.Set;
 
 import cgsynt.interpol.IInterpol;
 import cgsynt.interpol.IStatement;
+import cgsynt.interpol.TraceToInterpolants;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
+import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
@@ -18,10 +20,10 @@ public class TraceGeneralization {
 	
 	private NestedWordAutomaton<IStatement, IPredicate> mInterpolantNfa;
 	
-	public TraceGeneralization(Set<IPredicate> interpolants, Set<IStatement> traces, IInterpol interpolator) {
+	public TraceGeneralization(Set<IPredicate> interpolants, Set<IStatement> traces) {
 		this.mInterpolants = interpolants;
 		this.mTraces = traces;
-		this.mInterpolator = interpolator;
+		this.mInterpolator = TraceToInterpolants.getTraceToInterpolants();
 		
 		this.computeResult();
 	}
@@ -37,7 +39,7 @@ public class TraceGeneralization {
 		VpAlphabet<IStatement> alphabet = new VpAlphabet<>(mTraces);
 		
 		// This might need to be fixed (the factory argument)
-		this.mInterpolantNfa = new NestedWordAutomaton<IStatement, IPredicate>(automataService, alphabet, null);
+		this.mInterpolantNfa = new NestedWordAutomaton<IStatement, IPredicate>(automataService, alphabet, new GeneralizeStateFactory<IPredicate>());
 		
 		for (IPredicate pre : this.mInterpolants) {
 			for (IStatement statement : this.mTraces) {

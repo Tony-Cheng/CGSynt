@@ -65,8 +65,8 @@ import de.uni_freiburg.informatik.ultimate.util.datastructures.relation.HashRela
 public class TestTraceCheckConstructor {
 
 	public static void main(String[] args) {
-		//firstTest();
-		secondTest();
+		firstTest();
+		//secondTest();
 		//inequalityTest();
 	}
 	
