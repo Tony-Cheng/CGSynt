@@ -57,7 +57,7 @@ public class TraceToInterpolants implements IInterpol {
 	private BasicPredicateFactory predicateFactory;
 	private PredicateUnifier pUnifer;
 	private List<IStatement> preconditions;
-	private List<IStatement> postconditions;
+	private List<IStatement> negatedPostconditions;
 
 	private static TraceToInterpolants traceToInterpolants = new TraceToInterpolants();
 
@@ -85,7 +85,7 @@ public class TraceToInterpolants implements IInterpol {
 		pUnifer = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		preconditions = new ArrayList<>();
-		postconditions = new ArrayList<>();
+		negatedPostconditions = new ArrayList<>();
 	}
 
 	public static TraceToInterpolants getTraceToInterpolants() {
@@ -94,10 +94,19 @@ public class TraceToInterpolants implements IInterpol {
 
 	private NestedWord<IAction> buildTrace(List<IStatement> statements) {
 		int len = statements.size();
-		IAction[] word = new IAction[len];
-		int[] nestingRelation = new int[len];
+		IAction[] word = new IAction[len + preconditions.size() + negatedPostconditions.size()];
+		int[] nestingRelation = new int[len + preconditions.size() + negatedPostconditions.size()];
 
-		for (int i = 0; i < len; i++) {
+		for (int i = 0; i < preconditions.size(); i++) {
+			word[i] = preconditions.get(i).getFormula();
+			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
+		}
+
+		for (int i = preconditions.size(); i < preconditions.size() + len; i++) {
+			word[i] = statements.get(i).getFormula();
+			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
+		}
+		for (int i = preconditions.size() + len; i < preconditions.size() + len + negatedPostconditions.size(); i++) {
 			word[i] = statements.get(i).getFormula();
 			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
 		}
@@ -133,6 +142,22 @@ public class TraceToInterpolants implements IInterpol {
 	@Override
 	public IPredicate getFalsePredicate() {
 		return pUnifer.getFalsePredicate();
+	}
+
+	public List<IStatement> getPreconditions() {
+		return preconditions;
+	}
+
+	public void setPreconditions(List<IStatement> preconditions) {
+		this.preconditions = preconditions;
+	}
+
+	public List<IStatement> getNegatedPostconditions() {
+		return negatedPostconditions;
+	}
+
+	public void setNegatedPostconditions(List<IStatement> negatedPostconditions) {
+		this.negatedPostconditions = negatedPostconditions;
 	}
 
 	private List<IStatement> buildStatementList(IStatement statement) {
