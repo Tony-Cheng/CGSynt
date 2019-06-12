@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import cgsynt.interpol.IStatement;
@@ -21,13 +22,22 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOld
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class TestTraceGeneralization {	
+	
+	@BeforeAll
+	static void init() throws Exception {
+		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		
+		vf.constructVariable("x", VariableFactory.INT);
+		vf.constructVariable("y", VariableFactory.INT);
+	}
+	
 	@Test
-	void test1() throws Exception{
+	void testComplex() throws Exception{
 		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();	
 		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
 		
-		BoogieNonOldVar x = vf.constructVariable("x", VariableFactory.INT);
-		BoogieNonOldVar y = vf.constructVariable("y", VariableFactory.INT);
+		BoogieNonOldVar x = vf.getVariable("x");
+		BoogieNonOldVar y = vf.getVariable("y");
 		
 		IStatement s0 = new ScriptAssumptionStatement(x, y.getTerm(), "<=");
 		IStatement s1 = new ScriptAssignmentStatement(x, script.numeral("0"));
@@ -48,13 +58,35 @@ public class TestTraceGeneralization {
 		Set<IPredicate> interpolants = new HashSet<>(Arrays.asList(predicates));
 		Set<IStatement> tokens = new HashSet<>(statements);
 		
-		System.exit(0);
+		TraceGeneralization generalize = new TraceGeneralization(interpolants, tokens);
+		NestedWordAutomaton<IStatement, IPredicate> generalTrace = generalize.getResult();
+	}
+	
+	@Test
+	void testPaperExample() throws Exception{
+		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();	
+		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		
+		BoogieNonOldVar x = vf.getVariable("x");
+		BoogieNonOldVar y = vf.getVariable("y");
+		
+		IStatement s0 = new ScriptAssignmentStatement(x, script.numeral("0"));
+		IStatement s1 = new ScriptAssignmentStatement(y, script.numeral("0"));
+		IStatement s2 = new ScriptAssignmentStatement(x, script.term("+", x.getTerm(), script.numeral("1")));
+		IStatement s3 = new ScriptAssumptionStatement(y, script.numeral("-1"), "=");
+		
+		List<IStatement> statements = new ArrayList<>();
+		statements.add(s0);
+		statements.add(s1);
+		statements.add(s2);
+		statements.add(s3);
+		
+		IPredicate[] predicates = TraceToInterpolants.getTraceToInterpolants().computeInterpolants(statements);
+		
+		Set<IPredicate> interpolants = new HashSet<>(Arrays.asList(predicates));
+		Set<IStatement> tokens = new HashSet<>(statements);
 		
 		TraceGeneralization generalize = new TraceGeneralization(interpolants, tokens);
 		NestedWordAutomaton<IStatement, IPredicate> generalTrace = generalize.getResult();
-		
-		for (IPredicate pred : predicates) {
-			System.out.println(pred);
-		}
 	}
 }

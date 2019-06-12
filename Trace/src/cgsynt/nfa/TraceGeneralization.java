@@ -25,6 +25,13 @@ public class TraceGeneralization {
 		this.mTraces = traces;
 		this.mInterpolator = TraceToInterpolants.getTraceToInterpolants();
 		
+		this.mInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
+		this.mInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
+		
+		for (IPredicate pred : this.mInterpolants) {
+			System.out.println(pred.getFormula());
+		}
+		
 		this.computeResult();
 	}
 	
