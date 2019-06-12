@@ -1,5 +1,7 @@
 package cgsynt.nfa;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import cgsynt.interpol.IInterpol;
@@ -18,6 +20,8 @@ public class TraceGeneralization {
 	private Set<IStatement> mTraces;
 	private IInterpol mInterpolator;
 	
+	private List<String> mTransitionsAdded;
+	
 	private NestedWordAutomaton<IStatement, IPredicate> mInterpolantNfa;
 	
 	public TraceGeneralization(Set<IPredicate> interpolants, Set<IStatement> traces) {
@@ -28,11 +32,13 @@ public class TraceGeneralization {
 		this.mInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
 		this.mInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
 		
-		for (IPredicate pred : this.mInterpolants) {
-			System.out.println(pred.getFormula());
-		}
+		this.mTransitionsAdded = new ArrayList<>();
 		
 		this.computeResult();
+		
+		for (String s : this.mTransitionsAdded) {
+			System.out.println(s);
+		}
 	}
 	
 	public NestedWordAutomaton<IStatement, IPredicate> getResult(){
@@ -51,9 +57,12 @@ public class TraceGeneralization {
 		for (IPredicate pre : this.mInterpolants) {
 			for (IStatement statement : this.mTraces) {
 				for (IPredicate post : this.mInterpolants) {
-					boolean sat = this.mInterpolator.checkSat(pre, statement, post);
+					boolean unsat = this.mInterpolator.isCorrect(pre, statement, post);
 					
-					if (!sat) {
+					if (unsat) {
+						String trans = "(" + pre.toString() + ", " + statement.ltoString() + ", " + post.toString() + ")";
+						this.mTransitionsAdded.add(trans);
+						
 						Set<IPredicate> states = this.mInterpolantNfa.getStates();
 						
 						if (!states.contains(pre))

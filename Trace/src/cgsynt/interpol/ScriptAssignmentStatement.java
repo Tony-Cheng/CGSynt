@@ -65,4 +65,8 @@ public class ScriptAssignmentStatement implements IStatement {
 		return new BasicInternalAction(null, null, formula);
 	}
 
+	@Override
+	public String toString() {
+		return lhs.toString() + " := " + rhs.toString();
+	}
 }

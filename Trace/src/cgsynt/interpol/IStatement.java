@@ -24,4 +24,9 @@ public interface IStatement {
 	 * @return
 	 */
 	public IAction getFormula();
+	
+	/**
+	 * Return the string representation of an IStatement.
+	 */
+	public String toString();
 }

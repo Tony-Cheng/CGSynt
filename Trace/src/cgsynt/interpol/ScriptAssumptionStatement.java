@@ -58,4 +58,8 @@ public class ScriptAssumptionStatement implements IStatement {
 		return new BasicInternalAction(null, null, formula);
 	}
 
+	@Override
+	public String toString() {
+		return lhs.toString() + " " + type + " " + rhs.toString();
+	}
 }
