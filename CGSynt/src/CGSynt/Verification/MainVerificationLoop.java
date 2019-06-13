@@ -82,13 +82,13 @@ public class MainVerificationLoop {
 		// Transform the DFA into an LTA
 		DfaToLtaPowerSet<IStatement, String> dfaToLta = new DfaToLtaPowerSet<>(stringDFAPI, allInterpolants, deadState);
 		
-		BuchiTreeAutomaton<RankedBool, IPredicate> powerSet;
+		BuchiTreeAutomaton<RankedBool, String> powerSet = dfaToLta.getResult();
 		
 		
-		LTAIntersection<RankedBool, String, IPredicate> intersection = new LTAIntersection<>(programs, powerSet);
-		BuchiTreeAutomaton<RankedBool, LTAIntersectState<String, IPredicate>> intersectedAut = intersection
+		LTAIntersection<RankedBool, String, String> intersection = new LTAIntersection<>(programs, powerSet);
+		BuchiTreeAutomaton<RankedBool, LTAIntersectState<String, String>> intersectedAut = intersection
 				.computeResult();
-		LTAEmptinessCheck<RankedBool, LTAIntersectState<String, IPredicate>> emptinessCheck = new LTAEmptinessCheck<>(
+		LTAEmptinessCheck<RankedBool, LTAIntersectState<String, String>> emptinessCheck = new LTAEmptinessCheck<>(
 				intersectedAut);
 		emptinessCheck.computeResult();
 		if (!emptinessCheck.getResult()) {

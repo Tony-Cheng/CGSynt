@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import cgsynt.interpol.IStatement;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
@@ -14,7 +15,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.Outgo
 public class DfaToLtaPowerSet<LETTER, STATE> {
 	private final INestedWordAutomaton<LETTER, STATE> mDfa;
 	private final BuchiTreeAutomaton<RankedBool, STATE> mResult;
-	private final List<STATE> mAllStateOrdering;
+	private final List<IStatement> mAllStateOrdering;
 
 	private final int mArity;
 	private final STATE mDeadState;
@@ -25,7 +26,7 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 	 * @param dfa
 	 *            The DFA to Convert
 	 */
-	public DfaToLtaPowerSet(final INestedWordAutomaton<LETTER, STATE> dfa, final List<STATE> allStateOrdering, final STATE deadState) {
+	public DfaToLtaPowerSet(final INestedWordAutomaton<LETTER, STATE> dfa, final List<IStatement> allStateOrdering, final STATE deadState) {
 		this.mDfa = dfa;
 		this.mAllStateOrdering = allStateOrdering;
 		
@@ -67,15 +68,7 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 		final Set<STATE> states = this.mDfa.getStates();
 
 		for (STATE state : states) {
-			final Iterator<OutgoingInternalTransition<LETTER, STATE>> dests = this.mDfa.internalSuccessors(state)
-					.iterator();
-			List<STATE> destStates = new ArrayList<>();
-
-			while (dests.hasNext()) {
-				destStates.add(dests.next().getSucc());
-			}
-
-			destStates = this.orderStates(destStates);
+			List<STATE> destStates = this.orderStates(state);
 			
 			assert destStates.size() == this.mArity;
 			
@@ -104,23 +97,31 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 		}
 	}
 	
-	/**
+	/*
 	 * Order the input states in the same order as the allStateOrdering.
 	 * If a state is missing in the states list, then add the dead state in
 	 * to fill the missing states spot.
 	 */
-	private List<STATE> orderStates(List<STATE> states){
+	private List<STATE> orderStates(STATE state){
 		List<STATE> orderedStates = new ArrayList<>();
 		
-		for (STATE stateToLookFor : this.mAllStateOrdering) {
-			for (STATE state : states) {
-				if (state.equals(stateToLookFor)) {
-					orderedStates.add(state);
+		for (IStatement statementToLookFor : this.mAllStateOrdering) {
+			Iterator<OutgoingInternalTransition<LETTER, STATE>> transitions = this.mDfa.internalSuccessors(state)
+					.iterator();
+			
+			boolean found = false;
+			
+			while (transitions.hasNext()) {
+				OutgoingInternalTransition<LETTER, STATE> transition = transitions.next();
+				if (transition.getLetter().equals(statementToLookFor)) {
+					orderedStates.add(transition.getSucc());
+					found = true;
 					break;
 				}
 			}
 			
-			orderedStates.add(this.mDeadState);
+			if (!found)
+				orderedStates.add(this.mDeadState);
 		}
 		
 		return orderedStates;
