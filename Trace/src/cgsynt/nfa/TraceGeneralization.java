@@ -16,7 +16,7 @@ import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
 public class TraceGeneralization {
 	private Set<IPredicate> mInterpolants;
-	private Set<IStatement> mTraces;
+	private Set<IStatement> mAllStatements;
 	private IInterpol mInterpolator;
 	
 	private List<String> mTransitionsAdded;
@@ -24,9 +24,9 @@ public class TraceGeneralization {
 	
 	private NestedWordAutomaton<IStatement, IPredicate> mInterpolantNfa;
 	
-	public TraceGeneralization(Set<IPredicate> interpolants, Set<IStatement> traces) {
+	public TraceGeneralization(Set<IPredicate> interpolants, Set<IStatement> allStatements) {
 		this.mInterpolants = interpolants;
-		this.mTraces = traces;
+		this.mAllStatements = allStatements;
 		this.mInterpolator = TraceToInterpolants.getTraceToInterpolants();
 		
 		this.mInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
@@ -52,13 +52,13 @@ public class TraceGeneralization {
 		IUltimateServiceProvider serviceProvider = UltimateMocks.createUltimateServiceProviderMock();
 		AutomataLibraryServices automataService = new AutomataLibraryServices(serviceProvider);
 		
-		VpAlphabet<IStatement> alphabet = new VpAlphabet<>(mTraces);
+		VpAlphabet<IStatement> alphabet = new VpAlphabet<>(this.mAllStatements);
 		
 		// This might need to be fixed (the factory argument)
 		this.mInterpolantNfa = new NestedWordAutomaton<IStatement, IPredicate>(automataService, alphabet, new GeneralizeStateFactory<IPredicate>());
 		
 		for (IPredicate pre : this.mInterpolants) {
-			for (IStatement statement : this.mTraces) {
+			for (IStatement statement : this.mAllStatements) {
 				for (IPredicate post : this.mInterpolants) {
 					boolean unsat = this.mInterpolator.isCorrect(pre, statement, post);
 					
