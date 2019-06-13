@@ -12,17 +12,21 @@ import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
 public class TraceGlobalVariables {
 
-	private static TraceGlobalVariables globalVar = new TraceGlobalVariables();
+	private static TraceGlobalVariables globalVar;
 	private ManagedScript managedScript;
 	private VariableFactory variableFactory;
 	private IUltimateServiceProvider service;
 
-	public TraceGlobalVariables() {
-		service = UltimateMocks.createUltimateServiceProviderMock();
+	private TraceGlobalVariables(IUltimateServiceProvider service) {
+		this.service = service;
 		managedScript = new ManagedScript(service, new SMTInterpol(new DefaultLogger()));
 		managedScript.getScript().setOption(":produce-proofs", true);
 		managedScript.getScript().setLogic(Logics.QF_LIA);
 		variableFactory = new VariableFactory(managedScript.getScript());
+	}
+
+	public static void init(IUltimateServiceProvider service) {
+		globalVar = new TraceGlobalVariables(service);
 	}
 
 	public ManagedScript getManagedScript() {
