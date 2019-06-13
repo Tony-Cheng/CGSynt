@@ -8,14 +8,16 @@ import java.util.Set;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
-import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
 public class DfaToLtaPowerSet<LETTER, STATE> {
-	private final NestedWordAutomaton<LETTER, STATE> mDfa;
+	private final INestedWordAutomaton<LETTER, STATE> mDfa;
 	private final BuchiTreeAutomaton<RankedBool, STATE> mResult;
+	private final List<STATE> mAllStateOrdering;
 
 	private final int mArity;
+	private final STATE mDeadState;
 
 	/**
 	 * Convert A DFA to an LTA that accepts all subsets of the language of the DFA.
@@ -23,12 +25,24 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 	 * @param dfa
 	 *            The DFA to Convert
 	 */
-	public DfaToLtaPowerSet(final NestedWordAutomaton<LETTER, STATE> dfa) {
+	public DfaToLtaPowerSet(final INestedWordAutomaton<LETTER, STATE> dfa, final List<STATE> allStateOrdering, final STATE deadState) {
 		this.mDfa = dfa;
+		this.mAllStateOrdering = allStateOrdering;
+		
 		this.mArity = dfa.getAlphabet().size();
+		this.mDeadState = deadState;
 
 		this.mResult = new BuchiTreeAutomaton<RankedBool, STATE>(mArity);
-
+		
+		// Setup the dead state
+		this.mResult.addState(deadState);
+		List<STATE> deadStateDestinations = new ArrayList<STATE>();
+		for (int i = 0; i < this.mArity; i++)
+			deadStateDestinations.add(deadState);
+		final BuchiTreeAutomatonRule<RankedBool, STATE> deadRule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
+				deadState, deadStateDestinations);
+		this.mResult.addRule(deadRule);
+		
 		this.compute();
 	}
 
@@ -55,14 +69,16 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 		for (STATE state : states) {
 			final Iterator<OutgoingInternalTransition<LETTER, STATE>> dests = this.mDfa.internalSuccessors(state)
 					.iterator();
-			final List<STATE> destStates = new ArrayList<>();
+			List<STATE> destStates = new ArrayList<>();
 
 			while (dests.hasNext()) {
 				destStates.add(dests.next().getSucc());
 			}
 
+			destStates = this.orderStates(destStates);
+			
 			assert destStates.size() == this.mArity;
-
+			
 			if (this.mDfa.isFinal(state)) {
 				final BuchiTreeAutomatonRule<RankedBool, STATE> trueRule = new BuchiTreeAutomatonRule<>(RankedBool.TRUE,
 						state, destStates);
@@ -81,11 +97,33 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 	 * DFA.
 	 */
 	private void computeFinalStates() {
-		final Set<STATE> states = this.mDfa.getFinalStates();
+		final Set<STATE> states = (Set<STATE>) this.mDfa.getFinalStates();
 
 		for (STATE state : states) {
 			this.mResult.addFinalState(state);
 		}
+	}
+	
+	/*
+	 * Order the input states in the same order as the allStateOrdering.
+	 * If a state is missing in the states list, then add the dead state in
+	 * to fill the missing states spot.
+	 */
+	private List<STATE> orderStates(List<STATE> states){
+		List<STATE> orderedStates = new ArrayList<>();
+		
+		for (STATE stateToLookFor : this.mAllStateOrdering) {
+			for (STATE state : states) {
+				if (state.equals(stateToLookFor)) {
+					orderedStates.add(state);
+					break;
+				}
+			}
+			
+			orderedStates.add(this.mDeadState);
+		}
+		
+		return orderedStates;
 	}
 
 	/**
