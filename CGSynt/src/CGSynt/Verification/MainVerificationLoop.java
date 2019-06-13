@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import CGSynt.Operations.CounterExamplesToInterpolants;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
@@ -15,6 +16,7 @@ import cgsynt.nfa.TraceGeneralization;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.lta.LTAIntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
+import cgsynt.tree.buchi.operations.ConvertToStringState;
 import cgsynt.tree.buchi.operations.LTAEmptinessCheck;
 import cgsynt.tree.buchi.operations.LTAIntersection;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
@@ -23,6 +25,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomat
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.IDeterminizeStateFactory;
+import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
@@ -47,7 +50,7 @@ public class MainVerificationLoop {
 		this.resultComputed = false;
 		this.transitionAlphabet = new ArrayList<>();
 		this.pi = createPI();
-		this.allInterpolants = new HashSet<>();
+		this.allInterpolants = new TreeSet<>();
 	}
 
 	private NestedWordAutomaton<IStatement, IPredicate> createPI() {
@@ -63,11 +66,25 @@ public class MainVerificationLoop {
 
 	private void computeOneIteration() throws AutomataOperationCanceledException {
 		
-		Determinize<IStatement, IPredicate> determinize = new Determinize<>(autService,
-				(IDeterminizeStateFactory<IPredicate>) pi.getStateFactory(), pi);
-		DfaToLtaPowerSet<IStatement, IPredicate> powerSetConstruct = new DfaToLtaPowerSet(
-				(NestedWordAutomaton) determinize.getResult());
-		BuchiTreeAutomaton<RankedBool, IPredicate> powerSet = null;
+		// Turn PI into a NFA that has String states.
+		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.pi);
+		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(autService);
+		
+		// Determinize the String state version of PI.
+		Determinize<IStatement, String> determinize = new Determinize<>(autService,
+				new StringFactory(), stringNFAPI);
+		
+		NestedWordAutomaton<IStatement, String> stringDFAPI = (NestedWordAutomaton<IStatement, String>) determinize.getResult();
+		
+		// Dead State
+		String deadState = "hi Im dead!";
+		
+		// Transform the DFA into an LTA
+		DfaToLtaPowerSet<IStatement, String> dfaToLta = new DfaToLtaPowerSet<>(stringDFAPI, allInterpolants, deadState);
+		
+		BuchiTreeAutomaton<RankedBool, IPredicate> powerSet;
+		
+		
 		LTAIntersection<RankedBool, String, IPredicate> intersection = new LTAIntersection<>(programs, powerSet);
 		BuchiTreeAutomaton<RankedBool, LTAIntersectState<String, IPredicate>> intersectedAut = intersection
 				.computeResult();
