@@ -21,6 +21,7 @@ import cgsynt.tree.buchi.operations.LTAEmptinessCheck;
 import cgsynt.tree.buchi.operations.LTAIntersection;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataOperationCanceledException;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
@@ -74,13 +75,13 @@ public class MainVerificationLoop {
 		Determinize<IStatement, String> determinize = new Determinize<>(autService,
 				new StringFactory(), stringNFAPI);
 		
-		NestedWordAutomaton<IStatement, String> stringDFAPI = (NestedWordAutomaton<IStatement, String>) determinize.getResult();
+		INestedWordAutomaton<IStatement, String> stringDFAPI =  determinize.getResult();
 		
 		// Dead State
 		String deadState = "hi Im dead!";
 		
 		// Transform the DFA into an LTA
-		DfaToLtaPowerSet<IStatement, String> dfaToLta = new DfaToLtaPowerSet<>(stringDFAPI, allInterpolants, deadState);
+		DfaToLtaPowerSet<IStatement, String> dfaToLta = new DfaToLtaPowerSet<IStatement, String>(stringDFAPI, transitionAlphabet, deadState);
 		
 		BuchiTreeAutomaton<RankedBool, String> powerSet = dfaToLta.getResult();
 		
