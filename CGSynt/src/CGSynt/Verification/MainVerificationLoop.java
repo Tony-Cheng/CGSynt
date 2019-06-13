@@ -4,21 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import CGSynt.Core.RankedBool;
 import CGSynt.Operations.CounterExamplesToInterpolants;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.lta.LTAIntersectState;
+import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.LTAEmptinessCheck;
 import cgsynt.tree.buchi.operations.LTAIntersection;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class MainVerificationLoop {
 
 	private BuchiTreeAutomaton<RankedBool, String> programs;
 	private BuchiTreeAutomaton<RankedBool, IPredicate> powerSet;
+	private NestedWordAutomaton<IStatement, IPredicate> pi;
 	private List<IStatement> transitionAlphabet;
 	private boolean isCorrect;
 
