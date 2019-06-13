@@ -14,20 +14,34 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.Outgo
 public class DfaToLtaLanguage<LETTER, STATE> {
 	private final NestedWordAutomaton<LETTER, STATE> mDfa;
 	private final BuchiTreeAutomaton<RankedBool, STATE> mResult;
+	private final List<STATE> mAllStateOrdering;
 
+	
 	private final int mArity;
-
+	private final STATE mDeadState;
+	
 	/**
 	 * Convert A DFA to an LTA that the language of the DFA of the DFA.
 	 *
 	 * @param dfa
 	 *            The DFA to Convert
 	 */
-	public DfaToLtaLanguage(final NestedWordAutomaton<LETTER, STATE> dfa) {
+	public DfaToLtaLanguage(final NestedWordAutomaton<LETTER, STATE> dfa, final List<STATE> allStateOrdering, final STATE deadState) {
 		this.mDfa = dfa;
 		this.mArity = dfa.getAlphabet().size();
+		this.mAllStateOrdering = allStateOrdering;
+		this.mDeadState = deadState;
 
 		this.mResult = new BuchiTreeAutomaton<RankedBool, STATE>(mArity);
+		
+		// Setup the dead state
+		this.mResult.addState(deadState);
+		List<STATE> deadStateDestinations = new ArrayList<STATE>();
+		for (int i = 0; i < this.mArity; i++)
+			deadStateDestinations.add(deadState);
+		final BuchiTreeAutomatonRule<RankedBool, STATE> deadRule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
+				deadState, deadStateDestinations);
+		this.mResult.addRule(deadRule);
 
 		this.compute();
 	}
@@ -55,12 +69,14 @@ public class DfaToLtaLanguage<LETTER, STATE> {
 		for (STATE state : states) {
 			final Iterator<OutgoingInternalTransition<LETTER, STATE>> dests = this.mDfa.internalSuccessors(state)
 					.iterator();
-			final List<STATE> destStates = new ArrayList<>();
+			List<STATE> destStates = new ArrayList<>();
 
 			while (dests.hasNext()) {
 				destStates.add(dests.next().getSucc());
 			}
 
+			destStates = this.orderStates(destStates);
+			
 			assert destStates.size() == this.mArity;
 
 			boolean truth = this.mDfa.isFinal(state);
@@ -85,6 +101,28 @@ public class DfaToLtaLanguage<LETTER, STATE> {
 		for (STATE state : states) {
 			this.mResult.addFinalState(state);
 		}
+	}
+	
+	/**
+	 * Order the input states in the same order as the allStateOrdering.
+	 * If a state is missing in the states list, then add the dead state in
+	 * to fill the missing states spot.
+	 */
+	private List<STATE> orderStates(List<STATE> states){
+		List<STATE> orderedStates = new ArrayList<>();
+		
+		for (STATE stateToLookFor : this.mAllStateOrdering) {
+			for (STATE state : states) {
+				if (state.equals(stateToLookFor)) {
+					orderedStates.add(state);
+					break;
+				}
+			}
+			
+			orderedStates.add(this.mDeadState);
+		}
+		
+		return orderedStates;
 	}
 
 	/**

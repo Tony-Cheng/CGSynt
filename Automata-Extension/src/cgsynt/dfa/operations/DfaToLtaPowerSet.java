@@ -104,7 +104,7 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 		}
 	}
 	
-	/*
+	/**
 	 * Order the input states in the same order as the allStateOrdering.
 	 * If a state is missing in the states list, then add the dead state in
 	 * to fill the missing states spot.
