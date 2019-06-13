@@ -41,7 +41,7 @@ public class MainVerificationLoop {
 
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet) {
 		this.service = UltimateMocks.createUltimateServiceProviderMock();
-		autService = new AutomataLibraryServices(service);
+		this.autService = new AutomataLibraryServices(service);
 		TraceGlobalVariables.init(service);
 		this.programs = programs;
 		this.resultComputed = false;
@@ -62,6 +62,7 @@ public class MainVerificationLoop {
 	}
 
 	private void computeOneIteration() throws AutomataOperationCanceledException {
+		
 		Determinize<IStatement, IPredicate> determinize = new Determinize<>(autService,
 				(IDeterminizeStateFactory<IPredicate>) pi.getStateFactory(), pi);
 		DfaToLtaPowerSet<IStatement, IPredicate> powerSetConstruct = new DfaToLtaPowerSet(
@@ -108,5 +109,6 @@ public class MainVerificationLoop {
 			computeOneIteration();
 		}
 	}
+	
 
 }
