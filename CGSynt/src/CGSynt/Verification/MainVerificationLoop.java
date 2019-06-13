@@ -44,6 +44,7 @@ public class MainVerificationLoop {
 	private boolean resultComputed;
 
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet) {
+		RankedBool.setRank(transitionAlphabet.size());
 		this.service = UltimateMocks.createUltimateServiceProviderMock();
 		this.autService = new AutomataLibraryServices(service);
 		TraceGlobalVariables.init(service);
@@ -66,29 +67,27 @@ public class MainVerificationLoop {
 	}
 
 	private void computeOneIteration() throws AutomataOperationCanceledException {
-		
+
 		// Turn PI into a NFA that has String states.
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.pi);
 		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(autService);
-		
+
 		// Determinize the String state version of PI.
-		Determinize<IStatement, String> determinize = new Determinize<>(autService,
-				new StringFactory(), stringNFAPI);
-		
-		INestedWordAutomaton<IStatement, String> stringDFAPI =  determinize.getResult();
-		
+		Determinize<IStatement, String> determinize = new Determinize<>(autService, new StringFactory(), stringNFAPI);
+
+		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();
+
 		// Dead State
 		String deadState = "hi Im dead!";
-		
+
 		// Transform the DFA into an LTA
-		DfaToLtaPowerSet<IStatement, String> dfaToLta = new DfaToLtaPowerSet<IStatement, String>(stringDFAPI, transitionAlphabet, deadState);
-		
+		DfaToLtaPowerSet<IStatement, String> dfaToLta = new DfaToLtaPowerSet<IStatement, String>(stringDFAPI,
+				transitionAlphabet, deadState);
+
 		BuchiTreeAutomaton<RankedBool, String> powerSet = dfaToLta.getResult();
-		
-		
+
 		LTAIntersection<RankedBool, String, String> intersection = new LTAIntersection<>(programs, powerSet);
-		BuchiTreeAutomaton<RankedBool, LTAIntersectState<String, String>> intersectedAut = intersection
-				.computeResult();
+		BuchiTreeAutomaton<RankedBool, LTAIntersectState<String, String>> intersectedAut = intersection.computeResult();
 		LTAEmptinessCheck<RankedBool, LTAIntersectState<String, String>> emptinessCheck = new LTAEmptinessCheck<>(
 				intersectedAut);
 		emptinessCheck.computeResult();
@@ -127,6 +126,5 @@ public class MainVerificationLoop {
 			computeOneIteration();
 		}
 	}
-	
 
 }
