@@ -4,6 +4,7 @@ import de.uni_freiburg.informatik.ultimate.test.mocks.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import cgsynt.nfa.GeneralizeStateFactory;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryException;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataOperationCanceledException;
@@ -42,7 +43,7 @@ public class CheatSheet {
 
 		VpAlphabet<Character> alpha = new VpAlphabet<>(letters);
 
-		NestedWordAutomaton<Character, String> nwa = new NestedWordAutomaton<>(service, alpha, new StringFactory());
+		NestedWordAutomaton<Character, String> nwa = new NestedWordAutomaton<>(service, alpha, new GeneralizeStateFactory<>());
 
 		nwa.addState(true, false, "q0");
 		nwa.addState(false, false, "q1");
