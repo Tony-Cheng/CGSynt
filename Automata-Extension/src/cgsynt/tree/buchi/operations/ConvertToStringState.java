@@ -7,7 +7,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.Outgo
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
-public class ConvertToStringState<LETTER extends IRankedLetter, STATE> {
+public class ConvertToStringState<LETTER, STATE> {
 
 	private final NestedWordAutomaton<LETTER, STATE> aut;
 
