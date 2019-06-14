@@ -38,12 +38,6 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 
 		// Setup the dead state
 		this.mResult.addState(deadState);
-		List<STATE> deadStateDestinations = new ArrayList<STATE>();
-		for (int i = 0; i < this.mArity; i++)
-			deadStateDestinations.add(deadState);
-		final BuchiTreeAutomatonRule<RankedBool, STATE> deadRule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
-				deadState, deadStateDestinations);
-		this.mResult.addRule(deadRule);
 
 		this.compute();
 	}
