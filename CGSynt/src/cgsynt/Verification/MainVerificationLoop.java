@@ -1,5 +1,6 @@
 package cgsynt.Verification;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,8 +9,11 @@ import java.util.TreeSet;
 import cgsynt.Operations.CounterExamplesToInterpolants;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.interpol.IStatement;
+import cgsynt.interpol.ScriptAssignmentStatement;
+import cgsynt.interpol.ScriptAssumptionStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
+import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
@@ -26,6 +30,8 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class MainVerificationLoop {
@@ -41,7 +47,7 @@ public class MainVerificationLoop {
 	private boolean mIsCorrect;
 
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
-			List<IStatement> preconditions, List<IStatement> negatedPostconditions) {
+			List<IStatement> preconditions, List<IStatement> negatedPostconditions) throws Exception {
 		RankedBool.setRank(transitionAlphabet.size());
 		this.mService = TraceGlobalVariables.getGlobalVariables().getService();
 		this.mAutService = new AutomataLibraryServices(mService);
@@ -56,6 +62,9 @@ public class MainVerificationLoop {
 		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
 
 		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
+		if (negatedPostconditions == null || negatedPostconditions.isEmpty()) {
+			negatedPostconditions = initNegatedPostconditions();
+		}
 		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(negatedPostconditions);
 	}
 
@@ -68,6 +77,18 @@ public class MainVerificationLoop {
 		pi.addState(false, true, TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
 		return pi;
 
+	}
+
+	private List<IStatement> initNegatedPostconditions() throws Exception {
+		VariableFactory variableFactory = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		BoogieNonOldVar var = variableFactory.constructVariable(VariableFactory.INT);
+		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		IStatement assignment = new ScriptAssignmentStatement(var, script.numeral("0"));
+		IStatement assumption = new ScriptAssumptionStatement(var, script.numeral("1"), "=");
+		List<IStatement> negatedPostconditions = new ArrayList<>();
+		negatedPostconditions.add(assignment);
+		negatedPostconditions.add(assumption);
+		return negatedPostconditions;
 	}
 
 	private void computeOneIteration() throws AutomataOperationCanceledException {
