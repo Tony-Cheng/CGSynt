@@ -63,7 +63,7 @@ public class MainVerificationLoop {
 		NestedWordAutomaton<IStatement, IPredicate> pi = new NestedWordAutomaton<>(autService, alpha,
 				new GeneralizeStateFactory<>());
 		pi.addState(true, false, TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
-		pi.addState(false, true, TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
+		pi.addState(false, true, TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
 		return pi;
 
 	}
