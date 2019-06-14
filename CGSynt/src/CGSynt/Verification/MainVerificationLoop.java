@@ -50,7 +50,7 @@ public class MainVerificationLoop {
 		this.autService = new AutomataLibraryServices(service);
 		this.programs = programs;
 		this.resultComputed = false;
-		this.transitionAlphabet = new ArrayList<>();
+		this.transitionAlphabet = transitionAlphabet;
 		this.pi = createPI();
 		this.allInterpolants = new TreeSet<>();
 		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);

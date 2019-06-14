@@ -26,15 +26,16 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 	 * @param dfa
 	 *            The DFA to Convert
 	 */
-	public DfaToLtaPowerSet(final INestedWordAutomaton<LETTER, STATE> dfa, final List<IStatement> allStateOrdering, final STATE deadState) {
+	public DfaToLtaPowerSet(final INestedWordAutomaton<LETTER, STATE> dfa, final List<IStatement> allStateOrdering,
+			final STATE deadState) {
 		this.mDfa = dfa;
 		this.mAllStateOrdering = allStateOrdering;
-		
-		this.mArity = dfa.getAlphabet().size();
+
+		this.mArity = allStateOrdering.size();
 		this.mDeadState = deadState;
 
 		this.mResult = new BuchiTreeAutomaton<RankedBool, STATE>(mArity);
-		
+
 		// Setup the dead state
 		this.mResult.addState(deadState);
 		List<STATE> deadStateDestinations = new ArrayList<STATE>();
@@ -43,7 +44,7 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 		final BuchiTreeAutomatonRule<RankedBool, STATE> deadRule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
 				deadState, deadStateDestinations);
 		this.mResult.addRule(deadRule);
-		
+
 		this.compute();
 	}
 
@@ -69,9 +70,9 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 
 		for (STATE state : states) {
 			List<STATE> destStates = this.orderStates(state);
-			
+
 			assert destStates.size() == this.mArity;
-			
+
 			if (this.mDfa.isFinal(state)) {
 				final BuchiTreeAutomatonRule<RankedBool, STATE> trueRule = new BuchiTreeAutomatonRule<>(RankedBool.TRUE,
 						state, destStates);
@@ -96,21 +97,21 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 			this.mResult.addFinalState(state);
 		}
 	}
-	
+
 	/*
-	 * Order the input states in the same order as the allStateOrdering.
-	 * If a state is missing in the states list, then add the dead state in
-	 * to fill the missing states spot.
+	 * Order the input states in the same order as the allStateOrdering. If a state
+	 * is missing in the states list, then add the dead state in to fill the missing
+	 * states spot.
 	 */
-	private List<STATE> orderStates(STATE state){
+	private List<STATE> orderStates(STATE state) {
 		List<STATE> orderedStates = new ArrayList<>();
-		
+
 		for (IStatement statementToLookFor : this.mAllStateOrdering) {
 			Iterator<OutgoingInternalTransition<LETTER, STATE>> transitions = this.mDfa.internalSuccessors(state)
 					.iterator();
-			
+
 			boolean found = false;
-			
+
 			while (transitions.hasNext()) {
 				OutgoingInternalTransition<LETTER, STATE> transition = transitions.next();
 				if (transition.getLetter().equals(statementToLookFor)) {
@@ -119,11 +120,11 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 					break;
 				}
 			}
-			
+
 			if (!found)
 				orderedStates.add(this.mDeadState);
 		}
-		
+
 		return orderedStates;
 	}
 

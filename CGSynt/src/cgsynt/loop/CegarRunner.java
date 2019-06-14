@@ -32,6 +32,8 @@ public class CegarRunner {
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s1", dest));
 		
 		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, new ArrayList<>(), new ArrayList<>());
+		loop.computeMainLoop();
+		System.out.println(loop.isCorrect());
 	}
 
 	public static void main(String args[]) throws Exception {
