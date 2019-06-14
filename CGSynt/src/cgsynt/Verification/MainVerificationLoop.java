@@ -1,6 +1,5 @@
 package cgsynt.Verification;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,7 +11,7 @@ import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.nfa.GeneralizeStateFactory;
-import cgsynt.nfa.TraceGeneralization;
+import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.lta.LTAIntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
@@ -25,42 +24,45 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutoma
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
-import de.uni_freiburg.informatik.ultimate.automata.statefactory.IDeterminizeStateFactory;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
-import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
 public class MainVerificationLoop {
 
-	private BuchiTreeAutomaton<RankedBool, String> programs;
-	private NestedWordAutomaton<IStatement, IPredicate> pi;
-	private List<IStatement> transitionAlphabet;
-	private boolean isCorrect;
-	private IUltimateServiceProvider service;
-	private Set<IPredicate> allInterpolants;
-	private AutomataLibraryServices autService;
+	private BuchiTreeAutomaton<RankedBool, String> mPrograms;
+	private NestedWordAutomaton<IStatement, IPredicate> mPI;
+	private List<IStatement> mTransitionAlphabet;
+	private IUltimateServiceProvider mService;
+	private Set<IPredicate> mAllInterpolants;
+	private AutomataLibraryServices mAutService;
 
-	private boolean resultComputed;
-
+	private boolean mResultComputed;
+	private boolean mIsCorrect;
+	
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
 			List<IStatement> preconditions, List<IStatement> negatedPostconditions) {
 		RankedBool.setRank(transitionAlphabet.size());
-		this.service = TraceGlobalVariables.getGlobalVariables().getService();
-		this.autService = new AutomataLibraryServices(service);
-		this.programs = programs;
-		this.resultComputed = false;
-		this.transitionAlphabet = transitionAlphabet;
-		this.pi = createPI();
-		this.allInterpolants = new TreeSet<>();
+		this.mService = TraceGlobalVariables.getGlobalVariables().getService();
+		this.mAutService = new AutomataLibraryServices(mService);
+		this.mPrograms = programs;
+		this.mResultComputed = false;
+		this.mTransitionAlphabet = transitionAlphabet;
+		this.mPI = createPI();
+		this.mAllInterpolants = new TreeSet<>();
+		
+		// Add the True and False Predicates
+		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
+		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
+		
 		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
 		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(negatedPostconditions);
 	}
 
 	private NestedWordAutomaton<IStatement, IPredicate> createPI() {
-		Set<IStatement> letters = new HashSet<>(transitionAlphabet);
+		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alpha = new VpAlphabet<>(letters);
-		NestedWordAutomaton<IStatement, IPredicate> pi = new NestedWordAutomaton<>(autService, alpha,
+		NestedWordAutomaton<IStatement, IPredicate> pi = new NestedWordAutomaton<>(mAutService, alpha,
 				new GeneralizeStateFactory<>());
 		pi.addState(true, false, TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
 		pi.addState(false, true, TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
@@ -71,60 +73,67 @@ public class MainVerificationLoop {
 	private void computeOneIteration() throws AutomataOperationCanceledException {
 
 		// Turn PI into a NFA that has String states.
-		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.pi);
-		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(autService);
+		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
+		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
 
 		// Determinize the String state version of PI.
-		Determinize<IStatement, String> determinize = new Determinize<>(autService, new StringFactory(), stringNFAPI);
+		Determinize<IStatement, String> determinize = new Determinize<>(mAutService, new StringFactory(), stringNFAPI);
 
 		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();
 
 		// Dead State
-		String deadState = "hi Im dead!";
+		String deadState = "DeadState";
 
 		// Transform the DFA into an LTA
 		DfaToLtaPowerSet<IStatement, String> dfaToLta = new DfaToLtaPowerSet<IStatement, String>(stringDFAPI,
-				transitionAlphabet, deadState);
+				mTransitionAlphabet, deadState);
 
 		BuchiTreeAutomaton<RankedBool, String> powerSet = dfaToLta.getResult();
 
-		LTAIntersection<RankedBool, String, String> intersection = new LTAIntersection<>(programs, powerSet);
+		LTAIntersection<RankedBool, String, String> intersection = new LTAIntersection<>(mPrograms, powerSet);
 		BuchiTreeAutomaton<RankedBool, LTAIntersectState<String, String>> intersectedAut = intersection.computeResult();
 		LTAEmptinessCheck<RankedBool, LTAIntersectState<String, String>> emptinessCheck = new LTAEmptinessCheck<>(
 				intersectedAut);
 		emptinessCheck.computeResult();
 		if (!emptinessCheck.getResult()) {
-			isCorrect = true;
-			resultComputed = true;
+			mIsCorrect = true;
+			mResultComputed = true;
 			return;
 		}
-		Set<List<IStatement>> counterExamples = emptinessCheck.findCounterExamples(transitionAlphabet);
+		Set<List<IStatement>> counterExamples = emptinessCheck.findCounterExamples(mTransitionAlphabet);
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
 		counterExampleToInterpolants.computeResult();
 		if (counterExampleToInterpolants.getIncorrectTrace().size() > 0) {
-			isCorrect = false;
-			resultComputed = true;
+			mIsCorrect = false;
+			mResultComputed = true;
 			return;
 		}
-		addToAllInterpolants(counterExampleToInterpolants.getInterpolants());
 
-		TraceGeneralization generalization = new TraceGeneralization(allInterpolants,
-				new HashSet<>(transitionAlphabet));
-		pi = generalization.getResult();
+		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(
+				mAllInterpolants, flatten(counterExampleToInterpolants.getInterpolants()),
+				new HashSet<>(mTransitionAlphabet), mPI);
+		mPI = generalization.getResult();
+		
+		// Change the set of interpolants after the old and new ones have been used to calculate the new triplets.
+		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
 	}
 
-	private void addToAllInterpolants(List<Set<IPredicate>> interpolants) {
+	private Set<IPredicate> flatten(List<Set<IPredicate>> interpolants) {
+		Set<IPredicate> flattenedInterpolants = new HashSet<>();
+		
 		for (Set<IPredicate> interpolantsSet : interpolants) {
-			allInterpolants.addAll(interpolantsSet);
+			flattenedInterpolants.addAll(interpolantsSet);
 		}
+		
+		return flattenedInterpolants;
 	}
 
 	public boolean isCorrect() {
-		return isCorrect;
+		return mIsCorrect;
 	}
 
 	public void computeMainLoop() throws AutomataOperationCanceledException {
-		while (!resultComputed) {
+		while (!mResultComputed) {
 			computeOneIteration();
 		}
 	}
