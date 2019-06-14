@@ -14,5 +14,6 @@
 	<classpathentry kind="src" path="/Library-BoogieAST"/>
 	<classpathentry kind="src" path="/Library-ModelCheckerUtils"/>
 	<classpathentry kind="src" path="/TraceAbstraction"/>
+	<classpathentry kind="src" path="/CGSynt"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
