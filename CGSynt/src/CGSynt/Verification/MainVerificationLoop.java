@@ -1,4 +1,4 @@
-package CGSynt.Verification;
+package cgsynt.Verification;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import CGSynt.Operations.CounterExamplesToInterpolants;
+import cgsynt.Operations.CounterExamplesToInterpolants;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;

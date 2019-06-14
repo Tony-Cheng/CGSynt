@@ -1,4 +1,4 @@
-package CGSynt.Operations;
+package cgsynt.Operations;
 
 import java.util.ArrayList;
 import java.util.Arrays;

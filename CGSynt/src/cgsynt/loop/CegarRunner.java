@@ -3,7 +3,7 @@ package cgsynt.loop;
 import java.util.ArrayList;
 import java.util.List;
 
-import CGSynt.Verification.MainVerificationLoop;
+import cgsynt.Verification.MainVerificationLoop;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.TraceGlobalVariables;
