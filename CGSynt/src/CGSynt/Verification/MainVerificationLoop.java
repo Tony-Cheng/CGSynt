@@ -43,7 +43,8 @@ public class MainVerificationLoop {
 
 	private boolean resultComputed;
 
-	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet) {
+	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
+			List<IStatement> preconditions, List<IStatement> negatedPostconditions) {
 		RankedBool.setRank(transitionAlphabet.size());
 		this.service = TraceGlobalVariables.getGlobalVariables().getService();
 		this.autService = new AutomataLibraryServices(service);
@@ -52,6 +53,8 @@ public class MainVerificationLoop {
 		this.transitionAlphabet = new ArrayList<>();
 		this.pi = createPI();
 		this.allInterpolants = new TreeSet<>();
+		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
+		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(negatedPostconditions);
 	}
 
 	private NestedWordAutomaton<IStatement, IPredicate> createPI() {
