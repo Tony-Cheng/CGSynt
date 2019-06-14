@@ -59,7 +59,7 @@ public class TraceToInterpolants implements IInterpol {
 	private List<IStatement> preconditions;
 	private List<IStatement> negatedPostconditions;
 
-	private static TraceToInterpolants traceToInterpolants = new TraceToInterpolants();
+	private static TraceToInterpolants traceToInterpolants;
 
 	public TraceToInterpolants() {
 		ILogger logger = new ConsoleLogger();
@@ -86,6 +86,10 @@ public class TraceToInterpolants implements IInterpol {
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		preconditions = new ArrayList<>();
 		negatedPostconditions = new ArrayList<>();
+	}
+
+	public static void reset() {
+		traceToInterpolants = new TraceToInterpolants();
 	}
 
 	public static TraceToInterpolants getTraceToInterpolants() {

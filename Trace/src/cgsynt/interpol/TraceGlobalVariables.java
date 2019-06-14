@@ -1,18 +1,15 @@
 package cgsynt.interpol;
 
-import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
-import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
-import de.uni_freiburg.informatik.ultimate.test.mocks.ConsoleLogger;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
 public class TraceGlobalVariables {
 
-	private static TraceGlobalVariables globalVar = new TraceGlobalVariables();
+	private static TraceGlobalVariables globalVar;
 	private ManagedScript managedScript;
 	private VariableFactory variableFactory;
 	private IUltimateServiceProvider service;
@@ -23,6 +20,10 @@ public class TraceGlobalVariables {
 		managedScript.getScript().setOption(":produce-proofs", true);
 		managedScript.getScript().setLogic(Logics.QF_LIA);
 		variableFactory = new VariableFactory(managedScript.getScript());
+	}
+
+	public static void reset() {
+		globalVar = new TraceGlobalVariables();
 	}
 
 	public ManagedScript getManagedScript() {
