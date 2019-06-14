@@ -45,9 +45,8 @@ public class MainVerificationLoop {
 
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet) {
 		RankedBool.setRank(transitionAlphabet.size());
-		this.service = UltimateMocks.createUltimateServiceProviderMock();
+		this.service = TraceGlobalVariables.getGlobalVariables().getService();
 		this.autService = new AutomataLibraryServices(service);
-		TraceGlobalVariables.init(service);
 		this.programs = programs;
 		this.resultComputed = false;
 		this.transitionAlphabet = new ArrayList<>();
