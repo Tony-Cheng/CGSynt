@@ -39,7 +39,7 @@ public class MainVerificationLoop {
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
-	
+
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
 			List<IStatement> preconditions, List<IStatement> negatedPostconditions) {
 		RankedBool.setRank(transitionAlphabet.size());
@@ -49,12 +49,12 @@ public class MainVerificationLoop {
 		this.mResultComputed = false;
 		this.mTransitionAlphabet = transitionAlphabet;
 		this.mPI = createPI();
-		this.mAllInterpolants = new TreeSet<>();
-		
+		this.mAllInterpolants = new HashSet<>();
+
 		// Add the True and False Predicates
 		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
 		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
-		
+
 		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
 		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(negatedPostconditions);
 	}
@@ -109,22 +109,22 @@ public class MainVerificationLoop {
 			return;
 		}
 
-		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(
-				mAllInterpolants, flatten(counterExampleToInterpolants.getInterpolants()),
-				new HashSet<>(mTransitionAlphabet), mPI);
+		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
+				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);
 		mPI = generalization.getResult();
-		
-		// Change the set of interpolants after the old and new ones have been used to calculate the new triplets.
+
+		// Change the set of interpolants after the old and new ones have been used to
+		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
 	}
 
 	private Set<IPredicate> flatten(List<Set<IPredicate>> interpolants) {
 		Set<IPredicate> flattenedInterpolants = new HashSet<>();
-		
+
 		for (Set<IPredicate> interpolantsSet : interpolants) {
 			flattenedInterpolants.addAll(interpolantsSet);
 		}
-		
+
 		return flattenedInterpolants;
 	}
 
