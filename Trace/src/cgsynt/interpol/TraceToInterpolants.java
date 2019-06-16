@@ -58,6 +58,8 @@ public class TraceToInterpolants implements IInterpol {
 	private PredicateUnifier pUnifer;
 	private List<IStatement> preconditions;
 	private List<IStatement> negatedPostconditions;
+	private IPredicate preconditionsPred;
+	private IPredicate postconditionsPred;
 
 	private static TraceToInterpolants traceToInterpolants;
 
@@ -86,6 +88,8 @@ public class TraceToInterpolants implements IInterpol {
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		preconditions = new ArrayList<>();
 		negatedPostconditions = new ArrayList<>();
+		preconditionsPred = pUnifer.getTruePredicate();
+		postconditionsPred = pUnifer.getTruePredicate();
 	}
 
 	public static void reset() {
@@ -157,6 +161,12 @@ public class TraceToInterpolants implements IInterpol {
 
 	public void setPreconditions(List<IStatement> preconditions) {
 		this.preconditions = preconditions;
+		this.preconditionsPred = pUnifer.getTruePredicate();
+		for (int i = 0; i < preconditions.size(); i++) {
+			IPredicate statementPred = predicateFactory
+					.newPredicate(preconditions.get(i).getFormula().getTransformula().getFormula());
+			preconditionsPred = predicateFactory.and(preconditionsPred, statementPred);
+		}
 	}
 
 	public List<IStatement> getNegatedPostconditions() {
@@ -165,6 +175,13 @@ public class TraceToInterpolants implements IInterpol {
 
 	public void setNegatedPostconditions(List<IStatement> negatedPostconditions) {
 		this.negatedPostconditions = negatedPostconditions;
+		this.postconditionsPred = pUnifer.getFalsePredicate();
+		for (int i = 0; i < negatedPostconditions.size(); i++) {
+			IPredicate statementPred = predicateFactory
+					.newPredicate(negatedPostconditions.get(i).getFormula().getTransformula().getFormula());
+			postconditionsPred = predicateFactory.or(false, postconditionsPred, statementPred);
+		}
+		postconditionsPred = predicateFactory.not(postconditionsPred);
 	}
 
 	private List<IStatement> buildStatementList(IStatement statement) {
@@ -183,6 +200,22 @@ public class TraceToInterpolants implements IInterpol {
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
 				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
 		return interpolate.isCorrect() != LBool.SAT;
+	}
+
+	@Override
+	public boolean isCorrect(List<IStatement> statements) {
+		List<Object> controlLocationSequence = generateControlLocationSequence(statements.size() + 1);
+		NestedWord<IAction> trace = buildTrace(statements);
+		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(preconditionsPred,
+				postconditionsPred, pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript,
+				null, pUnifer, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
+				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
+				SimplificationTechnique.NONE, false);
+		if (interpolate.isCorrect() != LBool.SAT) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }
