@@ -38,6 +38,7 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 
 		// Setup the dead state
 		this.mResult.addState(deadState);
+		this.mResult.addFinalState(deadState);
 
 		this.compute();
 	}
