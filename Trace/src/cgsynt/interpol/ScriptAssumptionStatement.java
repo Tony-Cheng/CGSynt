@@ -13,13 +13,14 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.Unm
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 
-public class ScriptAssumptionStatement implements IStatement {
+public class ScriptAssumptionStatement implements IAssumption {
 
 	private BoogieNonOldVar lhs;
 	private Term rhs;
 	private DefaultIcfgSymbolTable symbolTable;
 	private ManagedScript managedScript;
 	private String type;
+	private boolean negated;
 
 	public ScriptAssumptionStatement(BoogieNonOldVar lhs, Term rhs, String type) {
 		this.lhs = lhs;
@@ -27,6 +28,7 @@ public class ScriptAssumptionStatement implements IStatement {
 		this.type = type;
 		symbolTable = TraceGlobalVariables.getGlobalVariables().getVariableFactory().getSymbolTable();
 		managedScript = TraceGlobalVariables.getGlobalVariables().getManagedScript();
+		this.negated = false;
 
 	}
 
@@ -37,17 +39,21 @@ public class ScriptAssumptionStatement implements IStatement {
 
 	@Override
 	public IAction getFormula() {
+		if (negated)
+			return getFormulaInternal(true);
 		return getFormulaInternal(false);
 	}
-	
+
 	public NestedWord<IAction> getNegatedTrace() {
 		return getTraceInternal(true);
 	}
 
 	public IAction getNegatedFormula() {
+		if (negated)
+			return getFormulaInternal(false);
 		return getFormulaInternal(true);
 	}
-	
+
 	private NestedWord<IAction> getTraceInternal(boolean negated) {
 		List<IProgramVar> lhs = new ArrayList<>();
 		List<Term> rhs = new ArrayList<>();
@@ -77,5 +83,15 @@ public class ScriptAssumptionStatement implements IStatement {
 	@Override
 	public String toString() {
 		return lhs.toString() + " " + type + " " + rhs.toString();
+	}
+
+	@Override
+	public void negate() {
+		negated = !negated;
+	}
+
+	@Override
+	public boolean isNegated() {
+		return negated;
 	}
 }

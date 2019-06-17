@@ -89,6 +89,12 @@ public class TraceToInterpolants implements IInterpol {
 		negatedPostconditions = createInitialNegatePostconditions();
 	}
 
+	private List<IAssumption> negatePostconditions(List<IAssumption> postconditions) {
+		for (IAssumption precondition : postconditions)
+			precondition.negate();
+		return postconditions;
+		
+	}
 	private List<IStatement> createInitialNegatePostconditions() throws Exception {
 		ArrayList<IStatement> negatedPostconditions = new ArrayList<>();
 		VariableFactory variableFactory = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
