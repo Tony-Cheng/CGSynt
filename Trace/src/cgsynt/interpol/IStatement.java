@@ -11,19 +11,21 @@ public interface IStatement {
 
 	/**
 	 * Return a trace that only contains this statement.
+	 * @param negated True if the negation of
+	 * 		  this IStatement is to be returned.
 	 * 
 	 * @return
 	 */
-	public NestedWord<IAction> getTrace();
+	public NestedWord<IAction> getTrace(boolean negated);
 
 	/**
 	 * Return a formula that represents this statement.
 	 * 
-	 * @param prevProcedure
-	 * @param nextProcedure
+	 * @param negated True if the negation of 
+	 * 		  this IStatement is to be returned.
 	 * @return
 	 */
-	public IAction getFormula();
+	public IAction getFormula(boolean negated);
 	
 	/**
 	 * Return the string representation of an IStatement.
