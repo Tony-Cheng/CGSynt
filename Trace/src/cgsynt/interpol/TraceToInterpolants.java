@@ -13,7 +13,9 @@ import java.util.TreeMap;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Script.LBool;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.CfgSmtToolkit;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.ConcurrencyInformation;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.DefaultIcfgSymbolTable;
@@ -61,7 +63,7 @@ public class TraceToInterpolants implements IInterpol {
 
 	private static TraceToInterpolants traceToInterpolants;
 
-	public TraceToInterpolants() {
+	public TraceToInterpolants() throws Exception {
 		ILogger logger = new ConsoleLogger();
 		managedScript = TraceGlobalVariables.getGlobalVariables().getManagedScript();
 		service = TraceGlobalVariables.getGlobalVariables().getService();
@@ -85,10 +87,23 @@ public class TraceToInterpolants implements IInterpol {
 		pUnifer = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		preconditions = new ArrayList<>();
-		negatedPostconditions = new ArrayList<>();
+		negatedPostconditions = createInitialNegatePostconditions();
 	}
 
-	public static void reset() {
+	private List<IStatement> createInitialNegatePostconditions() throws Exception {
+		ArrayList<IStatement> negatedPostconditions = new ArrayList<>();
+		VariableFactory variableFactory = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		BoogieNonOldVar var = variableFactory.constructVariable(VariableFactory.INT);
+		IStatement statement1 = new ScriptAssumptionStatement(var, script.numeral("0"), "=");
+		IStatement statement2 = new ScriptAssumptionStatement(var, script.numeral("1"), "=");
+		negatedPostconditions.add(statement1);
+		negatedPostconditions.add(statement2);
+		return negatedPostconditions;
+
+	}
+
+	public static void reset() throws Exception {
 		traceToInterpolants = new TraceToInterpolants();
 	}
 
