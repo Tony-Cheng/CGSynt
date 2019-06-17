@@ -200,7 +200,9 @@ public class TraceToInterpolants implements IInterpol {
 				pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
 				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
-		return interpolate.isCorrect() != LBool.SAT;
+		
+		assert interpolate.isCorrect() != LBool.UNKNOWN;
+		return interpolate.isCorrect() == LBool.UNSAT;
 	}
 
 }
