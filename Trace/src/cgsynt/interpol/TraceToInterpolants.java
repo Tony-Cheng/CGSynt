@@ -128,8 +128,8 @@ public class TraceToInterpolants implements IInterpol {
 
 	@Override
 	public IPredicate[] computeInterpolants(List<IStatement> statements) {
-		List<Object> controlLocationSequence = generateControlLocationSequence(statements.size() + 1);
 		NestedWord<IAction> trace = buildTrace(statements);
+		List<Object> controlLocationSequence = generateControlLocationSequence(trace.length() + 1);
 		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(
 				pUnifer.getTruePredicate(), pUnifer.getFalsePredicate(), pendingContexts, trace,
 				controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
@@ -176,8 +176,8 @@ public class TraceToInterpolants implements IInterpol {
 	@Override
 	public boolean isCorrect(IPredicate pre, IStatement statement, IPredicate post) {
 		List<IStatement> statements = buildStatementList(statement);
-		List<Object> controlLocationSequence = generateControlLocationSequence(statements.size() + 1);
 		NestedWord<IAction> trace = buildTrace(statements);
+		List<Object> controlLocationSequence = generateControlLocationSequence(trace.length() + 1);
 		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(pre, post,
 				pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
