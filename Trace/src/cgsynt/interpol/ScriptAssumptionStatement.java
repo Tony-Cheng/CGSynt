@@ -31,7 +31,24 @@ public class ScriptAssumptionStatement implements IStatement {
 	}
 
 	@Override
-	public NestedWord<IAction> getTrace(boolean negated) {
+	public NestedWord<IAction> getTrace() {
+		return getTraceInternal(false);
+	}
+
+	@Override
+	public IAction getFormula() {
+		return getFormulaInternal(false);
+	}
+	
+	public NestedWord<IAction> getNegatedTrace() {
+		return getTraceInternal(true);
+	}
+
+	public IAction getNegatedFormula() {
+		return getFormulaInternal(true);
+	}
+	
+	private NestedWord<IAction> getTraceInternal(boolean negated) {
 		List<IProgramVar> lhs = new ArrayList<>();
 		List<Term> rhs = new ArrayList<>();
 		lhs.add(this.lhs);
@@ -47,8 +64,7 @@ public class ScriptAssumptionStatement implements IStatement {
 		return trace;
 	}
 
-	@Override
-	public IAction getFormula(boolean negated) {
+	private IAction getFormulaInternal(boolean negated) {
 		List<IProgramVar> lhs = new ArrayList<>();
 		List<Term> rhs = new ArrayList<>();
 		lhs.add(this.lhs);

@@ -101,16 +101,16 @@ public class TraceToInterpolants implements IInterpol {
 		int[] nestingRelation = new int[len + preconditions.size() + negatedPostconditions.size()];
 
 		for (int i = 0; i < preconditions.size(); i++) {
-			word[i] = preconditions.get(i).getFormula(false);
+			word[i] = preconditions.get(i).getFormula();
 			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
 		}
 
 		for (int i = preconditions.size(); i < preconditions.size() + len; i++) {
-			word[i] = statements.get(i - preconditions.size()).getFormula(false);
+			word[i] = statements.get(i - preconditions.size()).getFormula();
 			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
 		}
 		for (int i = preconditions.size() + len; i < preconditions.size() + len + negatedPostconditions.size(); i++) {
-			word[i] = negatedPostconditions.get(i - preconditions.size() - len).getFormula(false);
+			word[i] = negatedPostconditions.get(i - preconditions.size() - len).getFormula();
 			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
 		}
 		return new NestedWord<>(word, nestingRelation);
