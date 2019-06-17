@@ -85,7 +85,7 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 	 * DFA.
 	 */
 	private void computeFinalStates() {
-		final Set<STATE> states = (Set<STATE>) this.mDfa.getFinalStates();
+		final Set<STATE> states = (Set<STATE>) this.mDfa.getStates();
 
 		for (STATE state : states) {
 			this.mResult.addFinalState(state);

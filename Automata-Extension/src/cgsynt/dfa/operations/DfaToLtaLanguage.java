@@ -96,7 +96,7 @@ public class DfaToLtaLanguage<LETTER, STATE> {
 	 * DFA.
 	 */
 	private void computeFinalStates() {
-		final Set<STATE> states = this.mDfa.getFinalStates();
+		final Set<STATE> states = this.mDfa.getStates();
 
 		for (STATE state : states) {
 			this.mResult.addFinalState(state);
