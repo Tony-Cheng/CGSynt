@@ -121,18 +121,6 @@ public class TraceToInterpolants implements IInterpol {
 		return new NestedWord<>(word, nestingRelation);
 	}
 
-	private NestedWord<IAction> buildTraceOnly(List<IStatement> statements) {
-		int len = statements.size();
-		IAction[] word = new IAction[len];
-		int[] nestingRelation = new int[len];
-
-		for (int i = 0; i < len; i++) {
-			word[i] = statements.get(i).getFormula();
-			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
-		}
-		return new NestedWord<>(word, nestingRelation);
-	}
-
 	private List<Object> generateControlLocationSequence(int n) {
 		List<Object> controlLocationSequence = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
@@ -144,9 +132,8 @@ public class TraceToInterpolants implements IInterpol {
 
 	@Override
 	public IPredicate[] computeInterpolants(List<IStatement> statements) {
+		List<Object> controlLocationSequence = generateControlLocationSequence(statements.size() + 1);
 		NestedWord<IAction> trace = buildTrace(statements);
-		List<Object> controlLocationSequence = generateControlLocationSequence(
-				statements.size() + preconditions.size() + negatedPostconditions.size() + 1);
 		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(
 				pUnifer.getTruePredicate(), pUnifer.getFalsePredicate(), pendingContexts, trace,
 				controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
@@ -217,8 +204,8 @@ public class TraceToInterpolants implements IInterpol {
 
 	@Override
 	public boolean isCorrect(List<IStatement> statements) {
-		NestedWord<IAction> trace = buildTraceOnly(statements);
 		List<Object> controlLocationSequence = generateControlLocationSequence(statements.size() + 1);
+		NestedWord<IAction> trace = buildTrace(statements);
 		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(preconditionsPred,
 				postconditionsPred, pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript,
 				null, pUnifer, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
