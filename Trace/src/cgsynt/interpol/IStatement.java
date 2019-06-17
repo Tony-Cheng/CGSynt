@@ -19,8 +19,6 @@ public interface IStatement {
 	/**
 	 * Return a formula that represents this statement.
 	 * 
-	 * @param prevProcedure
-	 * @param nextProcedure
 	 * @return
 	 */
 	public IAction getFormula();

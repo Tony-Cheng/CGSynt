@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.IIcfgSymbolTable;
@@ -32,13 +33,14 @@ public class ExtendedTransFormulaBuilder extends TransFormulaBuilder{
 	}
 	
 	public static UnmodifiableTransFormula constructAssumption(final List<? extends IProgramVar> lhs,
-			final List<Term> rhs, final IIcfgSymbolTable symbolTable, final ManagedScript mgdScript, final String type) {
-		return constructInequality(lhs, rhs, symbolTable, mgdScript, type, true);
+			final List<Term> rhs, final IIcfgSymbolTable symbolTable, final ManagedScript mgdScript, final String type, 
+			final boolean negated) {
+		return constructInequality(lhs, rhs, symbolTable, mgdScript, type, true, negated);
 	}
 	
 	private static UnmodifiableTransFormula constructInequality(final List<? extends IProgramVar> lhs,
 			final List<Term> rhs, final IIcfgSymbolTable symbolTable, final ManagedScript mgdScript, final String type, 
-			final boolean lhsAreAlsoInVars) {
+			final boolean lhsAreAlsoInVars, final boolean negated) {
 		if (lhs.size() != rhs.size()) {
 			throw new IllegalArgumentException("different number of argument on LHS and RHS");
 		}
@@ -76,10 +78,23 @@ public class ExtendedTransFormulaBuilder extends TransFormulaBuilder{
 				tfb.addInVar(pv, freshTv);
 			}
 			final Term renamedRightHandSide = subst.transform(rhs.get(i));
-			conjuncts.add(mgdScript.getScript().term(type, freshTv, renamedRightHandSide));
+			
+			if (!negated)
+				conjuncts.add(mgdScript.getScript().term(type, freshTv, renamedRightHandSide));
+			// If the formula is to be negated.
+			else {
+				Script script = mgdScript.getScript();
+				conjuncts.add(script.term("not", script.term(type, freshTv, renamedRightHandSide)));
+			}
 		}
-
-		final Term conjunction = SmtUtils.and(mgdScript.getScript(), conjuncts);
+		
+		Term conjunction = null;
+		if (!negated)
+			conjunction = SmtUtils.and(mgdScript.getScript(), conjuncts);
+		// If the formula is to be negated. Create an or of negations.
+		else
+			conjunction = SmtUtils.or(mgdScript.getScript(), conjuncts);
+		
 		tfb.setFormula(conjunction);
 		// an assignment is always feasible
 		tfb.setInfeasibility(Infeasibility.UNPROVEABLE);

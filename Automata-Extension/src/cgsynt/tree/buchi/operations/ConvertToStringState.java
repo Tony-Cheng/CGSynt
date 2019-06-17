@@ -1,11 +1,9 @@
 package cgsynt.tree.buchi.operations;
 
-import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
-import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingReturnTransition;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
-import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
 public class ConvertToStringState<LETTER, STATE> {
 
@@ -25,7 +23,7 @@ public class ConvertToStringState<LETTER, STATE> {
 		}
 
 		for (STATE state : aut.getStates()) {
-			for (OutgoingReturnTransition<LETTER, STATE> transition : aut.returnSuccessors(state)) {
+			for (OutgoingInternalTransition<LETTER, STATE> transition : aut.internalSuccessors(state)) {
 				stringAut.addInternalTransition(state.toString(), transition.getLetter(),
 						transition.getSucc().toString());
 			}

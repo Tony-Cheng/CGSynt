@@ -32,12 +32,29 @@ public class ScriptAssumptionStatement implements IStatement {
 
 	@Override
 	public NestedWord<IAction> getTrace() {
+		return getTraceInternal(false);
+	}
+
+	@Override
+	public IAction getFormula() {
+		return getFormulaInternal(false);
+	}
+	
+	public NestedWord<IAction> getNegatedTrace() {
+		return getTraceInternal(true);
+	}
+
+	public IAction getNegatedFormula() {
+		return getFormulaInternal(true);
+	}
+	
+	private NestedWord<IAction> getTraceInternal(boolean negated) {
 		List<IProgramVar> lhs = new ArrayList<>();
 		List<Term> rhs = new ArrayList<>();
 		lhs.add(this.lhs);
 		rhs.add(this.rhs);
 		UnmodifiableTransFormula formula = ExtendedTransFormulaBuilder.constructAssumption(lhs, rhs, symbolTable,
-				managedScript, type);
+				managedScript, type, negated);
 		BasicInternalAction basicAction = new BasicInternalAction(null, null, formula);
 		IAction[] word = new IAction[1];
 		int[] nestingRelation = new int[1];
@@ -47,14 +64,13 @@ public class ScriptAssumptionStatement implements IStatement {
 		return trace;
 	}
 
-	@Override
-	public IAction getFormula() {
+	private IAction getFormulaInternal(boolean negated) {
 		List<IProgramVar> lhs = new ArrayList<>();
 		List<Term> rhs = new ArrayList<>();
 		lhs.add(this.lhs);
 		rhs.add(this.rhs);
 		UnmodifiableTransFormula formula = ExtendedTransFormulaBuilder.constructAssumption(lhs, rhs, symbolTable,
-				managedScript, type);
+				managedScript, type, negated);
 		return new BasicInternalAction(null, null, formula);
 	}
 
