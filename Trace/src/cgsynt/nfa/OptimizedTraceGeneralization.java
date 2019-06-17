@@ -68,26 +68,33 @@ public class OptimizedTraceGeneralization {
 				for (IPredicate post : postSet) {
 					boolean unsat = this.mInterpolator.isCorrect(pre, statement, post);
 					
+					IInterpol inter = this.mInterpolator;
+					
 					if (unsat) {
-						if (DEBUG) {
-							String trans = "(" + pre.getFormula().toString() + ", " + statement.toString() + ", " + post.getFormula().toString() + ")";
-							this.mTransitionsAdded.add(trans);
+						if (!((pre.equals(inter.getTruePredicate()) && post.equals(inter.getTruePredicate())) 
+						   || (pre.equals(inter.getTruePredicate()) && post.equals(inter.getFalsePredicate()))
+						   || (pre.equals(inter.getFalsePredicate()) && post.equals(inter.getTruePredicate()))
+						   || (pre.equals(inter.getFalsePredicate()) && post.equals(inter.getFalsePredicate())))) {
+							if (DEBUG) {
+								String trans = "(" + pre.getFormula().toString() + ", " + statement.toString() + ", " + post.getFormula().toString() + ")";
+								this.mTransitionsAdded.add(trans);
+							}
+							
+							Set<IPredicate> states = this.mInterpolantNfa.getStates();
+							
+							if (!states.contains(pre))
+								this.mInterpolantNfa.addState(
+										pre.equals(this.mInterpolator.getTruePredicate()),
+										pre.equals(this.mInterpolator.getFalsePredicate()),
+										pre);
+							if (!states.contains(post))
+								this.mInterpolantNfa.addState(
+										post.equals(this.mInterpolator.getTruePredicate()),
+										post.equals(this.mInterpolator.getFalsePredicate()),
+										post);
+							
+							this.mInterpolantNfa.addInternalTransition(pre, statement, post);
 						}
-						
-						Set<IPredicate> states = this.mInterpolantNfa.getStates();
-						
-						if (!states.contains(pre))
-							this.mInterpolantNfa.addState(
-									pre.equals(this.mInterpolator.getTruePredicate()),
-									pre.equals(this.mInterpolator.getFalsePredicate()),
-									pre);
-						if (!states.contains(post))
-							this.mInterpolantNfa.addState(
-									post.equals(this.mInterpolator.getTruePredicate()),
-									post.equals(this.mInterpolator.getFalsePredicate()),
-									post);
-						
-						this.mInterpolantNfa.addInternalTransition(pre, statement, post);
 					}
 				}
 			}
