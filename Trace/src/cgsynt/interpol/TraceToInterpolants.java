@@ -34,7 +34,6 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.Basi
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.PredicateUnifier;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.tracecheck.ITraceCheckPreferences.AssertCodeBlockOrder;
-import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.InterpolationTechnique;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.singletracecheck.InterpolatingTraceCheckCraig;
 import de.uni_freiburg.informatik.ultimate.test.mocks.ConsoleLogger;
@@ -102,16 +101,16 @@ public class TraceToInterpolants implements IInterpol {
 		int[] nestingRelation = new int[len + preconditions.size() + negatedPostconditions.size()];
 
 		for (int i = 0; i < preconditions.size(); i++) {
-			word[i] = preconditions.get(i).getFormula();
+			word[i] = preconditions.get(i).getFormula(false);
 			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
 		}
 
 		for (int i = preconditions.size(); i < preconditions.size() + len; i++) {
-			word[i] = statements.get(i - preconditions.size()).getFormula();
+			word[i] = statements.get(i - preconditions.size()).getFormula(false);
 			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
 		}
 		for (int i = preconditions.size() + len; i < preconditions.size() + len + negatedPostconditions.size(); i++) {
-			word[i] = negatedPostconditions.get(i - preconditions.size() - len).getFormula();
+			word[i] = negatedPostconditions.get(i - preconditions.size() - len).getFormula(false);
 			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
 		}
 		return new NestedWord<>(word, nestingRelation);
