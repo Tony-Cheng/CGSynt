@@ -177,8 +177,12 @@ public class TraceToInterpolants implements IInterpol {
 		return negatedPostconditions;
 	}
 
-	public void setNegatedPostconditions(List<IStatement> negatedPostconditions) {
-		this.negatedPostconditions = negatedPostconditions;
+	public void setNegatedPostconditions(List<IStatement> negatedPostconditions) throws Exception {
+		if (negatedPostconditions.isEmpty()) {
+			this.negatedPostconditions = createInitialNegatePostconditions();
+		} else {
+			this.negatedPostconditions = negatedPostconditions;
+		}
 	}
 
 	private List<IStatement> buildStatementList(IStatement statement) {

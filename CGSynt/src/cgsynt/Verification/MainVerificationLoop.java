@@ -62,9 +62,6 @@ public class MainVerificationLoop {
 		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
 
 		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
-		if (negatedPostconditions == null || negatedPostconditions.isEmpty()) {
-			negatedPostconditions = initNegatedPostconditions();
-		}
 		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(negatedPostconditions);
 	}
 
@@ -77,18 +74,6 @@ public class MainVerificationLoop {
 		pi.addState(false, true, TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
 		return pi;
 
-	}
-
-	private List<IStatement> initNegatedPostconditions() throws Exception {
-		VariableFactory variableFactory = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		BoogieNonOldVar var = variableFactory.constructVariable(VariableFactory.INT);
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
-		IStatement assignment = new ScriptAssignmentStatement(var, script.numeral("0"));
-		IStatement assumption = new ScriptAssumptionStatement(var, script.numeral("1"), "=");
-		List<IStatement> negatedPostconditions = new ArrayList<>();
-		negatedPostconditions.add(assignment);
-		negatedPostconditions.add(assumption);
-		return negatedPostconditions;
 	}
 
 	private void computeOneIteration() throws AutomataOperationCanceledException {
