@@ -27,7 +27,8 @@ public class TestMainVerificationLoop2 {
 	 * [i == 0 & n >= 0]
 	 * while i < n:
 	 * 		i++
-	 * [i==n]
+	 * [i
+	 * ==n]
 	 */
 	@Test
 	void test2() throws Exception {
@@ -54,7 +55,7 @@ public class TestMainVerificationLoop2 {
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
 		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
 		
-		IStatement post = new ScriptAssumptionStatement(i, n.getTerm(), ">"); // originally type="="
+		IStatement post = new ScriptAssumptionStatement(i, n.getTerm(), "="); // originally type="="
 		
 		List<IStatement> letters = new ArrayList<IStatement>();
 		letters.add(ilen);
@@ -69,7 +70,6 @@ public class TestMainVerificationLoop2 {
 		
 		List<String> dest2true = Arrays.asList("s3", "s3", "s3");
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2true));
-		
 		
 		List<String> dest3 = Arrays.asList("s3", "s3", "s3");
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
