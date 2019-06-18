@@ -73,8 +73,11 @@ public class MainVerificationLoop {
 		pi.addState(true, false, TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
 		pi.addState(false, true, TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
 		IPredicate falsePred = TraceToInterpolants.getTraceToInterpolants().getFalsePredicate();
+		IPredicate truePred = TraceToInterpolants.getTraceToInterpolants().getTruePredicate();
+
 		for (IStatement statement : mTransitionAlphabet) {
 			pi.addInternalTransition(falsePred, statement, falsePred);
+			pi.addInternalTransition(truePred, statement, truePred);
 		}
 		return pi;
 
