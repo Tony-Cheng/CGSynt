@@ -68,13 +68,13 @@ public class OptimizedTraceGeneralization {
 				for (IPredicate post : postSet) {
 					boolean unsat = this.mInterpolator.isCorrect(pre, statement, post);
 					
-					IInterpol inter = this.mInterpolator;
+					//IInterpol inter = this.mInterpolator;
 					
 					if (unsat) {
-						if (!((pre.equals(inter.getTruePredicate()) && post.equals(inter.getTruePredicate())) 
-						   || (pre.equals(inter.getTruePredicate()) && post.equals(inter.getFalsePredicate()))
-						   || (pre.equals(inter.getFalsePredicate()) && post.equals(inter.getTruePredicate()))
-						   || (pre.equals(inter.getFalsePredicate()) && post.equals(inter.getFalsePredicate())))) {
+						//if (!((pre.equals(inter.getTruePredicate()) && post.equals(inter.getTruePredicate())) 
+						//   || (pre.equals(inter.getTruePredicate()) && post.equals(inter.getFalsePredicate()))
+						//   || (pre.equals(inter.getFalsePredicate()) && post.equals(inter.getTruePredicate()))
+						//   || (pre.equals(inter.getFalsePredicate()) && post.equals(inter.getFalsePredicate())))) {
 							if (DEBUG) {
 								String trans = "(" + pre.getFormula().toString() + ", " + statement.toString() + ", " + post.getFormula().toString() + ")";
 								this.mTransitionsAdded.add(trans);
@@ -94,7 +94,7 @@ public class OptimizedTraceGeneralization {
 										post);
 							
 							this.mInterpolantNfa.addInternalTransition(pre, statement, post);
-						}
+						//}
 					}
 				}
 			}
