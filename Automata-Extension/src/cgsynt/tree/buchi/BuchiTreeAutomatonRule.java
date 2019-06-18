@@ -8,8 +8,10 @@ import de.uni_freiburg.informatik.ultimate.util.HashUtils;
 /**
  * Rule of a BuchiTreeAutomaton.
  *
- * @param <LETTER> Letters of the automation.
- * @param <STATE> States of the automation.
+ * @param <LETTER>
+ *            Letters of the automation.
+ * @param <STATE>
+ *            States of the automation.
  */
 public class BuchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE> {
 	private final LETTER mLetter;
@@ -18,6 +20,7 @@ public class BuchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE> {
 
 	/**
 	 * Construct a rule: letter(src) -> dest
+	 * 
 	 * @param letter
 	 * @param src
 	 * @param dest
@@ -33,6 +36,7 @@ public class BuchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE> {
 
 	/**
 	 * Get
+	 * 
 	 * @return
 	 */
 	public STATE getSource() {
@@ -50,12 +54,13 @@ public class BuchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE> {
 	public int getArity() {
 		return mLetter.getRank();
 	}
-	
+
 	@Override
 	public String toString() {
-		return "(" + mSrc.toString() + " | " + mLetter.toString() + " | " + mDest.toString() + ")";
+		return "(" + mSrc.toString() + " | " + mLetter.toString() + " | " + mDest.toString() + ")" + " "
+				+ mLetter.toString();
 	}
-	
+
 	@Override
 	public boolean equals(final Object x) {
 		if (!(x instanceof BuchiTreeAutomatonRule)) {
