@@ -31,6 +31,10 @@ public class BuchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE> {
 		this.mDest = dest;
 	}
 
+	/**
+	 * Get
+	 * @return
+	 */
 	public STATE getSource() {
 		return mSrc;
 	}
