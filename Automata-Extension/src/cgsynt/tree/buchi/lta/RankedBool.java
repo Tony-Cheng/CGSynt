@@ -26,5 +26,10 @@ public class RankedBool implements IRankedLetter {
 	public int getRank() {
 		return rank;
 	}
+	
+	@Override
+	public String toString() {
+		return "" + bool;
+	}
 
 }

@@ -55,7 +55,7 @@ public class TestMainVerificationLoop2 {
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
 		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
 		
-		IStatement post = new ScriptAssumptionStatement(i, n.getTerm(), ">="); // originally type="="
+		IStatement post = new ScriptAssumptionStatement(i, n.getTerm(), ">"); // originally type="="
 		
 		List<IStatement> letters = new ArrayList<IStatement>();
 		letters.add(ilen);
@@ -65,11 +65,11 @@ public class TestMainVerificationLoop2 {
 		List<String> dest1 = Arrays.asList("s4", "s3", "s2");
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s1", dest1));
 
-		List<String> dest2false = Arrays.asList("s3", "s3", "s3");
-		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s2", dest2false));
+		//List<String> dest2false = Arrays.asList("s3", "s3", "s3");
+		//program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s2", dest2false));
 		
-		//List<String> dest2true = Arrays.asList("s3", "s3", "s3");
-		//program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2true));
+		List<String> dest2true = Arrays.asList("s3", "s3", "s3");
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2true));
 		
 		List<String> dest3 = Arrays.asList("s3", "s3", "s3");
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
@@ -82,6 +82,6 @@ public class TestMainVerificationLoop2 {
 		
 		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
 		loop.computeMainLoop();
-		assertFalse(loop.isCorrect());
+		assertTrue(loop.isCorrect());
 	}
 }
