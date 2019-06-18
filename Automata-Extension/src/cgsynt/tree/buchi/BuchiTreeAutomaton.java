@@ -320,14 +320,26 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		return mInitStates;
 	}
 
+	/**
+	 * Get the set containing this BuchiTreeAutomaton's final states
+	 * @return A set of states.
+	 */
 	public Set<STATE> getFinalStates() {
 		return mFinalStates;
 	}
 
+	/**
+	 * Get the set of transition rules for this automaton
+	 * @return A set of transitions
+	 */
 	public Set<BuchiTreeAutomatonRule<LETTER, STATE>> getRules() {
 		return mRules;
 	}
 
+	/**
+	 * Get the rank of this tree automaton.
+	 * @return The rank of the automaton
+	 */
 	public int getRank() {
 		return rank;
 	}
@@ -342,10 +354,20 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		return mSourceMap.get(src);
 	}
 
+	/**
+	 * Get the map that maps automaton states to the collection 
+	 * of destination states reachable from that state.
+	 * @return A source map
+	 */
 	public Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> getSourceMap() {
 		return mSourceMap;
 	}
 
+	/**
+	 * Get the map that maps automaton states to the collection
+	 * of source states for a specified state.
+	 * @return A child map
+	 */
 	public Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> getChildMap() {
 		return mChildMap;
 	}

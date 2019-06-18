@@ -35,6 +35,10 @@ public class BüchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE, ALPHA>
 		return transitions.get(alpha);
 	}
 
+	/**
+	 * Get the alphabet for this 
+	 * @return
+	 */
 	public List<ALPHA> getAlphabet() {
 		return alpha;
 	}
