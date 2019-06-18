@@ -121,6 +121,8 @@ public class MainVerificationLoop {
 			mResultComputed = true;
 			return;
 		}
+		List<IPredicate[]> nonSetInterpolants = counterExampleToInterpolants.getNonSetInterpolants();
+		counterExampleToInterpolants.setPreAndPostStatesFinal(mPI, nonSetInterpolants);
 
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);

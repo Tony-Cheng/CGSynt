@@ -210,5 +210,13 @@ public class TraceToInterpolants implements IInterpol {
 		assert interpolate.isCorrect() != LBool.UNKNOWN;
 		return interpolate.isCorrect() == LBool.UNSAT;
 	}
+	
+	public int getPreconditionsSize() {
+		return preconditions.size();
+	}
+	
+	public int getNegatedPostconditionsSize() {
+		return negatedPostconditions.size();
+	}
 
 }

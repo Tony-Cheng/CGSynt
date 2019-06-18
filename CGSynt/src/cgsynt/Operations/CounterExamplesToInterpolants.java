@@ -8,6 +8,7 @@ import java.util.Set;
 
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceToInterpolants;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class CounterExamplesToInterpolants {
@@ -17,6 +18,7 @@ public class CounterExamplesToInterpolants {
 	private List<Set<IPredicate>> interpolants;
 	private List<Set<IStatement>> correctTraces;
 	private List<Set<IStatement>> incorrectTraces;
+	private List<IPredicate[]> nonSetInterpolants;
 
 	public CounterExamplesToInterpolants(Set<List<IStatement>> counterExamples) {
 		this.counterExamples = counterExamples;
@@ -24,6 +26,7 @@ public class CounterExamplesToInterpolants {
 		interpolants = new ArrayList<>();
 		correctTraces = new ArrayList<>();
 		incorrectTraces = new ArrayList<>();
+		this.nonSetInterpolants = new ArrayList<>();
 	}
 
 	public boolean getResultComputed() {
@@ -34,6 +37,7 @@ public class CounterExamplesToInterpolants {
 		for (List<IStatement> statements : counterExamples) {
 			IPredicate[] trace_interpolants = TraceToInterpolants.getTraceToInterpolants()
 					.computeInterpolants(statements);
+			nonSetInterpolants.add(trace_interpolants);
 			if (trace_interpolants != null) {
 				interpolants.add(new HashSet<>(Arrays.asList(trace_interpolants)));
 				correctTraces.add(new HashSet<>(statements));
@@ -42,6 +46,10 @@ public class CounterExamplesToInterpolants {
 			}
 		}
 		resultComputed = true;
+	}
+
+	public List<IPredicate[]> getNonSetInterpolants() {
+		return nonSetInterpolants;
 	}
 
 	public List<Set<IPredicate>> getInterpolants() {
@@ -60,6 +68,24 @@ public class CounterExamplesToInterpolants {
 		if (resultComputed)
 			return incorrectTraces;
 		return null;
+	}
+
+	public void setPreAndPostStatesFinal(NestedWordAutomaton<IStatement, IPredicate> pi,
+			List<IPredicate[]> nonSetInterpolants) {
+		int preSize = TraceToInterpolants.getTraceToInterpolants().getPreconditionsSize();
+		int negPostSize = TraceToInterpolants.getTraceToInterpolants().getNegatedPostconditionsSize();
+		for (IPredicate[] interpolants : nonSetInterpolants) {
+			for (int i = 0; i < preSize; i++) {
+				if (!pi.contains(interpolants[i])) {
+					pi.addState(true, false, interpolants[i]);
+				}
+			}
+			for (int i = interpolants.length - 1; i >= interpolants.length - negPostSize; i--) {
+				if (!pi.contains(interpolants[i])) {
+					pi.addState(false, true, interpolants[i]);
+				}
+			}
+		}
 	}
 
 }
