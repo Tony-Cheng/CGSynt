@@ -4,6 +4,7 @@ import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceP
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
@@ -16,7 +17,10 @@ public class TraceGlobalVariables {
 
 	private TraceGlobalVariables() {
 		this.service = UltimateMocks.createUltimateServiceProviderMock();
-		managedScript = new ManagedScript(service, new SMTInterpol(new DefaultLogger()));
+		LogProxy logger = new DefaultLogger();
+		logger.setLoglevel(LogProxy.LOGLEVEL_OFF);
+		SMTInterpol interpolator = new SMTInterpol(logger);
+		managedScript = new ManagedScript(service, interpolator);
 		managedScript.getScript().setOption(":produce-proofs", true);
 		managedScript.getScript().setLogic(Logics.QF_LIA);
 		variableFactory = new VariableFactory(managedScript.getScript());

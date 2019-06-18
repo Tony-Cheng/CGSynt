@@ -148,8 +148,11 @@ public class MainVerificationLoop {
 	}
 
 	public void computeMainLoop() throws AutomataOperationCanceledException {
+		int i = 0;
 		while (!mResultComputed) {
+			System.out.println("Iteration: " + i);
 			computeOneIteration();
+			i++;
 		}
 	}
 
