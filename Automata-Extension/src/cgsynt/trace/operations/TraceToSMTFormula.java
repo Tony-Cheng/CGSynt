@@ -7,12 +7,14 @@ import java.util.Set;
 import cgsynt.FormulaInterface;
 import cgsynt.Token;
 import cgsynt.TraceInterface;
+import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
 
 public class TraceToSMTFormula {
@@ -44,7 +46,9 @@ public class TraceToSMTFormula {
 	 * Convert the Trace to an SMT Script
 	 */
 	private void compute() {
-		mScript = new SMTInterpol(new DefaultLogger());
+		LogProxy logger = new DefaultLogger();
+		logger.setLoglevel(LogProxy.LOGLEVEL_OFF);
+		mScript = new SMTInterpol(logger);
 		mScript.setOption(":produce-proofs", true);
 		mScript.setOption(":interactive-mode", true);
 		mScript.setLogic(Logics.QF_LIA);

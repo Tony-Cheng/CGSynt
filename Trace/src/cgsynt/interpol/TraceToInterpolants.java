@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
+import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Script.LBool;
@@ -64,6 +65,7 @@ public class TraceToInterpolants implements IInterpol {
 
 	public TraceToInterpolants() throws Exception {
 		ILogger logger = new ConsoleLogger();
+		logger.setLevel(LogLevel.OFF);
 		managedScript = TraceGlobalVariables.getGlobalVariables().getManagedScript();
 		service = TraceGlobalVariables.getGlobalVariables().getService();
 		symbolTable = TraceGlobalVariables.getGlobalVariables().getVariableFactory().getSymbolTable();
