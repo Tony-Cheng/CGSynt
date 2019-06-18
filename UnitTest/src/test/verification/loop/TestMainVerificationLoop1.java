@@ -49,7 +49,6 @@ public class TestMainVerificationLoop1 {
 
 		List<String> dest2 = new ArrayList<>();
 		dest2.add("s3");
-		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s2", dest2));
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2));
 
 		List<String> dest3 = new ArrayList<>();
@@ -86,7 +85,6 @@ public class TestMainVerificationLoop1 {
 
 		List<String> dest2 = new ArrayList<>();
 		dest2.add("s3");
-		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s2", dest2));
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2));
 
 		List<String> dest3 = new ArrayList<>();
@@ -132,7 +130,6 @@ public class TestMainVerificationLoop1 {
 
 		List<String> dest2 = new ArrayList<>();
 		dest2.add("s3");
-		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s2", dest2));
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2));
 
 		List<String> dest3 = new ArrayList<>();
