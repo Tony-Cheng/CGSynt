@@ -59,7 +59,7 @@ public class TraceToInterpolants implements IInterpol {
 	private BasicPredicateFactory predicateFactory;
 	private PredicateUnifier pUnifer;
 	private List<IStatement> preconditions;
-	private List<IStatement> negatedPostconditions;
+	private List<IAssumption> negatedPostconditions;
 
 	private static TraceToInterpolants traceToInterpolants;
 
@@ -88,22 +88,23 @@ public class TraceToInterpolants implements IInterpol {
 		pUnifer = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		preconditions = new ArrayList<>();
-		negatedPostconditions = createInitialNegatePostconditions();
+		negatedPostconditions = createInitialNegatedPostconditions();
 	}
 
 	private List<IAssumption> negatePostconditions(List<IAssumption> postconditions) {
 		for (IAssumption precondition : postconditions)
 			precondition.negate();
 		return postconditions;
-		
+
 	}
-	private List<IStatement> createInitialNegatePostconditions() throws Exception {
-		ArrayList<IStatement> negatedPostconditions = new ArrayList<>();
+
+	private List<IAssumption> createInitialNegatedPostconditions() throws Exception {
+		ArrayList<IAssumption> negatedPostconditions = new ArrayList<>();
 		VariableFactory variableFactory = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
 		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
 		BoogieNonOldVar var = variableFactory.constructVariable(VariableFactory.INT);
-		IStatement statement1 = new ScriptAssumptionStatement(var, script.numeral("0"), "=");
-		IStatement statement2 = new ScriptAssumptionStatement(var, script.numeral("1"), "=");
+		IAssumption statement1 = new ScriptAssumptionStatement(var, script.numeral("0"), "=");
+		IAssumption statement2 = new ScriptAssumptionStatement(var, script.numeral("1"), "=");
 		negatedPostconditions.add(statement1);
 		negatedPostconditions.add(statement2);
 		return negatedPostconditions;
@@ -181,16 +182,8 @@ public class TraceToInterpolants implements IInterpol {
 		this.preconditions = preconditions;
 	}
 
-	public List<IStatement> getNegatedPostconditions() {
+	public List<IAssumption> getNegatedPostconditions() {
 		return negatedPostconditions;
-	}
-
-	public void setNegatedPostconditions(List<IStatement> negatedPostconditions) throws Exception {
-		if (negatedPostconditions.isEmpty()) {
-			this.negatedPostconditions = createInitialNegatePostconditions();
-		} else {
-			this.negatedPostconditions = negatedPostconditions;
-		}
 	}
 
 	private List<IStatement> buildStatementList(IStatement statement) {
@@ -208,17 +201,25 @@ public class TraceToInterpolants implements IInterpol {
 				pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
 				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
-		
+
 		assert interpolate.isCorrect() != LBool.UNKNOWN;
 		return interpolate.isCorrect() == LBool.UNSAT;
 	}
-	
+
 	public int getPreconditionsSize() {
 		return preconditions.size();
 	}
-	
+
 	public int getNegatedPostconditionsSize() {
 		return negatedPostconditions.size();
+	}
+
+	public void setNegatedPostconditions(List<IAssumption> postconditions) throws Exception {
+		if (postconditions.isEmpty())
+			this.negatedPostconditions = createInitialNegatedPostconditions();
+		else
+			this.negatedPostconditions = negatePostconditions(postconditions);
+
 	}
 
 }

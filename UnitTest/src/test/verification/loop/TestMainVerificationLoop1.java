@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cgsynt.Verification.MainVerificationLoop;
+import cgsynt.interpol.IAssumption;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.ScriptAssumptionStatement;
@@ -92,15 +93,15 @@ public class TestMainVerificationLoop1 {
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
 
 		List<IStatement> preconditions = new ArrayList<>();
-		List<IStatement> negatedPostconditions = new ArrayList<>();
+		List<IAssumption> postconditions = new ArrayList<>();
 
 		IStatement xe0 = new ScriptAssumptionStatement(x, script.numeral("0"), "=");
-		IStatement xl1 = new ScriptAssumptionStatement(x, script.numeral("1"), "<");
+		IAssumption xl1 = new ScriptAssumptionStatement(x, script.numeral("1"), ">=");
 
 		preconditions.add(xe0);
-		negatedPostconditions.add(xl1);
+		postconditions.add(xl1);
 
-		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, preconditions, negatedPostconditions);
+		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, preconditions, postconditions);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}
@@ -137,15 +138,15 @@ public class TestMainVerificationLoop1 {
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
 
 		List<IStatement> preconditions = new ArrayList<>();
-		List<IStatement> negatedPostconditions = new ArrayList<>();
+		List<IAssumption> postconditions = new ArrayList<>();
 
 		IStatement xe0 = new ScriptAssumptionStatement(x, script.numeral("0"), "=");
-		IStatement xl1 = new ScriptAssumptionStatement(x, script.numeral("1"), ">=");
+		IAssumption xl1 = new ScriptAssumptionStatement(x, script.numeral("1"), "<");
 
 		preconditions.add(xe0);
-		negatedPostconditions.add(xl1);
+		postconditions.add(xl1);
 
-		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, preconditions, negatedPostconditions);
+		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, preconditions, postconditions);
 		loop.computeMainLoop();
 		assertFalse(loop.isCorrect());
 	}

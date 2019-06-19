@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cgsynt.Verification.MainVerificationLoop;
+import cgsynt.interpol.IAssumption;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.ScriptAssumptionStatement;
@@ -55,7 +56,7 @@ public class TestMainVerificationLoop2 {
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
 		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
 		
-		IStatement post = new ScriptAssumptionStatement(i, n.getTerm(), ">"); // originally type="="
+		IAssumption post = new ScriptAssumptionStatement(i, n.getTerm(), "="); // originally type="="
 		
 		List<IStatement> letters = new ArrayList<IStatement>();
 		letters.add(ilen);
@@ -78,10 +79,10 @@ public class TestMainVerificationLoop2 {
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s4", dest4));
 	
 		List<IStatement> preconditions = Arrays.asList(pre1, pre2);
-		List<IStatement> postconditions = Arrays.asList(post);
+		List<IAssumption> postconditions = Arrays.asList(post);
 		
 		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
 		loop.computeMainLoop();
-		System.out.println(loop.isCorrect());
+		assertTrue(loop.isCorrect());
 	}
 }

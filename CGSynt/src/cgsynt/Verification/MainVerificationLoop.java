@@ -8,12 +8,10 @@ import java.util.TreeSet;
 
 import cgsynt.Operations.CounterExamplesToInterpolants;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
+import cgsynt.interpol.IAssumption;
 import cgsynt.interpol.IStatement;
-import cgsynt.interpol.ScriptAssignmentStatement;
-import cgsynt.interpol.ScriptAssumptionStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
-import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
@@ -30,8 +28,6 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
-import de.uni_freiburg.informatik.ultimate.logic.Script;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class MainVerificationLoop {
@@ -47,7 +43,7 @@ public class MainVerificationLoop {
 	private boolean mIsCorrect;
 
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
-			List<IStatement> preconditions, List<IStatement> negatedPostconditions) throws Exception {
+			List<IStatement> preconditions, List<IAssumption> postconditions) throws Exception {
 		RankedBool.setRank(transitionAlphabet.size());
 		this.mService = TraceGlobalVariables.getGlobalVariables().getService();
 		this.mAutService = new AutomataLibraryServices(mService);
@@ -62,7 +58,7 @@ public class MainVerificationLoop {
 		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
 
 		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
-		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(negatedPostconditions);
+		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(postconditions);
 	}
 
 	private NestedWordAutomaton<IStatement, IPredicate> createPI() {
