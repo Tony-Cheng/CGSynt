@@ -22,11 +22,13 @@ import cgsynt.tree.buchi.operations.LTAEmptinessCheck;
 import cgsynt.tree.buchi.operations.LTAIntersection;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataOperationCanceledException;
+import de.uni_freiburg.informatik.ultimate.automata.LibraryIdentifiers;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
+import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
@@ -63,6 +65,8 @@ public class MainVerificationLoop {
 
 		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
 		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(postconditions);
+		
+		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);;
 	}
 
 	private NestedWordAutomaton<IStatement, IPredicate> createPI() {
@@ -86,14 +90,13 @@ public class MainVerificationLoop {
 	}
 
 	private void computeOneIteration() throws AutomataOperationCanceledException {
-
 		// Turn PI into a NFA that has String states.
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
 		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
 
 		// Determinize the String state version of PI.
 		Determinize<IStatement, String> determinize = new Determinize<>(mAutService, new StringFactory(), stringNFAPI);
-
+		
 		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();
 
 		// Dead State
@@ -153,10 +156,11 @@ public class MainVerificationLoop {
 	public void computeMainLoop() throws AutomataOperationCanceledException {
 		int i = 0;
 		while (!mResultComputed) {
-			System.out.println("Iteration: " + i);
 			computeOneIteration();
 			i++;
 		}
+		
+		System.err.println("The process took " + (i + 1) + " iterations.");
 	}
 
 }
