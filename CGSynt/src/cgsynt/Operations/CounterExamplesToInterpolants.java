@@ -9,6 +9,9 @@ import java.util.Set;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceToInterpolants;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.ITransitionlet;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.IncomingInternalTransition;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class CounterExamplesToInterpolants {
@@ -71,21 +74,72 @@ public class CounterExamplesToInterpolants {
 	}
 
 	public void setPreAndPostStatesFinal(NestedWordAutomaton<IStatement, IPredicate> pi,
-			List<IPredicate[]> nonSetInterpolants) {
+			List<IPredicate[]> nonSetInterpolants, Set<IPredicate> preconditionInterpolants,
+			Set<IPredicate> postconditionInterpolants) {
 		int preSize = TraceToInterpolants.getTraceToInterpolants().getPreconditionsSize();
 		int negPostSize = TraceToInterpolants.getTraceToInterpolants().getNegatedPostconditionsSize();
 		for (IPredicate[] interpolants : nonSetInterpolants) {
 			for (int i = 0; i < preSize; i++) {
-				if (!pi.contains(interpolants[i])) {
-					pi.addState(true, false, interpolants[i]);
+				if (!preconditionInterpolants.contains(interpolants[i])) {
+					Set<IncomingInternalTransition<IStatement, IPredicate>> removedIncomingTransitions = new HashSet<>();
+					Set<OutgoingInternalTransition<IStatement, IPredicate>> removedOutgoingTransitions = new HashSet<>();
+					if (pi.contains(interpolants[i])) {
+						addAllRemovedTransitions(pi, removedIncomingTransitions, removedOutgoingTransitions,
+								interpolants[i]);
+						pi.removeState(interpolants[i]);
+					}
+					if (postconditionInterpolants.contains(interpolants[i])) {
+						pi.addState(true, true, interpolants[i]);
+					} else {
+						pi.addState(true, false, interpolants[i]);
+					}
+					addRemovedTransitionsToPi(pi, removedIncomingTransitions, removedOutgoingTransitions,
+							interpolants[i]);
+					preconditionInterpolants.add(interpolants[i]);
 				}
 			}
 			for (int i = interpolants.length - 1; i >= interpolants.length - negPostSize; i--) {
-				if (!pi.contains(interpolants[i])) {
-					pi.addState(false, true, interpolants[i]);
+				if (!postconditionInterpolants.contains(interpolants[i])) {
+					Set<IncomingInternalTransition<IStatement, IPredicate>> removedIncomingTransitions = new HashSet<>();
+					Set<OutgoingInternalTransition<IStatement, IPredicate>> removedOutgoingTransitions = new HashSet<>();
+					if (pi.contains(interpolants[i])) {
+						addAllRemovedTransitions(pi, removedIncomingTransitions, removedOutgoingTransitions,
+								interpolants[i]);
+						pi.removeState(interpolants[i]);
+					}
+					if (preconditionInterpolants.contains(interpolants[i])) {
+						pi.addState(true, true, interpolants[i]);
+					} else {
+						pi.addState(false, true, interpolants[i]);
+					}
+					addRemovedTransitionsToPi(pi, removedIncomingTransitions, removedOutgoingTransitions,
+							interpolants[i]);
+					postconditionInterpolants.add(interpolants[i]);
 				}
 			}
 		}
 	}
 
+	private void addRemovedTransitionsToPi(NestedWordAutomaton<IStatement, IPredicate> pi,
+			Set<IncomingInternalTransition<IStatement, IPredicate>> removedIncomingTransitions,
+			Set<OutgoingInternalTransition<IStatement, IPredicate>> removedOutgoingTransitions, IPredicate state) {
+		for (IncomingInternalTransition<IStatement, IPredicate> transition : removedIncomingTransitions) {
+			pi.addInternalTransition(transition.getPred(), transition.getLetter(), state);
+		}
+		for (OutgoingInternalTransition<IStatement, IPredicate> transition : removedOutgoingTransitions) {
+			pi.addInternalTransition(state, transition.getLetter(), transition.getSucc());
+		}
+
+	}
+
+	private void addAllRemovedTransitions(NestedWordAutomaton<IStatement, IPredicate> pi,
+			Set<IncomingInternalTransition<IStatement, IPredicate>> removedIncomingTransitions,
+			Set<OutgoingInternalTransition<IStatement, IPredicate>> removedOutgoingTransitions, IPredicate state) {
+		for (IncomingInternalTransition<IStatement, IPredicate> transition : pi.internalPredecessors(state)) {
+			removedIncomingTransitions.add(transition);
+		}
+		for (OutgoingInternalTransition<IStatement, IPredicate> transition : pi.internalSuccessors(state)) {
+			removedOutgoingTransitions.add(transition);
+		}
+	}
 }

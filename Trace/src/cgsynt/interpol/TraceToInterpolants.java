@@ -58,7 +58,7 @@ public class TraceToInterpolants implements IInterpol {
 	private SortedMap<Integer, IPredicate> pendingContexts;
 	private BasicPredicateFactory predicateFactory;
 	private PredicateUnifier pUnifer;
-	private List<IStatement> preconditions;
+	private List<IAssumption> preconditions;
 	private List<IAssumption> negatedPostconditions;
 
 	private static TraceToInterpolants traceToInterpolants;
@@ -89,6 +89,7 @@ public class TraceToInterpolants implements IInterpol {
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		preconditions = new ArrayList<>();
 		negatedPostconditions = createInitialNegatedPostconditions();
+		preconditions = createInitialPreconditions();
 	}
 
 	private List<IAssumption> negatePostconditions(List<IAssumption> postconditions) {
@@ -96,6 +97,16 @@ public class TraceToInterpolants implements IInterpol {
 			precondition.negate();
 		return postconditions;
 
+	}
+
+	private List<IAssumption> createInitialPreconditions() throws Exception {
+		ArrayList<IAssumption> preconditions = new ArrayList<>();
+		VariableFactory variableFactory = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		BoogieNonOldVar var = variableFactory.constructVariable(VariableFactory.INT);
+		IAssumption statement1 = new ScriptAssumptionStatement(var, script.numeral("0"), "=");
+		negatedPostconditions.add(statement1);
+		return preconditions;
 	}
 
 	private List<IAssumption> createInitialNegatedPostconditions() throws Exception {
@@ -108,7 +119,6 @@ public class TraceToInterpolants implements IInterpol {
 		negatedPostconditions.add(statement1);
 		negatedPostconditions.add(statement2);
 		return negatedPostconditions;
-
 	}
 
 	public static void reset() throws Exception {
@@ -174,12 +184,15 @@ public class TraceToInterpolants implements IInterpol {
 		return pUnifer.getFalsePredicate();
 	}
 
-	public List<IStatement> getPreconditions() {
+	public List<IAssumption> getPreconditions() {
 		return preconditions;
 	}
 
-	public void setPreconditions(List<IStatement> preconditions) {
-		this.preconditions = preconditions;
+	public void setPreconditions(List<IAssumption> preconditions) throws Exception {
+		if (preconditions.isEmpty())
+			this.preconditions = createInitialPreconditions();
+		else
+			this.preconditions = preconditions;
 	}
 
 	public List<IAssumption> getNegatedPostconditions() {

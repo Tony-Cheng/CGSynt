@@ -92,10 +92,10 @@ public class TestMainVerificationLoop1 {
 		dest3.add("s3");
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
 
-		List<IStatement> preconditions = new ArrayList<>();
+		List<IAssumption> preconditions = new ArrayList<>();
 		List<IAssumption> postconditions = new ArrayList<>();
 
-		IStatement xe0 = new ScriptAssumptionStatement(x, script.numeral("0"), "=");
+		IAssumption xe0 = new ScriptAssumptionStatement(x, script.numeral("0"), "=");
 		IAssumption xl1 = new ScriptAssumptionStatement(x, script.numeral("1"), ">=");
 
 		preconditions.add(xe0);
@@ -137,10 +137,10 @@ public class TestMainVerificationLoop1 {
 		dest3.add("s3");
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
 
-		List<IStatement> preconditions = new ArrayList<>();
+		List<IAssumption> preconditions = new ArrayList<>();
 		List<IAssumption> postconditions = new ArrayList<>();
 
-		IStatement xe0 = new ScriptAssumptionStatement(x, script.numeral("0"), "=");
+		IAssumption xe0 = new ScriptAssumptionStatement(x, script.numeral("0"), "=");
 		IAssumption xl1 = new ScriptAssumptionStatement(x, script.numeral("1"), "<");
 
 		preconditions.add(xe0);

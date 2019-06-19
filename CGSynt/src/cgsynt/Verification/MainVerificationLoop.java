@@ -38,12 +38,16 @@ public class MainVerificationLoop {
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
+	private Set<IPredicate> preconditionInterpolants;
+	private Set<IPredicate> postconditionInterpolants;
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
 
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
-			List<IStatement> preconditions, List<IAssumption> postconditions) throws Exception {
+			List<IAssumption> preconditions, List<IAssumption> postconditions) throws Exception {
+		this.preconditionInterpolants = new HashSet<>();
+		this.postconditionInterpolants = new HashSet<>();
 		RankedBool.setRank(transitionAlphabet.size());
 		this.mService = TraceGlobalVariables.getGlobalVariables().getService();
 		this.mAutService = new AutomataLibraryServices(mService);
@@ -75,6 +79,8 @@ public class MainVerificationLoop {
 			pi.addInternalTransition(falsePred, statement, falsePred);
 			pi.addInternalTransition(truePred, statement, truePred);
 		}
+		this.preconditionInterpolants.add(truePred);
+		this.postconditionInterpolants.add(falsePred);
 		return pi;
 
 	}
@@ -118,7 +124,8 @@ public class MainVerificationLoop {
 			return;
 		}
 		List<IPredicate[]> nonSetInterpolants = counterExampleToInterpolants.getNonSetInterpolants();
-		counterExampleToInterpolants.setPreAndPostStatesFinal(mPI, nonSetInterpolants);
+		counterExampleToInterpolants.setPreAndPostStatesFinal(mPI, nonSetInterpolants, preconditionInterpolants,
+				postconditionInterpolants);
 
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);

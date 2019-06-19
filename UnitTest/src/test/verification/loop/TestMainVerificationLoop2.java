@@ -49,8 +49,8 @@ public class TestMainVerificationLoop2 {
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
 		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
 		
-		IStatement pre1 = new ScriptAssumptionStatement(i, script.numeral("0"), "=");
-		IStatement pre2 = new ScriptAssumptionStatement(n, script.numeral("0"), ">=");
+		IAssumption pre1 = new ScriptAssumptionStatement(i, script.numeral("0"), "=");
+		IAssumption pre2 = new ScriptAssumptionStatement(n, script.numeral("0"), ">=");
 		
 		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
@@ -78,7 +78,7 @@ public class TestMainVerificationLoop2 {
 		List<String> dest4 = Arrays.asList("s3", "s1", "s3");
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s4", dest4));
 	
-		List<IStatement> preconditions = Arrays.asList(pre1, pre2);
+		List<IAssumption> preconditions = Arrays.asList(pre1, pre2);
 		List<IAssumption> postconditions = Arrays.asList(post);
 		
 		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
