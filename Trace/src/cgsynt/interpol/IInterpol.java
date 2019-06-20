@@ -8,7 +8,7 @@ public interface IInterpol {
 
 	public boolean isCorrect(IPredicate pre, IStatement statement, IPredicate post);
 	
-	public IPredicate[] computeInterpolants(List<IStatement> statements);
+	public IPredicate[] computeInterpolants(List<IStatement> statements) throws Exception;
 	
 	public IPredicate getTruePredicate();
 	public IPredicate getFalsePredicate();

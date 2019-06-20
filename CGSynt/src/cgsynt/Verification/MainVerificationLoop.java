@@ -65,8 +65,9 @@ public class MainVerificationLoop {
 
 		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
 		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(postconditions);
-		
-		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);;
+
+		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
+		;
 	}
 
 	private NestedWordAutomaton<IStatement, IPredicate> createPI() {
@@ -89,14 +90,14 @@ public class MainVerificationLoop {
 
 	}
 
-	private void computeOneIteration() throws AutomataOperationCanceledException {
+	private void computeOneIteration() throws Exception {
 		// Turn PI into a NFA that has String states.
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
 		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
 
 		// Determinize the String state version of PI.
 		Determinize<IStatement, String> determinize = new Determinize<>(mAutService, new StringFactory(), stringNFAPI);
-		
+
 		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();
 
 		// Dead State
@@ -153,13 +154,13 @@ public class MainVerificationLoop {
 		return mIsCorrect;
 	}
 
-	public void computeMainLoop() throws AutomataOperationCanceledException {
+	public void computeMainLoop() throws Exception {
 		int i = 0;
 		while (!mResultComputed) {
 			computeOneIteration();
 			i++;
 		}
-		
+
 		System.err.println("The process took " + (i + 1) + " iterations.");
 	}
 

@@ -160,7 +160,7 @@ public class TraceToInterpolants implements IInterpol {
 	}
 
 	@Override
-	public IPredicate[] computeInterpolants(List<IStatement> statements) {
+	public IPredicate[] computeInterpolants(List<IStatement> statements) throws Exception {
 		NestedWord<IAction> trace = buildTrace(statements);
 		List<Object> controlLocationSequence = generateControlLocationSequence(trace.length() + 1);
 		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(
@@ -168,6 +168,9 @@ public class TraceToInterpolants implements IInterpol {
 				controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
 				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
+		if (interpolate.isCorrect() == LBool.UNKNOWN) {
+			throw new Exception("Is trace correct? Unknown.");
+		}
 		if (interpolate.isCorrect() == LBool.SAT) {
 			return null;
 		}

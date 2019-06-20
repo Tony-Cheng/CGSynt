@@ -36,7 +36,7 @@ public class CounterExamplesToInterpolants {
 		return resultComputed;
 	}
 
-	public void computeResult() {
+	public void computeResult() throws Exception {
 		for (List<IStatement> statements : counterExamples) {
 			IPredicate[] trace_interpolants = TraceToInterpolants.getTraceToInterpolants()
 					.computeInterpolants(statements);
