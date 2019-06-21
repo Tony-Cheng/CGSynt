@@ -14,6 +14,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.DefaultIcfgSymbolTable;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.ProgramVarUtils;
 
 /**
  * A factory for constructing variables used in the trace.
@@ -82,20 +83,14 @@ public class VariableFactory {
 		}
 		String identifierPrime = identifier + "'";
 		String stringType = typeToString(type);
-		IBoogieType boogieType = typeToBoogieType(type);
 		script.declareFun(identifier, new Sort[0], script.sort(stringType));
 		script.declareFun(identifierPrime, new Sort[0], script.sort(stringType));
-		BoogieOldVar var1 = new BoogieOldVar(identifierPrime, boogieType,
-				script.variable(identifierPrime, script.sort(stringType)),
-				(ApplicationTerm) script.term(identifierPrime), (ApplicationTerm) script.term(identifier));
-		BoogieNonOldVar var2 = new BoogieNonOldVar(identifier, boogieType,
-				script.variable(identifier, script.sort("Int")), (ApplicationTerm) script.term(identifier),
-				(ApplicationTerm) script.term(identifierPrime), var1);
-		var1.setNonOldVar(var2);
-		symbolTable.add(var2);
-		variablesMap.put(identifier, var2);
-		variables.add(var2);
-		return var2;
+		BoogieNonOldVar var = ProgramVarUtils.constructGlobalProgramVarPair(identifier, script.sort(stringType),
+				TraceGlobalVariables.getGlobalVariables().getManagedScript(), null);
+		symbolTable.add(var);
+		variablesMap.put(identifier, var);
+		variables.add(var);
+		return var;
 	}
 
 	public BoogieNonOldVar constructVariable(int type) throws Exception {
