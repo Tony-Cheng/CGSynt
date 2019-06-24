@@ -235,7 +235,10 @@ public class TraceToInterpolants implements IInterpol {
 			this.negatedPostconditions = createInitialNegatedPostconditions();
 		else
 			this.negatedPostconditions = negatePostconditions(postconditions);
+	}
 
+	public BasicPredicateFactory getPredicateFactory() {
+		return predicateFactory;
 	}
 
 }
