@@ -30,6 +30,7 @@ public class VariableFactory {
 
 	public static final int INT = 1;
 	public static final int BOOL = 2;
+	// public static final int INT_ARR = 3;
 
 	public VariableFactory(Script script) {
 		symbolTable = new DefaultIcfgSymbolTable();
@@ -55,23 +56,12 @@ public class VariableFactory {
 		return getVariable(identifier) != null;
 	}
 
-	private String typeToString(int type) throws Exception {
+	private Sort typeToSort(int type) throws Exception {
 		switch (type) {
 		case INT:
-			return "Int";
+			return script.sort("Int");
 		case BOOL:
-			return "Bool";
-		default:
-			throw new Exception("No such type");
-		}
-	}
-
-	private BoogiePrimitiveType typeToBoogieType(int type) throws Exception {
-		switch (type) {
-		case INT:
-			return BoogieType.TYPE_INT;
-		case BOOL:
-			return BoogieType.TYPE_BOOL;
+			return script.sort("Bool");
 		default:
 			throw new Exception("No such type");
 		}
@@ -81,11 +71,8 @@ public class VariableFactory {
 		if (isVariable(identifier)) {
 			throw new Exception("Variable already defined.");
 		}
-		String identifierPrime = identifier + "'";
-		String stringType = typeToString(type);
-		script.declareFun(identifier, new Sort[0], script.sort(stringType));
-		script.declareFun(identifierPrime, new Sort[0], script.sort(stringType));
-		BoogieNonOldVar var = ProgramVarUtils.constructGlobalProgramVarPair(identifier, script.sort(stringType),
+		Sort sort = typeToSort(type);
+		BoogieNonOldVar var = ProgramVarUtils.constructGlobalProgramVarPair(identifier, sort,
 				TraceGlobalVariables.getGlobalVariables().getManagedScript(), null);
 		symbolTable.add(var);
 		variablesMap.put(identifier, var);
