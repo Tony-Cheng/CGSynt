@@ -17,5 +17,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/CDTPlugin"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-UltimateCore"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Trace"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CGSynt"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
