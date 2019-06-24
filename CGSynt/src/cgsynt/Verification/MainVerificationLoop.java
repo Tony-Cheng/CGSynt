@@ -10,6 +10,7 @@ import cgsynt.Operations.CounterExamplesToInterpolants;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.interpol.IAssumption;
 import cgsynt.interpol.IStatement;
+import cgsynt.interpol.ScriptPredicateAssumptionStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.nfa.GeneralizeStateFactory;
@@ -48,6 +49,24 @@ public class MainVerificationLoop {
 
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
 			List<IAssumption> preconditions, List<IAssumption> postconditions) throws Exception {
+		initialize(programs, transitionAlphabet);
+		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
+		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(postconditions);
+	}
+
+	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
+			IPredicate preconditions, IPredicate postconditions) throws Exception {
+		initialize(programs, transitionAlphabet);
+		List<IAssumption> preconditionsList = new ArrayList<>();
+		List<IAssumption> postconditionsList = new ArrayList<>();
+		preconditionsList.add(new ScriptPredicateAssumptionStatement(preconditions));
+		postconditionsList.add(new ScriptPredicateAssumptionStatement(postconditions));
+		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditionsList);
+		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(postconditionsList);
+	}
+
+	private void initialize(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet)
+			throws Exception {
 		this.preconditionInterpolants = new HashSet<>();
 		this.postconditionInterpolants = new HashSet<>();
 		RankedBool.setRank(transitionAlphabet.size());
@@ -58,16 +77,11 @@ public class MainVerificationLoop {
 		this.mTransitionAlphabet = transitionAlphabet;
 		this.mPI = createPI();
 		this.mAllInterpolants = new HashSet<>();
-
 		// Add the True and False Predicates
 		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
 		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
-
-		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
-		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(postconditions);
-
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
-		;
+
 	}
 
 	private NestedWordAutomaton<IStatement, IPredicate> createPI() {
@@ -162,6 +176,11 @@ public class MainVerificationLoop {
 		}
 
 		System.err.println("The process took " + (i + 1) + " iterations.");
+	}
+
+	public static void resetAll() throws Exception {
+		TraceGlobalVariables.reset();
+		TraceToInterpolants.reset();
 	}
 
 }
