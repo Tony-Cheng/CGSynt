@@ -22,7 +22,7 @@ public class TraceGlobalVariables {
 		SMTInterpol interpolator = new SMTInterpol(logger);
 		managedScript = new ManagedScript(service, interpolator);
 		managedScript.getScript().setOption(":produce-proofs", true);
-		managedScript.getScript().setLogic(Logics.QF_LIA);
+		managedScript.getScript().setLogic(Logics.QF_ALIA);
 		variableFactory = new VariableFactory(managedScript.getScript());
 	}
 
