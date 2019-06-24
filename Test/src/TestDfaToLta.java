@@ -15,9 +15,9 @@ import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 public class TestDfaToLta {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static BuchiTreeAutomaton testDFAToLTA(NestedWordAutomaton dfa) {
-		DfaToLtaPowerSet op = new DfaToLtaPowerSet(dfa);
+		DfaToLtaPowerSet op;// = new DfaToLtaPowerSet(dfa);
 
-		return op.getResult();
+		return null;//op.getResult();
 	}
 
 	public static void main(String[] args) {

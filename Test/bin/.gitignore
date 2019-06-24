@@ -1,9 +1,5 @@
-/TTC/
 /TTC2/
-/t0.bpl
-/t1.bpl
-/t2.bpl
-/t3.bpl
-/t4.bpl
-/t5.bpl
-/t6.bpl
+/solvers/
+/z3
+/solvertest/
+/cgsynt/
