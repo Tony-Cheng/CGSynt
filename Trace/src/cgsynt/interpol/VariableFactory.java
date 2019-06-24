@@ -5,14 +5,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.uni_freiburg.informatik.ultimate.boogie.type.BoogiePrimitiveType;
-import de.uni_freiburg.informatik.ultimate.boogie.type.BoogieType;
-import de.uni_freiburg.informatik.ultimate.core.model.models.IBoogieType;
-import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.DefaultIcfgSymbolTable;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.ProgramVarUtils;
 
@@ -30,7 +25,7 @@ public class VariableFactory {
 
 	public static final int INT = 1;
 	public static final int BOOL = 2;
-	// public static final int INT_ARR = 3;
+	public static final int INT_ARR = 3;
 
 	public VariableFactory(Script script) {
 		symbolTable = new DefaultIcfgSymbolTable();
@@ -62,6 +57,8 @@ public class VariableFactory {
 			return script.sort("Int");
 		case BOOL:
 			return script.sort("Bool");
+		case INT_ARR:
+			return script.sort("Array", script.sort("Int"), script.sort("Int"));
 		default:
 			throw new Exception("No such type");
 		}
