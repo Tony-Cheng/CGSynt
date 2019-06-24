@@ -1,8 +1,11 @@
-package cgsynt.array;
+package test.verification.loop;
 
-import java.util.ArrayList;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 import cgsynt.Verification.MainVerificationLoop;
 import cgsynt.interpol.IAssumption;
@@ -28,7 +31,8 @@ public class TestArrays2 {
 	 * 		i++
 	 * [m >= A[j]]
 	 */
-	public static String arrayMaxTest() throws Exception {
+	@Test
+	public void arrayMaxTest() throws Exception {
 		TraceGlobalVariables.reset();
 		TraceToInterpolants.reset();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(6);
@@ -97,10 +101,7 @@ public class TestArrays2 {
 		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
 		loop.computeMainLoop();
 		
-		String out = "ArrayMAX: " + ((loop.isCorrect()) ? "Correct" : "Incorrect / unknown");
-		assert loop.isCorrect() == true;
-		
-		return out;
+		assertTrue(loop.isCorrect());
 	}
 	
 	/**
@@ -109,7 +110,8 @@ public class TestArrays2 {
 	 * A[i] = t
 	 * [i < A[i]]
 	 */
-	public static String simpleTest() throws Exception {
+	@Test
+	public void simpleTest() throws Exception {
 		TraceGlobalVariables.reset();
 		TraceToInterpolants.reset();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(2);
@@ -157,18 +159,7 @@ public class TestArrays2 {
 		
 		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
 		loop.computeMainLoop();
-		
-		String out = "SimpleProg: " + ((loop.isCorrect()) ? "Correct" : "Incorrect / unknown");
-		assert loop.isCorrect() == true;
-		
-		return out;
-	}
-	
-	public static void main(String args[]) throws Exception {
-		List<String> testResults = Arrays.asList(arrayMaxTest()); //simpleTest());
-		
-		for (String test : testResults) {
-			System.err.println(test);
-		}
+
+		assertTrue(loop.isCorrect());
 	}
 }
