@@ -164,4 +164,9 @@ public class MainVerificationLoop {
 		System.err.println("The process took " + (i + 1) + " iterations.");
 	}
 
+	public static void resetAll() throws Exception {
+		TraceToInterpolants.reset();
+		TraceGlobalVariables.reset();
+	}
+
 }

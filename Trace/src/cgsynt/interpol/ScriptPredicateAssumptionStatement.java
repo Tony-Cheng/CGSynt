@@ -12,7 +12,6 @@ import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.pr
 public class ScriptPredicateAssumptionStatement implements IAssumption {
 	IPredicate predicate;
 	private ManagedScript managedScript;
-	private PredicateFactory predicateFactory;
 	private boolean negated;
 
 	public ScriptPredicateAssumptionStatement(IPredicate predicate) {
