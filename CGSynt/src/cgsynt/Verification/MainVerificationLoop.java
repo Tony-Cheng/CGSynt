@@ -179,8 +179,8 @@ public class MainVerificationLoop {
 	}
 
 	public static void resetAll() throws Exception {
-		TraceToInterpolants.reset();
 		TraceGlobalVariables.reset();
+		TraceToInterpolants.reset();
 	}
 
 }
