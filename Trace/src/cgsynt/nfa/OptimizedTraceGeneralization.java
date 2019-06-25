@@ -74,7 +74,7 @@ public class OptimizedTraceGeneralization {
 							String trans = "(" + pre.getFormula().toString() + ", " + statement.toString() + ", " + post.getFormula().toString() + ")";
 							this.mTransitionsAdded.add(trans);
 						}
-						
+						//Add comment
 						Set<IPredicate> states = this.mInterpolantNfa.getStates();
 						
 						if (!states.contains(pre))
