@@ -1,6 +1,7 @@
 package cgsynt.tree.buchi.operations;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +46,8 @@ public class ProgramAutomatonConstruction {
 	}
 
 	private void computeAssignmentsAndAssumptions() {
+		assumptions = new ArrayList<>();
+		assignments = new ArrayList<>();
 		for (IStatement statement : statements) {
 			if (statement instanceof IAssumption) {
 				IAssumption copy = ((IAssumption) statement).copy();
@@ -58,6 +61,8 @@ public class ProgramAutomatonConstruction {
 
 	private void computeAlphabet() {
 		alphabet = new ArrayList<>();
+		assignmentsMap = new HashMap<>();
+		assumptionsMap = new HashMap<>();
 		for (int i = 0; i < assignments.size(); i++) {
 			alphabet.add(assignments.get(i));
 			assignmentsMap.put(assignments.get(i), i);
