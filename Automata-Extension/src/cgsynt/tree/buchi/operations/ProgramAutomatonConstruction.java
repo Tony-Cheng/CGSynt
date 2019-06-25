@@ -12,7 +12,7 @@ import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
 import javafx.util.Pair;
 
-public class ProgramAutomatonConstructon {
+public class ProgramAutomatonConstruction {
 	private Set<IStatement> statements;
 	private String stateLeft;
 	private String stateRight;
@@ -25,7 +25,7 @@ public class ProgramAutomatonConstructon {
 	private Map<Pair<IAssumption, IAssumption>, Integer> assumptionsMap;
 	private BuchiTreeAutomaton<RankedBool, String> result;
 
-	public ProgramAutomatonConstructon(Set<IStatement> statements) {
+	public ProgramAutomatonConstruction(Set<IStatement> statements) {
 		this.statements = statements;
 		this.resultComputed = false;
 	}
