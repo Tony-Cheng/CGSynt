@@ -131,11 +131,11 @@ public class TraceToInterpolants implements IInterpol {
 	public IPredicate[] computeInterpolants(List<IStatement> statements) throws Exception {
 		NestedWord<IAction> trace = buildTrace(statements);
 		List<Object> controlLocationSequence = generateControlLocationSequence(trace.length() + 1);
-		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(
-				preconditions, postconditions, pendingContexts, trace,
-				controlLocationSequence, service, toolkit, managedScript, null, pUnifier,
-				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
-				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
+		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(preconditions,
+				postconditions, pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null,
+				pUnifier, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
+				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
+				SimplificationTechnique.NONE, false);
 		if (interpolate.isCorrect() == LBool.UNKNOWN) {
 			throw new Exception("Is trace correct? Unknown.");
 		}
@@ -149,7 +149,7 @@ public class TraceToInterpolants implements IInterpol {
 	public IPredicate getTruePredicate() {
 		return pUnifier.getTruePredicate();
 	}
-	
+
 	public PredicateUnifier getPUnifier() {
 		return this.pUnifier;
 	}
@@ -164,7 +164,10 @@ public class TraceToInterpolants implements IInterpol {
 	}
 
 	public void setPreconditions(IPredicate preconditions) throws Exception {
-		this.preconditions = pUnifier.getOrConstructPredicate(preconditions);
+		if (preconditions == null)
+			this.preconditions = pUnifier.getTruePredicate();
+		else
+			this.preconditions = pUnifier.getOrConstructPredicate(preconditions);
 	}
 
 	public IPredicate getPostconditions() {
@@ -192,7 +195,10 @@ public class TraceToInterpolants implements IInterpol {
 	}
 
 	public void setPostconditions(IPredicate postconditions) throws Exception {
-		this.postconditions = pUnifier.getOrConstructPredicate(postconditions);
+		if (postconditions == null)
+			this.postconditions = pUnifier.getTruePredicate();
+		else
+			this.postconditions = pUnifier.getOrConstructPredicate(postconditions);
 	}
 
 	public BasicPredicateFactory getPredicateFactory() {

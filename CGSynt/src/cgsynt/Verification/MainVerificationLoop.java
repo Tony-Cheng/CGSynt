@@ -52,9 +52,10 @@ public class MainVerificationLoop {
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
 			IPredicate preconditions, IPredicate postconditions) throws Exception {
 		RankedBool.setRank(transitionAlphabet.size());
-		PredicateUnifier pUnifier = TraceToInterpolants.getTraceToInterpolants().getPUnifier();
-		preconditions = pUnifier.getOrConstructPredicate(preconditions);
-		postconditions = pUnifier.getOrConstructPredicate(postconditions);
+		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
+		TraceToInterpolants.getTraceToInterpolants().setPostconditions(postconditions);
+		preconditions = TraceToInterpolants.getTraceToInterpolants().getPreconditions();
+		postconditions = TraceToInterpolants.getTraceToInterpolants().getPostconditions();
 		this.mService = TraceGlobalVariables.getGlobalVariables().getService();
 		this.mAutService = new AutomataLibraryServices(mService);
 		this.mPrograms = programs;
@@ -62,15 +63,14 @@ public class MainVerificationLoop {
 		this.mTransitionAlphabet = transitionAlphabet;
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
-		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
-		TraceToInterpolants.getTraceToInterpolants().setPostconditions(postconditions);
 		this.mAllInterpolants.add(preconditions);
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
 
 	}
 
-	private NestedWordAutomaton<IStatement, IPredicate> createPI(IPredicate prePred, IPredicate postPred) throws Exception {
+	private NestedWordAutomaton<IStatement, IPredicate> createPI(IPredicate prePred, IPredicate postPred)
+			throws Exception {
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alpha = new VpAlphabet<>(letters);
 		NestedWordAutomaton<IStatement, IPredicate> pi = new NestedWordAutomaton<>(mAutService, alpha,
