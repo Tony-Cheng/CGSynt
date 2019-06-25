@@ -77,9 +77,6 @@ public class MainVerificationLoop {
 		this.mTransitionAlphabet = transitionAlphabet;
 		this.mPI = createPI();
 		this.mAllInterpolants = new HashSet<>();
-		// Add the True and False Predicates
-		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
-		this.mAllInterpolants.add(TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
 
 	}
