@@ -6,6 +6,7 @@ import java.util.Set;
 
 import cgsynt.interpol.IInterpol;
 import cgsynt.interpol.IStatement;
+import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
