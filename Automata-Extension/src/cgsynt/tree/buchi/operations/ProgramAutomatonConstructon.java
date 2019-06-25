@@ -40,6 +40,8 @@ public class ProgramAutomatonConstructon {
 		computeStates();
 		computeRightStateEdges();
 		computeBottomStateEdges();
+		computeLeftStateEdges();
+		resultComputed = true;
 	}
 
 	private void computeAssignmentsAndAssumptions() {
