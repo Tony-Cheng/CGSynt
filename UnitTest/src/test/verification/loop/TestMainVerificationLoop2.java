@@ -32,124 +32,116 @@ import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class TestMainVerificationLoop2 {
 
-//	/**
-//	 * [i == 0 & n >= 0] while i < n: i++ [i==n]
-//	 */
-//	@Test
-//	void test1() throws Exception {
-//		MainVerificationLoop.resetAll();
-//		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(3);
-//		RankedBool.setRank(3);
-//		program.addInitState("s1");
-//		program.addState("s2");
-//		program.addState("s3");
-//		program.addState("s4");
-//
-//		program.setAllStatesFinal();
-//		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-//		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
-//
-//		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
-//		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
-//
-//		IAssumption pre1 = new ScriptAssumptionStatement(i, script.numeral("0"), "=");
-//		IAssumption pre2 = new ScriptAssumptionStatement(n, script.numeral("0"), ">=");
-//
-//		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
-//		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
-//		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
-//
-//		IAssumption post = new ScriptAssumptionStatement(i, n.getTerm(), "="); // originally type="="
-//
-//		List<IStatement> letters = new ArrayList<IStatement>();
-//		letters.add(ilen);
-//		letters.add(ipp);
-//		letters.add(igen);
-//
-//		List<String> dest1 = Arrays.asList("s4", "s3", "s2");
-//		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s1", dest1));
-//
-//		// List<String> dest2false = Arrays.asList("s3", "s3", "s3");
-//		// program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s2",
-//		// dest2false));
-//
-//		List<String> dest2true = Arrays.asList("s3", "s3", "s3");
-//		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2true));
-//
-//		List<String> dest3 = Arrays.asList("s3", "s3", "s3");
-//		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
-//
-//		List<String> dest4 = Arrays.asList("s3", "s1", "s3");
-//		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s4", dest4));
-//
-//		List<IAssumption> preconditions = Arrays.asList(pre1, pre2);
-//		List<IAssumption> postconditions = Arrays.asList(post);
-//
-//		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
-//		loop.computeMainLoop();
-//		assertTrue(loop.isCorrect());
-//	}
-//
-//	/**
-//	 * [i == 0 & n >= 0] while i < n: i++ [i>n]
-//	 */
-//	@Test
-//	void test2() throws Exception {
-//		MainVerificationLoop.resetAll();
-//		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(3);
-//		RankedBool.setRank(3);
-//		program.addInitState("s1");
-//		program.addState("s2");
-//		program.addState("s3");
-//		program.addState("s4");
-//
-//		program.setAllStatesFinal();
-//		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-//		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
-//
-//		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
-//		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
-//
-//		IAssumption pre1 = new ScriptAssumptionStatement(i, script.numeral("0"), "=");
-//		IAssumption pre2 = new ScriptAssumptionStatement(n, script.numeral("0"), ">=");
-//
-//		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
-//		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
-//		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
-//
-//		IAssumption post = new ScriptAssumptionStatement(i, n.getTerm(), ">"); // originally type="="
-//
-//		List<IStatement> letters = new ArrayList<IStatement>();
-//		letters.add(ilen);
-//		letters.add(ipp);
-//		letters.add(igen);
-//
-//		List<String> dest1 = Arrays.asList("s4", "s3", "s2");
-//		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s1", dest1));
-//
-//		// List<String> dest2false = Arrays.asList("s3", "s3", "s3");
-//		// program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s2",
-//		// dest2false));
-//
-//		List<String> dest2true = Arrays.asList("s3", "s3", "s3");
-//		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2true));
-//
-//		List<String> dest3 = Arrays.asList("s3", "s3", "s3");
-//		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
-//
-//		List<String> dest4 = Arrays.asList("s3", "s1", "s3");
-//		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s4", dest4));
-//
-//		List<IAssumption> preconditions = Arrays.asList(pre1, pre2);
-//		List<IAssumption> postconditions = Arrays.asList(post);
-//
-//		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
-//		loop.computeMainLoop();
-//		assertFalse(loop.isCorrect());
-//	}
+	/**
+	 * [i == 0 & n >= 0] while i < n: i++ [i==n]
+	 */
+	@Test
+	void test1() throws Exception {
+		MainVerificationLoop.resetAll();
+		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(3);
+		RankedBool.setRank(3);
+		program.addInitState("s1");
+		program.addState("s2");
+		program.addState("s3");
+		program.addState("s4");
+
+		program.setAllStatesFinal();
+		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+
+		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
+		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
+
+		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
+		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
+		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
+
+		List<IStatement> letters = new ArrayList<IStatement>();
+		letters.add(ilen);
+		letters.add(ipp);
+		letters.add(igen);
+
+		List<String> dest1 = Arrays.asList("s4", "s3", "s2");
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s1", dest1));
+
+		List<String> dest2true = Arrays.asList("s3", "s3", "s3");
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2true));
+
+		List<String> dest3 = Arrays.asList("s3", "s3", "s3");
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
+
+		List<String> dest4 = Arrays.asList("s3", "s1", "s3");
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s4", dest4));
+
+		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		IPredicate pre = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
+		pre = predicateFactory.and(pre,
+				predicateFactory.newPredicate(script.term(">=",	n.getTerm(), script.numeral("0"))));
+		
+		IPredicate post = predicateFactory.newPredicate(script.term("=", i.getTerm(), n.getTerm()));
+
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
+		loop.computeMainLoop();
+		assertTrue(loop.isCorrect());
+	}
+
+	/**
+	 * [i == 0 & n >= 0] while i < n: i++ [i>n]
+	 */
+	@Test
+	void test2() throws Exception {
+		MainVerificationLoop.resetAll();
+		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(3);
+		RankedBool.setRank(3);
+		program.addInitState("s1");
+		program.addState("s2");
+		program.addState("s3");
+		program.addState("s4");
+
+		program.setAllStatesFinal();
+		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+
+		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
+		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
+
+		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
+		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
+		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
+
+		List<IStatement> letters = new ArrayList<IStatement>();
+		letters.add(ilen);
+		letters.add(ipp);
+		letters.add(igen);
+
+		List<String> dest1 = Arrays.asList("s4", "s3", "s2");
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s1", dest1));
+
+		List<String> dest2true = Arrays.asList("s3", "s3", "s3");
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2true));
+
+		List<String> dest3 = Arrays.asList("s3", "s3", "s3");
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
+
+		List<String> dest4 = Arrays.asList("s3", "s1", "s3");
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s4", dest4));
+
+		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		IPredicate pre = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
+		pre = predicateFactory.and(pre,
+				predicateFactory.newPredicate(script.term(">=",	n.getTerm(), script.numeral("0"))));
+		
+		IPredicate post = predicateFactory.newPredicate(script.term(">", i.getTerm(), n.getTerm()));
+
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
+		loop.computeMainLoop();
+		assertFalse(loop.isCorrect());
+	}
 
 	/**
 	 * [i == 0 & n >= 0] while i < n: i++ [i>=n]
@@ -171,14 +163,9 @@ public class TestMainVerificationLoop2 {
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
 		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
 
-		IAssumption pre1 = new ScriptAssumptionStatement(i, script.numeral("0"), "=");
-		IAssumption pre2 = new ScriptAssumptionStatement(n, script.numeral("0"), ">=");
-
 		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
 		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
-
-		IAssumption post = new ScriptAssumptionStatement(i, n.getTerm(), ">="); // originally type="="
 
 		List<IStatement> letters = new ArrayList<IStatement>();
 		letters.add(ilen);
@@ -201,10 +188,15 @@ public class TestMainVerificationLoop2 {
 		List<String> dest4 = Arrays.asList("s3", "s1", "s3");
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s4", dest4));
 
-		List<IAssumption> preconditions = Arrays.asList(pre1, pre2);
-		List<IAssumption> postconditions = Arrays.asList(post);
+		// Pre and post condition
+		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		IPredicate pre = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
+		pre = predicateFactory.and(pre,
+				predicateFactory.newPredicate(script.term(">=",	n.getTerm(), script.numeral("0"))));
+		
+		IPredicate post = predicateFactory.newPredicate(script.term(">=", i.getTerm(), n.getTerm()));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}
@@ -229,14 +221,9 @@ public class TestMainVerificationLoop2 {
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
 		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
 
-		IAssumption pre1 = new ScriptAssumptionStatement(i, script.numeral("0"), "=");
-		IAssumption pre2 = new ScriptAssumptionStatement(n, script.numeral("0"), ">=");
-
 		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
 		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
-
-		IAssumption post = new ScriptAssumptionStatement(i, n.getTerm(), "<"); // originally type="="
 
 		List<IStatement> letters = new ArrayList<IStatement>();
 		letters.add(ilen);
@@ -245,10 +232,6 @@ public class TestMainVerificationLoop2 {
 
 		List<String> dest1 = Arrays.asList("s4", "s3", "s2");
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s1", dest1));
-
-		// List<String> dest2false = Arrays.asList("s3", "s3", "s3");
-		// program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s2",
-		// dest2false));
 
 		List<String> dest2true = Arrays.asList("s3", "s3", "s3");
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s2", dest2true));
@@ -259,10 +242,14 @@ public class TestMainVerificationLoop2 {
 		List<String> dest4 = Arrays.asList("s3", "s1", "s3");
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s4", dest4));
 
-		List<IAssumption> preconditions = Arrays.asList(pre1, pre2);
-		List<IAssumption> postconditions = Arrays.asList(post);
-
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
+		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		IPredicate pre = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
+		pre = predicateFactory.and(pre,
+				predicateFactory.newPredicate(script.term(">=",	n.getTerm(), script.numeral("0"))));
+		
+		IPredicate post = predicateFactory.newPredicate(script.term("<", i.getTerm(), n.getTerm()));
+		
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
 		loop.computeMainLoop();
 		assertFalse(loop.isCorrect());
 	}
@@ -287,14 +274,9 @@ public class TestMainVerificationLoop2 {
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
 		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
 
-		IAssumption pre1 = new ScriptAssumptionStatement(i, script.numeral("0"), "=");
-		IAssumption pre2 = new ScriptAssumptionStatement(n, script.numeral("0"), ">=");
-
 		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
 		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), "<=");
-
-		IAssumption post = new ScriptAssumptionStatement(i, n.getTerm(), "<="); // originally type="="
 
 		List<IStatement> letters = new ArrayList<IStatement>();
 		letters.add(ilen);
@@ -317,10 +299,14 @@ public class TestMainVerificationLoop2 {
 		List<String> dest4 = Arrays.asList("s3", "s1", "s3");
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s4", dest4));
 
-		List<IAssumption> preconditions = Arrays.asList(pre1, pre2);
-		List<IAssumption> postconditions = Arrays.asList(post);
+		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		IPredicate pre = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
+		pre = predicateFactory.and(pre,
+				predicateFactory.newPredicate(script.term(">=",	n.getTerm(), script.numeral("0"))));
+		
+		IPredicate post = predicateFactory.newPredicate(script.term("<=", i.getTerm(), n.getTerm()));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}
