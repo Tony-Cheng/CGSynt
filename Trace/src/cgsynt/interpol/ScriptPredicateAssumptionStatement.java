@@ -56,4 +56,11 @@ public class ScriptPredicateAssumptionStatement implements IAssumption {
 		return true;
 	}
 
+	@Override
+	public IAssumption copy() {
+		ScriptPredicateAssumptionStatement copy = new ScriptPredicateAssumptionStatement(predicate);
+		copy.negated = negated;
+		return copy;
+	}
+
 }

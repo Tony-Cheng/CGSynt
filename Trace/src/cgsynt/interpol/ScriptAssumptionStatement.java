@@ -99,4 +99,11 @@ public class ScriptAssumptionStatement implements IAssumption {
 	public boolean isAssumption() {
 		return true;
 	}
+
+	@Override
+	public IAssumption copy() {
+		ScriptAssumptionStatement copy = new ScriptAssumptionStatement(lhs, rhs, type);
+		copy.negated = negated;
+		return copy;
+	}
 }

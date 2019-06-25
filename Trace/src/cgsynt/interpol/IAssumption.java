@@ -15,4 +15,6 @@ public interface IAssumption extends IStatement {
 	 * @return
 	 */
 	public boolean isNegated();
+	
+	public IAssumption copy();
 }
