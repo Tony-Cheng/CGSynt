@@ -63,4 +63,8 @@ public class ScriptPredicateAssumptionStatement implements IAssumption {
 		return copy;
 	}
 
+	@Override
+	public String toString() {
+		return predicate.getFormula().toString();
+	}
 }

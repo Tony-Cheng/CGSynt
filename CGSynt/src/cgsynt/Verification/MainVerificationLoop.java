@@ -172,7 +172,7 @@ public class MainVerificationLoop {
 			i++;
 		}
 
-		System.err.println("The process took " + (i + 1) + " iterations.");
+		System.err.println("The process took " + i + " iterations.");
 	}
 
 	public static void resetAll() throws Exception {
