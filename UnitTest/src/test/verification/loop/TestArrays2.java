@@ -149,7 +149,7 @@ public class TestArrays2 {
 				script.term("=", t.getTerm(), script.term("select", A.getTerm(), script.numeral("0")))));
 		pre = pf.and(pre, pf.newPredicate(script.term("=", t.getTerm(), script.numeral("0"))));
 		
-		IPredicate post = pf.newPredicate(script.term("<", i.getTerm(), script.term("select", A.getTerm(), t.getTerm())));
+		IPredicate post = pf.newPredicate(script.term("<", i.getTerm(), script.term("select", A.getTerm(), i.getTerm())));
 
 		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
 		loop.computeMainLoop();
