@@ -35,6 +35,7 @@ class IntersectionTest {
 
 	}
 
+	
 	@Test
 	void test1() {
 		// Test intersecting two single state buchi tree automaton.
