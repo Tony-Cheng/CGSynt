@@ -78,15 +78,9 @@ public class OptimizedTraceGeneralization {
 						Set<IPredicate> states = this.mInterpolantNfa.getStates();
 						
 						if (!states.contains(pre))
-							this.mInterpolantNfa.addState(
-									pre.equals(this.mInterpolator.getTruePredicate()),
-									pre.equals(this.mInterpolator.getFalsePredicate()),
-									pre);
+							this.mInterpolantNfa.addState(false, false, pre);
 						if (!states.contains(post))
-							this.mInterpolantNfa.addState(
-									post.equals(this.mInterpolator.getTruePredicate()),
-									post.equals(this.mInterpolator.getFalsePredicate()),
-									post);
+							this.mInterpolantNfa.addState(false, false, post);
 						
 						this.mInterpolantNfa.addInternalTransition(pre, statement, post);
 					}
