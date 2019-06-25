@@ -57,9 +57,9 @@ public class TraceToInterpolants implements IInterpol {
 	private CfgSmtToolkit toolkit;
 	private SortedMap<Integer, IPredicate> pendingContexts;
 	private BasicPredicateFactory predicateFactory;
-	private PredicateUnifier pUnifer;
-	private List<IAssumption> preconditions;
-	private List<IAssumption> negatedPostconditions;
+	private PredicateUnifier pUnifier;
+	private IPredicate preconditions;
+	private IPredicate postconditions;
 
 	private static TraceToInterpolants traceToInterpolants;
 
@@ -85,11 +85,10 @@ public class TraceToInterpolants implements IInterpol {
 		pendingContexts = new TreeMap<>();
 		predicateFactory = new BasicPredicateFactory(service, managedScript, symbolTable, SimplificationTechnique.NONE,
 				XnfConversionTechnique.BDD_BASED);
-		pUnifer = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
+		pUnifier = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
-		preconditions = new ArrayList<>();
-		negatedPostconditions = createInitialNegatedPostconditions();
-		preconditions = createInitialPreconditions();
+		postconditions = pUnifier.getTruePredicate();
+		postconditions = pUnifier.getTruePredicate();
 	}
 
 	private List<IAssumption> negatePostconditions(List<IAssumption> postconditions) {
@@ -97,28 +96,6 @@ public class TraceToInterpolants implements IInterpol {
 			precondition.negate();
 		return postconditions;
 
-	}
-
-	private List<IAssumption> createInitialPreconditions() throws Exception {
-		ArrayList<IAssumption> preconditions = new ArrayList<>();
-		VariableFactory variableFactory = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
-		BoogieNonOldVar var = variableFactory.constructVariable(VariableFactory.INT);
-		IAssumption statement1 = new ScriptAssumptionStatement(var, script.numeral("0"), "=");
-		negatedPostconditions.add(statement1);
-		return preconditions;
-	}
-
-	private List<IAssumption> createInitialNegatedPostconditions() throws Exception {
-		ArrayList<IAssumption> negatedPostconditions = new ArrayList<>();
-		VariableFactory variableFactory = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
-		BoogieNonOldVar var = variableFactory.constructVariable(VariableFactory.INT);
-		IAssumption statement1 = new ScriptAssumptionStatement(var, script.numeral("0"), "=");
-		IAssumption statement2 = new ScriptAssumptionStatement(var, script.numeral("1"), "=");
-		negatedPostconditions.add(statement1);
-		negatedPostconditions.add(statement2);
-		return negatedPostconditions;
 	}
 
 	public static void reset() throws Exception {
@@ -131,20 +108,11 @@ public class TraceToInterpolants implements IInterpol {
 
 	private NestedWord<IAction> buildTrace(List<IStatement> statements) {
 		int len = statements.size();
-		IAction[] word = new IAction[len + preconditions.size() + negatedPostconditions.size()];
-		int[] nestingRelation = new int[len + preconditions.size() + negatedPostconditions.size()];
+		IAction[] word = new IAction[len];
+		int[] nestingRelation = new int[len];
 
-		for (int i = 0; i < preconditions.size(); i++) {
-			word[i] = preconditions.get(i).getFormula();
-			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
-		}
-
-		for (int i = preconditions.size(); i < preconditions.size() + len; i++) {
-			word[i] = statements.get(i - preconditions.size()).getFormula();
-			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
-		}
-		for (int i = preconditions.size() + len; i < preconditions.size() + len + negatedPostconditions.size(); i++) {
-			word[i] = negatedPostconditions.get(i - preconditions.size() - len).getFormula();
+		for (int i = 0; i < len; i++) {
+			word[i] = statements.get(i).getFormula();
 			nestingRelation[i] = NestedWord.INTERNAL_POSITION;
 		}
 		return new NestedWord<>(word, nestingRelation);
@@ -164,8 +132,8 @@ public class TraceToInterpolants implements IInterpol {
 		NestedWord<IAction> trace = buildTrace(statements);
 		List<Object> controlLocationSequence = generateControlLocationSequence(trace.length() + 1);
 		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(
-				pUnifer.getTruePredicate(), pUnifer.getFalsePredicate(), pendingContexts, trace,
-				controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
+				preconditions, postconditions, pendingContexts, trace,
+				controlLocationSequence, service, toolkit, managedScript, null, pUnifier,
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
 				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
 		if (interpolate.isCorrect() == LBool.UNKNOWN) {
@@ -179,27 +147,28 @@ public class TraceToInterpolants implements IInterpol {
 
 	@Override
 	public IPredicate getTruePredicate() {
-		return pUnifer.getTruePredicate();
+		return pUnifier.getTruePredicate();
+	}
+	
+	public PredicateUnifier getPUnifier() {
+		return this.pUnifier;
 	}
 
 	@Override
 	public IPredicate getFalsePredicate() {
-		return pUnifer.getFalsePredicate();
+		return pUnifier.getFalsePredicate();
 	}
 
-	public List<IAssumption> getPreconditions() {
+	public IPredicate getPreconditions() {
 		return preconditions;
 	}
 
-	public void setPreconditions(List<IAssumption> preconditions) throws Exception {
-		if (preconditions.isEmpty())
-			this.preconditions = createInitialPreconditions();
-		else
-			this.preconditions = preconditions;
+	public void setPreconditions(IPredicate preconditions) throws Exception {
+		this.preconditions = pUnifier.getOrConstructPredicate(preconditions);
 	}
 
-	public List<IAssumption> getNegatedPostconditions() {
-		return negatedPostconditions;
+	public IPredicate getPostconditions() {
+		return postconditions;
 	}
 
 	private List<IStatement> buildStatementList(IStatement statement) {
@@ -214,7 +183,7 @@ public class TraceToInterpolants implements IInterpol {
 		NestedWord<IAction> trace = buildTrace(statements);
 		List<Object> controlLocationSequence = generateControlLocationSequence(trace.length() + 1);
 		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(pre, post,
-				pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null, pUnifer,
+				pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null, pUnifier,
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
 				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
 
@@ -222,19 +191,8 @@ public class TraceToInterpolants implements IInterpol {
 		return interpolate.isCorrect() == LBool.UNSAT;
 	}
 
-	public int getPreconditionsSize() {
-		return preconditions.size();
-	}
-
-	public int getNegatedPostconditionsSize() {
-		return negatedPostconditions.size();
-	}
-
-	public void setNegatedPostconditions(List<IAssumption> postconditions) throws Exception {
-		if (postconditions.isEmpty())
-			this.negatedPostconditions = createInitialNegatedPostconditions();
-		else
-			this.negatedPostconditions = negatePostconditions(postconditions);
+	public void setPostconditions(IPredicate postconditions) throws Exception {
+		this.postconditions = pUnifier.getOrConstructPredicate(postconditions);
 	}
 
 	public BasicPredicateFactory getPredicateFactory() {
