@@ -84,15 +84,15 @@ public class TestArrays2 {
 		// Create Meta Alphabet for LTA
 		List<IStatement> letters = Arrays.asList(ilen, igen, mleai, mgeai, meai, ipp);
 
-		List<String> dest1 = Arrays.asList("3", "2", "I", "I", "I", "I");
-		List<String> dest2 = Arrays.asList("I", "I", "I", "I", "I", "I");
-		List<String> dest3 = Arrays.asList("I", "I", "4", "5", "I", "I");
-		List<String> dest4 = Arrays.asList("I", "I", "I", "I", "5", "I");
-		List<String> dest5 = Arrays.asList("I", "I", "I", "I", "I", "1");
-		List<String> destI = Arrays.asList("I", "I", "I", "I", "I", "I");
+		List<String> dest1 = Arrays.asList(		 "3",  "2",  "I",   "I",   "I",  "I");
+		List<String> dest2 = Arrays.asList(		 "I",  "I",  "I",   "I",   "I",  "I");
+		List<String> dest3 = Arrays.asList(		 "I",  "I",  "4",   "5",   "I",  "I");
+		List<String> dest4 = Arrays.asList(		 "I",  "I",  "I",   "I",   "5",  "I");
+		List<String> dest5 = Arrays.asList(		 "I",  "I",  "I",   "I",   "I",  "1");
+		List<String> destI = Arrays.asList(		 "I",  "I",  "I",   "I",   "I",  "I");
 
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "1", dest1));
-		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "2", dest2));
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE,  "2", dest2));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "3", dest3));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "4", dest4));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "5", dest5));
@@ -107,7 +107,7 @@ public class TestArrays2 {
 	/**
 	 * [i = 0, t = A[0], t = 0] t = A[i] + 1 A[i] = t [i < A[i]]
 	 */
-	@Test
+	//@Test
 	public void simpleTest() throws Exception {
 		MainVerificationLoop.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(2);
