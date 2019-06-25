@@ -94,4 +94,9 @@ public class ScriptAssumptionStatement implements IAssumption {
 	public boolean isNegated() {
 		return negated;
 	}
+
+	@Override
+	public boolean isAssumption() {
+		return true;
+	}
 }

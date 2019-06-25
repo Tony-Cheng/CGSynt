@@ -69,4 +69,9 @@ public class ScriptAssignmentStatement implements IStatement {
 	public String toString() {
 		return lhs.toString() + " := " + rhs.toString();
 	}
+
+	@Override
+	public boolean isAssumption() {
+		return false;
+	}
 }

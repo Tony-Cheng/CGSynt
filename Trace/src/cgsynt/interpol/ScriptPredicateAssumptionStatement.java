@@ -51,4 +51,9 @@ public class ScriptPredicateAssumptionStatement implements IAssumption {
 		return negated;
 	}
 
+	@Override
+	public boolean isAssumption() {
+		return true;
+	}
+
 }

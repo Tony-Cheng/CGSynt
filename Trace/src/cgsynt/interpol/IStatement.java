@@ -27,4 +27,6 @@ public interface IStatement {
 	 * Return the string representation of an IStatement.
 	 */
 	public String toString();
+	
+	public boolean isAssumption();
 }
