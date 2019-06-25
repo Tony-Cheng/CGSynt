@@ -5,22 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.junit.jupiter.api.Test;
 
-//import TTC2.TestFactory;
-//import TTC2.Tuple;
 import cgsynt.Verification.MainVerificationLoop;
-import cgsynt.interpol.ExtendedTransFormulaBuilder;
-import cgsynt.interpol.IAssumption;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.ScriptAssumptionStatement;
