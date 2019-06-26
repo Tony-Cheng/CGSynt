@@ -167,6 +167,8 @@ public class MainVerificationLoop {
 	public void computeMainLoop() throws Exception {
 		int i = 0;
 		while (!mResultComputed) {
+			System.out.println("Iteration:" + i);
+			System.out.println(this.mAllInterpolants.size());
 			computeOneIteration();
 			i++;
 		}
