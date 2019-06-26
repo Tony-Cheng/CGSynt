@@ -82,7 +82,10 @@ public class ScriptAssumptionStatement implements IAssumption {
 
 	@Override
 	public String toString() {
-		return lhs.toString() + " " + type + " " + rhs.toString();
+		if (negated)
+			return "not " + lhs.toString() + " " + type + " " + rhs.toString();
+		else
+			return lhs.toString() + " " + type + " " + rhs.toString();
 	}
 
 	@Override

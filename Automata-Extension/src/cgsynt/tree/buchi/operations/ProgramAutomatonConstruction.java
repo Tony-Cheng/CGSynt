@@ -135,7 +135,7 @@ public class ProgramAutomatonConstruction {
 			BuchiTreeAutomatonRule<RankedBool, String> rule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
 					dest1);
 			BuchiTreeAutomatonRule<RankedBool, String> rule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
-					dest1);
+					dest2);
 			result.addRule(rule1);
 			result.addRule(rule2);
 		}
