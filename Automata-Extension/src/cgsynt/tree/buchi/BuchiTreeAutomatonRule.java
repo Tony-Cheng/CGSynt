@@ -57,8 +57,7 @@ public class BuchiTreeAutomatonRule<LETTER extends IRankedLetter, STATE> {
 
 	@Override
 	public String toString() {
-		return "(" + mSrc.toString() + " | " + mLetter.toString() + " | " + mDest.toString() + ")" + " "
-				+ mLetter.toString();
+		return "(" + mSrc.toString() + " | " + mLetter.toString() + " | " + mDest.toString() + ")";
 	}
 
 	@Override

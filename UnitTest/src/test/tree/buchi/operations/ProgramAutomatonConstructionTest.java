@@ -54,7 +54,7 @@ public class ProgramAutomatonConstructionTest {
 		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
 
 		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"));
-		IStatement ie1 = new ScriptAssignmentStatement(i, script.numeral("0"));
+		IStatement ie1 = new ScriptAssignmentStatement(i, script.numeral("1"));
 		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=");
 		Set<IStatement> statements = new HashSet<IStatement>();
 		statements.add(ie0);

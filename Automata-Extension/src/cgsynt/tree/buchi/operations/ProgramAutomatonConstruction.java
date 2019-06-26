@@ -1,6 +1,5 @@
 package cgsynt.tree.buchi.operations;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
