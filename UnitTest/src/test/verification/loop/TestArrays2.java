@@ -27,8 +27,12 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPre
 public class TestArrays2 {
 
 	/**
-	 * [i = 0, n >= 0, m = A[0], j >=0, j < n] while i < n: if m < A[i]: m = A[i]
-	 * i++ [m >= A[j]]
+	 * [i = 0, n >= 0, m = A[0], j >=0, j < n] 
+	 * while i < n: 
+	 * 	if m < A[i]: 
+	 * 		m = A[i]
+	 * 	i++ 
+	 * [m >= A[j]]
 	 */
 	@Test
 	public void arrayMaxTest() throws Exception {
@@ -107,7 +111,7 @@ public class TestArrays2 {
 	/**
 	 * [i = 0, t = A[0], t = 0] t = A[i] + 1 A[i] = t [i < A[i]]
 	 */
-	@Test
+	//@Test
 	public void simpleTest() throws Exception {
 		MainVerificationLoop.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(2);

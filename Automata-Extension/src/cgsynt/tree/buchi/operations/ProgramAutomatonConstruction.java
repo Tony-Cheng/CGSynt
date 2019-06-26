@@ -12,7 +12,6 @@ import cgsynt.interpol.IStatement;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
-import javafx.beans.NamedArg;
 
 public class ProgramAutomatonConstruction {
 	private Set<IStatement> statements;

@@ -181,10 +181,18 @@ public class MainVerificationLoop {
 			computeOneIteration();
 			i++;
 		}
+		
+		printAllInterpolants();
 
 		System.err.println("The process took " + i + " iterations.");
 	}
-
+	
+	private void printAllInterpolants() {
+		for (IPredicate interpol : this.mAllInterpolants) {
+			System.out.println(interpol);
+		}
+	}
+	
 	public static void resetAll() throws Exception {
 		TraceGlobalVariables.reset();
 		TraceToInterpolants.reset();
