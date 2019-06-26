@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import cgsynt.Verification.AlternateVerification;
 import cgsynt.Verification.MainVerificationLoop;
 import cgsynt.interpol.IAssumption;
 import cgsynt.interpol.IStatement;
@@ -102,7 +103,7 @@ public class TestArrays2 {
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "5", dest5));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "I", destI));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
+		AlternateVerification loop = new AlternateVerification(program, letters, preconditions, postconditions);
 		loop.computeMainLoop();
 
 		assertTrue(loop.isCorrect());
