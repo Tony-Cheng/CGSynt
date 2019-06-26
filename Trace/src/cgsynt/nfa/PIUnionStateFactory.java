@@ -10,12 +10,12 @@ public class PIUnionStateFactory implements IUnionStateFactory<IPredicate>{
 	
 	@Override
 	public IPredicate createEmptyStackState() {
-		return  mPf.newDebugPredicate("EmptyStackState");
+		return  mPf.newDebugPredicate("EmptyStackState:PIUnionStateFactory");
 	}
 
 	@Override
 	public IPredicate createSinkStateContent() {
-		return mPf.newDebugPredicate("SinkStatePredicate");
+		return mPf.newDebugPredicate("SinkStatePredicate:PIUnionStateFactory");
 	}
 
 	@Override

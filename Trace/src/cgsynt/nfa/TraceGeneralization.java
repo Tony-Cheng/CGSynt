@@ -55,7 +55,7 @@ public class TraceGeneralization {
 		VpAlphabet<IStatement> alphabet = new VpAlphabet<>(this.mAllStatements);
 		
 		// This might need to be fixed (the factory argument)
-		this.mInterpolantNfa = new NestedWordAutomaton<IStatement, IPredicate>(automataService, alphabet, new GeneralizeStateFactory<IPredicate>());
+		this.mInterpolantNfa = new NestedWordAutomaton<IStatement, IPredicate>(automataService, alphabet, new GeneralizeStateFactory());
 		
 		for (IPredicate pre : this.mInterpolants) {
 			for (IStatement statement : this.mAllStatements) {

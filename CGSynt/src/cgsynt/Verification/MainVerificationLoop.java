@@ -74,7 +74,7 @@ public class MainVerificationLoop {
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alpha = new VpAlphabet<>(letters);
 		NestedWordAutomaton<IStatement, IPredicate> pi = new NestedWordAutomaton<>(mAutService, alpha,
-				new GeneralizeStateFactory<>());
+				new GeneralizeStateFactory());
 		if (!prePred.equals(postPred)) {
 			pi.addState(true, false, prePred);
 			pi.addState(false, true, postPred);

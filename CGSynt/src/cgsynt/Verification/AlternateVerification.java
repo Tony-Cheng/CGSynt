@@ -70,7 +70,7 @@ public class AlternateVerification {
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alpha = new VpAlphabet<>(letters);
 		NestedWordAutomaton<IStatement, IPredicate> pi = new NestedWordAutomaton<>(mAutService, alpha,
-				new GeneralizeStateFactory<>());
+				new GeneralizeStateFactory());
 		if (!prePred.equals(postPred)) {
 			pi.addState(true, false, prePred);
 			pi.addState(false, true, postPred);
@@ -148,7 +148,7 @@ public class AlternateVerification {
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alpha = new VpAlphabet<>(letters);
 		INestedWordAutomaton<IStatement, IPredicate> genPI = new NestedWordAutomaton<>(mAutService, alpha,
-				new GeneralizeStateFactory<>());
+				new GeneralizeStateFactory());
 		
 		// Old interpolants set is set to empty so that we only generate the iteration of the new
 		// interpolants with the new interpolants
@@ -160,6 +160,10 @@ public class AlternateVerification {
 		
 		Union<IStatement, IPredicate> piUnion = new Union<>(mAutService, new PIUnionStateFactory(), mPI, genPI);
 		this.mPI = piUnion.getResult();
+		
+//		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(new HashSet<>(), 
+//				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), this.mPI);
+//		this.mPI = generalization.getResult();
 		
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
