@@ -96,10 +96,41 @@ public class ProgramAutomatonConstruction {
 					dest.add(stateRight);
 				}
 			}
-			BuchiTreeAutomatonRule<RankedBool, String> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
-					stateBottom, dest);
+			BuchiTreeAutomatonRule<RankedBool, String> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
+					dest);
 			result.addRule(rule);
 		}
+		for (Pair<IAssumption, IAssumption> statement : assumptions) {
+			List<String> dest1 = new ArrayList<>();
+			List<String> dest2 = new ArrayList<>();
+			int index = assumptionsMap.get(statement);
+			for (int i = 0; i < alphabet.size(); i++) {
+				if (i == index) {
+					dest1.add(stateLeft);
+					dest2.add(stateBottom);
+				} else if (i == index + 1) {
+					dest1.add(stateBottom);
+					dest2.add(stateLeft);
+				} else {
+					dest1.add(stateRight);
+					dest2.add(stateRight);
+				}
+			}
+			BuchiTreeAutomatonRule<RankedBool, String> rule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
+					dest1);
+			BuchiTreeAutomatonRule<RankedBool, String> rule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
+					dest2);
+			result.addRule(rule1);
+			result.addRule(rule2);
+		}
+
+		List<String> dest = new ArrayList<>();
+		for (int i = 0; i < alphabet.size(); i++) {
+			dest.add(stateRight);
+		}
+		BuchiTreeAutomatonRule<RankedBool, String> rule = new BuchiTreeAutomatonRule<>(RankedBool.TRUE, stateBottom,
+				dest);
+		result.addRule(rule);
 	}
 
 	private void computeLeftStateEdges() {
@@ -179,10 +210,12 @@ class Pair<K, V> {
 		this.key = key;
 		this.value = value;
 	}
+
 	@Override
 	public String toString() {
 		return "Pair [key=" + key + ", value=" + value + "]";
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -191,6 +224,7 @@ class Pair<K, V> {
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -212,19 +246,24 @@ class Pair<K, V> {
 			return false;
 		return true;
 	}
+
 	public K getKey() {
 		return key;
 	}
+
 	public void setKey(K key) {
 		this.key = key;
 	}
+
 	public V getValue() {
 		return value;
 	}
+
 	public void setValue(V value) {
 		this.value = value;
 	}
+
 	private K key;
 	private V value;
-	
+
 }
