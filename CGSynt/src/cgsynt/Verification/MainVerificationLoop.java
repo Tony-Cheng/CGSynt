@@ -105,6 +105,7 @@ public class MainVerificationLoop {
 
 	private void computeOneIteration() throws Exception {
 		// Turn PI into a NFA that has String states.
+		long time = System.nanoTime();
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
 		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
 
@@ -132,9 +133,15 @@ public class MainVerificationLoop {
 			mResultComputed = true;
 			return;
 		}
+		System.out.println("Start to emptiness check: " + (System.nanoTime() - time)/1000000);
+		time = System.nanoTime();
 		Set<List<IStatement>> counterExamples = emptinessCheck.findCounterExamples(mTransitionAlphabet);
+		System.out.println("Find counter examples: " + (System.nanoTime() - time)/1000000);
+		time = System.nanoTime();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
 		counterExampleToInterpolants.computeResult();
+		System.out.println("Find interpolants: " + (System.nanoTime() - time)/1000000);
+		time = System.nanoTime();
 		if (counterExampleToInterpolants.getIncorrectTrace().size() > 0) {
 			mIsCorrect = false;
 			mResultComputed = true;
@@ -144,6 +151,8 @@ public class MainVerificationLoop {
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);
 		mPI = generalization.getResult();
+		System.out.println("Generalization: " + (System.nanoTime() - time)/1000000);
+		time = System.nanoTime();
 
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
@@ -168,7 +177,7 @@ public class MainVerificationLoop {
 		int i = 0;
 		while (!mResultComputed) {
 			System.out.println("Iteration:" + i);
-			System.out.println(this.mAllInterpolants.size());
+			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
 			computeOneIteration();
 			i++;
 		}
