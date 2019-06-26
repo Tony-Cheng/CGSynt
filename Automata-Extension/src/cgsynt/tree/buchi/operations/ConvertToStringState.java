@@ -1,15 +1,16 @@
 package cgsynt.tree.buchi.operations;
 
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 
 public class ConvertToStringState<LETTER, STATE> {
 
-	private final NestedWordAutomaton<LETTER, STATE> aut;
+	private final INestedWordAutomaton<LETTER, STATE> aut;
 
-	public ConvertToStringState(NestedWordAutomaton<LETTER, STATE> aut) {
+	public ConvertToStringState(INestedWordAutomaton<LETTER, STATE> aut) {
 		this.aut = aut;
 	}
 

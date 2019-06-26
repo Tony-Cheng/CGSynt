@@ -179,10 +179,9 @@ public class MainVerificationLoop {
 			System.out.println("Iteration:" + i);
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
 			computeOneIteration();
+			System.out.println("Interpolants:");
 			i++;
 		}
-		
-		printAllInterpolants();
 
 		System.err.println("The process took " + i + " iterations.");
 	}
