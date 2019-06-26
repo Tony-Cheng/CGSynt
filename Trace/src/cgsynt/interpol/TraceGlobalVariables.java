@@ -1,5 +1,6 @@
 package cgsynt.interpol;
 
+import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
@@ -16,7 +17,7 @@ public class TraceGlobalVariables {
 	private IUltimateServiceProvider service;
 
 	private TraceGlobalVariables() {
-		this.service = UltimateMocks.createUltimateServiceProviderMock();
+		this.service = UltimateMocks.createUltimateServiceProviderMock(LogLevel.OFF);
 		LogProxy logger = new DefaultLogger();
 		logger.setLoglevel(LogProxy.LOGLEVEL_OFF);
 		SMTInterpol interpolator = new SMTInterpol(logger);

@@ -13,6 +13,7 @@ import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptPredicateAssumptionStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
+import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
@@ -31,7 +32,10 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determ
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.PredicateUnifier;
 
 public class MainVerificationLoop {
 
@@ -41,63 +45,61 @@ public class MainVerificationLoop {
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
-	private Set<IPredicate> preconditionInterpolants;
-	private Set<IPredicate> postconditionInterpolants;
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
 
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
-			List<IAssumption> preconditions, List<IAssumption> postconditions) throws Exception {
-		initialize(programs, transitionAlphabet);
-		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
-		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(postconditions);
-	}
-
-	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
 			IPredicate preconditions, IPredicate postconditions) throws Exception {
-		initialize(programs, transitionAlphabet);
-		List<IAssumption> preconditionsList = new ArrayList<>();
-		List<IAssumption> postconditionsList = new ArrayList<>();
-		preconditionsList.add(new ScriptPredicateAssumptionStatement(preconditions));
-		postconditionsList.add(new ScriptPredicateAssumptionStatement(postconditions));
-		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditionsList);
-		TraceToInterpolants.getTraceToInterpolants().setNegatedPostconditions(postconditionsList);
-	}
-
-	private void initialize(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet)
-			throws Exception {
-		this.preconditionInterpolants = new HashSet<>();
-		this.postconditionInterpolants = new HashSet<>();
 		RankedBool.setRank(transitionAlphabet.size());
+		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
+		TraceToInterpolants.getTraceToInterpolants().setPostconditions(postconditions);
+		preconditions = TraceToInterpolants.getTraceToInterpolants().getPreconditions();
+		postconditions = TraceToInterpolants.getTraceToInterpolants().getPostconditions();
 		this.mService = TraceGlobalVariables.getGlobalVariables().getService();
 		this.mAutService = new AutomataLibraryServices(mService);
 		this.mPrograms = programs;
 		this.mResultComputed = false;
 		this.mTransitionAlphabet = transitionAlphabet;
-		this.mPI = createPI();
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
+		this.mAllInterpolants.add(preconditions);
+		this.mAllInterpolants.add(postconditions);
+		this.mPI = createPI(preconditions, postconditions);
 
 	}
 
-	private NestedWordAutomaton<IStatement, IPredicate> createPI() {
+	private NestedWordAutomaton<IStatement, IPredicate> createPI(IPredicate prePred, IPredicate postPred)
+			throws Exception {
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alpha = new VpAlphabet<>(letters);
 		NestedWordAutomaton<IStatement, IPredicate> pi = new NestedWordAutomaton<>(mAutService, alpha,
 				new GeneralizeStateFactory<>());
-		pi.addState(true, false, TraceToInterpolants.getTraceToInterpolants().getTruePredicate());
-		pi.addState(false, true, TraceToInterpolants.getTraceToInterpolants().getFalsePredicate());
-		IPredicate falsePred = TraceToInterpolants.getTraceToInterpolants().getFalsePredicate();
-		IPredicate truePred = TraceToInterpolants.getTraceToInterpolants().getTruePredicate();
-
-		for (IStatement statement : mTransitionAlphabet) {
-			pi.addInternalTransition(falsePred, statement, falsePred);
-			pi.addInternalTransition(truePred, statement, truePred);
+		if (!prePred.equals(postPred)) {
+			pi.addState(true, false, prePred);
+			pi.addState(false, true, postPred);
+		} else {
+			pi.addState(true, true, prePred);
 		}
-		this.preconditionInterpolants.add(truePred);
-		this.postconditionInterpolants.add(falsePred);
+		IPredicate deadState = createDeadState();
+		pi.addState(false, false, deadState);
+		for (IStatement statement : mTransitionAlphabet) {
+			pi.addInternalTransition(prePred, statement, deadState);
+			pi.addInternalTransition(postPred, statement, deadState);
+			pi.addInternalTransition(deadState, statement, deadState);
+		}
+		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(new HashSet<>(),
+				mAllInterpolants, new HashSet<>(mTransitionAlphabet), pi);
+		pi = generalization.getResult();
 		return pi;
+	}
+
+	private IPredicate createDeadState() throws Exception {
+		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		BoogieNonOldVar x = vf.constructVariable(VariableFactory.INT);
+		return TraceToInterpolants.getTraceToInterpolants().getPredicateFactory()
+				.newPredicate(script.term("=", x.getTerm(), script.numeral("1")));
 
 	}
 
@@ -138,9 +140,6 @@ public class MainVerificationLoop {
 			mResultComputed = true;
 			return;
 		}
-		List<IPredicate[]> nonSetInterpolants = counterExampleToInterpolants.getNonSetInterpolants();
-		counterExampleToInterpolants.setPreAndPostStatesFinal(mPI, nonSetInterpolants, preconditionInterpolants,
-				postconditionInterpolants);
 
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);
@@ -168,6 +167,8 @@ public class MainVerificationLoop {
 	public void computeMainLoop() throws Exception {
 		int i = 0;
 		while (!mResultComputed) {
+			System.out.println("Iteration:" + i);
+			System.out.println(this.mAllInterpolants.size());
 			computeOneIteration();
 			i++;
 		}

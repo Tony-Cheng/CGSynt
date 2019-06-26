@@ -23,6 +23,7 @@ public class TestLoopFromCegarRunner {
 	@Test
 	void test1() throws Exception {
 		// Repeated x++ with no pre nor post conditions.
+		MainVerificationLoop.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> aut = new BuchiTreeAutomaton<>(1);
 		aut.addFinalState("s1");
 		aut.addInitState("s1");
@@ -40,7 +41,7 @@ public class TestLoopFromCegarRunner {
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s1", dest));
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s1", dest));
 
-		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, new ArrayList<>(), new ArrayList<>());
+		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, null, null);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}

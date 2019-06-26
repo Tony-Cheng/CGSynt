@@ -23,6 +23,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.PredicateUnifier;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 
 public class TestMainVerificationLoop1 {
@@ -59,7 +60,7 @@ public class TestMainVerificationLoop1 {
 		dest3.add("s3");
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
 
-		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, new ArrayList<>(), new ArrayList<>());
+		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, null, null);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}
@@ -95,16 +96,11 @@ public class TestMainVerificationLoop1 {
 		dest3.add("s3");
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
 
-		List<IAssumption> preconditions = new ArrayList<>();
-		List<IAssumption> postconditions = new ArrayList<>();
+		BasicPredicateFactory pf = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		IPredicate pre = pf.newPredicate(script.term("=", x.getTerm(), script.numeral("0")));
+		IPredicate post = pf.newPredicate(script.term(">=", x.getTerm(), script.numeral("1")));
 
-		IAssumption xe0 = new ScriptAssumptionStatement(x, script.numeral("0"), "=");
-		IAssumption xl1 = new ScriptAssumptionStatement(x, script.numeral("1"), ">=");
-
-		preconditions.add(xe0);
-		postconditions.add(xl1);
-
-		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, preconditions, postconditions);
+		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, pre, post);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}
@@ -140,16 +136,11 @@ public class TestMainVerificationLoop1 {
 		dest3.add("s3");
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s3", dest3));
 
-		List<IAssumption> preconditions = new ArrayList<>();
-		List<IAssumption> postconditions = new ArrayList<>();
+		BasicPredicateFactory pf = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		IPredicate pre = pf.newPredicate(script.term("=", x.getTerm(), script.numeral("0")));
+		IPredicate post = pf.newPredicate(script.term("<", x.getTerm(), script.numeral("1")));
 
-		IAssumption xe0 = new ScriptAssumptionStatement(x, script.numeral("0"), "=");
-		IAssumption xl1 = new ScriptAssumptionStatement(x, script.numeral("1"), "<");
-
-		preconditions.add(xe0);
-		postconditions.add(xl1);
-
-		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, preconditions, postconditions);
+		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, pre, post);
 		loop.computeMainLoop();
 		assertFalse(loop.isCorrect());
 	}

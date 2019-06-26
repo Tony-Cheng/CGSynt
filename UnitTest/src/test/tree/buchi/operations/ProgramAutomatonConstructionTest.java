@@ -37,7 +37,5 @@ public class ProgramAutomatonConstructionTest {
 		construct.computeResult();
 		System.out.println(construct.getResult());
 
-
-
 	}
 }
