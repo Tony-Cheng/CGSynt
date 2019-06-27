@@ -106,7 +106,7 @@ public class SynthesisLoop {
 
 	}
 
-	private void computeOneIteration() throws Exception {
+	private void computeOneIteration(int k) throws Exception {
 		// Turn PI into a NFA that has String states.
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
 		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
@@ -133,9 +133,10 @@ public class SynthesisLoop {
 		if (!emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
+			result = intersectedAut;
 			return;
 		}
-		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(this.mPI, 2);
+		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(this.mPI, k);
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
@@ -148,6 +149,10 @@ public class SynthesisLoop {
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
+	}
+	
+	public BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> getResult() {
+		return result;
 	}
 
 	private Set<IPredicate> flatten(List<Set<IPredicate>> interpolants) {
@@ -169,7 +174,7 @@ public class SynthesisLoop {
 		while (!mResultComputed) {
 			System.out.println("Iteration: " + i);
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
-			computeOneIteration();
+			computeOneIteration(i + 1);
 			System.out.println("Interpolants:");
 			i++;
 		}
