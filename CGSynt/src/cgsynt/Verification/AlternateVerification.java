@@ -11,6 +11,7 @@ import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
+import cgsynt.nfa.MinimizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.nfa.PIUnionStateFactory;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
@@ -26,6 +27,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomat
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Union;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.minimization.ShrinkNwa;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
@@ -44,6 +46,8 @@ public class AlternateVerification {
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
+	
+	private IPredicate mPre, mPost;
 
 	public AlternateVerification(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
 			IPredicate preconditions, IPredicate postconditions) throws Exception {
@@ -62,7 +66,8 @@ public class AlternateVerification {
 		this.mAllInterpolants.add(preconditions);
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
-
+		this.mPre = preconditions;
+		this.mPost = postconditions;
 	}
 
 	private INestedWordAutomaton<IStatement, IPredicate> createPI(IPredicate prePred, IPredicate postPred)
@@ -129,14 +134,14 @@ public class AlternateVerification {
 			mResultComputed = true;
 			return;
 		}
-		//System.out.println("Start to emptiness check: " + (System.nanoTime() - time)/1000000);
+		System.out.println("Start to emptiness check: " + (System.nanoTime() - time)/1000000);
 		time = System.nanoTime();
 		Set<List<IStatement>> counterExamples = emptinessCheck.findCounterExamples(mTransitionAlphabet);
-		//System.out.println("Find counter examples: " + (System.nanoTime() - time)/1000000);
+		System.out.println("Find counter examples: " + (System.nanoTime() - time)/1000000);
 		time = System.nanoTime();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
 		counterExampleToInterpolants.computeResult();
-		//System.out.println("Find interpolants: " + (System.nanoTime() - time)/1000000);
+		System.out.println("Find interpolants: " + (System.nanoTime() - time)/1000000);
 		time = System.nanoTime();
 		if (counterExampleToInterpolants.getIncorrectTrace().size() > 0) {
 			mIsCorrect = false;
@@ -147,19 +152,28 @@ public class AlternateVerification {
 		// Make the new gen PI
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alpha = new VpAlphabet<>(letters);
-		INestedWordAutomaton<IStatement, IPredicate> genPI = new NestedWordAutomaton<>(mAutService, alpha,
+		NestedWordAutomaton<IStatement, IPredicate> genPI = new NestedWordAutomaton<>(mAutService, alpha,
 				new GeneralizeStateFactory());
 		
 		// Old interpolants set is set to empty so that we only generate the iteration of the new
 		// interpolants with the new interpolants
+		Set<IPredicate> newInterpolants = flatten(counterExampleToInterpolants.getInterpolants());
+		newInterpolants.add(mPre);
+		newInterpolants.add(mPost);
+		genPI.addState(true, false, mPre);
+		genPI.addState(false, true, mPost);
+		
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(new HashSet<>(),
-				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), genPI);
-		//System.out.println("Generalization: " + (System.nanoTime() - time)/1000000);
+				newInterpolants, new HashSet<>(mTransitionAlphabet), genPI);
+		System.out.println("Generalization: " + (System.nanoTime() - time)/1000000);
 
 		genPI = generalization.getResult();
 		
 		Union<IStatement, IPredicate> piUnion = new Union<>(mAutService, new PIUnionStateFactory(), mPI, genPI);
 		this.mPI = piUnion.getResult();
+		
+		ShrinkNwa<IStatement, IPredicate> shrink = new ShrinkNwa<>(this.mAutService, new MinimizeStateFactory(), this.mPI);
+		this.mPI = shrink.getResult();
 		
 //		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(new HashSet<>(), 
 //				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), this.mPI);
@@ -188,7 +202,7 @@ public class AlternateVerification {
 		int i = 0;
 		while (!mResultComputed) {
 			System.out.println("Iteration:" + i);
-			//System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
+			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
 			computeOneIteration();
 			i++;
 		}
