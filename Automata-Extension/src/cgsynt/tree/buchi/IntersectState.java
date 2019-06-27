@@ -5,7 +5,7 @@ package cgsynt.tree.buchi;
  * 
  * @param <STATE>
  */
-public class IntersectState<STATE> {
+public class IntersectState<STATE1, STATE2> {
 	@Override
 	public String toString() {
 		return "IntersectState [state1=" + state1 + ", state2=" + state2 + ", mode=" + mode + "]";
@@ -14,11 +14,11 @@ public class IntersectState<STATE> {
 	/**
 	 * A state in the first Buchi tree.
 	 */
-	private final STATE state1;
+	private final STATE1 state1;
 	/**
 	 * A state in the second Buchi tree.
 	 */
-	private final STATE state2;
+	private final STATE2 state2;
 	/**
 	 * mode = 1 if the automaton is looking for a final state in the first Buchi
 	 * tree. mode = 2 if the automaton is looking for a final state in the second
@@ -38,7 +38,7 @@ public class IntersectState<STATE> {
 	 *            and 2 if the automaton is looking for a final state in the second
 	 *            tree
 	 */
-	public IntersectState(STATE state1, STATE state2, int mode) {
+	public IntersectState(STATE1 state1, STATE2 state2, int mode) {
 		this.state1 = state1;
 		this.state2 = state2;
 		this.mode = mode;
@@ -55,11 +55,11 @@ public class IntersectState<STATE> {
 		return result;
 	}
 
-	public STATE getState1() {
+	public STATE1 getState1() {
 		return state1;
 	}
 
-	public STATE getState2() {
+	public STATE2 getState2() {
 		return state2;
 	}
 

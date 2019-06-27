@@ -4,7 +4,7 @@ import java.util.List;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.IntersectState;
-import cgsynt.tree.buchi.operations.Intersect;
+import cgsynt.tree.buchi.operations.BuchiIntersection;
 
 public class CheatSheet_BuchiTree {
 
@@ -66,7 +66,7 @@ public class CheatSheet_BuchiTree {
 
 	public static BuchiTreeAutomaton<TestRankedAlphabet, IntersectState<String>> computeIntersect(
 			BuchiTreeAutomaton<TestRankedAlphabet, String> aut1, BuchiTreeAutomaton<TestRankedAlphabet, String> aut2) {
-		Intersect<TestRankedAlphabet, String> intersect = new Intersect<>(aut1, aut2);
+		BuchiIntersection<TestRankedAlphabet, String> intersect = new BuchiIntersection<>(aut1, aut2);
 		return intersect.computeResult();
 
 	}
