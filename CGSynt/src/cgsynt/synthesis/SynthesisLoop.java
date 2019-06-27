@@ -136,7 +136,8 @@ public class SynthesisLoop {
 			result = intersectedAut;
 			return;
 		}
-		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(this.mPI, k);
+		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(this.mPI,
+				k * this.mPI.getStates().size());
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
@@ -150,7 +151,7 @@ public class SynthesisLoop {
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
 	}
-	
+
 	public BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> getResult() {
 		return result;
 	}
