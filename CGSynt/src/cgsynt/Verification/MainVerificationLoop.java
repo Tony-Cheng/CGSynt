@@ -15,6 +15,7 @@ import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
+import cgsynt.nfa.MultiThreadGeneralization;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.lta.LTAIntersectState;
@@ -148,7 +149,7 @@ public class MainVerificationLoop {
 			return;
 		}
 
-		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
+		MultiThreadGeneralization generalization = new MultiThreadGeneralization(mAllInterpolants,
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);
 		mPI = generalization.getResult();
 		System.out.println("Generalization: " + (System.nanoTime() - time)/1000000);

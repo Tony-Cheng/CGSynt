@@ -37,7 +37,7 @@ public class TestArrays2 {
 	 */
 	@Test
 	public void arrayMaxTest() throws Exception {
-		AlternateVerification.resetAll();
+		MainVerificationLoop.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(6);
 
 		RankedBool.setRank(6);

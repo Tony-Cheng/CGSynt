@@ -43,7 +43,7 @@ public class CheatSheet {
 
 		VpAlphabet<Character> alpha = new VpAlphabet<>(letters);
 
-		NestedWordAutomaton<Character, String> nwa = new NestedWordAutomaton<>(service, alpha, new GeneralizeStateFactory<>());
+		NestedWordAutomaton<Character, String> nwa = new NestedWordAutomaton<>(service, alpha, new StringFactory());
 
 		nwa.addState(true, false, "q0");
 		nwa.addState(false, false, "q1");

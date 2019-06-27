@@ -64,9 +64,9 @@ public class CheatSheet_BuchiTree {
 
 	}
 
-	public static BuchiTreeAutomaton<TestRankedAlphabet, IntersectState<String>> computeIntersect(
+	public static BuchiTreeAutomaton<TestRankedAlphabet, IntersectState<String, String>> computeIntersect(
 			BuchiTreeAutomaton<TestRankedAlphabet, String> aut1, BuchiTreeAutomaton<TestRankedAlphabet, String> aut2) {
-		BuchiIntersection<TestRankedAlphabet, String> intersect = new BuchiIntersection<>(aut1, aut2);
+		BuchiIntersection<TestRankedAlphabet, String, String> intersect = new BuchiIntersection<>(aut1, aut2);
 		return intersect.computeResult();
 
 	}
@@ -90,7 +90,7 @@ public class CheatSheet_BuchiTree {
 		BuchiTreeAutomaton<TestRankedAlphabet, String> aut2 = createSecondBuchiTree();
 
 		// Intersect two Buchi tree automata.
-		BuchiTreeAutomaton<TestRankedAlphabet, IntersectState<String>> intersectAut = computeIntersect(aut1, aut2);
+		BuchiTreeAutomaton<TestRankedAlphabet, IntersectState<String, String>> intersectAut = computeIntersect(aut1, aut2);
 
 		// Print the transition rules of the first automaton
 		System.out.println("Automaton 1");
