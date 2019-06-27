@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import cgsynt.Verification.AlternateVerification;
 import cgsynt.Verification.MainVerificationLoop;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
@@ -31,7 +32,7 @@ public class TestMainVerificationLoop2 {
 	 */
 	@Test
 	void test1() throws Exception {
-		MainVerificationLoop.resetAll();
+		AlternateVerification.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(3);
 		RankedBool.setRank(3);
 		program.addInitState("s1");
@@ -74,7 +75,7 @@ public class TestMainVerificationLoop2 {
 		
 		IPredicate post = predicateFactory.newPredicate(script.term("=", i.getTerm(), n.getTerm()));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
+		AlternateVerification loop = new AlternateVerification(program, letters, pre, post);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}
@@ -84,7 +85,7 @@ public class TestMainVerificationLoop2 {
 	 */
 	@Test
 	void test2() throws Exception {
-		MainVerificationLoop.resetAll();
+		AlternateVerification.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(3);
 		RankedBool.setRank(3);
 		program.addInitState("s1");
@@ -127,7 +128,7 @@ public class TestMainVerificationLoop2 {
 		
 		IPredicate post = predicateFactory.newPredicate(script.term(">", i.getTerm(), n.getTerm()));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
+		AlternateVerification loop = new AlternateVerification(program, letters, pre, post);
 		loop.computeMainLoop();
 		assertFalse(loop.isCorrect());
 	}
@@ -137,7 +138,7 @@ public class TestMainVerificationLoop2 {
 	 */
 	@Test
 	void test3() throws Exception {
-		MainVerificationLoop.resetAll();
+		AlternateVerification.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(3);
 		RankedBool.setRank(3);
 		program.addInitState("s1");
@@ -185,7 +186,7 @@ public class TestMainVerificationLoop2 {
 		
 		IPredicate post = predicateFactory.newPredicate(script.term(">=", i.getTerm(), n.getTerm()));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
+		AlternateVerification loop = new AlternateVerification(program, letters, pre, post);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}
@@ -195,7 +196,7 @@ public class TestMainVerificationLoop2 {
 	 */
 	@Test
 	void test4() throws Exception {
-		MainVerificationLoop.resetAll();
+		AlternateVerification.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(3);
 		RankedBool.setRank(3);
 		program.addInitState("s1");
@@ -238,7 +239,7 @@ public class TestMainVerificationLoop2 {
 		
 		IPredicate post = predicateFactory.newPredicate(script.term("<", i.getTerm(), n.getTerm()));
 		
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
+		AlternateVerification loop = new AlternateVerification(program, letters, pre, post);
 		loop.computeMainLoop();
 		assertFalse(loop.isCorrect());
 	}
@@ -248,7 +249,7 @@ public class TestMainVerificationLoop2 {
 	 */
 	@Test
 	void test5() throws Exception {
-		MainVerificationLoop.resetAll();
+		AlternateVerification.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(3);
 		RankedBool.setRank(3);
 		program.addInitState("s1");
@@ -295,7 +296,7 @@ public class TestMainVerificationLoop2 {
 		
 		IPredicate post = predicateFactory.newPredicate(script.term("<=", i.getTerm(), n.getTerm()));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
+		AlternateVerification loop = new AlternateVerification(program, letters, pre, post);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}

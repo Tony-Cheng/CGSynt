@@ -37,7 +37,7 @@ public class TestArrays2 {
 	 */
 	@Test
 	public void arrayMaxTest() throws Exception {
-		MainVerificationLoop.resetAll();
+		AlternateVerification.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(6);
 
 		RankedBool.setRank(6);
@@ -103,7 +103,7 @@ public class TestArrays2 {
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "5", dest5));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "I", destI));
 
-		AlternateVerification loop = new AlternateVerification(program, letters, preconditions, postconditions);
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
 		loop.computeMainLoop();
 
 		assertTrue(loop.isCorrect());
