@@ -44,6 +44,7 @@ public class SynthesisLoop {
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
+	private BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> result;
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
@@ -59,9 +60,10 @@ public class SynthesisLoop {
 		this.mAutService = new AutomataLibraryServices(mService);
 		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet));
 		construction.computeResult();
+		RankedBool.setRank(construction.getAlphabet().size());
 		this.mPrograms = construction.getResult();
 		this.mResultComputed = false;
-		this.mTransitionAlphabet = transitionAlphabet;
+		this.mTransitionAlphabet = construction.getAlphabet();
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
 		this.mAllInterpolants.add(preconditions);
@@ -165,7 +167,7 @@ public class SynthesisLoop {
 	public void computeMainLoop() throws Exception {
 		int i = 0;
 		while (!mResultComputed) {
-			System.out.println("Iteration:" + i);
+			System.out.println("Iteration: " + i);
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
 			computeOneIteration();
 			System.out.println("Interpolants:");
