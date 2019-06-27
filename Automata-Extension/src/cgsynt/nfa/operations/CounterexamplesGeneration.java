@@ -8,14 +8,14 @@ import java.util.Set;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class CounterExampleGeneration<LETTER, STATE> {
+public class CounterexamplesGeneration<LETTER, STATE> {
 
 	private NestedWordAutomaton<LETTER, STATE> nwa;
 	private boolean resultComputed;
 	private Set<List<LETTER>> result;
 	private int k;
 
-	public CounterExampleGeneration(NestedWordAutomaton<LETTER, STATE> nwa, int k) {
+	public CounterexamplesGeneration(NestedWordAutomaton<LETTER, STATE> nwa, int k) {
 		this.nwa = nwa;
 		resultComputed = false;
 		this.k = k;
