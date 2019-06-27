@@ -36,7 +36,7 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 	}
 
 	private void findCounterexamples(STATE state, int len, List<LETTER> counterexample) {
-		if (!nwa.isFinal(state))
+		if (!nwa.isFinal(state) && counterexample.size() > 0)
 			result.add(counterexample);
 		if (len == 0) {
 			return;
