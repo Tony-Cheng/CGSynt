@@ -149,7 +149,7 @@ public class MainVerificationLoop {
 			return;
 		}
 
-		MultiThreadGeneralization generalization = new MultiThreadGeneralization(mAllInterpolants,
+		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);
 		mPI = generalization.getResult();
 		System.out.println("Generalization: " + (System.nanoTime() - time)/1000000);

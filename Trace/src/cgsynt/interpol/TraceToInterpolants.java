@@ -190,6 +190,7 @@ public class TraceToInterpolants implements IInterpol {
 				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
 				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
 
+
 		assert interpolate.isCorrect() != LBool.UNKNOWN;
 		return interpolate.isCorrect() == LBool.UNSAT;
 	}
