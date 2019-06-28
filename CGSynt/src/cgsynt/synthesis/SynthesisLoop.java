@@ -176,7 +176,6 @@ public class SynthesisLoop {
 			System.out.println("Iteration: " + i);
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
 			computeOneIteration(i + 1);
-			System.out.println("Interpolants:");
 			i++;
 		}
 
