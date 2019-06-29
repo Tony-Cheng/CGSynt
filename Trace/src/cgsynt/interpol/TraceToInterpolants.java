@@ -39,6 +39,7 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.Pred
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.tracecheck.ITraceCheckPreferences.AssertCodeBlockOrder;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.InterpolationTechnique;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.singletracecheck.InterpolatingTraceCheckCraig;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.singletracecheck.TraceCheck;
 import de.uni_freiburg.informatik.ultimate.test.mocks.ConsoleLogger;
 import de.uni_freiburg.informatik.ultimate.util.datastructures.SerialProvider;
 import de.uni_freiburg.informatik.ultimate.util.datastructures.relation.HashRelation;
@@ -184,12 +185,8 @@ public class TraceToInterpolants implements IInterpol {
 	public boolean isCorrect(IPredicate pre, IStatement statement, IPredicate post) {
 		List<IStatement> statements = buildStatementList(statement);
 		NestedWord<IAction> trace = buildTrace(statements);
-		List<Object> controlLocationSequence = generateControlLocationSequence(trace.length() + 1);
-		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(pre, post,
-				pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null, pUnifier,
-				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true, InterpolationTechnique.Craig_NestedInterpolation,
-				false, XnfConversionTechnique.BDD_BASED, SimplificationTechnique.NONE, false);
-
+		TraceCheck<IAction> interpolate = new TraceCheck<>(pre, post, pendingContexts, trace, service, toolkit,
+				AssertCodeBlockOrder.NOT_INCREMENTALLY, false, false);
 
 		assert interpolate.isCorrect() != LBool.UNKNOWN;
 		return interpolate.isCorrect() == LBool.UNSAT;

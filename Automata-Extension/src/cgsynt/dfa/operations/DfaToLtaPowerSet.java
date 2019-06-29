@@ -79,6 +79,15 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 					state, destStates);
 			this.mResult.addRule(falseRule);
 		}
+		
+		List<STATE> destStates = new ArrayList<>();
+		for (int i = 0; i < this.mAllStateOrdering.size(); i++) {
+			destStates.add(mDeadState);
+		}
+		final BuchiTreeAutomatonRule<RankedBool, STATE> falseRule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
+				this.mDeadState, destStates);
+		this.mResult.addRule(falseRule);
+
 	}
 
 	/**

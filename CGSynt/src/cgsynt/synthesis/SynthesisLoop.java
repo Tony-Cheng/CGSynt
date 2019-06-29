@@ -45,6 +45,7 @@ public class SynthesisLoop {
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
 	private BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> result;
+	private IPredicate deadState;
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
@@ -85,6 +86,7 @@ public class SynthesisLoop {
 			pi.addState(true, true, prePred);
 		}
 		IPredicate deadState = createDeadState();
+		this.deadState = deadState;
 		pi.addState(false, false, deadState);
 		for (IStatement statement : mTransitionAlphabet) {
 			pi.addInternalTransition(prePred, statement, deadState);
@@ -136,8 +138,8 @@ public class SynthesisLoop {
 			result = intersectedAut;
 			return;
 		}
-		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(this.mPI,
-				k * this.mPI.getStates().size());
+		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI,
+				k *stringDFAPI.getStates().size());
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);

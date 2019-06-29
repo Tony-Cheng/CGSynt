@@ -82,13 +82,6 @@ public class MainVerificationLoop {
 		} else {
 			pi.addState(true, true, prePred);
 		}
-		IPredicate deadState = createDeadState();
-		pi.addState(false, false, deadState);
-		for (IStatement statement : mTransitionAlphabet) {
-			pi.addInternalTransition(prePred, statement, deadState);
-			pi.addInternalTransition(postPred, statement, deadState);
-			pi.addInternalTransition(deadState, statement, deadState);
-		}
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(new HashSet<>(),
 				mAllInterpolants, new HashSet<>(mTransitionAlphabet), pi);
 		pi = generalization.getResult();
