@@ -13,6 +13,7 @@ import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
+import cgsynt.probability.ConfidenceIntervalCalculator;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.IntersectState;
 import cgsynt.tree.buchi.lta.LTAIntersectState;
@@ -118,6 +119,11 @@ public class SynthesisLoop {
 
 		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();
 
+		ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(stringDFAPI,
+				k * stringDFAPI.getStates().size(), 100, this.mTransitionAlphabet);
+		double[] interval = calc.calculate95TraceConfIntervals();
+		System.out.println("Trace conf interval: (" + interval[0] + ", " + interval[1] + ")");
+
 		// Dead State
 		String deadState = "DeadState";
 
@@ -132,7 +138,7 @@ public class SynthesisLoop {
 		EmptinessCheck<RankedBool, IntersectState<String, String>> emptinessCheck = new EmptinessCheck<>(
 				intersectedAut);
 		emptinessCheck.computeResult();
-		if (k > 2 && !emptinessCheck.getResult()) {
+		if (!emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
 			result = intersectedAut;
@@ -177,9 +183,9 @@ public class SynthesisLoop {
 		while (!mResultComputed) {
 			System.out.println("Iteration: " + i);
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
-			for (int j = 1; j < 256; j++) {
-				computeOneIteration(i + 1, 16);
-			}
+			// for (int j = 1; j < 256; j++) {
+			// computeOneIteration(i + 1, 16);
+			// }
 			computeOneIteration(i + 1, -1);
 			i++;
 		}
