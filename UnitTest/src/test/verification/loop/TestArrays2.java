@@ -35,7 +35,7 @@ public class TestArrays2 {
 	 * 	i++ 
 	 * [m >= A[j]]
 	 */
-	@Test
+	//@Test
 	public void arrayMaxTest() throws Exception {
 		MainVerificationLoop.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(6);
@@ -112,7 +112,7 @@ public class TestArrays2 {
 	/**
 	 * [i = 0, t = A[0], t = 0] t = A[i] + 1 A[i] = t [i < A[i]]
 	 */
-	//@Test
+	@Test
 	public void simpleTest() throws Exception {
 		MainVerificationLoop.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(2);
@@ -156,7 +156,7 @@ public class TestArrays2 {
 		
 		IPredicate post = pf.newPredicate(script.term("<", i.getTerm(), script.term("select", A.getTerm(), i.getTerm())));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
+		AlternateVerification loop = new AlternateVerification(program, letters, pre, post);
 		loop.computeMainLoop();
 
 		assertTrue(loop.isCorrect());
