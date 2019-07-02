@@ -46,7 +46,7 @@ public class SynthesisLoop {
 	private AutomataLibraryServices mAutService;
 	private BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> result;
 	private Set<List<IStatement>> visitedCounterexamples;
-	
+
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
 
@@ -108,7 +108,7 @@ public class SynthesisLoop {
 
 	}
 
-	private void computeOneIteration(int k) throws Exception {
+	private void computeOneIteration(int k, int bs) throws Exception {
 		// Turn PI into a NFA that has String states.
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
 		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
@@ -132,14 +132,14 @@ public class SynthesisLoop {
 		EmptinessCheck<RankedBool, IntersectState<String, String>> emptinessCheck = new EmptinessCheck<>(
 				intersectedAut);
 		emptinessCheck.computeResult();
-		if (!emptinessCheck.getResult()) {
+		if (k > 2 && !emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
 			result = intersectedAut;
 			return;
 		}
 		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI,
-				k *stringDFAPI.getStates().size(), visitedCounterexamples);
+				k * stringDFAPI.getStates().size(), visitedCounterexamples, bs);
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
@@ -177,7 +177,10 @@ public class SynthesisLoop {
 		while (!mResultComputed) {
 			System.out.println("Iteration: " + i);
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
-			computeOneIteration(i + 1);
+			for (int j = 1; j < 256; j++) {
+				computeOneIteration(i + 1, 16);
+			}
+			computeOneIteration(i + 1, -1);
 			i++;
 		}
 

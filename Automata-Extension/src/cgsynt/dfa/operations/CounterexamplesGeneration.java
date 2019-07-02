@@ -15,12 +15,15 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 	private Set<List<LETTER>> result;
 	private int k;
 	private Set<List<LETTER>> visited;
+	private int bs;
 
-	public CounterexamplesGeneration(INestedWordAutomaton<LETTER, STATE> nwa, int k, Set<List<LETTER>> visited) {
+	public CounterexamplesGeneration(INestedWordAutomaton<LETTER, STATE> nwa, int k, Set<List<LETTER>> visited,
+			int bs) {
 		this.nwa = nwa;
 		resultComputed = false;
 		this.k = k;
 		this.visited = visited;
+		this.bs = bs;
 	}
 
 	public void computeResult() {
@@ -38,6 +41,8 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 	}
 
 	private void findCounterexamples(STATE state, int len, List<LETTER> counterexample) {
+		if (bs > 0 && result.size() >= bs)
+			return;
 		if (!nwa.isFinal(state) && counterexample.size() > 0 && !visited.contains(counterexample)) {
 			result.add(counterexample);
 			visited.add(counterexample);

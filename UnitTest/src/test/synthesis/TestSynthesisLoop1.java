@@ -55,11 +55,13 @@ public class TestSynthesisLoop1 {
 		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
 		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
+		// IStatement imm = new ScriptAssignmentStatement(i, script.term("-", i.getTerm(), script.numeral("1")));
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
 		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), n.getTerm()));
 		List<IStatement> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add(ipp);
 		transitionAlphabet.add(ilen);
+		// transitionAlphabet.add(imm);
 		SynthesisLoop synthesis = new SynthesisLoop(transitionAlphabet, preconditions, postconditions);
 		synthesis.computeMainLoop();
 		System.out.println("Test 2");
