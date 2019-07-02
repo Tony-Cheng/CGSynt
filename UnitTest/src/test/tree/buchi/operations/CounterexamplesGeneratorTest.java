@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.nfa.GeneralizeStateFactory;
-import cgsynt.nfa.operations.CounterexamplesGeneration;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
@@ -32,7 +32,7 @@ public class CounterexamplesGeneratorTest {
 				new StringFactory());
 		nwa.addState(true, true, "A");
 		nwa.addInternalTransition("A", 'a', "A");
-		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7);
+		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7, new HashSet<>());
 		generation.computeResult();
 		System.out.println("Test 1");
 		System.out.println("Number of counterexamples: " + generation.getResult().size());
@@ -56,7 +56,7 @@ public class CounterexamplesGeneratorTest {
 				new StringFactory());
 		nwa.addState(true, false, "A");
 		nwa.addInternalTransition("A", 'a', "A");
-		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7);
+		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7, new HashSet<>());
 		generation.computeResult();
 		System.out.println("Test 2");
 		System.out.println("Number of counterexamples: " + generation.getResult().size());
@@ -80,7 +80,7 @@ public class CounterexamplesGeneratorTest {
 				new StringFactory());
 		nwa.addState(false, false, "A");
 		nwa.addInternalTransition("A", 'a', "A");
-		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7);
+		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7, new HashSet<>());
 		generation.computeResult();
 		System.out.println("Test 3");
 		System.out.println("Number of counterexamples: " + generation.getResult().size());
@@ -105,7 +105,7 @@ public class CounterexamplesGeneratorTest {
 		nwa.addState(true, false, "A");
 		nwa.addInternalTransition("A", 'a', "A");
 		nwa.addInternalTransition("A", 'b', "A");
-		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 3);
+		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 3, new HashSet<>());
 		generation.computeResult();
 		System.out.println("Test 4");
 		System.out.println("Number of counterexamples: " + generation.getResult().size());

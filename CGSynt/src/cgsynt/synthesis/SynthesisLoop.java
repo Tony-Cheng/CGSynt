@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import cgsynt.Operations.CounterExamplesToInterpolants;
+import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
@@ -12,7 +13,6 @@ import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
-import cgsynt.nfa.operations.CounterexamplesGeneration;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.IntersectState;
 import cgsynt.tree.buchi.lta.LTAIntersectState;
@@ -45,8 +45,8 @@ public class SynthesisLoop {
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
 	private BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> result;
-	private IPredicate deadState;
-
+	private Set<List<IStatement>> visitedCounterexamples;
+	
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
 
@@ -70,6 +70,7 @@ public class SynthesisLoop {
 		this.mAllInterpolants.add(preconditions);
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
+		this.visitedCounterexamples = new HashSet<>();
 
 	}
 
@@ -86,7 +87,6 @@ public class SynthesisLoop {
 			pi.addState(true, true, prePred);
 		}
 		IPredicate deadState = createDeadState();
-		this.deadState = deadState;
 		pi.addState(false, false, deadState);
 		for (IStatement statement : mTransitionAlphabet) {
 			pi.addInternalTransition(prePred, statement, deadState);
@@ -139,7 +139,7 @@ public class SynthesisLoop {
 			return;
 		}
 		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI,
-				k *stringDFAPI.getStates().size());
+				k *stringDFAPI.getStates().size(), visitedCounterexamples);
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
