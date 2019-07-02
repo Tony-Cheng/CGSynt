@@ -7,10 +7,6 @@ import java.util.Set;
 
 import cgsynt.Operations.CounterExamplesToInterpolants;
 import cgsynt.interpol.IStatement;
-import cgsynt.interpol.TraceToInterpolants;
-import cgsynt.tree.buchi.BuchiTreeAutomaton;
-import cgsynt.tree.buchi.IntersectState;
-import cgsynt.tree.buchi.lta.RankedBool;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
@@ -30,7 +26,7 @@ public class ConfidenceIntervalCalculator {
 		this.transitionAlphabet = transitionAlphabet;
 	}
 
-	private void generateSingleSample(String state, long len, List<IStatement> trace) {
+	private void generateSingleSample(long len, List<IStatement> trace) {
 		if (len == 0)
 			return;
 		long size = 1;
@@ -41,10 +37,8 @@ public class ConfidenceIntervalCalculator {
 		}
 		int index = (int) (randNum % transitionAlphabet.size());
 		trace.add(transitionAlphabet.get(index));
-		for (OutgoingInternalTransition<IStatement, String> transition : aut.internalSuccessors(state,
-				transitionAlphabet.get(index))) {
-			generateSingleSample(transition.getSucc(), len - 1, trace);
-		}
+		generateSingleSample(len - 1, trace);
+
 	}
 
 	private boolean generateSingleSample(String state, long len) {
@@ -64,26 +58,44 @@ public class ConfidenceIntervalCalculator {
 		return false;
 	}
 
-	private Set<List<IStatement>> generateTraceSamples() {
-		Set<List<IStatement>> samples = new HashSet<>();
+	private List<List<IStatement>> generateTraceSamples() {
+		List<List<IStatement>> samples = new ArrayList<>();
 		for (int i = 0; i < sampleSize; i++) {
-			for (String initial : aut.getInitialStates()) {
-				List<IStatement> trace = new ArrayList<>();
-				generateSingleSample(initial, k, trace);
-				samples.add(trace);
-			}
+			List<IStatement> trace = new ArrayList<>();
+			generateSingleSample(k, trace);
+			samples.add(trace);
 		}
 		return samples;
 	}
 
-	public double[] calculate95TraceConfIntervals() throws Exception {
-		Set<List<IStatement>> traces = generateTraceSamples();
-		if (traces.contains(new ArrayList<>())) {
-			traces.remove(new ArrayList<>());
+	private int generatePiSample() {
+		int count = 0;
+		for (int i = 0; i < sampleSize; i++) {
+			for (String initial : aut.getInitialStates()) {
+				if (generateSingleSample(initial, k))
+					count++;
+			}
 		}
-		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(traces);
-		counterExampleToInterpolants.computeResult();
-		int count = counterExampleToInterpolants.getCorrectTraces().size();
+		return count;
+	}
+
+	public double[] calculate95TraceConfIntervals() throws Exception {
+		List<List<IStatement>> traces = generateTraceSamples();
+		for (int i = 0; i < traces.size(); i++) {
+			if (traces.get(i).equals(new ArrayList<>())) {
+				traces.remove(i);
+				i--;
+			}
+		}
+		int count = 0;
+		for (int i = 0; i < traces.size(); i++) {
+			Set<List<IStatement>> singleTraceSet = new HashSet<>();
+			singleTraceSet.add(traces.get(i));
+			CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(
+					singleTraceSet);
+			counterExampleToInterpolants.computeResult();
+			count += counterExampleToInterpolants.getCorrectTraces().size();
+		}
 		return calculateInterval(count);
 	}
 
