@@ -1,6 +1,7 @@
 package cgsynt.synthesis;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +30,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutoma
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
@@ -116,8 +118,8 @@ public class SynthesisLoop {
 		// Determinize the String state version of PI.
 		Determinize<IStatement, String> determinize = new Determinize<>(mAutService, new StringFactory(), stringNFAPI);
 
-		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();
-
+		INestedWordAutomaton<IStatement, String> stringDFAPI = addDeadStates((NestedWordAutomaton<IStatement, String>)determinize.getResult());
+		
 		// Dead State
 		String deadState = "DeadState";
 
@@ -193,5 +195,28 @@ public class SynthesisLoop {
 	public static void resetAll() throws Exception {
 		TraceGlobalVariables.reset();
 		TraceToInterpolants.reset();
+	}
+	
+	public NestedWordAutomaton<IStatement, String> addDeadStates(NestedWordAutomaton<IStatement, String> aut){
+		NestedWordAutomaton<IStatement, String> newDFA = aut;
+		
+		newDFA.addState(false, false, "DeadState");
+		
+		for (String state : aut.getStates()) {
+			@SuppressWarnings("unchecked")
+			Iterator<OutgoingInternalTransition<IStatement,String>> trans = (Iterator<OutgoingInternalTransition<IStatement, String>>) aut.internalSuccessors(state);
+			
+			Set<IStatement> lettersUsed = new HashSet<>();
+			while (trans.hasNext())
+				lettersUsed.add(trans.next().getLetter());
+			
+			for (IStatement letter : this.mTransitionAlphabet) {
+				if (!lettersUsed.contains(letter)) {
+					newDFA.addInternalTransition(state, letter, "DeadState");
+				}
+			}
+		}
+		
+		return newDFA;
 	}
 }

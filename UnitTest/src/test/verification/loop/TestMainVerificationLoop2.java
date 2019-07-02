@@ -17,6 +17,7 @@ import cgsynt.interpol.ScriptAssumptionStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
+import cgsynt.nfa.PIUnionStateFactory;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
@@ -152,7 +153,7 @@ public class TestMainVerificationLoop2 {
 
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
 		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
-
+		
 		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
 		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");

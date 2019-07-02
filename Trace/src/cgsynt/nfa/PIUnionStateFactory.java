@@ -21,8 +21,8 @@ public class PIUnionStateFactory implements IUnionStateFactory<IPredicate>{
 		
 		if (sink == null) {
 			try {
-				PIUnionStateFactory.sink = vf.constructVariable("dontusethisvariablename:sink", VariableFactory.INT);
-				PIUnionStateFactory.empty = vf.constructVariable("dontusethisvariablename:empty", VariableFactory.INT);
+				PIUnionStateFactory.sink = vf.constructVariable("sink", VariableFactory.INT);
+				PIUnionStateFactory.empty = vf.constructVariable("empty", VariableFactory.INT);
 			} catch (Exception e) {
 				System.err.println("Could not create sink/empty state placeholders!");
 				System.exit(1);
@@ -32,13 +32,13 @@ public class PIUnionStateFactory implements IUnionStateFactory<IPredicate>{
 	
 	@Override
 	public IPredicate createEmptyStackState() {
-		return  mPf.newPredicate(this.script.term("=", empty.getTerm(), script.numeral("0")));
+		return  mPf.newPredicate(script.term("=", empty.getTerm(), script.numeral("0")));
 	}
 
 	@Override
 	public IPredicate createSinkStateContent() {
 		
-		return mPf.newPredicate(this.script.term("=", sink.getTerm(), script.numeral("0")));
+		return mPf.newPredicate(script.term("=", sink.getTerm(), script.numeral("0")));
 	}
 
 	@Override
