@@ -121,8 +121,11 @@ public class SynthesisLoop {
 
 		ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(stringDFAPI,
 				k * stringDFAPI.getStates().size(), 100, this.mTransitionAlphabet);
-		double[] interval = calc.calculate95TraceConfIntervals();
-		System.out.println("Trace conf interval: (" + interval[0] + ", " + interval[1] + ")");
+		double[] traceInterval = calc.calculate95TraceConfIntervals();
+		double[] piInterval = calc.calculate95PiConfIntervals();
+
+		System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
+		System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
 
 		// Dead State
 		String deadState = "DeadState";

@@ -79,6 +79,11 @@ public class ConfidenceIntervalCalculator {
 		return count;
 	}
 
+	public double[] calculate95PiConfIntervals() throws Exception {
+		int samples = generatePiSample();
+		return calculateInterval(samples);
+	}
+
 	public double[] calculate95TraceConfIntervals() throws Exception {
 		List<List<IStatement>> traces = generateTraceSamples();
 		for (int i = 0; i < traces.size(); i++) {
