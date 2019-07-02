@@ -47,6 +47,7 @@ public class SynthesisLoop {
 	private AutomataLibraryServices mAutService;
 	private BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> result;
 	private Set<List<IStatement>> visitedCounterexamples;
+	private INestedWordAutomaton<IStatement, String> dfa;
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
@@ -118,14 +119,7 @@ public class SynthesisLoop {
 		Determinize<IStatement, String> determinize = new Determinize<>(mAutService, new StringFactory(), stringNFAPI);
 
 		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();
-
-		ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(stringDFAPI,
-				k * stringDFAPI.getStates().size(), 100, this.mTransitionAlphabet);
-		double[] traceInterval = calc.calculate95TraceConfIntervals();
-		double[] piInterval = calc.calculate95PiConfIntervals();
-
-		System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
-		System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
+		this.dfa = stringDFAPI;
 
 		// Dead State
 		String deadState = "DeadState";
@@ -148,7 +142,8 @@ public class SynthesisLoop {
 			return;
 		}
 		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI,
-				k * stringDFAPI.getStates().size(), visitedCounterexamples, bs);
+				k * stringDFAPI.getStates().size(), visitedCounterexamples, bs,
+				new HashSet<>(this.mTransitionAlphabet));
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
@@ -190,6 +185,13 @@ public class SynthesisLoop {
 			// computeOneIteration(i + 1, 16);
 			// }
 			computeOneIteration(i + 1, -1);
+			ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa,
+					i * this.dfa.getStates().size(), 1000, this.mTransitionAlphabet);
+			double[] traceInterval = calc.calculate95TraceConfIntervals();
+			double[] piInterval = calc.calculate95PiConfIntervals();
+
+			System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
+			System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
 			i++;
 		}
 
