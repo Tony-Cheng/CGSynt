@@ -107,9 +107,11 @@ public class ConfidenceIntervalCalculator {
 	private double[] calculateInterval(int count) {
 		double[] interval = new double[2];
 		double x_bar = 1.0 * count / sampleSize;
-		double s2 = (count * Math.pow(1 - x_bar, 2) + (sampleSize - count) * Math.pow(0 - x_bar, 2)) / (sampleSize - 1);
-		interval[0] = x_bar - z975 * Math.sqrt(s2 / sampleSize);
-		interval[1] = x_bar + z975 * Math.sqrt(s2 / sampleSize);
+		// double var = (count * Math.pow(1 - x_bar, 2) + (sampleSize - count) *
+		// Math.pow(0 - x_bar, 2)) / (sampleSize - 1);
+		double var = x_bar * (1 - x_bar);
+		interval[0] = x_bar - z975 * Math.sqrt(var / sampleSize);
+		interval[1] = x_bar + z975 * Math.sqrt(var / sampleSize);
 		return interval;
 	}
 

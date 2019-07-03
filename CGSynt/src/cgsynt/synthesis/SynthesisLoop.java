@@ -47,6 +47,8 @@ public class SynthesisLoop {
 	private AutomataLibraryServices mAutService;
 	private BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> result;
 	private Set<List<IStatement>> visitedCounterexamples;
+
+	// For probability testing
 	private INestedWordAutomaton<IStatement, String> dfa;
 
 	private boolean mResultComputed;
@@ -181,12 +183,22 @@ public class SynthesisLoop {
 		while (!mResultComputed) {
 			System.out.println("Iteration: " + i);
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
+			if (i > 0) {
+				ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa,
+						i * this.dfa.getStates().size(), 3000, this.mTransitionAlphabet);
+				double[] traceInterval = calc.calculate95TraceConfIntervals();
+				double[] piInterval = calc.calculate95PiConfIntervals();
+				System.out.println("Before");
+				System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
+				System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
+			}
 			// for (int j = 1; j < 256; j++) {
 			// computeOneIteration(i + 1, 16);
 			// }
 			computeOneIteration(i + 1, -1);
+			System.out.println("After");
 			ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa,
-					i * this.dfa.getStates().size(), 1000, this.mTransitionAlphabet);
+					i * this.dfa.getStates().size(), 3000, this.mTransitionAlphabet);
 			double[] traceInterval = calc.calculate95TraceConfIntervals();
 			double[] piInterval = calc.calculate95PiConfIntervals();
 

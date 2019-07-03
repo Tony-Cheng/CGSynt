@@ -71,11 +71,13 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 	private void findCounterexamples(int len, List<LETTER> counterexample) {
 		if (bs > 0 && result.size() >= bs)
 			return;
-		result.add(counterexample);
-		visited.add(counterexample);
+		if (counterexample.size() > 0 && !visited.contains(counterexample)) {
+			result.add(counterexample);
+			visited.add(counterexample);
+		}
 		if (len == 0)
 			return;
-		for (LETTER letter : alphabet) {
+		for (LETTER letter : this.alphabet) {
 			List<LETTER> nextCounterexamples = new ArrayList<>();
 			nextCounterexamples.addAll(counterexample);
 			nextCounterexamples.add(letter);
