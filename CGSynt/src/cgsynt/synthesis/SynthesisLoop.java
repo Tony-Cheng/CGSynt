@@ -47,6 +47,7 @@ public class SynthesisLoop {
 	private AutomataLibraryServices mAutService;
 	private BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> result;
 	private Set<List<IStatement>> visitedCounterexamples;
+	private int prevSize;
 
 	// For probability testing
 	private INestedWordAutomaton<IStatement, String> dfa;
@@ -143,9 +144,9 @@ public class SynthesisLoop {
 			result = intersectedAut;
 			return;
 		}
-		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI,
-				k * stringDFAPI.getStates().size(), visitedCounterexamples, bs,
-				new HashSet<>(this.mTransitionAlphabet));
+		prevSize = k * stringDFAPI.getStates().size();
+		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI, k,
+				visitedCounterexamples, bs, new HashSet<>(this.mTransitionAlphabet));
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
@@ -183,25 +184,27 @@ public class SynthesisLoop {
 		while (!mResultComputed) {
 			System.out.println("Iteration: " + i);
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
-			if (i > 0) {
-				ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa,
-						i * this.dfa.getStates().size(), 3000, this.mTransitionAlphabet);
-				double[] traceInterval = calc.calculate95TraceConfIntervals();
-				double[] piInterval = calc.calculate95PiConfIntervals();
-				System.out.println("Before");
-				System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
-				System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
-			}
+			// if (i > 0) {
+			// ConfidenceIntervalCalculator calc = new
+			// ConfidenceIntervalCalculator(this.dfa,
+			// i * this.dfa.getStates().size(), 3000, this.mTransitionAlphabet);
+			// double[] traceInterval = calc.calculate95TraceConfIntervals();
+			// double[] piInterval = calc.calculate95PiConfIntervals();
+			// System.out.println("Before");
+			// System.out.println("Trace conf interval: (" + traceInterval[0] + ", " +
+			// traceInterval[1] + ")");
+			// System.out.println("PI conf interval: (" + piInterval[0] + ", " +
+			// piInterval[1] + ")");
+			// }
 			// for (int j = 1; j < 256; j++) {
 			// computeOneIteration(i + 1, 16);
 			// }
 			computeOneIteration(i + 1, -1);
-			System.out.println("After");
-			ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa,
-					i * this.dfa.getStates().size(), 3000, this.mTransitionAlphabet);
+			ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, this.prevSize, 3000,
+					this.mTransitionAlphabet);
 			double[] traceInterval = calc.calculate95TraceConfIntervals();
 			double[] piInterval = calc.calculate95PiConfIntervals();
-
+			System.out.println("Size: " + prevSize);
 			System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
 			System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
 			i++;

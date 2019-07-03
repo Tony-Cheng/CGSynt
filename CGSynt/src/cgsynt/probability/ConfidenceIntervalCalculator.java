@@ -30,7 +30,7 @@ public class ConfidenceIntervalCalculator {
 		if (len == 0)
 			return;
 		long size = 1;
-		size = (long) ((Math.pow(transitionAlphabet.size(), len) - 1) / (transitionAlphabet.size() - 1));
+		size = (long) ((Math.pow(transitionAlphabet.size(), len + 1) - 1) / (transitionAlphabet.size() - 1));
 		long randNum = (long) (Math.random() * size);
 		if (randNum == size - 1) {
 			return;
@@ -45,7 +45,7 @@ public class ConfidenceIntervalCalculator {
 		if (len == 0)
 			return aut.isFinal(state);
 		long size = 1;
-		size = (long) ((Math.pow(transitionAlphabet.size(), len) - 1) / (transitionAlphabet.size() - 1));
+		size = (long) ((Math.pow(transitionAlphabet.size(), len + 1) - 1) / (transitionAlphabet.size() - 1));
 		long randNum = (long) (Math.random() * size);
 		if (randNum == size - 1) {
 			return aut.isFinal(state);
