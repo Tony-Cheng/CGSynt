@@ -1,7 +1,6 @@
 package cgsynt.synthesis;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +13,7 @@ import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
+import cgsynt.probability.ConfidenceIntervalCalculator;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.IntersectState;
 import cgsynt.tree.buchi.lta.LTAIntersectState;
@@ -30,7 +30,6 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutoma
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
-import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
@@ -48,7 +47,11 @@ public class SynthesisLoop {
 	private AutomataLibraryServices mAutService;
 	private BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> result;
 	private Set<List<IStatement>> visitedCounterexamples;
-	
+	private int prevSize;
+
+	// For probability testing
+	private INestedWordAutomaton<IStatement, String> dfa;
+
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
 
@@ -110,7 +113,7 @@ public class SynthesisLoop {
 
 	}
 
-	private void computeOneIteration(int k) throws Exception {
+	private void computeOneIteration(int k, int bs) throws Exception {
 		// Turn PI into a NFA that has String states.
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
 		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
@@ -140,8 +143,9 @@ public class SynthesisLoop {
 			result = intersectedAut;
 			return;
 		}
-		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI,
-				k *stringDFAPI.getStates().size(), visitedCounterexamples);
+		prevSize = k * stringDFAPI.getStates().size();
+		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI, k,
+				visitedCounterexamples, bs, new HashSet<>(this.mTransitionAlphabet));
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
@@ -179,7 +183,29 @@ public class SynthesisLoop {
 		while (!mResultComputed) {
 			System.out.println("Iteration: " + i);
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
-			computeOneIteration(i + 1);
+			// if (i > 0) {
+			// ConfidenceIntervalCalculator calc = new
+			// ConfidenceIntervalCalculator(this.dfa,
+			// i * this.dfa.getStates().size(), 3000, this.mTransitionAlphabet);
+			// double[] traceInterval = calc.calculate95TraceConfIntervals();
+			// double[] piInterval = calc.calculate95PiConfIntervals();
+			// System.out.println("Before");
+			// System.out.println("Trace conf interval: (" + traceInterval[0] + ", " +
+			// traceInterval[1] + ")");
+			// System.out.println("PI conf interval: (" + piInterval[0] + ", " +
+			// piInterval[1] + ")");
+			// }
+			// for (int j = 1; j < 256; j++) {
+			// computeOneIteration(i + 1, 16);
+			// }
+			computeOneIteration(i + 1, -1);
+			ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, this.prevSize, 3000,
+					this.mTransitionAlphabet);
+			double[] traceInterval = calc.calculate95TraceConfIntervals();
+			double[] piInterval = calc.calculate95PiConfIntervals();
+			System.out.println("Size: " + prevSize);
+			System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
+			System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
 			i++;
 		}
 

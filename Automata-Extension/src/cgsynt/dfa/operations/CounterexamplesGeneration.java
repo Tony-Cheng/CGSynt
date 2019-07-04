@@ -15,12 +15,17 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 	private Set<List<LETTER>> result;
 	private int k;
 	private Set<List<LETTER>> visited;
+	private int bs;
+	private Set<LETTER> alphabet;
 
-	public CounterexamplesGeneration(INestedWordAutomaton<LETTER, STATE> nwa, int k, Set<List<LETTER>> visited) {
+	public CounterexamplesGeneration(INestedWordAutomaton<LETTER, STATE> nwa, int k, Set<List<LETTER>> visited, int bs,
+			Set<LETTER> alphabet) {
 		this.nwa = nwa;
 		resultComputed = false;
 		this.k = k;
 		this.visited = visited;
+		this.bs = bs;
+		this.alphabet = alphabet;
 	}
 
 	public void computeResult() {
@@ -38,6 +43,8 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 	}
 
 	private void findCounterexamples(STATE state, int len, List<LETTER> counterexample) {
+		if (bs > 0 && result.size() >= bs)
+			return;
 		if (!nwa.isFinal(state) && counterexample.size() > 0 && !visited.contains(counterexample)) {
 			result.add(counterexample);
 			visited.add(counterexample);
@@ -45,11 +52,36 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 		if (len == 0) {
 			return;
 		}
+		Set<LETTER> alphabetCopy = new HashSet<>(this.alphabet);
 		for (OutgoingInternalTransition<LETTER, STATE> next : nwa.internalSuccessors(state)) {
 			List<LETTER> nextCounterexamples = new ArrayList<>();
 			nextCounterexamples.addAll(counterexample);
 			nextCounterexamples.add(next.getLetter());
+			alphabetCopy.remove(next.getLetter());
 			findCounterexamples(next.getSucc(), len - 1, nextCounterexamples);
+		}
+		for (LETTER letter : alphabetCopy) {
+			List<LETTER> nextCounterexamples = new ArrayList<>();
+			nextCounterexamples.addAll(counterexample);
+			nextCounterexamples.add(letter);
+			findCounterexamples(len - 1, nextCounterexamples);
+		}
+	}
+
+	private void findCounterexamples(int len, List<LETTER> counterexample) {
+		if (bs > 0 && result.size() >= bs)
+			return;
+		if (counterexample.size() > 0 && !visited.contains(counterexample)) {
+			result.add(counterexample);
+			visited.add(counterexample);
+		}
+		if (len == 0)
+			return;
+		for (LETTER letter : this.alphabet) {
+			List<LETTER> nextCounterexamples = new ArrayList<>();
+			nextCounterexamples.addAll(counterexample);
+			nextCounterexamples.add(letter);
+			findCounterexamples(len - 1, nextCounterexamples);
 		}
 	}
 }
