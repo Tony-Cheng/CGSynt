@@ -58,7 +58,7 @@ public class TestSynthesisLoop1 {
 		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
 		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
-		// IStatement imm = new ScriptAssignmentStatement(i, script.term("-", i.getTerm(), script.numeral("1")));
+		IStatement imm = new ScriptAssignmentStatement(i, script.term("-", i.getTerm(), script.numeral("1")));
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
 		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), n.getTerm()));
 		List<IStatement> transitionAlphabet = new ArrayList<>();
@@ -71,8 +71,9 @@ public class TestSynthesisLoop1 {
 		System.out.println(synthesis.isCorrect());
 
 	}
-	
-	@Test void test3() throws Exception {
+
+	@Test
+	void test3() throws Exception {
 		SynthesisLoop.resetAll();
 		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
 		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
@@ -94,7 +95,7 @@ public class TestSynthesisLoop1 {
 		transitionAlphabet.add(mleai);
 		transitionAlphabet.add(meai);
 		transitionAlphabet.add(ipp);
-		
+
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
 		preconditions = predicateFactory.and(preconditions,
 				predicateFactory.newPredicate(script.term(">=", n.getTerm(), script.numeral("1"))));

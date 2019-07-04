@@ -117,7 +117,7 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 			STATE nextInitState = iterInitStates.next();
 			if (!goodStates.contains(nextInitState)) {
 				iterInitStates.remove();
-				removeState(nextInitState);
+				mtree.removeState(nextInitState);
 			}
 		}
 
@@ -126,48 +126,11 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 			STATE nextFinalState = iterFinalStates.next();
 			if (!goodStates.contains(nextFinalState)) {
 				iterFinalStates.remove();
-				removeState(nextFinalState);
+				mtree.removeState(nextFinalState);
 				finalStateRemoved = true;
 			}
 		}
 		return finalStateRemoved;
-	}
-
-	/**
-	 * Remove the state s and its transitions from the tree.
-	 * 
-	 * @param s
-	 */
-	private void removeState(STATE s) {
-		Collection<BuchiTreeAutomatonRule<LETTER, STATE>> rulesToS = mtree.getChildMap().get(s);
-		if (rulesToS != null) {
-			for (BuchiTreeAutomatonRule<LETTER, STATE> rule : rulesToS) {
-				for (STATE dest : rule.getDest()) {
-					if (!dest.equals(s) && mtree.getChildMap().get(dest) != null
-							&& mtree.getChildMap().get(dest).contains(rule)) {
-						mtree.getChildMap().get(dest).remove(rule);
-					}
-				}
-				if (mtree.getSourceMap().get(rule.getSource()) != null
-						&& mtree.getSourceMap().get(rule.getSource()).contains(rule)) {
-					mtree.getSourceMap().get(rule.getSource()).remove(rule);
-				}
-			}
-			mtree.getChildMap().remove(s);
-		}
-
-		Collection<BuchiTreeAutomatonRule<LETTER, STATE>> rulesFromS = mtree.getSourceMap().get(s);
-		if (rulesFromS != null) {
-			for (BuchiTreeAutomatonRule<LETTER, STATE> rule : rulesFromS) {
-				for (STATE dest : rule.getDest()) {
-					if (!dest.equals(s) && mtree.getChildMap().get(dest) != null
-							&& mtree.getChildMap().get(dest).contains(rule)) {
-						mtree.getChildMap().get(dest).remove(rule);
-					}
-				}
-			}
-			mtree.getSourceMap().remove(s);
-		}
 	}
 
 	/**

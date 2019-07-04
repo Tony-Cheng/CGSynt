@@ -49,22 +49,9 @@ public class IntersectState<STATE1, STATE2> {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + mode;
-		result = prime * result + ((state1 == null) ? 0 : state1.hashCode())
-				+ ((state2 == null) ? 0 : state2.hashCode());
+		result = prime * result + ((state1 == null) ? 0 : state1.hashCode());
 		result = prime * result + ((state2 == null) ? 0 : state2.hashCode());
 		return result;
-	}
-
-	public STATE1 getState1() {
-		return state1;
-	}
-
-	public STATE2 getState2() {
-		return state2;
-	}
-
-	public int getMode() {
-		return mode;
 	}
 
 	@Override
@@ -89,6 +76,18 @@ public class IntersectState<STATE1, STATE2> {
 		} else if (!state2.equals(other.state2))
 			return false;
 		return true;
+	}
+
+	public STATE1 getState1() {
+		return state1;
+	}
+
+	public STATE2 getState2() {
+		return state2;
+	}
+
+	public int getMode() {
+		return mode;
 	}
 
 }
