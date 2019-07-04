@@ -91,13 +91,6 @@ public class SynthesisLoop {
 		} else {
 			pi.addState(true, true, prePred);
 		}
-		IPredicate deadState = createDeadState();
-		pi.addState(false, false, deadState);
-		for (IStatement statement : mTransitionAlphabet) {
-			pi.addInternalTransition(prePred, statement, deadState);
-			pi.addInternalTransition(postPred, statement, deadState);
-			pi.addInternalTransition(deadState, statement, deadState);
-		}
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(new HashSet<>(),
 				mAllInterpolants, new HashSet<>(mTransitionAlphabet), pi);
 		pi = generalization.getResult();
@@ -193,7 +186,8 @@ public class SynthesisLoop {
 		}
 		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI, k,
 				visitedCounterexamples, bs, this.mTransitionAlphabet);
-		generator.computeResult();;
+		generator.computeResult();
+		;
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
 		counterExampleToInterpolants.computeResult();
@@ -252,7 +246,8 @@ public class SynthesisLoop {
 			} else {
 				computeOneIterationRandom(i, 100);
 			}
-			while (!(Math.abs(traceProb - piProb) <= 0.01) || !(traceInterval[0] <= piProb && piProb <= traceInterval[1])
+			while (!(Math.abs(traceProb - piProb) <= 0.01)
+					|| !(traceInterval[0] <= piProb && piProb <= traceInterval[1])
 					|| !(piInterval[0] <= traceProb && traceProb <= piInterval[1])) {
 				System.out.println(!(Math.abs(traceProb - piProb) <= 0.05) + " "
 						+ !(traceInterval[0] <= piProb && piProb <= traceInterval[1]) + " "
@@ -279,7 +274,7 @@ public class SynthesisLoop {
 		System.out.println("Size: " + prevSize);
 		System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
 		System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
-		
+
 	}
 
 	private void printAllInterpolants() {
