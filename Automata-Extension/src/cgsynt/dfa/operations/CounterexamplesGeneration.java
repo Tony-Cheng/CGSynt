@@ -10,6 +10,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.Outgo
 
 public class CounterexamplesGeneration<LETTER, STATE> {
 
+	public static int NO_BATCH = -1;
 	private INestedWordAutomaton<LETTER, STATE> nwa;
 	private boolean resultComputed;
 	private Set<List<LETTER>> result;

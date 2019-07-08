@@ -154,6 +154,53 @@ public class SynthesisLoop {
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
 	}
 
+	private void computeOneIterationExponential(int k) throws Exception {
+		// Turn PI into a NFA that has String states.
+		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
+		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
+
+		// Determinize the String state version of PI.
+		Determinize<IStatement, String> determinize = new Determinize<>(mAutService, new StringFactory(), stringNFAPI);
+
+		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();
+		this.dfa = stringDFAPI;
+
+		// Dead State
+		String deadState = "DeadState";
+
+		// Transform the DFA into an LTA
+		DfaToLtaPowerSet<IStatement, String> dfaToLta = new DfaToLtaPowerSet<IStatement, String>(stringDFAPI,
+				mTransitionAlphabet, deadState);
+
+		BuchiTreeAutomaton<RankedBool, String> powerSet = dfaToLta.getResult();
+
+		BuchiIntersection<RankedBool, String, String> intersection = new BuchiIntersection<>(mPrograms, powerSet);
+		BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> intersectedAut = intersection.computeResult();
+		EmptinessCheck<RankedBool, IntersectState<String, String>> emptinessCheck = new EmptinessCheck<>(
+				intersectedAut);
+		emptinessCheck.computeResult();
+		if (!emptinessCheck.getResult()) {
+			mIsCorrect = true;
+			mResultComputed = true;
+			result = intersectedAut;
+		}
+		prevSize = k * stringDFAPI.getStates().size();
+		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI, k,
+				visitedCounterexamples, CounterexamplesGeneration.NO_BATCH, this.mTransitionAlphabet);
+		generator.computeResult();
+		Set<List<IStatement>> counterExamples = generator.getResult();
+		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
+		counterExampleToInterpolants.computeResult();
+
+		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
+				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);
+		mPI = generalization.getResult();
+
+		// Change the set of interpolants after the old and new ones have been used to
+		// calculate the new triplets.
+		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
+	}
+
 	private void computeOneIterationRandom(int k, int bs) throws Exception {
 		// Turn PI into a NFA that has String states.
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
@@ -264,6 +311,10 @@ public class SynthesisLoop {
 				System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
 			}
 		}
+	}
+
+	public void computeMainLoopExponential(int len) throws Exception {
+		this.computeOneIterationExponential(len);
 	}
 
 	private void printRootConfidenceInterval() throws Exception {
