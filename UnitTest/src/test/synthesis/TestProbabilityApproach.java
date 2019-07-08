@@ -18,7 +18,7 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOld
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
-public class TestSynthesisLoop1 {
+public class TestProbabilityApproach {
 
 	@Test
 	void test1() throws Exception {
@@ -42,11 +42,11 @@ public class TestSynthesisLoop1 {
 		transitionAlphabet.add(ipp);
 		transitionAlphabet.add(imm);
 		SynthesisLoop synthesis = new SynthesisLoop(transitionAlphabet, preconditions, postconditions);
-		synthesis.computeMainLoop();
+		synthesis.computeMainLoopRandomly(3);;
 		System.out.println("Test 1");
 		System.out.println(synthesis.isCorrect());
 	}
-
+	
 	@Test
 	void test2() throws Exception {
 		SynthesisLoop.resetAll();
@@ -58,7 +58,7 @@ public class TestSynthesisLoop1 {
 		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
 		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
-		IStatement imm = new ScriptAssignmentStatement(i, script.term("-", i.getTerm(), script.numeral("1")));
+		// IStatement imm = new ScriptAssignmentStatement(i, script.term("-", i.getTerm(), script.numeral("1")));
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
 		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), n.getTerm()));
 		List<IStatement> transitionAlphabet = new ArrayList<>();
@@ -66,14 +66,13 @@ public class TestSynthesisLoop1 {
 		transitionAlphabet.add(ilen);
 		// transitionAlphabet.add(imm);
 		SynthesisLoop synthesis = new SynthesisLoop(transitionAlphabet, preconditions, postconditions);
-		synthesis.computeMainLoop();
+		synthesis.computeMainLoopRandomly(5);;
 		System.out.println("Test 2");
 		System.out.println(synthesis.isCorrect());
 
 	}
-
-	@Test
-	void test3() throws Exception {
+	
+	@Test void test3() throws Exception {
 		SynthesisLoop.resetAll();
 		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
 		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
@@ -95,7 +94,7 @@ public class TestSynthesisLoop1 {
 		transitionAlphabet.add(mleai);
 		transitionAlphabet.add(meai);
 		transitionAlphabet.add(ipp);
-
+		
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
 		preconditions = predicateFactory.and(preconditions,
 				predicateFactory.newPredicate(script.term(">=", n.getTerm(), script.numeral("1"))));
@@ -108,7 +107,7 @@ public class TestSynthesisLoop1 {
 		IPredicate postconditions = predicateFactory
 				.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), j.getTerm())));
 		SynthesisLoop synthesis = new SynthesisLoop(transitionAlphabet, preconditions, postconditions);
-		synthesis.computeMainLoop();
+		synthesis.computeMainLoopRandomly(5);;
 		System.out.println("Test 3");
 		System.out.println(synthesis.isCorrect());
 

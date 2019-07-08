@@ -19,6 +19,48 @@ import de.uni_freiburg.informatik.ultimate.core.model.models.IElement;
  * @param <STATE>
  */
 public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements IBuchiTreeAutomaton<LETTER, STATE> {
+
+	private final Set<LETTER> mAlphabet;
+	private final Map<List<STATE>, Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>>> mChildrenMap;
+	private final Set<STATE> mFinalStates;
+	private final Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mLettersMap;
+	private final Map<STATE, Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>>> mParentsMap;
+	private final Set<BuchiTreeAutomatonRule<LETTER, STATE>> mRules;
+	private final Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mSourceMap;
+	private final Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mChildMap;
+	private final Set<STATE> mStates;
+	private final Set<STATE> mInitStates;
+	private final int rank;
+
+	/**
+	 * Remove a state and its transitions from the automaton.
+	 * 
+	 * @param state
+	 */
+	public void removeState(STATE state) {
+		Set<BuchiTreeAutomatonRule<LETTER, STATE>> removedRules = new HashSet<>();
+		if (mSourceMap.containsKey(state))
+			removedRules.addAll(mSourceMap.get(state));
+		if (mChildMap.containsKey(state))
+			removedRules.addAll(mChildMap.get(state));
+		mRules.removeAll(removedRules);
+		for (BuchiTreeAutomatonRule<LETTER, STATE> rule : removedRules) {
+			mChildrenMap.get(rule.getDest()).get(rule.getLetter()).remove(rule);
+			mLettersMap.get(rule.getLetter()).remove(rule);
+			mParentsMap.get(rule.getSource()).get(rule.getLetter()).remove(rule);
+			mSourceMap.get(rule.getSource()).remove(rule);
+			for (STATE child : rule.getDest()) {
+				mChildMap.get(child).remove(rule);
+			}
+		}
+		if (mFinalStates.contains(state))
+			mFinalStates.remove(state);
+		if (mStates.contains(state))
+			mStates.remove(state);
+		if ((mInitStates).contains(state))
+			mInitStates.remove(state);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -88,18 +130,6 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 			return false;
 		return true;
 	}
-
-	private final Set<LETTER> mAlphabet;
-	private final Map<List<STATE>, Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>>> mChildrenMap;
-	private final Set<STATE> mFinalStates;
-	private final Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mLettersMap;
-	private final Map<STATE, Map<LETTER, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>>> mParentsMap;
-	private final Set<BuchiTreeAutomatonRule<LETTER, STATE>> mRules;
-	private final Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mSourceMap;
-	private final Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> mChildMap;
-	private final Set<STATE> mStates;
-	private final Set<STATE> mInitStates;
-	private final int rank;
 
 	/**
 	 * Create a BuchiTreeAutomaton.
@@ -322,6 +352,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 
 	/**
 	 * Get the set containing this BuchiTreeAutomaton's final states
+	 * 
 	 * @return A set of states.
 	 */
 	public Set<STATE> getFinalStates() {
@@ -330,6 +361,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 
 	/**
 	 * Get the set of transition rules for this automaton
+	 * 
 	 * @return A set of transitions
 	 */
 	public Set<BuchiTreeAutomatonRule<LETTER, STATE>> getRules() {
@@ -338,6 +370,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 
 	/**
 	 * Get the rank of this tree automaton.
+	 * 
 	 * @return The rank of the automaton
 	 */
 	public int getRank() {
@@ -355,8 +388,9 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	}
 
 	/**
-	 * Get the map that maps automaton states to the collection 
-	 * of destination states reachable from that state.
+	 * Get the map that maps automaton states to the collection of destination
+	 * states reachable from that state.
+	 * 
 	 * @return A source map
 	 */
 	public Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> getSourceMap() {
@@ -364,8 +398,9 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	}
 
 	/**
-	 * Get the map that maps automaton states to the collection
-	 * of source states for a specified state.
+	 * Get the map that maps automaton states to the collection of source states for
+	 * a specified state.
+	 * 
 	 * @return A child map
 	 */
 	public Map<STATE, Collection<BuchiTreeAutomatonRule<LETTER, STATE>>> getChildMap() {
@@ -406,7 +441,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		
+
 		result.append("States:\n");
 		for (STATE state : mStates) {
 			result.append(state.toString());
@@ -420,28 +455,28 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 			result.append("\n");
 		}
 		result.append("\n");
-		
+
 		result.append("Final States:\n");
 		for (STATE state : mFinalStates) {
 			result.append(state.toString());
 			result.append("\n");
 		}
 		result.append("\n");
-		
+
 		result.append("Alphabet:\n");
 		for (LETTER letter : mAlphabet) {
 			result.append(letter.toString());
 			result.append("\n");
 		}
 		result.append("\n");
-		
+
 		result.append("Transitions:\n");
 		for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mRules) {
 			result.append(rule.toString());
 			result.append("\n");
 		}
 		result.append("\n");
-		
+
 		result.append("\n");
 		return result.toString();
 

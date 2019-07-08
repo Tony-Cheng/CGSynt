@@ -107,22 +107,26 @@ public class BuchiIntersection<LETTER extends IRankedLetter, STATE1, STATE2> {
 						BuchiTreeAutomatonRule<LETTER, IntersectState<STATE1, STATE2>> newRule = new BuchiTreeAutomatonRule<>(
 								letter, newSource, destResultMode2);
 						result.addRule(newRule);
+
 					} else {
 						IntersectState<STATE1, STATE2> newSource = new IntersectState<>(source1, source2, 1);
 						BuchiTreeAutomatonRule<LETTER, IntersectState<STATE1, STATE2>> newRule = new BuchiTreeAutomatonRule<>(
 								letter, newSource, destResultMode1);
 						result.addRule(newRule);
+
 					}
 					if (tree2.isFinalState(source2)) {
 						IntersectState<STATE1, STATE2> newSource = new IntersectState<>(source1, source2, 2);
 						BuchiTreeAutomatonRule<LETTER, IntersectState<STATE1, STATE2>> newRule = new BuchiTreeAutomatonRule<>(
 								letter, newSource, destResultMode1);
 						result.addRule(newRule);
+
 					} else {
 						IntersectState<STATE1, STATE2> newSource = new IntersectState<>(source1, source2, 2);
 						BuchiTreeAutomatonRule<LETTER, IntersectState<STATE1, STATE2>> newRule = new BuchiTreeAutomatonRule<>(
 								letter, newSource, destResultMode2);
 						result.addRule(newRule);
+
 					}
 				}
 			}

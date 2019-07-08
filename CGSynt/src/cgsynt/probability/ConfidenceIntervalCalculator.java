@@ -38,7 +38,6 @@ public class ConfidenceIntervalCalculator {
 		int index = (int) (randNum % transitionAlphabet.size());
 		trace.add(transitionAlphabet.get(index));
 		generateSingleSample(len - 1, trace);
-
 	}
 
 	private boolean generateSingleSample(String state, long len) {

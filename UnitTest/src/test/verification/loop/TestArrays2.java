@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import cgsynt.Verification.AlternateVerification;
 import cgsynt.Verification.MainVerificationLoop;
-import cgsynt.interpol.IAssumption;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.ScriptAssumptionStatement;
@@ -28,14 +27,10 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPre
 public class TestArrays2 {
 
 	/**
-	 * [i = 0, n >= 0, m = A[0], j >=0, j < n] 
-	 * while i < n: 
-	 * 	if m < A[i]: 
-	 * 		m = A[i]
-	 * 	i++ 
-	 * [m >= A[j]]
+	 * [i = 0, n >= 0, m = A[0], j >=0, j < n] while i < n: if m < A[i]: m = A[i]
+	 * i++ [m >= A[j]]
 	 */
-	//@Test
+	@Test
 	public void arrayMaxTest() throws Exception {
 		MainVerificationLoop.resetAll();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(6);
@@ -89,15 +84,15 @@ public class TestArrays2 {
 		// Create Meta Alphabet for LTA
 		List<IStatement> letters = Arrays.asList(ilen, igen, mleai, mgeai, meai, ipp);
 
-		List<String> dest1 = Arrays.asList(		 "3",  "2",  "I",   "I",   "I",  "I");
-		List<String> dest2 = Arrays.asList(		 "I",  "I",  "I",   "I",   "I",  "I");
-		List<String> dest3 = Arrays.asList(		 "I",  "I",  "4",   "5",   "I",  "I");
-		List<String> dest4 = Arrays.asList(		 "I",  "I",  "I",   "I",   "5",  "I");
-		List<String> dest5 = Arrays.asList(		 "I",  "I",  "I",   "I",   "I",  "1");
-		List<String> destI = Arrays.asList(		 "I",  "I",  "I",   "I",   "I",  "I");
+		List<String> dest1 = Arrays.asList("3", "2", "I", "I", "I", "I");
+		List<String> dest2 = Arrays.asList("I", "I", "I", "I", "I", "I");
+		List<String> dest3 = Arrays.asList("I", "I", "4", "5", "I", "I");
+		List<String> dest4 = Arrays.asList("I", "I", "I", "I", "5", "I");
+		List<String> dest5 = Arrays.asList("I", "I", "I", "I", "I", "1");
+		List<String> destI = Arrays.asList("I", "I", "I", "I", "I", "I");
 
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "1", dest1));
-		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE,  "2", dest2));
+		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "2", dest2));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "3", dest3));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "4", dest4));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "5", dest5));
@@ -126,7 +121,7 @@ public class TestArrays2 {
 		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
 		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
 		BasicPredicateFactory pf = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
-		
+
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
 		BoogieNonOldVar t = vf.constructVariable("t", VariableFactory.INT);
 		BoogieNonOldVar A = vf.constructVariable("A", VariableFactory.INT_ARR);
@@ -150,16 +145,17 @@ public class TestArrays2 {
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "I", destI));
 
 		IPredicate pre = pf.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
-		pre = pf.and(pre, pf.newPredicate(
-				script.term("=", t.getTerm(), script.term("select", A.getTerm(), script.numeral("0")))));
+		pre = pf.and(pre, pf
+				.newPredicate(script.term("=", t.getTerm(), script.term("select", A.getTerm(), script.numeral("0")))));
 		pre = pf.and(pre, pf.newPredicate(script.term("=", t.getTerm(), script.numeral("0"))));
-		
-		IPredicate post = pf.newPredicate(script.term("<", i.getTerm(), script.term("select", A.getTerm(), i.getTerm())));
+
+		IPredicate post = pf
+				.newPredicate(script.term("<", i.getTerm(), script.term("select", A.getTerm(), i.getTerm())));
 
 		AlternateVerification loop = new AlternateVerification(program, letters, pre, post);
 		loop.computeMainLoop();
 
 		assertTrue(loop.isCorrect());
 	}
-	
+
 }

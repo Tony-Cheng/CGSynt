@@ -16,10 +16,10 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 	private int k;
 	private Set<List<LETTER>> visited;
 	private int bs;
-	private Set<LETTER> alphabet;
+	private List<LETTER> alphabet;
 
 	public CounterexamplesGeneration(INestedWordAutomaton<LETTER, STATE> nwa, int k, Set<List<LETTER>> visited, int bs,
-			Set<LETTER> alphabet) {
+			List<LETTER> alphabet) {
 		this.nwa = nwa;
 		resultComputed = false;
 		this.k = k;
@@ -33,7 +33,7 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 			return;
 		result = new HashSet<>();
 		for (STATE initialState : nwa.getInitialStates()) {
-			findCounterexamples(initialState, k * nwa.getStates().size(), new ArrayList<>());
+			findCounterexamples(initialState, k, new ArrayList<>());
 		}
 		resultComputed = true;
 	}
@@ -83,5 +83,34 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 			nextCounterexamples.add(letter);
 			findCounterexamples(len - 1, nextCounterexamples);
 		}
+	}
+
+	private void findCounterexamplesRandom(int len, List<LETTER> counterexample) {
+		if (len == 0)
+			return;
+		long size = 1;
+		size = (long) ((Math.pow(alphabet.size(), len + 1) - 1) / (alphabet.size() - 1));
+		long randNum = (long) (Math.random() * size);
+		if (randNum == size - 1) {
+			return;
+		}
+		int index = (int) (randNum % alphabet.size());
+		counterexample.add(alphabet.get(index));
+		findCounterexamplesRandom(len - 1, counterexample);
+	}
+
+	public void computeRandomly() {
+		if (resultComputed)
+			return;
+		result = new HashSet<>();
+		for (int i = 0; i < bs; i++) {
+			List<LETTER> counterexample = new ArrayList<>();
+			findCounterexamplesRandom(k, counterexample);
+			if (counterexample.size() > 0) {
+				result.add(counterexample);
+				visited.add(counterexample);
+			}
+		}
+		resultComputed = true;
 	}
 }
