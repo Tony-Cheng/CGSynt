@@ -309,12 +309,29 @@ public class SynthesisLoop {
 				System.out.println("Size: " + i);
 				System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
 				System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
+				System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
 			}
 		}
 	}
 
 	public void computeMainLoopExponential(int len) throws Exception {
-		this.computeOneIterationExponential(len);
+		for (int i = 0; i < len; i++) {
+			System.out.println("Iteration: " + i);
+			this.computeOneIterationExponential(i);
+			ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, i, 500,
+					this.mTransitionAlphabet);
+			double[] traceInterval = calc.calculate95TraceConfIntervals();
+			double[] piInterval = calc.calculate95PiConfIntervals();
+			double traceProb = (traceInterval[1] + traceInterval[0]) / 2;
+			double piProb = (piInterval[1] + piInterval[0]) / 2;
+			System.out.println("Size: " + i);
+			System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
+			System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
+			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
+			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
+			
+
+		}
 	}
 
 	private void printRootConfidenceInterval() throws Exception {
