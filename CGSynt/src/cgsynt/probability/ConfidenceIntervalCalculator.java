@@ -56,6 +56,78 @@ public class ConfidenceIntervalCalculator {
 		}
 		return false;
 	}
+	
+	private void generateSingleSampleBottom(long len, List<IStatement> trace) {
+		if (len == 0)
+			return;
+		long size = 1;
+		size = (long) ((Math.pow(transitionAlphabet.size(), len + 1) - 1) / (transitionAlphabet.size() - 1)) - 1;
+		long randNum = (long) (Math.random() * size);
+		int index = (int) (randNum % transitionAlphabet.size());
+		trace.add(transitionAlphabet.get(index));
+		generateSingleSample(len - 1, trace);
+	}
+	
+	private boolean generateSingleSampleBottom(String state, long len) {
+		if (len == 0)
+			return aut.isFinal(state);
+		long size = 1;
+		size = (long) ((Math.pow(transitionAlphabet.size(), len + 1) - 1) / (transitionAlphabet.size() - 1)) - 1;
+		long randNum = (long) (Math.random() * size);
+		int index = (int) (randNum % transitionAlphabet.size());
+		for (OutgoingInternalTransition<IStatement, String> transition : aut.internalSuccessors(state,
+				transitionAlphabet.get(index))) {
+			return generateSingleSample(transition.getSucc(), len - 1);
+		}
+		return false;
+	}
+	
+	private List<List<IStatement>> generateTraceSamplesBottom() {
+		List<List<IStatement>> samples = new ArrayList<>();
+		for (int i = 0; i < sampleSize; i++) {
+			List<IStatement> trace = new ArrayList<>();
+			generateSingleSampleBottom(k, trace);
+			samples.add(trace);
+		}
+		return samples;
+	}
+
+	private int generatePiSampleBottom() {
+		int count = 0;
+		for (int i = 0; i < sampleSize; i++) {
+			for (String initial : aut.getInitialStates()) {
+				if (generateSingleSampleBottom(initial, k))
+					count++;
+			}
+		}
+		return count;
+	}
+	
+	public double[] calculate95PiConfIntervalsBottom() throws Exception {
+		int samples = generatePiSampleBottom();
+		return calculateInterval(samples);
+	}
+
+	public double[] calculate95TraceConfIntervalsBottom() throws Exception {
+		List<List<IStatement>> traces = generateTraceSamplesBottom();
+		for (int i = 0; i < traces.size(); i++) {
+			if (traces.get(i).equals(new ArrayList<>())) {
+				traces.remove(i);
+				i--;
+			}
+		}
+		int count = 0;
+		for (int i = 0; i < traces.size(); i++) {
+			Set<List<IStatement>> singleTraceSet = new HashSet<>();
+			singleTraceSet.add(traces.get(i));
+			CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(
+					singleTraceSet);
+			counterExampleToInterpolants.computeResult();
+			count += counterExampleToInterpolants.getCorrectTraces().size();
+		}
+		return calculateInterval(count);
+	}
+
 
 	private List<List<IStatement>> generateTraceSamples() {
 		List<List<IStatement>> samples = new ArrayList<>();

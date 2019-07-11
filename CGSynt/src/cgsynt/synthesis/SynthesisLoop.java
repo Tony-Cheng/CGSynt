@@ -274,7 +274,7 @@ public class SynthesisLoop {
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
 			i++;
 		}
-		printRootConfidenceInterval();
+		// printRootConfidenceInterval();
 	}
 
 	public void computeMainLoopRandomly(int len) throws Exception {
@@ -282,6 +282,8 @@ public class SynthesisLoop {
 		double[] piInterval = new double[] { 0.0, 0.0 };
 		double traceProb = (traceInterval[1] - traceInterval[0]) / 2;
 		double piProb = (piInterval[1] - piInterval[0]) / 2;
+		double[] traceBottomInterval = new double[] { 0.0, 0.0 };
+		double[] piBottomInterval = new double[] { 0.0, 0.0 };
 		for (int i = 0; i < len; i++) {
 			if (i > 0) {
 				ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, i, 500,
@@ -306,9 +308,15 @@ public class SynthesisLoop {
 				piInterval = calc.calculate95PiConfIntervals();
 				traceProb = (traceInterval[1] + traceInterval[0]) / 2;
 				piProb = (piInterval[1] + piInterval[0]) / 2;
+				traceBottomInterval = calc.calculate95TraceConfIntervalsBottom();
+				piBottomInterval = calc.calculate95PiConfIntervalsBottom();
 				System.out.println("Size: " + i);
 				System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
 				System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
+				System.out.println(
+						"Trace bottom conf interval: (" + traceBottomInterval[0] + ", " + traceBottomInterval[1] + ")");
+				System.out
+						.println("PI bottom conf interval: (" + piBottomInterval[0] + ", " + piBottomInterval[1] + ")");
 				System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
 			}
 		}
@@ -322,14 +330,15 @@ public class SynthesisLoop {
 					this.mTransitionAlphabet);
 			double[] traceInterval = calc.calculate95TraceConfIntervals();
 			double[] piInterval = calc.calculate95PiConfIntervals();
-			double traceProb = (traceInterval[1] + traceInterval[0]) / 2;
-			double piProb = (piInterval[1] + piInterval[0]) / 2;
+			double[] traceBottomInterval = calc.calculate95TraceConfIntervalsBottom();
+			double[] piBottomInterval = calc.calculate95PiConfIntervalsBottom();
 			System.out.println("Size: " + i);
 			System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
 			System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
+			System.out.println(
+					"Trace bottom conf interval: (" + traceBottomInterval[0] + ", " + traceBottomInterval[1] + ")");
+			System.out.println("PI bottom conf interval: (" + piBottomInterval[0] + ", " + piBottomInterval[1] + ")");
 			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
-			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
-			
 
 		}
 	}
