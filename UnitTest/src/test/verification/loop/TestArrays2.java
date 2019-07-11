@@ -99,9 +99,10 @@ public class TestArrays2 {
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "I", destI));
 
 		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
-		loop.computeMainLoop();
 		loop.setPrintLogs(true);
 
+		loop.computeMainLoop();
+		TraceToInterpolants.getTraceToInterpolants().printAverageTime();
 		assertTrue(loop.isCorrect());
 	}
 
