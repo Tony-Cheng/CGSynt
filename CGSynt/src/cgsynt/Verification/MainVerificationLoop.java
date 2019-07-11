@@ -49,6 +49,9 @@ public class MainVerificationLoop {
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
+	private List<String> logs;
+	private boolean printLogs;
+	private int prevLogLen;
 
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
 			IPredicate preconditions, IPredicate postconditions) throws Exception {
@@ -67,7 +70,14 @@ public class MainVerificationLoop {
 		this.mAllInterpolants.add(preconditions);
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
+		this.logs = new ArrayList<>();
+		this.printLogs = false;
+		this.prevLogLen = 0;
 
+	}
+
+	public void setPrintLogs(boolean printLogs) {
+		this.printLogs = printLogs;
 	}
 
 	private NestedWordAutomaton<IStatement, IPredicate> createPI(IPredicate prePred, IPredicate postPred)
@@ -127,14 +137,16 @@ public class MainVerificationLoop {
 			mResultComputed = true;
 			return;
 		}
-		System.out.println("Start to emptiness check: " + (System.nanoTime() - time)/1000000);
+		logs.add("Start to emptiness check: " + (System.nanoTime() - time) / 1000000);
 		time = System.nanoTime();
 		Set<List<IStatement>> counterExamples = emptinessCheck.findCounterExamples(mTransitionAlphabet);
-		System.out.println("Find counter examples: " + (System.nanoTime() - time)/1000000);
+		logs.add("Find counter examples: " + (System.nanoTime() - time) / 1000000);
 		time = System.nanoTime();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
 		counterExampleToInterpolants.computeResult();
-		System.out.println("Find interpolants: " + (System.nanoTime() - time)/1000000);
+		logs.add("Number of counterexamples: " + (counterExampleToInterpolants.getCorrectTraces().size()
+				+ counterExampleToInterpolants.getIncorrectTrace().size()));
+		logs.add("Find interpolants: " + (System.nanoTime() - time) / 1000000);
 		time = System.nanoTime();
 		if (counterExampleToInterpolants.getIncorrectTrace().size() > 0) {
 			mIsCorrect = false;
@@ -145,12 +157,22 @@ public class MainVerificationLoop {
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);
 		mPI = generalization.getResult();
-		System.out.println("Generalization: " + (System.nanoTime() - time)/1000000);
+		logs.add("Generalization: " + (System.nanoTime() - time) / 1000000);
 		time = System.nanoTime();
 
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
+	}
+
+	public void printLogs() {
+		for (String log : logs) {
+			System.out.println(log);
+		}
+	}
+
+	public List<String> getLogs() {
+		return logs;
 	}
 
 	private Set<IPredicate> flatten(List<Set<IPredicate>> interpolants) {
@@ -170,22 +192,32 @@ public class MainVerificationLoop {
 	public void computeMainLoop() throws Exception {
 		int i = 0;
 		while (!mResultComputed) {
-			System.out.println("Iteration:" + i);
-			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
+			logs.add("Iteration:" + i);
 			computeOneIteration();
-			System.out.println("Interpolants:");
+			logs.add("Number of interpolants: " + this.mAllInterpolants.size());
 			i++;
+			if (printLogs)
+				printLogsOnIteration();
 		}
+		logs.add("The process took " + i + " iterations.");
+		if (printLogs)
+			printLogsOnIteration();
 
-		System.err.println("The process took " + i + " iterations.");
 	}
-	
+
+	private void printLogsOnIteration() {
+		for (int i = this.prevLogLen; i < this.logs.size(); i++) {
+			System.out.println(logs.get(i));
+		}
+		this.prevLogLen = this.logs.size();
+	}
+
 	private void printAllInterpolants() {
 		for (IPredicate interpol : this.mAllInterpolants) {
 			System.out.println(interpol);
 		}
 	}
-	
+
 	public static void resetAll() throws Exception {
 		TraceGlobalVariables.reset();
 		TraceToInterpolants.reset();
