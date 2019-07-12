@@ -13,6 +13,7 @@ import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
 import cgsynt.synthesis.SynthesisLoop;
+import cgsynt.synthesis.SynthesisLoopExperimental;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
@@ -22,60 +23,66 @@ public class TestProbabilityApproach {
 
 	@Test
 	void test1() throws Exception {
-		SynthesisLoop.resetAll();
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		VariableFactory vf = globalVars.getVariableFactory();
+		Script script = globalVars.getManagedScript().getScript();
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
 		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
 
-		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
-		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
-		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
-		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
-		IStatement imm = new ScriptAssignmentStatement(i, script.term("-", i.getTerm(), script.numeral("1")));
-		IStatement ie0 = new ScriptAssumptionStatement(i, script.numeral("0"), "=");
-		IStatement ie1 = new ScriptAssumptionStatement(i, script.numeral("1"), "=");
-		IStatement ien = new ScriptAssumptionStatement(i, n.getTerm(), "=");
+		BasicPredicateFactory predicateFactory = globalVars.getPredicateFactory();
+
+		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement imm = new ScriptAssignmentStatement(i, script.term("-", i.getTerm(), script.numeral("1")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
 		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("2")));
 		List<IStatement> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add(ipp);
 		transitionAlphabet.add(imm);
-		SynthesisLoop synthesis = new SynthesisLoop(transitionAlphabet, preconditions, postconditions);
+		SynthesisLoopExperimental synthesis = new SynthesisLoopExperimental(transitionAlphabet, preconditions,
+				postconditions, globalVars);
 		synthesis.computeMainLoopRandomly(10);
 		System.out.println("Test 1");
 		System.out.println(synthesis.isCorrect());
 	}
-	
+
 	@Test
 	void test2() throws Exception {
-		SynthesisLoop.resetAll();
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		VariableFactory vf = globalVars.getVariableFactory();
+		Script script = globalVars.getManagedScript().getScript();
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
 		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
 
-		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
-		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
-		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
-		// IStatement imm = new ScriptAssignmentStatement(i, script.term("-", i.getTerm(), script.numeral("1")));
+		BasicPredicateFactory predicateFactory = globalVars.getPredicateFactory();
+		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<", globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+		// IStatement imm = new ScriptAssignmentStatement(i, script.term("-",
+		// i.getTerm(), script.numeral("1")));
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
 		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), n.getTerm()));
 		List<IStatement> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add(ipp);
 		transitionAlphabet.add(ilen);
 		// transitionAlphabet.add(imm);
-		SynthesisLoop synthesis = new SynthesisLoop(transitionAlphabet, preconditions, postconditions);
-		synthesis.computeMainLoopRandomly(5);;
+		SynthesisLoopExperimental synthesis = new SynthesisLoopExperimental(transitionAlphabet, preconditions,
+				postconditions, globalVars);
+		synthesis.computeMainLoopRandomly(5);
+		;
 		System.out.println("Test 2");
 		System.out.println(synthesis.isCorrect());
 
 	}
-	
-	@Test void test3() throws Exception {
-		SynthesisLoop.resetAll();
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+
+	@Test
+	void test3() throws Exception {
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		VariableFactory vf = globalVars.getVariableFactory();
+		Script script = globalVars.getManagedScript().getScript();
 		BoogieNonOldVar j = vf.constructVariable("j", VariableFactory.INT);
 
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
@@ -83,18 +90,23 @@ public class TestProbabilityApproach {
 		BoogieNonOldVar m = vf.constructVariable("m", VariableFactory.INT);
 
 		BoogieNonOldVar A = vf.constructVariable("A", VariableFactory.INT_ARR);
-		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
-		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
-		IStatement mleai = new ScriptPredicateAssumptionStatement(predicateFactory
-				.newPredicate(script.term("<", m.getTerm(), script.term("select", A.getTerm(), i.getTerm()))));
-		IStatement meai = new ScriptAssignmentStatement(m, script.term("select", A.getTerm(), i.getTerm()));
-		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
+		BasicPredicateFactory predicateFactory = globalVars.getPredicateFactory();
+		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement mleai = new ScriptPredicateAssumptionStatement(
+				predicateFactory
+						.newPredicate(script.term("<", m.getTerm(), script.term("select", A.getTerm(), i.getTerm()))),
+				globalVars.getManagedScript(), globalVars.getPredicateFactory());
+		IStatement meai = new ScriptAssignmentStatement(m, script.term("select", A.getTerm(), i.getTerm()),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
 		List<IStatement> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add(igen);
 		transitionAlphabet.add(mleai);
 		transitionAlphabet.add(meai);
 		transitionAlphabet.add(ipp);
-		
+
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
 		preconditions = predicateFactory.and(preconditions,
 				predicateFactory.newPredicate(script.term(">=", n.getTerm(), script.numeral("1"))));
@@ -106,8 +118,9 @@ public class TestProbabilityApproach {
 				predicateFactory.newPredicate(script.term("<", j.getTerm(), n.getTerm())));
 		IPredicate postconditions = predicateFactory
 				.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), j.getTerm())));
-		SynthesisLoop synthesis = new SynthesisLoop(transitionAlphabet, preconditions, postconditions);
-		synthesis.computeMainLoopRandomly(5);;
+		SynthesisLoopExperimental synthesis = new SynthesisLoopExperimental(transitionAlphabet, preconditions,
+				postconditions, globalVars);
+		synthesis.computeMainLoopRandomly(5);
 		System.out.println("Test 3");
 		System.out.println(synthesis.isCorrect());
 

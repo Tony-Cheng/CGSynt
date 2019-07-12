@@ -23,16 +23,17 @@ public class TestLoopFromCegarRunner {
 	@Test
 	void test1() throws Exception {
 		// Repeated x++ with no pre nor post conditions.
-		MainVerificationLoop.resetAll();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
 		BuchiTreeAutomaton<RankedBool, String> aut = new BuchiTreeAutomaton<>(1);
 		aut.addFinalState("s1");
 		aut.addInitState("s1");
 
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		VariableFactory vf = globalVars.getVariableFactory();
+		Script script = globalVars.getManagedScript().getScript();
 		BoogieNonOldVar x = vf.constructVariable("x", VariableFactory.INT);
 
-		IStatement xpp = new ScriptAssignmentStatement(x, script.term("+", x.getTerm(), script.numeral("1")));
+		IStatement xpp = new ScriptAssignmentStatement(x, script.term("+", x.getTerm(), script.numeral("1")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
 		List<IStatement> letters = new ArrayList<>();
 		letters.add(xpp);
 
@@ -41,7 +42,7 @@ public class TestLoopFromCegarRunner {
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s1", dest));
 		aut.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s1", dest));
 
-		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, null, null);
+		MainVerificationLoop loop = new MainVerificationLoop(aut, letters, null, null, globalVars);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}

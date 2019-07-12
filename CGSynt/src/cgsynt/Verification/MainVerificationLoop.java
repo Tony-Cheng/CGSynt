@@ -52,15 +52,17 @@ public class MainVerificationLoop {
 	private List<String> logs;
 	private boolean printLogs;
 	private int prevLogLen;
+	private TraceGlobalVariables globalVars;
 
 	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
-			IPredicate preconditions, IPredicate postconditions) throws Exception {
+			IPredicate preconditions, IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
 		RankedBool.setRank(transitionAlphabet.size());
-		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
-		TraceToInterpolants.getTraceToInterpolants().setPostconditions(postconditions);
-		preconditions = TraceToInterpolants.getTraceToInterpolants().getPreconditions();
-		postconditions = TraceToInterpolants.getTraceToInterpolants().getPostconditions();
-		this.mService = TraceGlobalVariables.getGlobalVariables().getService();
+		this.globalVars = globalVars;
+		globalVars.getTraceInterpolator().setPreconditions(preconditions);
+		globalVars.getTraceInterpolator().setPostconditions(postconditions);
+		preconditions = globalVars.getTraceInterpolator().getPreconditions();
+		postconditions = globalVars.getTraceInterpolator().getPostconditions();
+		this.mService = globalVars.getService();
 		this.mAutService = new AutomataLibraryServices(mService);
 		this.mPrograms = programs;
 		this.mResultComputed = false;
@@ -85,7 +87,7 @@ public class MainVerificationLoop {
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alpha = new VpAlphabet<>(letters);
 		NestedWordAutomaton<IStatement, IPredicate> pi = new NestedWordAutomaton<>(mAutService, alpha,
-				new GeneralizeStateFactory());
+				new GeneralizeStateFactory(globalVars.getPredicateFactory()));
 		if (!prePred.equals(postPred)) {
 			pi.addState(true, false, prePred);
 			pi.addState(false, true, postPred);
@@ -93,18 +95,9 @@ public class MainVerificationLoop {
 			pi.addState(true, true, prePred);
 		}
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(new HashSet<>(),
-				mAllInterpolants, new HashSet<>(mTransitionAlphabet), pi);
+				mAllInterpolants, new HashSet<>(mTransitionAlphabet), pi, globalVars.getTraceInterpolator());
 		pi = generalization.getResult();
 		return pi;
-	}
-
-	private IPredicate createDeadState() throws Exception {
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
-		BoogieNonOldVar x = vf.constructVariable(VariableFactory.INT);
-		return TraceToInterpolants.getTraceToInterpolants().getPredicateFactory()
-				.newPredicate(script.term("=", x.getTerm(), script.numeral("1")));
-
 	}
 
 	private void computeOneIteration() throws Exception {
@@ -142,7 +135,8 @@ public class MainVerificationLoop {
 		Set<List<IStatement>> counterExamples = emptinessCheck.findCounterExamples(mTransitionAlphabet);
 		logs.add("Find counter examples: " + (System.nanoTime() - time) / 1000000);
 		time = System.nanoTime();
-		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
+		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples,
+				globalVars.getTraceInterpolator());
 		counterExampleToInterpolants.computeResult();
 		logs.add("Number of counterexamples: " + (counterExampleToInterpolants.getCorrectTraces().size()
 				+ counterExampleToInterpolants.getIncorrectTrace().size()));
@@ -155,7 +149,8 @@ public class MainVerificationLoop {
 		}
 
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
-				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);
+				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI,
+				globalVars.getTraceInterpolator());
 		mPI = generalization.getResult();
 		logs.add("Generalization: " + (System.nanoTime() - time) / 1000000);
 		time = System.nanoTime();
@@ -216,11 +211,6 @@ public class MainVerificationLoop {
 		for (IPredicate interpol : this.mAllInterpolants) {
 			System.out.println(interpol);
 		}
-	}
-
-	public static void resetAll() throws Exception {
-		TraceGlobalVariables.reset();
-		TraceToInterpolants.reset();
 	}
 
 }

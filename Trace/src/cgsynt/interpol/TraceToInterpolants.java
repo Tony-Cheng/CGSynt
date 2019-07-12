@@ -64,14 +64,13 @@ public class TraceToInterpolants implements IInterpol {
 	private long totaltime;
 	private long numSamples;
 
-	private static TraceToInterpolants traceToInterpolants;
-
-	public TraceToInterpolants() throws Exception {
+	public TraceToInterpolants(ManagedScript managedScript, IUltimateServiceProvider service,
+			DefaultIcfgSymbolTable symbolTable) throws Exception {
 		ILogger logger = new ConsoleLogger();
 		logger.setLevel(LogLevel.OFF);
-		managedScript = TraceGlobalVariables.getGlobalVariables().getManagedScript();
-		service = TraceGlobalVariables.getGlobalVariables().getService();
-		symbolTable = TraceGlobalVariables.getGlobalVariables().getVariableFactory().getSymbolTable();
+		this.managedScript = managedScript;
+		this.service = service;
+		this.symbolTable = symbolTable;
 		procedures = new HashSet<>();
 		HashRelation<String, IProgramNonOldVar> mProc2Globals = new HashRelation<>();
 		modifiableGlobalsTable = new ModifiableGlobalsTable(mProc2Globals);
@@ -94,14 +93,6 @@ public class TraceToInterpolants implements IInterpol {
 		postconditions = pUnifier.getTruePredicate();
 		this.totaltime = 0;
 		this.numSamples = 0;
-	}
-
-	public static void reset() throws Exception {
-		traceToInterpolants = new TraceToInterpolants();
-	}
-
-	public static TraceToInterpolants getTraceToInterpolants() {
-		return traceToInterpolants;
 	}
 
 	private NestedWord<IAction> buildTrace(List<IStatement> statements) {
@@ -146,9 +137,9 @@ public class TraceToInterpolants implements IInterpol {
 		}
 		return interpolate.getInterpolants();
 	}
-	
+
 	public void printAverageTime() {
-		System.out.println(totaltime/numSamples/1000000);
+		System.out.println(totaltime / numSamples / 1000000);
 	}
 
 	@Override

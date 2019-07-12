@@ -7,6 +7,7 @@ import java.util.Set;
 
 import cgsynt.Operations.CounterExamplesToInterpolants;
 import cgsynt.interpol.IStatement;
+import cgsynt.interpol.TraceToInterpolants;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
@@ -17,13 +18,15 @@ public class ConfidenceIntervalCalculator {
 	private int sampleSize;
 	private static double z975 = 1.96;
 	private List<IStatement> transitionAlphabet;
+	private TraceToInterpolants interpolator;
 
 	public ConfidenceIntervalCalculator(INestedWordAutomaton<IStatement, String> aut, int k, int sampleSize,
-			List<IStatement> transitionAlphabet) {
+			List<IStatement> transitionAlphabet, TraceToInterpolants interpolator) {
 		this.aut = aut;
 		this.k = k;
 		this.sampleSize = sampleSize;
 		this.transitionAlphabet = transitionAlphabet;
+		this.interpolator = interpolator;
 	}
 
 	private void generateSingleSample(long len, List<IStatement> trace) {
@@ -56,7 +59,7 @@ public class ConfidenceIntervalCalculator {
 		}
 		return false;
 	}
-	
+
 	private void generateSingleSampleBottom(long len, List<IStatement> trace) {
 		if (len == 0)
 			return;
@@ -67,7 +70,7 @@ public class ConfidenceIntervalCalculator {
 		trace.add(transitionAlphabet.get(index));
 		generateSingleSample(len - 1, trace);
 	}
-	
+
 	private boolean generateSingleSampleBottom(String state, long len) {
 		if (len == 0)
 			return aut.isFinal(state);
@@ -81,7 +84,7 @@ public class ConfidenceIntervalCalculator {
 		}
 		return false;
 	}
-	
+
 	private List<List<IStatement>> generateTraceSamplesBottom() {
 		List<List<IStatement>> samples = new ArrayList<>();
 		for (int i = 0; i < sampleSize; i++) {
@@ -102,7 +105,7 @@ public class ConfidenceIntervalCalculator {
 		}
 		return count;
 	}
-	
+
 	public double[] calculate95PiConfIntervalsBottom() throws Exception {
 		int samples = generatePiSampleBottom();
 		return calculateInterval(samples);
@@ -121,13 +124,12 @@ public class ConfidenceIntervalCalculator {
 			Set<List<IStatement>> singleTraceSet = new HashSet<>();
 			singleTraceSet.add(traces.get(i));
 			CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(
-					singleTraceSet);
+					singleTraceSet, interpolator);
 			counterExampleToInterpolants.computeResult();
 			count += counterExampleToInterpolants.getCorrectTraces().size();
 		}
 		return calculateInterval(count);
 	}
-
 
 	private List<List<IStatement>> generateTraceSamples() {
 		List<List<IStatement>> samples = new ArrayList<>();
@@ -168,7 +170,7 @@ public class ConfidenceIntervalCalculator {
 			Set<List<IStatement>> singleTraceSet = new HashSet<>();
 			singleTraceSet.add(traces.get(i));
 			CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(
-					singleTraceSet);
+					singleTraceSet, interpolator);
 			counterExampleToInterpolants.computeResult();
 			count += counterExampleToInterpolants.getCorrectTraces().size();
 		}
