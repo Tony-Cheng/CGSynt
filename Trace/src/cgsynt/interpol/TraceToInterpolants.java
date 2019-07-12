@@ -145,7 +145,8 @@ public class TraceToInterpolants implements IInterpol {
 		totaltime += System.nanoTime() - time;
 		numSamples++;
 		if (interpolate.isCorrect() == LBool.UNKNOWN) {
-			throw new Exception("Is trace correct? Unknown.");
+			System.err.println("Is the trace correct? Unknown.");
+			return null;
 		}
 		if (interpolate.isCorrect() == LBool.SAT) {
 			return null;
