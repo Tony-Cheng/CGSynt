@@ -1,5 +1,6 @@
 package cgsynt.synthesis;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,19 +11,15 @@ import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
-import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.probability.ConfidenceIntervalCalculator;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.IntersectState;
-import cgsynt.tree.buchi.lta.LTAIntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.BuchiIntersection;
 import cgsynt.tree.buchi.operations.ConvertToStringState;
 import cgsynt.tree.buchi.operations.EmptinessCheck;
-import cgsynt.tree.buchi.operations.LTAEmptinessCheck;
-import cgsynt.tree.buchi.operations.LTAIntersection;
 import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.LibraryIdentifiers;
@@ -33,8 +30,6 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determ
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
-import de.uni_freiburg.informatik.ultimate.logic.Script;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class SynthesisLoopExperimental {
@@ -54,9 +49,12 @@ public class SynthesisLoopExperimental {
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
+	private List<String> logs;
+	private boolean printLogs;
+	private int printedLogsSize;
 
-	public SynthesisLoopExperimental(List<IStatement> transitionAlphabet, IPredicate preconditions,
-			IPredicate postconditions) throws Exception {
+	public SynthesisLoopExperimental(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions)
+			throws Exception {
 		RankedBool.setRank(transitionAlphabet.size());
 		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
 		TraceToInterpolants.getTraceToInterpolants().setPostconditions(postconditions);
@@ -76,7 +74,13 @@ public class SynthesisLoopExperimental {
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
 		this.visitedCounterexamples = new HashSet<>();
+		this.logs = new ArrayList<>();
+		this.printLogs = false;
+		this.printedLogsSize = 0;
+	}
 
+	public void setPrintLogs(boolean printLogs) {
+		this.printLogs = printLogs;
 	}
 
 	private NestedWordAutomaton<IStatement, IPredicate> createPI(IPredicate prePred, IPredicate postPred)
@@ -97,7 +101,7 @@ public class SynthesisLoopExperimental {
 		return pi;
 	}
 
-	private void computeOneIteration(int k, int bs) throws Exception {
+	private void computeOneIterationExponential(int k) throws Exception {
 		// Turn PI into a NFA that has String states.
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
 		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
@@ -126,11 +130,10 @@ public class SynthesisLoopExperimental {
 			mIsCorrect = true;
 			mResultComputed = true;
 			result = intersectedAut;
-			return;
 		}
 		prevSize = k * stringDFAPI.getStates().size();
-		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI,
-				k * stringDFAPI.getStates().size(), visitedCounterexamples, bs, this.mTransitionAlphabet);
+		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI, k,
+				visitedCounterexamples, CounterexamplesGeneration.NO_BATCH, this.mTransitionAlphabet);
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
@@ -144,7 +147,6 @@ public class SynthesisLoopExperimental {
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
 	}
-
 
 	private void computeOneIterationRandom(int k, int bs) throws Exception {
 		// Turn PI into a NFA that has String states.
@@ -232,7 +234,7 @@ public class SynthesisLoopExperimental {
 			while (!(Math.abs(traceProb - piProb) <= 0.01)
 					|| !(traceInterval[0] <= piProb && piProb <= traceInterval[1])
 					|| !(piInterval[0] <= traceProb && traceProb <= piInterval[1])) {
-				System.out.println(!(Math.abs(traceProb - piProb) <= 0.05) + " "
+				logs.add(!(Math.abs(traceProb - piProb) <= 0.05) + " "
 						+ !(traceInterval[0] <= piProb && piProb <= traceInterval[1]) + " "
 						+ !(piInterval[0] <= traceProb && traceProb <= piInterval[1]));
 				computeOneIterationRandom(i, 100);
@@ -242,21 +244,38 @@ public class SynthesisLoopExperimental {
 				piInterval = calc.calculate95PiConfIntervals();
 				traceProb = (traceInterval[1] + traceInterval[0]) / 2;
 				piProb = (piInterval[1] + piInterval[0]) / 2;
-				traceBottomInterval = calc.calculate95TraceConfIntervalsBottom();
-				piBottomInterval = calc.calculate95PiConfIntervalsBottom();
-				System.out.println("Size: " + i);
-				System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
-				System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
-				System.out.println(
+				logs.add("Size: " + i);
+				logs.add("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
+				logs.add("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
+				logs.add(
 						"Trace bottom conf interval: (" + traceBottomInterval[0] + ", " + traceBottomInterval[1] + ")");
-				System.out
-						.println("PI bottom conf interval: (" + piBottomInterval[0] + ", " + piBottomInterval[1] + ")");
-				System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
+				logs.add("PI bottom conf interval: (" + piBottomInterval[0] + ", " + piBottomInterval[1] + ")");
+				logs.add("Number of interpolants: " + this.mAllInterpolants.size());
 			}
 		}
 	}
 
-	private void printRootConfidenceInterval() throws Exception {
+	public void computeMainLoopExponential(int len) throws Exception {
+		for (int i = 0; i < len; i++) {
+			System.out.println("Iteration: " + i);
+			this.computeOneIterationExponential(i);
+			ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, i, 500,
+					this.mTransitionAlphabet);
+			double[] traceInterval = calc.calculate95TraceConfIntervals();
+			double[] piInterval = calc.calculate95PiConfIntervals();
+			double[] traceBottomInterval = calc.calculate95TraceConfIntervalsBottom();
+			double[] piBottomInterval = calc.calculate95PiConfIntervalsBottom();
+			logs.add("Size: " + i);
+			logs.add("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
+			logs.add("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
+			logs.add("Trace bottom conf interval: (" + traceBottomInterval[0] + ", " + traceBottomInterval[1] + ")");
+			logs.add("PI bottom conf interval: (" + piBottomInterval[0] + ", " + piBottomInterval[1] + ")");
+			logs.add("Number of interpolants: " + this.mAllInterpolants.size());
+
+		}
+	}
+
+	public void printRootConfidenceInterval() throws Exception {
 		ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, this.prevSize, 3000,
 				this.mTransitionAlphabet);
 		double[] traceInterval = calc.calculate95TraceConfIntervals();
@@ -267,7 +286,19 @@ public class SynthesisLoopExperimental {
 
 	}
 
-	private void printAllInterpolants() {
+	public void printLogs() {
+		for (String log : logs)
+			System.out.println(log);
+	}
+
+	private void printLogsIteration() {
+		for (int i = this.printedLogsSize; i < logs.size(); i++) {
+			System.out.println(logs.get(i));
+		}
+		this.printedLogsSize = logs.size();
+	}
+
+	public void printAllInterpolants() {
 		for (IPredicate interpol : this.mAllInterpolants) {
 			System.out.println(interpol);
 		}
