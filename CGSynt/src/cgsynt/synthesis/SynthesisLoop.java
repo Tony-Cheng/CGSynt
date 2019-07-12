@@ -1,5 +1,6 @@
 package cgsynt.synthesis;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,19 +11,15 @@ import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
-import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.probability.ConfidenceIntervalCalculator;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.IntersectState;
-import cgsynt.tree.buchi.lta.LTAIntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.BuchiIntersection;
 import cgsynt.tree.buchi.operations.ConvertToStringState;
 import cgsynt.tree.buchi.operations.EmptinessCheck;
-import cgsynt.tree.buchi.operations.LTAEmptinessCheck;
-import cgsynt.tree.buchi.operations.LTAIntersection;
 import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.LibraryIdentifiers;
@@ -33,8 +30,6 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determ
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
-import de.uni_freiburg.informatik.ultimate.logic.Script;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class SynthesisLoop {
@@ -54,6 +49,9 @@ public class SynthesisLoop {
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
+	private List<String> logs;
+	private boolean printLogs;
+	private int printedLogsSize;
 
 	public SynthesisLoop(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions)
 			throws Exception {
@@ -76,7 +74,13 @@ public class SynthesisLoop {
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
 		this.visitedCounterexamples = new HashSet<>();
+		this.logs = new ArrayList<>();
+		this.printLogs = false;
+		this.printedLogsSize = 0;
+	}
 
+	public void setPrintLogs(boolean printLogs) {
+		this.printLogs = printLogs;
 	}
 
 	private NestedWordAutomaton<IStatement, IPredicate> createPI(IPredicate prePred, IPredicate postPred)
@@ -95,15 +99,6 @@ public class SynthesisLoop {
 				mAllInterpolants, new HashSet<>(mTransitionAlphabet), pi);
 		pi = generalization.getResult();
 		return pi;
-	}
-
-	private IPredicate createDeadState() throws Exception {
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
-		BoogieNonOldVar x = vf.constructVariable(VariableFactory.INT);
-		return TraceToInterpolants.getTraceToInterpolants().getPredicateFactory()
-				.newPredicate(script.term("=", x.getTerm(), script.numeral("1")));
-
 	}
 
 	private void computeOneIteration(int k, int bs) throws Exception {
@@ -222,12 +217,13 @@ public class SynthesisLoop {
 	public void computeMainLoop() throws Exception {
 		int i = 0;
 		while (!mResultComputed) {
-			System.out.println("Iteration: " + i);
+			logs.add("Iteration: " + i);
 			computeOneIteration(i + 1, -1);
-			System.out.println("Number of interpolants: " + this.mAllInterpolants.size());
+			logs.add("Number of interpolants: " + this.mAllInterpolants.size());
 			i++;
+			if (this.printLogs)
+				printLogsIteration();
 		}
-		printRootConfidenceInterval();
 	}
 
 	public void computeMainLoopRandomly(int len) throws Exception {
@@ -249,7 +245,7 @@ public class SynthesisLoop {
 			while (!(Math.abs(traceProb - piProb) <= 0.01)
 					|| !(traceInterval[0] <= piProb && piProb <= traceInterval[1])
 					|| !(piInterval[0] <= traceProb && traceProb <= piInterval[1])) {
-				System.out.println(!(Math.abs(traceProb - piProb) <= 0.05) + " "
+				logs.add(!(Math.abs(traceProb - piProb) <= 0.05) + " "
 						+ !(traceInterval[0] <= piProb && piProb <= traceInterval[1]) + " "
 						+ !(piInterval[0] <= traceProb && traceProb <= piInterval[1]));
 				computeOneIterationRandom(i, 100);
@@ -259,14 +255,14 @@ public class SynthesisLoop {
 				piInterval = calc.calculate95PiConfIntervals();
 				traceProb = (traceInterval[1] + traceInterval[0]) / 2;
 				piProb = (piInterval[1] + piInterval[0]) / 2;
-				System.out.println("Size: " + i);
-				System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
-				System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
+				logs.add("Size: " + i);
+				logs.add("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
+				logs.add("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
 			}
 		}
 	}
 
-	private void printRootConfidenceInterval() throws Exception {
+	public void printRootConfidenceInterval() throws Exception {
 		ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, this.prevSize, 3000,
 				this.mTransitionAlphabet);
 		double[] traceInterval = calc.calculate95TraceConfIntervals();
@@ -277,7 +273,19 @@ public class SynthesisLoop {
 
 	}
 
-	private void printAllInterpolants() {
+	public void printLogs() {
+		for (String log : logs)
+			System.out.println(log);
+	}
+
+	private void printLogsIteration() {
+		for (int i = this.printedLogsSize; i < logs.size(); i++) {
+			System.out.println(logs.get(i));
+		}
+		this.printedLogsSize = logs.size();
+	}
+
+	public void printAllInterpolants() {
 		for (IPredicate interpol : this.mAllInterpolants) {
 			System.out.println(interpol);
 		}

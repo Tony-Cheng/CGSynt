@@ -23,10 +23,11 @@ public class TraceGlobalVariables {
 	private TraceGlobalVariables() {
 		this.service = UltimateMocks.createUltimateServiceProviderMock(LogLevel.OFF);
 		LogProxy logger = new DefaultLogger();
-		logger.setLoglevel(LogProxy.LOGLEVEL_TRACE);
 		Script interpolator;
 		try {
+			// logger.setLoglevel(LogProxy.LOGLEVEL_TRACE);
 			// interpolator = new LoggingScript("maxArray.smt2", true);
+			logger.setLoglevel(LogProxy.LOGLEVEL_OFF);
 			interpolator = new SMTInterpol(logger);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

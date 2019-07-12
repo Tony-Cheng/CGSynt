@@ -96,13 +96,6 @@ public class TraceToInterpolants implements IInterpol {
 		this.numSamples = 0;
 	}
 
-	private List<IAssumption> negatePostconditions(List<IAssumption> postconditions) {
-		for (IAssumption precondition : postconditions)
-			precondition.negate();
-		return postconditions;
-
-	}
-
 	public static void reset() throws Exception {
 		traceToInterpolants = new TraceToInterpolants();
 	}
