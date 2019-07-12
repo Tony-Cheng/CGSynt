@@ -61,6 +61,8 @@ public class TraceToInterpolants implements IInterpol {
 	private PredicateUnifier pUnifier;
 	private IPredicate preconditions;
 	private IPredicate postconditions;
+	private long totaltime;
+	private long numSamples;
 
 	private static TraceToInterpolants traceToInterpolants;
 
@@ -90,6 +92,8 @@ public class TraceToInterpolants implements IInterpol {
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		postconditions = pUnifier.getTruePredicate();
 		postconditions = pUnifier.getTruePredicate();
+		this.totaltime = 0;
+		this.numSamples = 0;
 	}
 
 	private List<IAssumption> negatePostconditions(List<IAssumption> postconditions) {
@@ -132,18 +136,26 @@ public class TraceToInterpolants implements IInterpol {
 	public IPredicate[] computeInterpolants(List<IStatement> statements) throws Exception {
 		NestedWord<IAction> trace = buildTrace(statements);
 		List<Object> controlLocationSequence = generateControlLocationSequence(trace.length() + 1);
+		long time = System.nanoTime();
 		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(preconditions,
 				postconditions, pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null,
 				pUnifier, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
 				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
 				SimplificationTechnique.NONE, false);
+		totaltime += System.nanoTime() - time;
+		numSamples++;
 		if (interpolate.isCorrect() == LBool.UNKNOWN) {
-			throw new Exception("Is trace correct? Unknown.");
+			System.err.println("Is the trace correct? Unknown.");
+			return null;
 		}
 		if (interpolate.isCorrect() == LBool.SAT) {
 			return null;
 		}
 		return interpolate.getInterpolants();
+	}
+	
+	public void printAverageTime() {
+		System.out.println(totaltime/numSamples/1000000);
 	}
 
 	@Override

@@ -99,8 +99,10 @@ public class TestArrays2 {
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "I", destI));
 
 		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
-		loop.computeMainLoop();
+		loop.setPrintLogs(true);
 
+		loop.computeMainLoop();
+		TraceToInterpolants.getTraceToInterpolants().printAverageTime();
 		assertTrue(loop.isCorrect());
 	}
 
@@ -152,9 +154,9 @@ public class TestArrays2 {
 		IPredicate post = pf
 				.newPredicate(script.term("<", i.getTerm(), script.term("select", A.getTerm(), i.getTerm())));
 
-		AlternateVerification loop = new AlternateVerification(program, letters, pre, post);
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
 		loop.computeMainLoop();
-
+		loop.printLogs();
 		assertTrue(loop.isCorrect());
 	}
 

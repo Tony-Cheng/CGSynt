@@ -1,8 +1,12 @@
 package cgsynt.interpol;
 
+import java.io.FileNotFoundException;
+
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.logic.LoggingScript;
 import de.uni_freiburg.informatik.ultimate.logic.Logics;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
@@ -19,8 +23,16 @@ public class TraceGlobalVariables {
 	private TraceGlobalVariables() {
 		this.service = UltimateMocks.createUltimateServiceProviderMock(LogLevel.OFF);
 		LogProxy logger = new DefaultLogger();
-		logger.setLoglevel(LogProxy.LOGLEVEL_OFF);
-		SMTInterpol interpolator = new SMTInterpol(logger);
+		logger.setLoglevel(LogProxy.LOGLEVEL_TRACE);
+		Script interpolator;
+		try {
+			// interpolator = new LoggingScript("maxArray.smt2", true);
+			interpolator = new SMTInterpol(logger);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
 		managedScript = new ManagedScript(service, interpolator);
 		managedScript.getScript().setOption(":produce-proofs", true);
 		managedScript.getScript().setLogic(Logics.QF_ALIA);

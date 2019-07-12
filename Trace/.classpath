@@ -11,5 +11,6 @@
 	<classpathentry kind="src" path="/Library-UltimateUtil"/>
 	<classpathentry kind="src" path="/SMTInterpol"/>
 	<classpathentry kind="src" path="/TraceAbstraction"/>
+	<classpathentry kind="src" path="/UltimateCLI"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
