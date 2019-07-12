@@ -32,7 +32,7 @@ public class TestArrays2 {
 	 */
 	@Test
 	public void arrayMaxTest() throws Exception {
-		MainVerificationLoop.resetAll();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(6);
 
 		RankedBool.setRank(6);
@@ -45,8 +45,8 @@ public class TestArrays2 {
 
 		program.setAllStatesFinal();
 
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		VariableFactory vf = globalVars.getVariableFactory();
+		Script script = globalVars.getManagedScript().getScript();
 
 		// Ghost Var
 		BoogieNonOldVar j = vf.constructVariable("j", VariableFactory.INT);
@@ -56,17 +56,25 @@ public class TestArrays2 {
 		BoogieNonOldVar m = vf.constructVariable("m", VariableFactory.INT);
 
 		BoogieNonOldVar A = vf.constructVariable("A", VariableFactory.INT_ARR);
-		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		BasicPredicateFactory predicateFactory = globalVars.getTraceInterpolator().getPredicateFactory();
 
 		// Define Program Statements
-		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<");
-		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
-		IStatement mleai = new ScriptPredicateAssumptionStatement(predicateFactory
-				.newPredicate(script.term("<", m.getTerm(), script.term("select", A.getTerm(), i.getTerm()))));
-		IStatement mgeai = new ScriptPredicateAssumptionStatement(predicateFactory
-				.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), i.getTerm()))));
-		IStatement meai = new ScriptAssignmentStatement(m, script.term("select", A.getTerm(), i.getTerm()));
-		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
+		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<", globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement mleai = new ScriptPredicateAssumptionStatement(
+				predicateFactory
+						.newPredicate(script.term("<", m.getTerm(), script.term("select", A.getTerm(), i.getTerm()))),
+				globalVars.getManagedScript(), globalVars.getPredicateFactory());
+		IStatement mgeai = new ScriptPredicateAssumptionStatement(
+				predicateFactory
+						.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), i.getTerm()))),
+				globalVars.getManagedScript(), globalVars.getPredicateFactory());
+		IStatement meai = new ScriptAssignmentStatement(m, script.term("select", A.getTerm(), i.getTerm()),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
 
 		// Define Postconditions
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
@@ -98,11 +106,12 @@ public class TestArrays2 {
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "5", dest5));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "I", destI));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions,
+				globalVars);
 		loop.setPrintLogs(true);
 
 		loop.computeMainLoop();
-		TraceToInterpolants.getTraceToInterpolants().printAverageTime();
+		globalVars.getTraceInterpolator().printAverageTime();
 		assertTrue(loop.isCorrect());
 	}
 
@@ -111,7 +120,7 @@ public class TestArrays2 {
 	 */
 	@Test
 	public void simpleTest() throws Exception {
-		MainVerificationLoop.resetAll();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
 		BuchiTreeAutomaton<RankedBool, String> program = new BuchiTreeAutomaton<>(2);
 
 		RankedBool.setRank(2);
@@ -120,9 +129,9 @@ public class TestArrays2 {
 		program.addState("3");
 		program.setAllStatesFinal();
 
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
-		BasicPredicateFactory pf = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		VariableFactory vf = globalVars.getVariableFactory();
+		Script script = globalVars.getManagedScript().getScript();
+		BasicPredicateFactory pf = globalVars.getPredicateFactory();
 
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
 		BoogieNonOldVar t = vf.constructVariable("t", VariableFactory.INT);
@@ -130,8 +139,10 @@ public class TestArrays2 {
 
 		// Define Program Statements
 		IStatement teapo = new ScriptAssignmentStatement(t,
-				script.term("+", script.term("select", A.getTerm(), i.getTerm()), script.numeral("1")));
-		IStatement aiet = new ScriptAssignmentStatement(A, script.term("store", A.getTerm(), i.getTerm(), t.getTerm()));
+				script.term("+", script.term("select", A.getTerm(), i.getTerm()), script.numeral("1")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement aiet = new ScriptAssignmentStatement(A, script.term("store", A.getTerm(), i.getTerm(), t.getTerm()),
+				globalVars.getManagedScript(), vf.getSymbolTable());
 
 		// Create Meta Alphabet for LTA
 		List<IStatement> letters = Arrays.asList(teapo, aiet);
@@ -154,7 +165,7 @@ public class TestArrays2 {
 		IPredicate post = pf
 				.newPredicate(script.term("<", i.getTerm(), script.term("select", A.getTerm(), i.getTerm())));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post);
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, pre, post, globalVars);
 		loop.computeMainLoop();
 		loop.printLogs();
 		assertTrue(loop.isCorrect());

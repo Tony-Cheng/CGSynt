@@ -32,13 +32,13 @@ public class OptimizedTraceGeneralization {
 	private NestedWordAutomaton<IStatement, IPredicate> mInterpolantNfa;
 
 	public OptimizedTraceGeneralization(Set<IPredicate> currentInterpolants, Set<IPredicate> additionalInterpolants,
-			Set<IStatement> allStatements, INestedWordAutomaton<IStatement, IPredicate> PI) {
+			Set<IStatement> allStatements, INestedWordAutomaton<IStatement, IPredicate> PI, TraceToInterpolants interpolator) {
 		this.mCurrentInterpolants = currentInterpolants;
 		this.mAdditionalInterpolantSet = additionalInterpolants;
 		this.mAllStatements = allStatements;
 		this.mInterpolantNfa = (NestedWordAutomaton<IStatement, IPredicate>) PI;
 
-		this.mInterpolator = TraceToInterpolants.getTraceToInterpolants();
+		this.mInterpolator = interpolator;
 
 		this.mTransitionsAdded = new ArrayList<>();
 

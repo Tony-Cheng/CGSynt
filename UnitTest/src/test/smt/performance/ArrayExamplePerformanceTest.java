@@ -80,9 +80,9 @@ public class ArrayExamplePerformanceTest {
 
 	@Test
 	void test1() throws Exception {
-		MainVerificationLoop.resetAll();
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		VariableFactory vf = globalVars.getVariableFactory();
+		Script script = globalVars.getManagedScript().getScript();
 		BoogieNonOldVar j = vf.constructVariable("j", VariableFactory.INT);
 
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
@@ -90,16 +90,24 @@ public class ArrayExamplePerformanceTest {
 		BoogieNonOldVar m = vf.constructVariable("m", VariableFactory.INT);
 
 		BoogieNonOldVar A = vf.constructVariable("A", VariableFactory.INT_ARR);
-		IStatement iln = new ScriptAssumptionStatement(i, n.getTerm(), "<");
-		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=");
+		IStatement iln = new ScriptAssumptionStatement(i, n.getTerm(), "<", globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement igen = new ScriptAssumptionStatement(i, n.getTerm(), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
 
-		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
-		IStatement mlai = new ScriptPredicateAssumptionStatement(predicateFactory
-				.newPredicate(script.term("<", m.getTerm(), script.term("select", A.getTerm(), i.getTerm()))));
-		IStatement mgeai = new ScriptPredicateAssumptionStatement(predicateFactory
-				.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), i.getTerm()))));
-		IStatement meai = new ScriptAssignmentStatement(m, script.term("select", A.getTerm(), i.getTerm()));
-		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")));
+		BasicPredicateFactory predicateFactory = globalVars.getPredicateFactory();
+		IStatement mlai = new ScriptPredicateAssumptionStatement(
+				predicateFactory
+						.newPredicate(script.term("<", m.getTerm(), script.term("select", A.getTerm(), i.getTerm()))),
+				globalVars.getManagedScript(), globalVars.getPredicateFactory());
+		IStatement mgeai = new ScriptPredicateAssumptionStatement(
+				predicateFactory
+						.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), i.getTerm()))),
+				globalVars.getManagedScript(), globalVars.getPredicateFactory());
+		IStatement meai = new ScriptAssignmentStatement(m, script.term("select", A.getTerm(), i.getTerm()),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
 
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
 		preconditions = predicateFactory.and(preconditions,
@@ -113,8 +121,8 @@ public class ArrayExamplePerformanceTest {
 		IPredicate postconditions = predicateFactory
 				.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), j.getTerm())));
 
-		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
-		TraceToInterpolants.getTraceToInterpolants().setPostconditions(postconditions);
+		globalVars.getTraceInterpolator().setPreconditions(preconditions);
+		globalVars.getTraceInterpolator().setPostconditions(postconditions);
 
 		List<IStatement> trace = new ArrayList<>();
 
@@ -127,9 +135,9 @@ public class ArrayExamplePerformanceTest {
 		trace.add(ipp);
 		trace.add(igen);
 		long time = System.nanoTime();
-		int size = 1;
+		int size = 100;
 		for (int k = 0; k < size; k++) {
-			TraceToInterpolants.getTraceToInterpolants().computeInterpolants(trace);
+			globalVars.getTraceInterpolator().computeInterpolants(trace);
 		}
 		System.out.println("Average Time: " + (System.nanoTime() - time) / size / 1000000);
 
@@ -138,31 +146,33 @@ public class ArrayExamplePerformanceTest {
 	@Test
 	void test2() {
 		// Multi pre and post conditions using predicates
-//		final Script s = new SMTInterpol(new DefaultLogger());
-//		s.setOption(":produce-proofs", true);
-//		s.setLogic(Logics.QF_ALIA);
-//		Variable i0 = new Variable("i_0", new Sort[0], "Int");
-//		Variable n = new Variable("n", new Sort[0], "Int");
-//		Formula form1 = new StandardFormula("+", new Numerical("0"), new Numerical("0"));
-//		Formula form2 = new StandardFormula("+", new Numerical("0"), new Numerical("0"));
-//		Formula form3 = new StandardFormula("+", x, new Numerical("1"));
-//		Formula form4 = new StandardFormula("=", x, new Numerical("-1"));
-//		Statement s1 = new Assignment(x, form1);
-//		Statement s2 = new Assignment(y, form2);
-//		Statement s3 = new Assignment(x, form3);
-//		Statement s4 = new Assumption(form4);
-//
-//		Trace trace = new Trace();
-//		trace.addVariable(x);
-//		trace.addVariable(y);
-//
-//		trace.addStatement(s1);
-//		trace.addStatement(s2);
-//		trace.addStatement(s3);
-//		trace.addStatement(s4);
-//
-//		TraceToCraigInterpolant ttc = new TraceToCraigInterpolant(trace, s);
-//
-//		CraigInterpolant interpolants = ttc.computeResult();
+		// final Script s = new SMTInterpol(new DefaultLogger());
+		// s.setOption(":produce-proofs", true);
+		// s.setLogic(Logics.QF_ALIA);
+		// Variable i0 = new Variable("i_0", new Sort[0], "Int");
+		// Variable n = new Variable("n", new Sort[0], "Int");
+		// Formula form1 = new StandardFormula("+", new Numerical("0"), new
+		// Numerical("0"));
+		// Formula form2 = new StandardFormula("+", new Numerical("0"), new
+		// Numerical("0"));
+		// Formula form3 = new StandardFormula("+", x, new Numerical("1"));
+		// Formula form4 = new StandardFormula("=", x, new Numerical("-1"));
+		// Statement s1 = new Assignment(x, form1);
+		// Statement s2 = new Assignment(y, form2);
+		// Statement s3 = new Assignment(x, form3);
+		// Statement s4 = new Assumption(form4);
+		//
+		// Trace trace = new Trace();
+		// trace.addVariable(x);
+		// trace.addVariable(y);
+		//
+		// trace.addStatement(s1);
+		// trace.addStatement(s2);
+		// trace.addStatement(s3);
+		// trace.addStatement(s4);
+		//
+		// TraceToCraigInterpolant ttc = new TraceToCraigInterpolant(trace, s);
+		//
+		// CraigInterpolant interpolants = ttc.computeResult();
 	}
 }

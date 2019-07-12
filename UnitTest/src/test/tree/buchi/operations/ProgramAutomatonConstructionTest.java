@@ -23,13 +23,15 @@ public class ProgramAutomatonConstructionTest {
 	void test1() throws Exception {
 		// Assignment: i=0
 		// Assumption: i>=0
-		MainVerificationLoop.resetAll();
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		VariableFactory vf = globalVars.getVariableFactory();
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		Script script = globalVars.getManagedScript().getScript();
 
-		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"));
-		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=");
+		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"), globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
 		Set<IStatement> statements = new HashSet<IStatement>();
 		statements.add(ie0);
 		statements.add(ige0);
@@ -48,14 +50,17 @@ public class ProgramAutomatonConstructionTest {
 	void test2() throws Exception {
 		// Assignment: i=0 i=1
 		// Assumption: i>=0
-		MainVerificationLoop.resetAll();
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		VariableFactory vf = globalVars.getVariableFactory();
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		Script script = globalVars.getManagedScript().getScript();
 
-		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"));
-		IStatement ie1 = new ScriptAssignmentStatement(i, script.numeral("1"));
-		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=");
+		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"), globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ie1 = new ScriptAssignmentStatement(i, script.numeral("1"), globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
 		Set<IStatement> statements = new HashSet<IStatement>();
 		statements.add(ie0);
 		statements.add(ige0);
@@ -75,14 +80,17 @@ public class ProgramAutomatonConstructionTest {
 	void test3() throws Exception {
 		// Assignment: i=0
 		// Assumption: i>=0 i>=1
-		MainVerificationLoop.resetAll();
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		VariableFactory vf = globalVars.getVariableFactory();
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		Script script = globalVars.getManagedScript().getScript();
 
-		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"));
-		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=");
-		IStatement ige1 = new ScriptAssumptionStatement(i, script.numeral("1"), ">=");
+		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"), globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ige1 = new ScriptAssumptionStatement(i, script.numeral("1"), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
 		Set<IStatement> statements = new HashSet<IStatement>();
 		statements.add(ie0);
 		statements.add(ige0);
@@ -102,14 +110,17 @@ public class ProgramAutomatonConstructionTest {
 	void test4() throws Exception {
 		// Assignment: i=0
 		// Assumption: i>=0 i>=1
-		MainVerificationLoop.resetAll();
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		VariableFactory vf = globalVars.getVariableFactory();
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		Script script = globalVars.getManagedScript().getScript();
 
-		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"));
-		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=");
-		IStatement ige1 = new ScriptAssumptionStatement(i, script.numeral("1"), ">=");
+		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"), globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ige1 = new ScriptAssumptionStatement(i, script.numeral("1"), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
 		Set<IStatement> statements = new HashSet<IStatement>();
 		statements.add(ie0);
 		statements.add(ige0);
@@ -129,15 +140,19 @@ public class ProgramAutomatonConstructionTest {
 	void test5() throws Exception {
 		// Assignment: i=0 i=1
 		// Assumption: i>=0 i>=1
-		MainVerificationLoop.resetAll();
-		VariableFactory vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		VariableFactory vf = globalVars.getVariableFactory();
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		Script script = globalVars.getManagedScript().getScript();
 
-		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"));
-		IStatement ie1 = new ScriptAssignmentStatement(i, script.numeral("1"));
-		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=");
-		IStatement ige1 = new ScriptAssumptionStatement(i, script.numeral("1"), ">=");
+		IStatement ie0 = new ScriptAssignmentStatement(i, script.numeral("0"), globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ie1 = new ScriptAssignmentStatement(i, script.numeral("1"), globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ige0 = new ScriptAssumptionStatement(i, script.numeral("0"), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
+		IStatement ige1 = new ScriptAssumptionStatement(i, script.numeral("1"), ">=", globalVars.getManagedScript(),
+				vf.getSymbolTable());
 		Set<IStatement> statements = new HashSet<IStatement>();
 		statements.add(ie0);
 		statements.add(ige0);

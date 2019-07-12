@@ -6,6 +6,7 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IActi
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.TransFormulaBuilder;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 
@@ -13,10 +14,13 @@ public class ScriptPredicateAssumptionStatement implements IAssumption {
 	IPredicate predicate;
 	private ManagedScript managedScript;
 	private boolean negated;
+	private BasicPredicateFactory predicateFactory;
 
-	public ScriptPredicateAssumptionStatement(IPredicate predicate) {
+	public ScriptPredicateAssumptionStatement(IPredicate predicate, ManagedScript managedScript,
+			BasicPredicateFactory predicateFactory) {
 		this.predicate = predicate;
-		managedScript = TraceGlobalVariables.getGlobalVariables().getManagedScript();
+		this.managedScript = managedScript;
+		this.predicateFactory = predicateFactory;
 		negated = false;
 	}
 
@@ -42,7 +46,7 @@ public class ScriptPredicateAssumptionStatement implements IAssumption {
 
 	@Override
 	public void negate() {
-		predicate = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory().not(predicate);
+		predicate = predicateFactory.not(predicate);
 		negated = !negated;
 	}
 
@@ -58,7 +62,8 @@ public class ScriptPredicateAssumptionStatement implements IAssumption {
 
 	@Override
 	public IAssumption copy() {
-		ScriptPredicateAssumptionStatement copy = new ScriptPredicateAssumptionStatement(predicate);
+		ScriptPredicateAssumptionStatement copy = new ScriptPredicateAssumptionStatement(predicate, managedScript,
+				predicateFactory);
 		copy.negated = negated;
 		return copy;
 	}

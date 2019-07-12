@@ -52,15 +52,17 @@ public class SynthesisLoop {
 	private List<String> logs;
 	private boolean printLogs;
 	private int printedLogsSize;
+	private TraceGlobalVariables globalVars;
 
-	public SynthesisLoop(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions)
-			throws Exception {
+	public SynthesisLoop(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions,
+			TraceGlobalVariables globalVars) throws Exception {
+		this.globalVars = globalVars;
 		RankedBool.setRank(transitionAlphabet.size());
-		TraceToInterpolants.getTraceToInterpolants().setPreconditions(preconditions);
-		TraceToInterpolants.getTraceToInterpolants().setPostconditions(postconditions);
-		preconditions = TraceToInterpolants.getTraceToInterpolants().getPreconditions();
-		postconditions = TraceToInterpolants.getTraceToInterpolants().getPostconditions();
-		this.mService = TraceGlobalVariables.getGlobalVariables().getService();
+		globalVars.getTraceInterpolator().setPreconditions(preconditions);
+		globalVars.getTraceInterpolator().setPostconditions(postconditions);
+		preconditions = globalVars.getTraceInterpolator().getPreconditions();
+		postconditions = globalVars.getTraceInterpolator().getPostconditions();
+		this.mService = globalVars.getService();
 		this.mAutService = new AutomataLibraryServices(mService);
 		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet));
 		construction.computeResult();
@@ -88,7 +90,7 @@ public class SynthesisLoop {
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alpha = new VpAlphabet<>(letters);
 		NestedWordAutomaton<IStatement, IPredicate> pi = new NestedWordAutomaton<>(mAutService, alpha,
-				new GeneralizeStateFactory());
+				new GeneralizeStateFactory(globalVars.getPredicateFactory()));
 		if (!prePred.equals(postPred)) {
 			pi.addState(true, false, prePred);
 			pi.addState(false, true, postPred);
@@ -96,7 +98,7 @@ public class SynthesisLoop {
 			pi.addState(true, true, prePred);
 		}
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(new HashSet<>(),
-				mAllInterpolants, new HashSet<>(mTransitionAlphabet), pi);
+				mAllInterpolants, new HashSet<>(mTransitionAlphabet), pi, globalVars.getTraceInterpolator());
 		pi = generalization.getResult();
 		return pi;
 	}
@@ -137,18 +139,19 @@ public class SynthesisLoop {
 				k * stringDFAPI.getStates().size(), visitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
-		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples);
+		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples,
+				globalVars.getTraceInterpolator());
 		counterExampleToInterpolants.computeResult();
 
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
-				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI);
+				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI,
+				globalVars.getTraceInterpolator());
 		mPI = generalization.getResult();
 
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
 	}
-
 
 	public BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> getResult() {
 		return result;
@@ -182,7 +185,7 @@ public class SynthesisLoop {
 
 	public void printRootConfidenceInterval() throws Exception {
 		ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, this.prevSize, 3000,
-				this.mTransitionAlphabet);
+				this.mTransitionAlphabet, globalVars.getTraceInterpolator());
 		double[] traceInterval = calc.calculate95TraceConfIntervals();
 		double[] piInterval = calc.calculate95PiConfIntervals();
 		System.out.println("Size: " + prevSize);
@@ -207,10 +210,5 @@ public class SynthesisLoop {
 		for (IPredicate interpol : this.mAllInterpolants) {
 			System.out.println(interpol);
 		}
-	}
-
-	public static void resetAll() throws Exception {
-		TraceGlobalVariables.reset();
-		TraceToInterpolants.reset();
 	}
 }

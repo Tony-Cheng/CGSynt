@@ -10,14 +10,15 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.Basi
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class PIUnionStateFactory implements IUnionStateFactory<IPredicate>{
-	private BasicPredicateFactory mPf = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+	private BasicPredicateFactory mPf;
 	private Script script;
 	private static BoogieNonOldVar sink = null, empty = null;
 	private VariableFactory vf;
 	
-	public PIUnionStateFactory() {
-		this.script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
-		this.vf = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
+	public PIUnionStateFactory(Script script, VariableFactory vf, BasicPredicateFactory mPf) {
+		this.script = script;
+		this.vf = vf;
+		this.mPf = mPf;
 		
 		if (sink == null) {
 			try {

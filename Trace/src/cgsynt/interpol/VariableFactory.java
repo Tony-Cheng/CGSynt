@@ -10,6 +10,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.DefaultIcfgSymbolTable;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.ProgramVarUtils;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 
 /**
  * A factory for constructing variables used in the trace.
@@ -19,6 +20,7 @@ public class VariableFactory {
 
 	private Set<BoogieNonOldVar> variables;
 	private Map<String, BoogieNonOldVar> variablesMap;
+	private ManagedScript managedScript;
 	private Script script;
 	private DefaultIcfgSymbolTable symbolTable;
 	private int curID;
@@ -27,11 +29,12 @@ public class VariableFactory {
 	public static final int BOOL = 2;
 	public static final int INT_ARR = 3;
 
-	public VariableFactory(Script script) {
+	public VariableFactory(ManagedScript managedScript) {
 		symbolTable = new DefaultIcfgSymbolTable();
 		variablesMap = new HashMap<>();
 		variables = new HashSet<>();
-		this.script = script;
+		this.managedScript = managedScript;
+		this.script = managedScript.getScript();
 		curID = 0;
 	}
 
@@ -69,8 +72,7 @@ public class VariableFactory {
 			throw new Exception("Variable already defined.");
 		}
 		Sort sort = typeToSort(type);
-		BoogieNonOldVar var = ProgramVarUtils.constructGlobalProgramVarPair(identifier, sort,
-				TraceGlobalVariables.getGlobalVariables().getManagedScript(), null);
+		BoogieNonOldVar var = ProgramVarUtils.constructGlobalProgramVarPair(identifier, sort, managedScript, null);
 		symbolTable.add(var);
 		variablesMap.put(identifier, var);
 		variables.add(var);

@@ -22,14 +22,16 @@ public class CounterExamplesToInterpolants {
 	private List<Set<IStatement>> correctTraces;
 	private List<Set<IStatement>> incorrectTraces;
 	private List<IPredicate[]> nonSetInterpolants;
+	private TraceToInterpolants interpolator;
 
-	public CounterExamplesToInterpolants(Set<List<IStatement>> counterExamples) {
+	public CounterExamplesToInterpolants(Set<List<IStatement>> counterExamples, TraceToInterpolants interpolator) {
 		this.counterExamples = counterExamples;
 		this.resultComputed = false;
 		interpolants = new ArrayList<>();
 		correctTraces = new ArrayList<>();
 		incorrectTraces = new ArrayList<>();
 		this.nonSetInterpolants = new ArrayList<>();
+		this.interpolator = interpolator;
 	}
 
 	public boolean getResultComputed() {
@@ -38,8 +40,7 @@ public class CounterExamplesToInterpolants {
 
 	public void computeResult() throws Exception {
 		for (List<IStatement> statements : counterExamples) {
-			IPredicate[] trace_interpolants = TraceToInterpolants.getTraceToInterpolants()
-					.computeInterpolants(statements);
+			IPredicate[] trace_interpolants = interpolator.computeInterpolants(statements);
 			nonSetInterpolants.add(trace_interpolants);
 			if (trace_interpolants != null) {
 				interpolants.add(new HashSet<>(Arrays.asList(trace_interpolants)));
