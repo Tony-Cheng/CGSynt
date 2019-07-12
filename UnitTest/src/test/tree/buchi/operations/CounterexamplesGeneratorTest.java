@@ -1,5 +1,6 @@
 package test.tree.buchi.operations;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,11 +20,11 @@ public class CounterexamplesGeneratorTest {
 
 	@Test
 	void test1() {
-		Set<Character> letters = new HashSet<Character>();
+		List<Character> letters = new ArrayList<Character>();
 		letters.add('a');
 		letters.add('b');
 		letters.add('c');
-		VpAlphabet<Character> alpha = new VpAlphabet<>(letters);
+		VpAlphabet<Character> alpha = new VpAlphabet<>(new HashSet<>(letters));
 
 		IUltimateServiceProvider mock = UltimateMocks.createUltimateServiceProviderMock();
 		AutomataLibraryServices service = new AutomataLibraryServices(mock);
@@ -32,7 +33,7 @@ public class CounterexamplesGeneratorTest {
 				new StringFactory());
 		nwa.addState(true, true, "A");
 		nwa.addInternalTransition("A", 'a', "A");
-		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7, new HashSet<>());
+		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7, letters);
 		generation.computeResult();
 		System.out.println("Test 1");
 		System.out.println("Number of counterexamples: " + generation.getResult().size());
@@ -43,11 +44,11 @@ public class CounterexamplesGeneratorTest {
 
 	@Test
 	void test2() {
-		Set<Character> letters = new HashSet<Character>();
+		List<Character> letters = new ArrayList<Character>();
 		letters.add('a');
 		letters.add('b');
 		letters.add('c');
-		VpAlphabet<Character> alpha = new VpAlphabet<>(letters);
+		VpAlphabet<Character> alpha = new VpAlphabet<>(new HashSet<>(letters));
 
 		IUltimateServiceProvider mock = UltimateMocks.createUltimateServiceProviderMock();
 		AutomataLibraryServices service = new AutomataLibraryServices(mock);
@@ -56,7 +57,8 @@ public class CounterexamplesGeneratorTest {
 				new StringFactory());
 		nwa.addState(true, false, "A");
 		nwa.addInternalTransition("A", 'a', "A");
-		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7, new HashSet<>());
+
+		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7, letters);
 		generation.computeResult();
 		System.out.println("Test 2");
 		System.out.println("Number of counterexamples: " + generation.getResult().size());
@@ -64,14 +66,14 @@ public class CounterexamplesGeneratorTest {
 			System.out.println(next);
 		}
 	}
-	
+
 	@Test
 	void test3() {
-		Set<Character> letters = new HashSet<Character>();
+		List<Character> letters = new ArrayList<Character>();
 		letters.add('a');
 		letters.add('b');
 		letters.add('c');
-		VpAlphabet<Character> alpha = new VpAlphabet<>(letters);
+		VpAlphabet<Character> alpha = new VpAlphabet<>(new HashSet<>(letters));
 
 		IUltimateServiceProvider mock = UltimateMocks.createUltimateServiceProviderMock();
 		AutomataLibraryServices service = new AutomataLibraryServices(mock);
@@ -80,7 +82,7 @@ public class CounterexamplesGeneratorTest {
 				new StringFactory());
 		nwa.addState(false, false, "A");
 		nwa.addInternalTransition("A", 'a', "A");
-		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7, new HashSet<>());
+		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 7, letters);
 		generation.computeResult();
 		System.out.println("Test 3");
 		System.out.println("Number of counterexamples: " + generation.getResult().size());
@@ -88,14 +90,14 @@ public class CounterexamplesGeneratorTest {
 			System.out.println(next);
 		}
 	}
-	
+
 	@Test
 	void test4() {
-		Set<Character> letters = new HashSet<Character>();
+		List<Character> letters = new ArrayList<Character>();
 		letters.add('a');
 		letters.add('b');
 		letters.add('c');
-		VpAlphabet<Character> alpha = new VpAlphabet<>(letters);
+		VpAlphabet<Character> alpha = new VpAlphabet<>(new HashSet<>(letters));
 
 		IUltimateServiceProvider mock = UltimateMocks.createUltimateServiceProviderMock();
 		AutomataLibraryServices service = new AutomataLibraryServices(mock);
@@ -105,7 +107,7 @@ public class CounterexamplesGeneratorTest {
 		nwa.addState(true, false, "A");
 		nwa.addInternalTransition("A", 'a', "A");
 		nwa.addInternalTransition("A", 'b', "A");
-		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 3, new HashSet<>());
+		CounterexamplesGeneration<Character, String> generation = new CounterexamplesGeneration<>(nwa, 3, letters);
 		generation.computeResult();
 		System.out.println("Test 4");
 		System.out.println("Number of counterexamples: " + generation.getResult().size());
