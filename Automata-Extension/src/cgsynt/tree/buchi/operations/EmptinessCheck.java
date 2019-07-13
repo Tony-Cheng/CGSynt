@@ -23,7 +23,6 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	private BuchiTreeAutomaton<LETTER, STATE> mtree;
-	private BuchiTreeAutomaton<LETTER, STATE> mtree2;
 
 	private boolean result;
 	private boolean resultComputed;
@@ -48,7 +47,6 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 
 	public EmptinessCheck(BuchiTreeAutomaton<LETTER, STATE> mtree) {
 		this.mtree = mtree.mkcpy();
-		this.mtree2 = mtree.mkcpy();
 		finalStates = mtree.getFinalStates();
 		goodStates = new HashSet<STATE>();
 		goodTransitions = new Stack<>();
@@ -177,114 +175,5 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	public boolean getResult() {
 		return result;
 	}
-
-	/**
-	 * Return a set counter examples rooted at s.
-	 * 
-	 * @param s
-	 * @param alphabet
-	 * @return
-	 */
-	private <ALPHA> Set<List<ALPHA>> explore(STATE s, List<ALPHA> alphabet) {
-		if (visitedStates.contains(s) || goodStates.contains(s)) {
-			return new HashSet<>();
-		} else if (mtree2.getRulesBySource(s) == null) {
-			Set<List<ALPHA>> allS = new HashSet<>();
-			allS.add(new ArrayList<>());
-			return allS;
-		} else {
-			Set<List<ALPHA>> allS = new HashSet<>();
-			visitedStates.add(s);
-			for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mtree2.getRulesBySource(s)) {
-				List<STATE> states = rule.getDest();
-				for (int i = 0; i < rule.getArity(); i++) {
-					STATE q = states.get(i);
-					if (q != null) {
-						Set<List<ALPHA>> S = explore(q, alphabet);
-						if (!S.isEmpty()) {
-							for (List<ALPHA> list : S) {
-								list.add(alphabet.get(i));
-							}
-							allS.addAll(S);
-							break;
-						}
-					}
-				}
-			}
-			visitedStates.remove(s);
-			return allS;
-		}
-	}
-
-	/**
-	 * Return a set of counterexamples root at the initial state.
-	 * 
-	 * @param alphabet
-	 * @return
-	 */
-	public <ALPHA> Set<List<ALPHA>> findCounterExamples(List<ALPHA> alphabet) {
-		visitedStates = new HashSet<>();
-		Set<List<ALPHA>> allS = new HashSet<>();
-		for (STATE state : mtree2.getInitStates()) {
-			allS.addAll(explore(state, alphabet));
-		}
-		for (List<ALPHA> list : allS) {
-			Collections.reverse(list);
-		}
-		return allS;
-	}
-
-	/**
-	 * Return a counterexample for the subtree rooted at s.
-	 * 
-	 * @param s
-	 * @return
-	 */
-	private <ALPHA> Set<List<ALPHA>> explore(STATE s) {
-		if (visitedStates.contains(s) || goodStates.contains(s)) {
-			return new HashSet<>();
-		} else if (!mtree2.getRulesBySource(s).isEmpty()) {
-			Set<List<ALPHA>> allS = new HashSet<>();
-			allS.add(new ArrayList<>());
-			return allS;
-		} else {
-			Set<List<ALPHA>> allS = new HashSet<>();
-			visitedStates.add(s);
-			for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mtree2.getRulesBySource(s)) {
-				BüchiTreeAutomatonRule<LETTER, STATE, ALPHA> advancedRule = (BüchiTreeAutomatonRule<LETTER, STATE, ALPHA>) rule;
-				for (ALPHA alpha : advancedRule.getAlphabet()) {
-					STATE q = advancedRule.getState(alpha);
-					if (q != null) {
-						Set<List<ALPHA>> S = explore(q);
-						if (!S.isEmpty()) {
-							for (List<ALPHA> list : S) {
-								list.add(alpha);
-							}
-							allS.addAll(S);
-							break;
-						}
-					}
-				}
-			}
-			visitedStates.remove(s);
-			return allS;
-		}
-	}
-
-	/**
-	 * Return a counterexample.
-	 * 
-	 * @return
-	 */
-	public <ALPHA> Set<List<ALPHA>> findCounterExamples() {
-		visitedStates = new HashSet<>();
-		Set<List<ALPHA>> allS = new HashSet<>();
-		for (STATE state : mtree2.getInitStates()) {
-			allS.addAll(explore(state));
-		}
-		for (List<ALPHA> list : allS) {
-			Collections.reverse(list);
-		}
-		return allS;
-	}
+	
 }
