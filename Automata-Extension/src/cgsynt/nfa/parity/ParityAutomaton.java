@@ -19,4 +19,8 @@ public class ParityAutomaton<LETTER, STATE> extends NestedWordAutomaton<LETTER, 
 	public Map<STATE, Integer> getColouringFunction(){
 		return mColouringFunction;
 	}
+	
+	public void setColouringFunction(Map<STATE, Integer> colouringFunction) {
+		mColouringFunction = colouringFunction;
+	}
 }
