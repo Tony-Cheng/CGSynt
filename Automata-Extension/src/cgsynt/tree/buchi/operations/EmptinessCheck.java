@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import cgsynt.interpol.IStatement;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.BüchiTreeAutomatonRule;
@@ -175,5 +176,11 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	public boolean getResult() {
 		return result;
 	}
-	
+
+	public BuchiTreeAutomaton<LETTER, STATE> getGoodAutomaton() {
+		if (!resultComputed)
+			return null;
+		return mtree;
+	}
+
 }

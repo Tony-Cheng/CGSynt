@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import cgsynt.Operations.CounterExamplesToInterpolants;
+import cgsynt.Operations.ProgramRetrieval;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.interpol.IStatement;
@@ -131,7 +132,7 @@ public class SynthesisLoop {
 		if (!emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
-			result = intersectedAut;
+			result = emptinessCheck.getGoodAutomaton();
 			return;
 		}
 		prevSize = k * stringDFAPI.getStates().size();
@@ -209,6 +210,18 @@ public class SynthesisLoop {
 	public void printAllInterpolants() {
 		for (IPredicate interpol : this.mAllInterpolants) {
 			System.out.println(interpol);
+		}
+	}
+
+	public void printProgram() {
+		IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
+		for (int i = 0; i < statements.length; i++) {
+			statements[i] = mTransitionAlphabet.get(i);
+		}
+		ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result, statements);
+		retrieve.computeResult();
+		for (String statement : retrieve.getResult()) {
+			System.out.println(statement);
 		}
 	}
 }

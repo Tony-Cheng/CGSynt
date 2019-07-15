@@ -22,6 +22,7 @@ public class TestSynthesisLoop1 {
 
 	@Test
 	void test1() throws Exception {
+		// i++; i++
 		TraceGlobalVariables globalVars = new TraceGlobalVariables();
 		VariableFactory vf = globalVars.getVariableFactory();
 		Script script = globalVars.getManagedScript().getScript();
@@ -43,10 +44,12 @@ public class TestSynthesisLoop1 {
 		synthesis.computeMainLoop();
 		System.out.println("Test 1");
 		System.out.println(synthesis.isCorrect());
+		// synthesis.printProgram();
 	}
 
 	@Test
 	void test2() throws Exception {
+		// while i < n, i++
 		TraceGlobalVariables globalVars = new TraceGlobalVariables();
 		VariableFactory vf = globalVars.getVariableFactory();
 		Script script = globalVars.getManagedScript().getScript();
@@ -68,11 +71,13 @@ public class TestSynthesisLoop1 {
 		synthesis.computeMainLoop();
 		System.out.println("Test 2");
 		System.out.println(synthesis.isCorrect());
+		// synthesis.printProgram();
 
 	}
 
 	@Test
 	void test3() throws Exception {
+		// find max in an array
 		TraceGlobalVariables globalVars = new TraceGlobalVariables();
 		VariableFactory vf = globalVars.getVariableFactory();
 		Script script = globalVars.getManagedScript().getScript();
@@ -115,6 +120,7 @@ public class TestSynthesisLoop1 {
 		synthesis.computeMainLoop();
 		System.out.println("Test 3");
 		System.out.println(synthesis.isCorrect());
+		// synthesis.printProgram();
 
 	}
 }
