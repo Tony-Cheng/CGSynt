@@ -278,7 +278,10 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		return result.toString();
 
 	}
-<<<<<<< Updated upstream
+	
+	public boolean contains(STATE state) {
+		return mStates.contains(state);
+	}
 
 	public void removeState(STATE state) {
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : mSourceMap.get(state)) {
