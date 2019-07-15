@@ -1,4 +1,4 @@
-package cgsynt.parity;
+package cgsynt.tree.parity;
 
 public interface IParityState {
 	int getRank();
