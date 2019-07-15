@@ -303,4 +303,13 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		if (mInitStates.contains(state))
 			mInitStates.remove(state);
 	}
+	
+	public IParityState fetchEqualState(STATE query) {
+		for (STATE state : mStates) {
+			if (state.equals(query))
+				return state;
+		}
+		
+		return null;
+	}
 }
