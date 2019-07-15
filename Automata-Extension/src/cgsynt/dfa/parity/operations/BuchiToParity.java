@@ -1,10 +1,11 @@
-package cgsynt.dfa.parity;
+package cgsynt.dfa.parity.operations;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import cgsynt.dfa.parity.ParityAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 
 public class BuchiToParity<LETTER, STATE> {
