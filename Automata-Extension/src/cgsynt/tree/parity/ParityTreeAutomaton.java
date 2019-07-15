@@ -278,6 +278,7 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		return result.toString();
 
 	}
+<<<<<<< Updated upstream
 
 	public void removeState(STATE state) {
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : mSourceMap.get(state)) {
@@ -299,5 +300,10 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		if (mInitStates.contains(state))
 			mInitStates.remove(state);
 
+=======
+	
+	public boolean contains(STATE state) {
+		return mStates.contains(state);
+>>>>>>> Stashed changes
 	}
 }
