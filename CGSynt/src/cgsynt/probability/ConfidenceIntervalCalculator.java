@@ -7,6 +7,7 @@ import java.util.Set;
 
 import cgsynt.Operations.CounterExamplesToInterpolants;
 import cgsynt.interpol.IStatement;
+import cgsynt.interpol.TraceToInterpolants;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
@@ -17,13 +18,15 @@ public class ConfidenceIntervalCalculator {
 	private int sampleSize;
 	private static double z975 = 1.96;
 	private List<IStatement> transitionAlphabet;
+	private TraceToInterpolants interpolator;
 
 	public ConfidenceIntervalCalculator(INestedWordAutomaton<IStatement, String> aut, int k, int sampleSize,
-			List<IStatement> transitionAlphabet) {
+			List<IStatement> transitionAlphabet, TraceToInterpolants interpolator) {
 		this.aut = aut;
 		this.k = k;
 		this.sampleSize = sampleSize;
 		this.transitionAlphabet = transitionAlphabet;
+		this.interpolator = interpolator;
 	}
 
 	private void generateSingleSample(long len, List<IStatement> trace) {
@@ -96,7 +99,7 @@ public class ConfidenceIntervalCalculator {
 			Set<List<IStatement>> singleTraceSet = new HashSet<>();
 			singleTraceSet.add(traces.get(i));
 			CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(
-					singleTraceSet);
+					singleTraceSet, interpolator);
 			counterExampleToInterpolants.computeResult();
 			count += counterExampleToInterpolants.getCorrectTraces().size();
 		}

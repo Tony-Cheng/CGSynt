@@ -6,12 +6,16 @@ import de.uni_freiburg.informatik.ultimate.automata.statefactory.IEmptyStackStat
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
-public class GeneralizeStateFactory implements IEmptyStackStateFactory<IPredicate>{
+public class GeneralizeStateFactory implements IEmptyStackStateFactory<IPredicate> {
+
+	BasicPredicateFactory pf;
+
+	public GeneralizeStateFactory(BasicPredicateFactory pf) {
+		this.pf = pf;
+	}
 
 	@Override
 	public IPredicate createEmptyStackState() {
-		BasicPredicateFactory pf = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
-		
 		return pf.newDebugPredicate("EmptyStackState:GeneralizeStateFactory");
 	}
 

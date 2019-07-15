@@ -30,11 +30,12 @@ public class ScriptAssignmentStatement implements IStatement {
 	 * @param rhs
 	 *            the right hand side of the statement.
 	 */
-	public ScriptAssignmentStatement(BoogieNonOldVar lhs, Term rhs) {
+	public ScriptAssignmentStatement(BoogieNonOldVar lhs, Term rhs, ManagedScript managedScript,
+			DefaultIcfgSymbolTable symbolTable) {
 		this.lhs = lhs;
 		this.rhs = rhs;
-		this.symbolTable = TraceGlobalVariables.getGlobalVariables().getVariableFactory().getSymbolTable();
-		this.managedScript = TraceGlobalVariables.getGlobalVariables().getManagedScript();
+		this.symbolTable = symbolTable;
+		this.managedScript = managedScript;
 	}
 
 	@Override

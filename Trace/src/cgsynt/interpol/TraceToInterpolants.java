@@ -61,15 +61,16 @@ public class TraceToInterpolants implements IInterpol {
 	private PredicateUnifier pUnifier;
 	private IPredicate preconditions;
 	private IPredicate postconditions;
+	private long totaltime;
+	private long numSamples;
 
-	private static TraceToInterpolants traceToInterpolants;
-
-	public TraceToInterpolants() throws Exception {
+	public TraceToInterpolants(ManagedScript managedScript, IUltimateServiceProvider service,
+			DefaultIcfgSymbolTable symbolTable) throws Exception {
 		ILogger logger = new ConsoleLogger();
 		logger.setLevel(LogLevel.OFF);
-		managedScript = TraceGlobalVariables.getGlobalVariables().getManagedScript();
-		service = TraceGlobalVariables.getGlobalVariables().getService();
-		symbolTable = TraceGlobalVariables.getGlobalVariables().getVariableFactory().getSymbolTable();
+		this.managedScript = managedScript;
+		this.service = service;
+		this.symbolTable = symbolTable;
 		procedures = new HashSet<>();
 		HashRelation<String, IProgramNonOldVar> mProc2Globals = new HashRelation<>();
 		modifiableGlobalsTable = new ModifiableGlobalsTable(mProc2Globals);
@@ -90,21 +91,8 @@ public class TraceToInterpolants implements IInterpol {
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		postconditions = pUnifier.getTruePredicate();
 		postconditions = pUnifier.getTruePredicate();
-	}
-
-	private List<IAssumption> negatePostconditions(List<IAssumption> postconditions) {
-		for (IAssumption precondition : postconditions)
-			precondition.negate();
-		return postconditions;
-
-	}
-
-	public static void reset() throws Exception {
-		traceToInterpolants = new TraceToInterpolants();
-	}
-
-	public static TraceToInterpolants getTraceToInterpolants() {
-		return traceToInterpolants;
+		this.totaltime = 0;
+		this.numSamples = 0;
 	}
 
 	private NestedWord<IAction> buildTrace(List<IStatement> statements) {
@@ -132,18 +120,26 @@ public class TraceToInterpolants implements IInterpol {
 	public IPredicate[] computeInterpolants(List<IStatement> statements) throws Exception {
 		NestedWord<IAction> trace = buildTrace(statements);
 		List<Object> controlLocationSequence = generateControlLocationSequence(trace.length() + 1);
+		long time = System.nanoTime();
 		InterpolatingTraceCheckCraig<IAction> interpolate = new InterpolatingTraceCheckCraig<>(preconditions,
 				postconditions, pendingContexts, trace, controlLocationSequence, service, toolkit, managedScript, null,
 				pUnifier, AssertCodeBlockOrder.NOT_INCREMENTALLY, false, true,
 				InterpolationTechnique.Craig_NestedInterpolation, false, XnfConversionTechnique.BDD_BASED,
 				SimplificationTechnique.NONE, false);
+		totaltime += System.nanoTime() - time;
+		numSamples++;
 		if (interpolate.isCorrect() == LBool.UNKNOWN) {
-			throw new Exception("Is trace correct? Unknown.");
+			System.err.println("Is the trace correct? Unknown.");
+			return null;
 		}
 		if (interpolate.isCorrect() == LBool.SAT) {
 			return null;
 		}
 		return interpolate.getInterpolants();
+	}
+
+	public void printAverageTime() {
+		System.out.println(totaltime / numSamples / 1000000);
 	}
 
 	@Override

@@ -22,12 +22,13 @@ public class ScriptAssumptionStatement implements IAssumption {
 	private String type;
 	private boolean negated;
 
-	public ScriptAssumptionStatement(BoogieNonOldVar lhs, Term rhs, String type) {
+	public ScriptAssumptionStatement(BoogieNonOldVar lhs, Term rhs, String type, ManagedScript managedScript,
+			DefaultIcfgSymbolTable symbolTable) {
 		this.lhs = lhs;
 		this.rhs = rhs;
 		this.type = type;
-		symbolTable = TraceGlobalVariables.getGlobalVariables().getVariableFactory().getSymbolTable();
-		managedScript = TraceGlobalVariables.getGlobalVariables().getManagedScript();
+		this.symbolTable = symbolTable;
+		this.managedScript = managedScript;
 		this.negated = false;
 
 	}
@@ -105,7 +106,7 @@ public class ScriptAssumptionStatement implements IAssumption {
 
 	@Override
 	public IAssumption copy() {
-		ScriptAssumptionStatement copy = new ScriptAssumptionStatement(lhs, rhs, type);
+		ScriptAssumptionStatement copy = new ScriptAssumptionStatement(lhs, rhs, type, managedScript, symbolTable);
 		copy.negated = negated;
 		return copy;
 	}

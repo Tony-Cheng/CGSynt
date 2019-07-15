@@ -33,13 +33,13 @@ public class TestArrayVerification1 {
 	void test1() throws Exception {
 		// Pre : None
 		// Post: (A[3] = A[1] or A[3] = A[2]) and (A[3] > A[2] and A[3] >= A[2])
-		MainVerificationLoop.resetAll();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		Script script = globalVars.getManagedScript().getScript();
 		script.declareFun("arr", new Sort[0], script.sort("Array", script.sort("Int"), script.sort("Int")));
-		VariableFactory factory = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		VariableFactory factory = globalVars.getVariableFactory();
+		BasicPredicateFactory predicateFactory = globalVars.getTraceInterpolator().getPredicateFactory();
 		BoogieNonOldVar A = factory.constructVariable(VariableFactory.INT_ARR);
-		IPredicate preconditions = TraceToInterpolants.getTraceToInterpolants().getTruePredicate();
+		IPredicate preconditions = globalVars.getTraceInterpolator().getTruePredicate();
 		IPredicate postconditions = predicateFactory
 				.newPredicate(script.term(">=", script.term("select", A.getTerm(), script.numeral("3")),
 						script.term("select", A.getTerm(), script.numeral("1"))));
@@ -57,14 +57,20 @@ public class TestArrayVerification1 {
 		program.setAllStatesFinal();
 		IStatement statement1 = new ScriptPredicateAssumptionStatement(
 				predicateFactory.newPredicate(script.term("<", script.term("select", A.getTerm(), script.numeral("1")),
-						script.term("select", A.getTerm(), script.numeral("2")))));
+						script.term("select", A.getTerm(), script.numeral("2")))),
+				globalVars.getManagedScript(), globalVars.getPredicateFactory());
 		IStatement statement2 = new ScriptPredicateAssumptionStatement(
 				predicateFactory.newPredicate(script.term(">=", script.term("select", A.getTerm(), script.numeral("1")),
-						script.term("select", A.getTerm(), script.numeral("2")))));
-		IStatement statement3 = new ScriptAssignmentStatement(A, script.term("store", A.getTerm(), script.numeral("3"),
-				script.term("select", A.getTerm(), script.numeral("2"))));
-		IStatement statement4 = new ScriptAssignmentStatement(A, script.term("store", A.getTerm(), script.numeral("3"),
-				script.term("select", A.getTerm(), script.numeral("1"))));
+						script.term("select", A.getTerm(), script.numeral("2")))),
+				globalVars.getManagedScript(), globalVars.getPredicateFactory());
+		IStatement statement3 = new ScriptAssignmentStatement(A,
+				script.term("store", A.getTerm(), script.numeral("3"),
+						script.term("select", A.getTerm(), script.numeral("2"))),
+				globalVars.getManagedScript(), factory.getSymbolTable());
+		IStatement statement4 = new ScriptAssignmentStatement(A,
+				script.term("store", A.getTerm(), script.numeral("3"),
+						script.term("select", A.getTerm(), script.numeral("1"))),
+				globalVars.getManagedScript(), factory.getSymbolTable());
 
 		List<IStatement> letters = new ArrayList<>(Arrays.asList(statement1, statement2, statement3, statement4));
 
@@ -79,22 +85,23 @@ public class TestArrayVerification1 {
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s4", dest4));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s5", dest4));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions,
+				globalVars);
 		loop.computeMainLoop();
 		assertTrue(loop.isCorrect());
 	}
-	
+
 	@Test
 	void test2() throws Exception {
 		// Pre : None
 		// Post: (A[3] = A[1] or A[3] = A[2]) and (A[3] > A[2] and A[3] >= A[2])
-		MainVerificationLoop.resetAll();
-		Script script = TraceGlobalVariables.getGlobalVariables().getManagedScript().getScript();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		Script script = globalVars.getManagedScript().getScript();
 		script.declareFun("arr", new Sort[0], script.sort("Array", script.sort("Int"), script.sort("Int")));
-		VariableFactory factory = TraceGlobalVariables.getGlobalVariables().getVariableFactory();
-		BasicPredicateFactory predicateFactory = TraceToInterpolants.getTraceToInterpolants().getPredicateFactory();
+		VariableFactory factory = globalVars.getVariableFactory();
+		BasicPredicateFactory predicateFactory = globalVars.getPredicateFactory();
 		BoogieNonOldVar A = factory.constructVariable(VariableFactory.INT_ARR);
-		IPredicate preconditions = TraceToInterpolants.getTraceToInterpolants().getTruePredicate();
+		IPredicate preconditions = globalVars.getTraceInterpolator().getTruePredicate();
 		IPredicate postconditions = predicateFactory
 				.newPredicate(script.term("<", script.term("select", A.getTerm(), script.numeral("3")),
 						script.term("select", A.getTerm(), script.numeral("1"))));
@@ -112,14 +119,20 @@ public class TestArrayVerification1 {
 		program.setAllStatesFinal();
 		IStatement statement1 = new ScriptPredicateAssumptionStatement(
 				predicateFactory.newPredicate(script.term("<", script.term("select", A.getTerm(), script.numeral("1")),
-						script.term("select", A.getTerm(), script.numeral("2")))));
+						script.term("select", A.getTerm(), script.numeral("2")))),
+				globalVars.getManagedScript(), globalVars.getPredicateFactory());
 		IStatement statement2 = new ScriptPredicateAssumptionStatement(
 				predicateFactory.newPredicate(script.term(">=", script.term("select", A.getTerm(), script.numeral("1")),
-						script.term("select", A.getTerm(), script.numeral("2")))));
-		IStatement statement3 = new ScriptAssignmentStatement(A, script.term("store", A.getTerm(), script.numeral("3"),
-				script.term("select", A.getTerm(), script.numeral("2"))));
-		IStatement statement4 = new ScriptAssignmentStatement(A, script.term("store", A.getTerm(), script.numeral("3"),
-				script.term("select", A.getTerm(), script.numeral("1"))));
+						script.term("select", A.getTerm(), script.numeral("2")))),
+				globalVars.getManagedScript(), globalVars.getPredicateFactory());
+		IStatement statement3 = new ScriptAssignmentStatement(A,
+				script.term("store", A.getTerm(), script.numeral("3"),
+						script.term("select", A.getTerm(), script.numeral("2"))),
+				globalVars.getManagedScript(), factory.getSymbolTable());
+		IStatement statement4 = new ScriptAssignmentStatement(A,
+				script.term("store", A.getTerm(), script.numeral("3"),
+						script.term("select", A.getTerm(), script.numeral("1"))),
+				globalVars.getManagedScript(), factory.getSymbolTable());
 
 		List<IStatement> letters = new ArrayList<>(Arrays.asList(statement1, statement2, statement3, statement4));
 
@@ -134,7 +147,8 @@ public class TestArrayVerification1 {
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.TRUE, "s4", dest4));
 		program.addRule(new BuchiTreeAutomatonRule<>(RankedBool.FALSE, "s5", dest4));
 
-		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions);
+		MainVerificationLoop loop = new MainVerificationLoop(program, letters, preconditions, postconditions,
+				globalVars);
 		loop.computeMainLoop();
 		assertFalse(loop.isCorrect());
 	}

@@ -18,6 +18,25 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 	private int bs;
 	private List<LETTER> alphabet;
 
+	public CounterexamplesGeneration(INestedWordAutomaton<LETTER, STATE> nwa, int k, Set<List<LETTER>> visited,
+			List<LETTER> alphabet) {
+		this.nwa = nwa;
+		resultComputed = false;
+		this.k = k;
+		this.visited = visited;
+		this.bs = -1;
+		this.alphabet = alphabet;
+	}
+
+	public CounterexamplesGeneration(INestedWordAutomaton<LETTER, STATE> nwa, int k, List<LETTER> alphabet) {
+		this.nwa = nwa;
+		resultComputed = false;
+		this.k = k;
+		this.visited = new HashSet<>();
+		this.bs = -1;
+		this.alphabet = alphabet;
+	}
+
 	public CounterexamplesGeneration(INestedWordAutomaton<LETTER, STATE> nwa, int k, Set<List<LETTER>> visited, int bs,
 			List<LETTER> alphabet) {
 		this.nwa = nwa;
