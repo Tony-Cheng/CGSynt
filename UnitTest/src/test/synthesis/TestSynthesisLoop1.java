@@ -44,7 +44,7 @@ public class TestSynthesisLoop1 {
 		synthesis.computeMainLoop();
 		System.out.println("Test 1");
 		System.out.println(synthesis.isCorrect());
-		// synthesis.printProgram();
+		synthesis.printProgram();
 	}
 
 	@Test
@@ -71,7 +71,7 @@ public class TestSynthesisLoop1 {
 		synthesis.computeMainLoop();
 		System.out.println("Test 2");
 		System.out.println(synthesis.isCorrect());
-		// synthesis.printProgram();
+		synthesis.printProgram();
 
 	}
 
@@ -120,7 +120,7 @@ public class TestSynthesisLoop1 {
 		synthesis.computeMainLoop();
 		System.out.println("Test 3");
 		System.out.println(synthesis.isCorrect());
-		// synthesis.printProgram();
+		synthesis.printProgram();
 
 	}
 }

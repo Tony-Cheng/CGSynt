@@ -3,9 +3,11 @@ package cgsynt.tree.buchi.operations;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -38,19 +40,20 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 	 */
 	private Set<STATE> goodStates;
 
-	private Set<STATE> visitedStates;
-
 	/**
 	 * Transitions whose destination is a list consists of all acceptance states or
 	 * roots of some good subtree embedded.
 	 */
 	private Stack<BuchiTreeAutomatonRule<LETTER, STATE>> goodTransitions;
 
+	private Map<STATE, BuchiTreeAutomatonRule<LETTER, STATE>> goodProgram;
+
 	public EmptinessCheck(BuchiTreeAutomaton<LETTER, STATE> mtree) {
 		this.mtree = mtree.mkcpy();
 		finalStates = mtree.getFinalStates();
 		goodStates = new HashSet<STATE>();
 		goodTransitions = new Stack<>();
+		this.goodProgram = new HashMap<>();
 		resultComputed = false;
 	}
 
@@ -84,6 +87,7 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 			STATE src = nextRule.getSource();
 			if (!goodStates.contains(src)) {
 				goodStates.add(src);
+				goodProgram.put(src, nextRule);
 				Collection<BuchiTreeAutomatonRule<LETTER, STATE>> ruleToSrc = mtree.getChildMap().get(src);
 				if (ruleToSrc != null && !finalStates.contains(src)) {
 					for (BuchiTreeAutomatonRule<LETTER, STATE> rule : ruleToSrc) {
@@ -159,6 +163,7 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 				}
 				goodStates.clear();
 				goodTransitions.clear();
+				goodProgram.clear();
 				initializeGoodTransitions();
 				findAllGoodStates();
 			}
@@ -166,6 +171,10 @@ public class EmptinessCheck<LETTER extends IRankedLetter, STATE> {
 		resultComputed = true;
 		result = true;
 		return;
+	}
+
+	public Map<STATE, BuchiTreeAutomatonRule<LETTER, STATE>> getGoodProgram() {
+		return goodProgram;
 	}
 
 	/**

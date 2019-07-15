@@ -3,6 +3,7 @@ package cgsynt.synthesis;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import cgsynt.Operations.CounterExamplesToInterpolants;
@@ -16,6 +17,7 @@ import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.probability.ConfidenceIntervalCalculator;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
+import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.IntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.BuchiIntersection;
@@ -54,6 +56,7 @@ public class SynthesisLoop {
 	private boolean printLogs;
 	private int printedLogsSize;
 	private TraceGlobalVariables globalVars;
+	private Map<IntersectState<String, String>, BuchiTreeAutomatonRule<RankedBool, IntersectState<String, String>>> goodProgram;
 
 	public SynthesisLoop(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions,
 			TraceGlobalVariables globalVars) throws Exception {
@@ -133,6 +136,7 @@ public class SynthesisLoop {
 			mIsCorrect = true;
 			mResultComputed = true;
 			result = emptinessCheck.getGoodAutomaton();
+			this.goodProgram = emptinessCheck.getGoodProgram();
 			return;
 		}
 		prevSize = k * stringDFAPI.getStates().size();
@@ -218,7 +222,7 @@ public class SynthesisLoop {
 		for (int i = 0; i < statements.length; i++) {
 			statements[i] = mTransitionAlphabet.get(i);
 		}
-		ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result, statements);
+		ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result, statements, goodProgram);
 		retrieve.computeResult();
 		for (String statement : retrieve.getResult()) {
 			System.out.println(statement);
