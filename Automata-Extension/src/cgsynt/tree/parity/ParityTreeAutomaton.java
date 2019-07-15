@@ -37,6 +37,10 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		return mAlphabet;
 	}
 
+	public Set<STATE> getStates() {
+		return mStates;
+	}
+
 	public int size() {
 		return mStates.size();
 	}
@@ -272,6 +276,28 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 
 		result.append("\n");
 		return result.toString();
+
+	}
+
+	public void removeState(STATE state) {
+		for (ParityTreeAutomatonRule<LETTER, STATE> rule : mSourceMap.get(state)) {
+			mChildrenMap.get(rule.getDest()).get(rule.getLetter()).remove(rule);
+			mLettersMap.get(rule.getLetter()).remove(rule);
+			mParentsMap.get(rule.getSource()).get(rule.getLetter()).remove(rule);
+			mRules.remove(rule);
+		}
+
+		for (ParityTreeAutomatonRule<LETTER, STATE> rule : mChildMap.get(state)) {
+			mChildrenMap.get(rule.getDest()).get(rule.getLetter()).remove(rule);
+			mLettersMap.get(rule.getLetter()).remove(rule);
+			mParentsMap.get(rule.getSource()).get(rule.getLetter()).remove(rule);
+			mRules.remove(rule);
+		}
+		mSourceMap.remove(state);
+		mChildMap.remove(state);
+		mStates.remove(state);
+		if (mInitStates.contains(state))
+			mInitStates.remove(state);
 
 	}
 }
