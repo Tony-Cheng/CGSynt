@@ -64,7 +64,85 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		if (resultComputed)
 			return;
 		computeGoodTree();
+		goodStates.clear();
+		goodTransitions.clear();
+		if (computeDecentTree()) {
+			result = true;
+			resultComputed = true;
+			return;
+		} else {
+			result = false;
+			resultComputed = false;
+			return;
+		}
+	}
+	
+	
+	public boolean getResult() {
+		return result;
+	}
 
+	private boolean computeDecentTree() {
+		initializeDecentTransitions();
+		findAllDecentStates();
+		removeInitialNotDecentStates();
+		if (tree.getInitStates().isEmpty()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private void initializeDecentTransitions() {
+		Set<ParityTreeAutomatonRule<LETTER, STATE>> allRules = tree.getRules();
+		for (ParityTreeAutomatonRule<LETTER, STATE> rule : allRules) {
+			List<STATE> dests = rule.getDest();
+			boolean isGoodTransition = true;
+			for (STATE dest : dests) {
+				if (!evenStates.contains(dest)) {
+					isGoodTransition = false;
+					break;
+				}
+			}
+			if (isGoodTransition)
+				goodTransitions.add(rule);
+		}
+	}
+
+	private void findAllDecentStates() {
+		while (!goodTransitions.isEmpty()) {
+			ParityTreeAutomatonRule<LETTER, STATE> nextRule = goodTransitions.pop();
+			STATE src = nextRule.getSource();
+			if (!goodStates.contains(src)) {
+				goodStates.add(src);
+				Collection<ParityTreeAutomatonRule<LETTER, STATE>> ruleToSrc = tree.getChildMap().get(src);
+				if (ruleToSrc != null && !evenStates.contains(src)) {
+					for (ParityTreeAutomatonRule<LETTER, STATE> rule : ruleToSrc) {
+						boolean isGoodTransition = true;
+						for (STATE dest : rule.getDest()) {
+							if (!evenStates.contains(dest) && !goodStates.contains(dest)) {
+								isGoodTransition = false;
+								break;
+							}
+						}
+						if (isGoodTransition) {
+							goodTransitions.add(rule);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void removeInitialNotDecentStates() {
+		Iterator<STATE> iterInitStates = tree.getInitStates().iterator();
+		while (iterInitStates.hasNext()) {
+			STATE nextInitState = iterInitStates.next();
+			if (!goodStates.contains(nextInitState)) {
+				iterInitStates.remove();
+				tree.removeState(nextInitState);
+			}
+		}
 	}
 
 	private void computeGoodTree() {
