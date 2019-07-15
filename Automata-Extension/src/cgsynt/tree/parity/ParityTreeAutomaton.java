@@ -302,11 +302,5 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		mStates.remove(state);
 		if (mInitStates.contains(state))
 			mInitStates.remove(state);
-
-=======
-	
-	public boolean contains(STATE state) {
-		return mStates.contains(state);
->>>>>>> Stashed changes
 	}
 }
