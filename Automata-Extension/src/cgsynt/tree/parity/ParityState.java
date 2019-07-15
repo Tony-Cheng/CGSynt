@@ -1,4 +1,4 @@
-package cgsynt.parity;
+package cgsynt.tree.parity;
 
 public class ParityState<STATE> implements IParityState {
 	private STATE state;

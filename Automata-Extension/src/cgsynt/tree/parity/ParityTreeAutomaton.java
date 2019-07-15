@@ -1,4 +1,4 @@
-package cgsynt.parity;
+package cgsynt.tree.parity;
 
 import java.util.Collection;
 import java.util.HashMap;
