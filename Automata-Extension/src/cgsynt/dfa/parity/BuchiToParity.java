@@ -1,4 +1,4 @@
-package cgsynt.nfa.parity;
+package cgsynt.dfa.parity;
 
 import java.util.Collection;
 import java.util.HashMap;
