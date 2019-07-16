@@ -21,7 +21,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 	private boolean resultComputed;
 	private ParityTreeAutomaton<LETTER, STATE> tree;
 
-	private Set<STATE> evenStates;
+	private Set<STATE> goodEvenStates;
 
 	private Set<STATE> goodStates;
 
@@ -32,7 +32,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 	public ParityEmptinessCheck(ParityTreeAutomaton<LETTER, STATE> tree) {
 		resultComputed = false;
 		this.tree = tree;
-		this.evenStates = computeEvenStates(tree);
+		this.goodEvenStates = computeEvenStates(tree);
 		this.goodStates = new HashSet<>();
 		this.maxOdd = initializeMaxOdd();
 		this.goodTransitions = new Stack<>();
@@ -99,7 +99,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 			List<STATE> dests = rule.getDest();
 			boolean isGoodTransition = true;
 			for (STATE dest : dests) {
-				if (!evenStates.contains(dest)) {
+				if (!goodEvenStates.contains(dest)) {
 					isGoodTransition = false;
 					break;
 				}
@@ -116,11 +116,11 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 			if (!goodStates.contains(src)) {
 				goodStates.add(src);
 				Collection<ParityTreeAutomatonRule<LETTER, STATE>> ruleToSrc = tree.getChildMap().get(src);
-				if (ruleToSrc != null && !evenStates.contains(src)) {
+				if (ruleToSrc != null && !goodEvenStates.contains(src)) {
 					for (ParityTreeAutomatonRule<LETTER, STATE> rule : ruleToSrc) {
 						boolean isGoodTransition = true;
 						for (STATE dest : rule.getDest()) {
-							if (!evenStates.contains(dest) && !goodStates.contains(dest)) {
+							if (!goodEvenStates.contains(dest) && !goodStates.contains(dest)) {
 								isGoodTransition = false;
 								break;
 							}
@@ -166,7 +166,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 			List<STATE> dests = rule.getDest();
 			boolean isGoodTransition = true;
 			for (STATE dest : dests) {
-				if (!evenStates.contains(dest)) {
+				if (!goodEvenStates.contains(dest)) {
 					isGoodTransition = false;
 					break;
 				}
@@ -184,7 +184,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 				boolean isGoodTransition = true;
 				int maxOddValue = oddValue;
 				for (STATE dest : rule.getDest()) {
-					if (!evenStates.contains(dest) && !goodStates.contains(dest)) {
+					if (!goodEvenStates.contains(dest) && !goodStates.contains(dest)) {
 						isGoodTransition = false;
 						break;
 					}
@@ -193,7 +193,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 					}
 				}
 				if (isGoodTransition
-						&& (!evenStates.contains(rule.getSource()) || rule.getSource().getRank() >= maxOddValue)) {
+						&& (!goodEvenStates.contains(rule.getSource()) || rule.getSource().getRank() >= maxOddValue)) {
 					if (goodStates.contains(rule.getSource())) {
 						if (maxOdd.get(state) > maxOddValue) {
 							updateMaxOdd(rule.getSource(), maxOddValue);
@@ -222,7 +222,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 				continue;
 			}
 			goodStates.add(src);
-			if (evenStates.contains(src))
+			if (goodEvenStates.contains(src))
 				continue;
 			int oddValue = maxOdd.get(src);
 			for (STATE state : nextRule.getDest()) {
@@ -236,7 +236,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 					boolean isGoodTransition = true;
 					int maxOddValue = oddValue;
 					for (STATE dest : rule.getDest()) {
-						if (!evenStates.contains(dest) && !goodStates.contains(dest)) {
+						if (!goodEvenStates.contains(dest) && !goodStates.contains(dest)) {
 							isGoodTransition = false;
 							break;
 						}
@@ -245,7 +245,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 						}
 					}
 					if (isGoodTransition
-							&& (!evenStates.contains(rule.getSource()) || rule.getSource().getRank() >= maxOddValue)) {
+							&& (!goodEvenStates.contains(rule.getSource()) || rule.getSource().getRank() >= maxOddValue)) {
 						goodTransitions.add(rule);
 					}
 				}
@@ -256,12 +256,12 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 	private boolean removeEvenNotGoodStates() {
 		boolean evenStateRemoved = false;
 
-		Iterator<STATE> iterEvenStates = evenStates.iterator();
+		Iterator<STATE> iterEvenStates = goodEvenStates.iterator();
 		while (iterEvenStates.hasNext()) {
 			STATE nextEvenState = iterEvenStates.next();
 			if (!goodStates.contains(nextEvenState)) {
 				iterEvenStates.remove();
-				tree.removeState(nextEvenState);
+				goodEvenStates.remove(nextEvenState);
 				evenStateRemoved = true;
 			}
 		}
