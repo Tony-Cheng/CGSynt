@@ -47,4 +47,8 @@ public class ParityState<STATE> implements IParityState {
 		return rank;
 	}
 
+	@Override
+	public String toString() {
+		return state + ": " + rank;
+	}
 }
