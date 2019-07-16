@@ -80,6 +80,23 @@ public class FsaFactory {
 		return dfa;
 	}
 	
+	public static NestedWordAutomaton<Character, String> sparseDfa(AutomataLibraryServices service){
+		VpAlphabet<Character> alpha = alphabet('a', 'b');
+		
+		NestedWordAutomaton<Character, String> dfa = new NestedWordAutomaton<>(service, alpha, new StringFactory());
+		
+		dfa.addState(true, false, "0");
+		dfa.addState(false, true, "1");
+		dfa.addState(false, true, "2");
+		
+		dfa.addInternalTransition("0", 'a', "1");
+		dfa.addInternalTransition("0", 'b', "2");
+		dfa.addInternalTransition("1", 'b', "2");
+		dfa.addInternalTransition("2", 'b', "0");
+		
+		return dfa;
+	}
+	
 	/**
 	 * Initialize a new VpAlphabet with the specified letters.
 	 * 

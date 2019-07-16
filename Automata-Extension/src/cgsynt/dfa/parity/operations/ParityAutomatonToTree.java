@@ -6,19 +6,20 @@ import java.util.Map;
 
 import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.tree.buchi.lta.RankedBool;
+import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class ParityAutomatonToTree<LETTER, STATE> {
+public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
 	private ParityAutomaton<LETTER, STATE> mInAutomaton;
 	private List<LETTER> mLetterOrder;
-	private ParityState<STATE> mDeadState;
+	private STATE mDeadState;
 	
-	private ParityTreeAutomaton<RankedBool, ParityState<STATE>> mOutAutomaton;
+	private ParityTreeAutomaton<RankedBool, STATE> mOutAutomaton;
 	
-	public ParityAutomatonToTree(final ParityAutomaton<LETTER, STATE> automaton, List<LETTER> letterOrder, ParityState<STATE> deadState){
+	public ParityAutomatonToTree(final ParityAutomaton<LETTER, STATE> automaton, List<LETTER> letterOrder, STATE deadState){
 		mInAutomaton = automaton;
 		mLetterOrder = letterOrder;
 		mDeadState = deadState;
@@ -31,16 +32,12 @@ public class ParityAutomatonToTree<LETTER, STATE> {
 	
 	@SuppressWarnings("unchecked")
 	public void computeResult() {
-		Map<STATE, Integer> colouringFunction = mInAutomaton.getColouringFunction();
-		
 		for (STATE state : mInAutomaton.getStates()) {
-			int colour = colouringFunction.get(state);
-			
-			ParityState<STATE> newState = new ParityState<>(state, colour);
+			STATE newState = state;
 			
 			boolean existant = false;
 			if (mOutAutomaton.contains(newState)) {
-				newState = (ParityState<STATE>) mOutAutomaton.fetchEqualState(newState);
+				newState = mOutAutomaton.fetchEqualState(newState);
 				existant = true;
 			}
 			
@@ -50,13 +47,13 @@ public class ParityAutomatonToTree<LETTER, STATE> {
 				mOutAutomaton.addState(newState);
 			
 			if (mInAutomaton.isFinal(state)) {
-				ParityTreeAutomatonRule<RankedBool, ParityState<STATE>> trueRule = 
+				ParityTreeAutomatonRule<RankedBool, STATE> trueRule = 
 						new ParityTreeAutomatonRule<>(RankedBool.TRUE, newState, createDestinationList(state));
 				
 				mOutAutomaton.addRule(trueRule);
 			}
 			
-			ParityTreeAutomatonRule<RankedBool, ParityState<STATE>> falseRule = 
+			ParityTreeAutomatonRule<RankedBool, STATE> falseRule = 
 					new ParityTreeAutomatonRule<>(RankedBool.FALSE, newState, createDestinationList(state));
 			
 			mOutAutomaton.addRule(falseRule);
@@ -64,9 +61,8 @@ public class ParityAutomatonToTree<LETTER, STATE> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<ParityState<STATE>> createDestinationList(STATE source){
-		List<ParityState<STATE>> destList = new ArrayList<>();
-		Map<STATE, Integer> colouringFunction = mInAutomaton.getColouringFunction();
+	public List<STATE> createDestinationList(STATE source){
+		List<STATE> destList = new ArrayList<>();
 		
 		for (LETTER letter : mLetterOrder) {
 			Iterable<OutgoingInternalTransition<LETTER, STATE>> successors = mInAutomaton.internalSuccessors(source);
@@ -74,17 +70,15 @@ public class ParityAutomatonToTree<LETTER, STATE> {
 			boolean found = false;
 			for (OutgoingInternalTransition<LETTER, STATE> transition : successors) {
 				if (transition.getLetter().equals(letter)) {
-					STATE state = transition.getSucc();
-					int colour = colouringFunction.get(transition.getSucc());
+					STATE succState = transition.getSucc();
 					
-					ParityState<STATE> succState = new ParityState<>(state, colour);
 					boolean existant = false;
 					if (mOutAutomaton.contains(succState)) {
-						succState = (ParityState<STATE>) mOutAutomaton.fetchEqualState(succState);
+						succState = mOutAutomaton.fetchEqualState(succState);
 						existant = true;
 					}
 						
-					if (mInAutomaton.isInitial(state) && !existant)
+					if (mInAutomaton.isInitial(succState) && !existant)
 						mOutAutomaton.addInitState(succState);
 					else if (!existant)
 						mOutAutomaton.addState(succState);
@@ -103,7 +97,7 @@ public class ParityAutomatonToTree<LETTER, STATE> {
 		return destList;
 	} 
 	
-	public ParityTreeAutomaton<RankedBool, ParityState<STATE>> getResult(){
+	public ParityTreeAutomaton<RankedBool, STATE> getResult(){
 		return mOutAutomaton;
 	}
 }

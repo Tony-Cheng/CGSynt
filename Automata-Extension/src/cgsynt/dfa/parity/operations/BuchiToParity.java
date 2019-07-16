@@ -1,39 +1,58 @@
 package cgsynt.dfa.parity.operations;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import cgsynt.dfa.parity.ParityAutomaton;
+import cgsynt.tree.parity.ParityState;
+import cgsynt.tree.parity.ParityStateFactory;
+import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
 public class BuchiToParity<LETTER, STATE> {
 	private NestedWordAutomaton<LETTER, STATE> mInAutomaton;
-	private ParityAutomaton<LETTER, STATE> mOutAutomaton;
+	private ParityAutomaton<LETTER, ParityState<STATE>> mOutAutomaton;
 	
-	public BuchiToParity(final NestedWordAutomaton<LETTER, STATE> automaton) {
+	private AutomataLibraryServices mService;
+	
+	public BuchiToParity(final NestedWordAutomaton<LETTER, STATE> automaton, AutomataLibraryServices service) {
 		mInAutomaton = automaton;
+		mService = service;
 		
 		computeResult();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void computeResult() {
+		mOutAutomaton = new ParityAutomaton<>(mService, mInAutomaton.getVpAlphabet(), new ParityStateFactory());
+	
 		Set<STATE> allStates = mInAutomaton.getStates();
-		
-		Map<STATE, Integer> colouringFunction = new HashMap<>();
 		for (STATE state : allStates) {
-			if (mInAutomaton.isFinal(state)) 
-				colouringFunction.put(state, 0);
-			else 
-				colouringFunction.put(state, 1);
+			ParityState<STATE> newState =
+					new ParityState<>(state, (mInAutomaton.isFinal(state)) ? 0 : 1);
+			
+			if (!mOutAutomaton.contains(newState))
+				mOutAutomaton.addState(mInAutomaton.isInitial(state), mInAutomaton.isFinal(state), newState);
+			
+			for (OutgoingInternalTransition<LETTER, STATE> transition : mInAutomaton.internalSuccessors(state)) {
+				STATE oldSucc = transition.getSucc();
+				
+				ParityState<STATE> succ = 
+						new ParityState<>(oldSucc, (mInAutomaton.isFinal(oldSucc) ? 0 : 1));
+				
+				if (mOutAutomaton.contains(succ))
+					succ = (ParityState<STATE>) mOutAutomaton.fetchEqualState(succ);
+				else 
+					mOutAutomaton.addState(mInAutomaton.isInitial(oldSucc), mInAutomaton.isFinal(oldSucc), succ);
+				
+				LETTER letter = transition.getLetter();
+				
+				mOutAutomaton.addInternalTransition(newState, letter, succ);
+			}
 		}
-		
-		mOutAutomaton = (ParityAutomaton<LETTER, STATE>) mInAutomaton;
-		mOutAutomaton.setColouringFunction(colouringFunction);
 	}
 	
-	public ParityAutomaton<LETTER, STATE> getResult(){
+	public ParityAutomaton<LETTER, ParityState<STATE>> getResult(){
 		return mOutAutomaton;
 	}
 }
