@@ -6,12 +6,13 @@ import java.util.Map;
 
 import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.tree.buchi.lta.RankedBool;
+import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class ParityAutomatonToTree<LETTER, STATE> {
+public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
 	private ParityAutomaton<LETTER, STATE> mInAutomaton;
 	private List<LETTER> mLetterOrder;
 	private ParityState<STATE> mDeadState;
@@ -31,10 +32,8 @@ public class ParityAutomatonToTree<LETTER, STATE> {
 	
 	@SuppressWarnings("unchecked")
 	public void computeResult() {
-		Map<STATE, Integer> colouringFunction = mInAutomaton.getColouringFunction();
-		
 		for (STATE state : mInAutomaton.getStates()) {
-			int colour = colouringFunction.get(state);
+			int colour = state.getRank();
 			
 			ParityState<STATE> newState = new ParityState<>(state, colour);
 			
@@ -66,7 +65,6 @@ public class ParityAutomatonToTree<LETTER, STATE> {
 	@SuppressWarnings("unchecked")
 	public List<ParityState<STATE>> createDestinationList(STATE source){
 		List<ParityState<STATE>> destList = new ArrayList<>();
-		Map<STATE, Integer> colouringFunction = mInAutomaton.getColouringFunction();
 		
 		for (LETTER letter : mLetterOrder) {
 			Iterable<OutgoingInternalTransition<LETTER, STATE>> successors = mInAutomaton.internalSuccessors(source);
@@ -75,7 +73,7 @@ public class ParityAutomatonToTree<LETTER, STATE> {
 			for (OutgoingInternalTransition<LETTER, STATE> transition : successors) {
 				if (transition.getLetter().equals(letter)) {
 					STATE state = transition.getSucc();
-					int colour = colouringFunction.get(transition.getSucc());
+					int colour = transition.getSucc().getRank();
 					
 					ParityState<STATE> succState = new ParityState<>(state, colour);
 					boolean existant = false;
