@@ -85,9 +85,6 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		children.add(rule);
 
 		// parents
-		if (!mParentsMap.containsKey(src)) {
-			mParentsMap.put(src, new HashMap<LETTER, Collection<ParityTreeAutomatonRule<LETTER, STATE>>>());
-		}
 		final Map<LETTER, Collection<ParityTreeAutomatonRule<LETTER, STATE>>> parentLetter = mParentsMap.get(src);
 		if (!parentLetter.containsKey(letter)) {
 			parentLetter.put(letter, new HashSet<ParityTreeAutomatonRule<LETTER, STATE>>());
@@ -106,18 +103,13 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 
 		// SourceRules
 
-		if (!mSourceMap.containsKey(src)) {
-			mSourceMap.put(src, new HashSet<>());
-		}
 		final HashSet<ParityTreeAutomatonRule<LETTER, STATE>> rulesBySource = (HashSet<ParityTreeAutomatonRule<LETTER, STATE>>) mSourceMap
 				.get(src);
 		rulesBySource.add(rule);
 
 		// mRulesContainChildren
 		for (STATE child : rule.getDest()) {
-			if (!mChildMap.containsKey(child)) {
-				mChildMap.put(child, new HashSet<>());
-			}
+			addState(child);
 			mChildMap.get(child).add(rule);
 		}
 
@@ -130,7 +122,18 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 	 *            a state in this automaton
 	 */
 	public void addState(STATE state) {
-		mStates.add(state);
+		if (!mStates.contains(state)) {
+			mStates.add(state);
+			if (!mParentsMap.containsKey(state)) {
+				mParentsMap.put(state, new HashMap<LETTER, Collection<ParityTreeAutomatonRule<LETTER, STATE>>>());
+			}
+			if (!mSourceMap.containsKey(state)) {
+				mSourceMap.put(state, new HashSet<>());
+			}
+			if (!mChildMap.containsKey(state)) {
+				mChildMap.put(state, new HashSet<>());
+			}
+		}
 	}
 
 	/**
@@ -278,7 +281,7 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		return result.toString();
 
 	}
-	
+
 	public boolean contains(STATE state) {
 		return mStates.contains(state);
 	}
@@ -303,13 +306,13 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		if (mInitStates.contains(state))
 			mInitStates.remove(state);
 	}
-	
+
 	public IParityState fetchEqualState(STATE query) {
 		for (STATE state : mStates) {
 			if (state.equals(query))
 				return state;
 		}
-		
+
 		return null;
 	}
 }
