@@ -196,4 +196,165 @@ public class EmptinessCheckTest {
 		emptinessCheck.computeResult();
 		assertTrue(emptinessCheck.getResult());
 	}
+	
+	@Test
+	void test7() {
+		// nonempty
+		RankedBool.setRank(2);
+		ParityTreeAutomaton<RankedBool, ParityState<String>> aut = new ParityTreeAutomaton<>(2);
+		ParityState<String> q1 = new ParityState<String>("q1", 1);
+		ParityState<String> q2 = new ParityState<String>("q2", 2);
+		ParityState<String> q0 = new ParityState<String>("q0", 0);
+
+		List<ParityState<String>> list1 = new ArrayList<>();
+		list1.add(q0);
+		list1.add(q2);
+
+		List<ParityState<String>> list2 = new ArrayList<>();
+		list2.add(q2);
+		list2.add(q2);
+
+		List<ParityState<String>> list3 = new ArrayList<>();
+		list3.add(q0);
+		list3.add(q0);
+
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule1 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q1, list1);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule2 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q2, list2);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule0 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q0, list3);
+
+		aut.addRule(rule1);
+		aut.addRule(rule2);
+		aut.addRule(rule0);
+		aut.addInitState(q1);
+
+		ParityEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityEmptinessCheck<>(aut);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+	}
+	
+	@Test
+	void test8() {
+		// empty
+		RankedBool.setRank(2);
+		ParityTreeAutomaton<RankedBool, ParityState<String>> aut = new ParityTreeAutomaton<>(2);
+		ParityState<String> q1 = new ParityState<String>("q1", 1);
+		ParityState<String> q2 = new ParityState<String>("q2", 2);
+		ParityState<String> q0 = new ParityState<String>("q0", 0);
+
+		List<ParityState<String>> list1 = new ArrayList<>();
+		list1.add(q0);
+		list1.add(q2);
+
+		List<ParityState<String>> list2 = new ArrayList<>();
+		list2.add(q2);
+		list2.add(q2);
+
+		List<ParityState<String>> list3 = new ArrayList<>();
+		list3.add(q0);
+		list3.add(q1);
+
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule1 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q1, list1);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule2 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q2, list2);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule0 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q0, list3);
+
+		aut.addRule(rule1);
+		aut.addRule(rule2);
+		aut.addRule(rule0);
+		aut.addInitState(q1);
+
+		ParityEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityEmptinessCheck<>(aut);
+		emptinessCheck.computeResult();
+		assertTrue(emptinessCheck.getResult());
+	}
+	
+	@Test
+	void test9() {
+		// nonempty
+		RankedBool.setRank(2);
+		ParityTreeAutomaton<RankedBool, ParityState<String>> aut = new ParityTreeAutomaton<>(2);
+		ParityState<String> q1 = new ParityState<String>("q1", 1);
+		ParityState<String> q2 = new ParityState<String>("q2", 2);
+		ParityState<String> q0 = new ParityState<String>("q0", 0);
+
+		List<ParityState<String>> list1 = new ArrayList<>();
+		list1.add(q0);
+		list1.add(q2);
+
+		List<ParityState<String>> list2 = new ArrayList<>();
+		list2.add(q1);
+		list2.add(q2);
+
+		List<ParityState<String>> list3 = new ArrayList<>();
+		list3.add(q0);
+		list3.add(q0);
+
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule1 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q1, list1);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule2 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q2, list2);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule0 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q0, list3);
+
+		aut.addRule(rule1);
+		aut.addRule(rule2);
+		aut.addRule(rule0);
+		aut.addInitState(q1);
+
+		ParityEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityEmptinessCheck<>(aut);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+	}
+	
+	@Test
+	void test10() {
+		// nonempty
+		RankedBool.setRank(2);
+		ParityTreeAutomaton<RankedBool, ParityState<String>> aut = new ParityTreeAutomaton<>(2);
+		ParityState<String> q1 = new ParityState<String>("q1", 1);
+		ParityState<String> q2 = new ParityState<String>("q2", 2);
+		ParityState<String> q0 = new ParityState<String>("q0", 0);
+		ParityState<String> q3 = new ParityState<String>("q3", 3);
+
+
+		List<ParityState<String>> list0 = new ArrayList<>();
+		list0.add(q1);
+		list0.add(q2);
+		
+		List<ParityState<String>> list1 = new ArrayList<>();
+		list1.add(q2);
+		list1.add(q2);
+
+		List<ParityState<String>> list2 = new ArrayList<>();
+		list2.add(q2);
+		list2.add(q2);
+
+		List<ParityState<String>> list3 = new ArrayList<>();
+		list3.add(q0);
+		list3.add(q0);
+		
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule0 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q0, list0);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule1 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q1, list1);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule2 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q2, list2);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule3 = new ParityTreeAutomatonRule<>(RankedBool.FALSE,
+				q3, list3);
+
+		aut.addRule(rule1);
+		aut.addRule(rule2);
+		aut.addRule(rule0);
+		aut.addRule(rule3);
+		aut.addInitState(q3);
+
+		ParityEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityEmptinessCheck<>(aut);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+	}
 }
