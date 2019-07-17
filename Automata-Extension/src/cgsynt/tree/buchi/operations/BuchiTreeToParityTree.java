@@ -35,6 +35,9 @@ public class BuchiTreeToParityTree<LETTER extends IRankedLetter, STATE> {
 				mOutAutomaton.addState(newSourceState);
 			
 			Collection<BuchiTreeAutomatonRule<LETTER, STATE>> rules = mInAutomaton.getRulesBySource(state);
+			if (rules == null)
+				continue;
+			
 			for (BuchiTreeAutomatonRule<LETTER, STATE> rule : rules) {
 				List<STATE> dests = rule.getDest();
 				
