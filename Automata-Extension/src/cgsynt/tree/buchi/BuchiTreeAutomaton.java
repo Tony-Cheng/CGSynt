@@ -318,6 +318,10 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	public boolean isFinalState(STATE state) {
 		return mFinalStates.contains(state);
 	}
+	
+	public boolean isInitState(STATE state) {
+		return mInitStates.contains(state);
+	}
 
 	/**
 	 * Add a state the set of final states.
