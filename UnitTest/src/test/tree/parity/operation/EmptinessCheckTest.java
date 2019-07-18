@@ -445,4 +445,25 @@ public class EmptinessCheckTest {
 		emptinessCheck.computeResult();
 		assertFalse(emptinessCheck.getResult());
 	}
+	
+	@Test
+	public void test13() {
+		RankedBool.setRank(2);
+		
+		ParityState<String> q = new ParityState<>("q", 0);
+		List<ParityState<String>> qt = new ArrayList<>();
+		qt.add(q);
+		qt.add(q);
+		
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule = new ParityTreeAutomatonRule<>(RankedBool.TRUE,
+				q, qt);
+		
+		ParityTreeAutomaton<RankedBool, ParityState<String>> aut = new ParityTreeAutomaton<>(2);
+		aut.addInitState(q);
+		aut.addRule(rule);
+		
+		ParityEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityEmptinessCheck<>(aut);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+	}
 }
