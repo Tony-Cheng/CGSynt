@@ -15,6 +15,7 @@ public class ParityIntersectTree<LETTER extends IRankedLetter, STATE1 extends IP
 	private final Set<ParityIntersectRule<LETTER, STATE1, STATE2, STATE3>> mRules;
 	private final Map<ParityIntersectState<STATE1, STATE2, STATE3>, Collection<ParityIntersectRule<LETTER, STATE1, STATE2, STATE3>>> mChildMap;
 	private final Set<ParityIntersectState<STATE1, STATE2, STATE3>> mStates;
+	private final Set<ParityIntersectState<STATE1, STATE2, STATE3>> mAltStates;
 	private final Set<ParityIntersectState<STATE1, STATE2, STATE3>> mInitStates;
 
 	public ParityIntersectTree(ParityTreeAutomaton<LETTER, STATE1> tree1, ParityTreeAutomaton<LETTER, STATE2> tree2,
@@ -24,6 +25,7 @@ public class ParityIntersectTree<LETTER extends IRankedLetter, STATE1 extends IP
 		this.mChildMap = new HashMap<>();
 		this.mStates = new HashSet<>();
 		this.mInitStates = new HashSet<>();
+		this.mAltStates = new HashSet<>();
 		initializeStates(tree1.getStates(), tree2.getStates(), tree3.getStates());
 		initializeInitStates(tree1.getInitStates(), tree2.getInitStates(), tree3.getInitStates());
 		initializeRules(tree1, tree2, tree3);
@@ -81,36 +83,16 @@ public class ParityIntersectTree<LETTER extends IRankedLetter, STATE1 extends IP
 		for (STATE1 state1 : states1) {
 			for (STATE2 state2 : states2) {
 				for (STATE3 state3 : states3) {
-					ParityIntersectState<STATE1, STATE2, STATE3> intersectState1 = new ParityIntersectState<>(state1,
-							state2, state3, false, false, false);
-					ParityIntersectState<STATE1, STATE2, STATE3> intersectState2 = new ParityIntersectState<>(state1,
-							state2, state3, false, false, true);
-					ParityIntersectState<STATE1, STATE2, STATE3> intersectState3 = new ParityIntersectState<>(state1,
-							state2, state3, false, true, false);
-					ParityIntersectState<STATE1, STATE2, STATE3> intersectState4 = new ParityIntersectState<>(state1,
-							state2, state3, false, true, true);
-					ParityIntersectState<STATE1, STATE2, STATE3> intersectState5 = new ParityIntersectState<>(state1,
-							state2, state3, true, false, false);
-					ParityIntersectState<STATE1, STATE2, STATE3> intersectState6 = new ParityIntersectState<>(state1,
-							state2, state3, true, false, true);
-					ParityIntersectState<STATE1, STATE2, STATE3> intersectState7 = new ParityIntersectState<>(state1,
-							state2, state3, true, true, false);
-					ParityIntersectState<STATE1, STATE2, STATE3> intersectState8 = new ParityIntersectState<>(state1,
-							state2, state3, true, true, true);
-					List<ParityIntersectState<STATE1, STATE2, STATE3>> states = new ArrayList<>();
-					states.add(intersectState1);
-					states.add(intersectState2);
-					states.add(intersectState3);
-					states.add(intersectState4);
-					states.add(intersectState5);
-					states.add(intersectState6);
-					states.add(intersectState7);
-					states.add(intersectState8);
-					for (int i = 0; i < 8; i++) {
-						addState(states.get(i));
-						mSourceMap.put(states.get(i), new HashSet<>());
-						mChildMap.put(states.get(i), new HashSet<>());
-					}
+					ParityIntersectState<STATE1, STATE2, STATE3> intersectState = new ParityIntersectState<>(state1,
+							state2, state3);
+					addState(intersectState);
+					addAltState(intersectState.copy(false, false, false));
+					addAltState(intersectState.copy(false, false, true));
+					addAltState(intersectState.copy(false, true, false));
+					addAltState(intersectState.copy(false, true, true));
+					addAltState(intersectState.copy(true, false, false));
+					addAltState(intersectState.copy(true, false, true));
+					addAltState(intersectState.copy(true, true, false));
 				}
 			}
 		}
@@ -121,7 +103,7 @@ public class ParityIntersectTree<LETTER extends IRankedLetter, STATE1 extends IP
 			for (STATE2 state2 : init2) {
 				for (STATE3 state3 : init3) {
 					ParityIntersectState<STATE1, STATE2, STATE3> intersectState = new ParityIntersectState<>(state1,
-							state2, state3, false, false, false);
+							state2, state3);
 					mInitStates.add(intersectState);
 				}
 			}
@@ -130,7 +112,31 @@ public class ParityIntersectTree<LETTER extends IRankedLetter, STATE1 extends IP
 
 	private void addState(ParityIntersectState<STATE1, STATE2, STATE3> state) {
 		if (mStates.contains(state))
-			mStates.add(state);
+			return;
+		mStates.add(state);
+		mAltStates.add(state);
+		mSourceMap.put(state, new HashSet<>());
+		mChildMap.put(state, new HashSet<>());
+	}
+
+	private void addAltState(ParityIntersectState<STATE1, STATE2, STATE3> state) {
+		if (mStates.contains(state))
+			return;
+		mAltStates.add(state);
+		mSourceMap.put(state, new HashSet<>());
+		mChildMap.put(state, new HashSet<>());
+	}
+
+	public Set<ParityIntersectState<STATE1, STATE2, STATE3>> getStates() {
+		return mStates;
+	}
+
+	public Set<ParityIntersectState<STATE1, STATE2, STATE3>> getAltStates() {
+		return mAltStates;
+	}
+
+	public Set<ParityIntersectRule<LETTER, STATE1, STATE2, STATE3>> getRules() {
+		return mRules;
 	}
 
 }

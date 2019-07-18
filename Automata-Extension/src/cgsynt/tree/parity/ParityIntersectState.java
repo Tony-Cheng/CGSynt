@@ -17,7 +17,7 @@ public class ParityIntersectState<STATE1 extends IParityState, STATE2 extends IP
 		this.isGood2 = isGood2;
 		this.isGood3 = isGood3;
 	}
-	
+
 	public ParityIntersectState(STATE1 state1, STATE2 state2, STATE3 state3) {
 		this.state1 = state1;
 		this.state2 = state2;
@@ -29,6 +29,10 @@ public class ParityIntersectState<STATE1 extends IParityState, STATE2 extends IP
 
 	public ParityIntersectState<STATE1, STATE2, STATE3> getGoodIntersectState() {
 		return new ParityIntersectState<>(state1, state2, state3, true, true, true);
+	}
+
+	public ParityIntersectState<STATE1, STATE2, STATE3> copy(boolean isGood1, boolean isGood2, boolean isGood3) {
+		return new ParityIntersectState<>(state1, state2, state3, isGood1, isGood2, isGood3);
 	}
 
 	@Override
