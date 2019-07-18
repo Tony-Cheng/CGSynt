@@ -35,15 +35,15 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		this.tree = tree;
 		this.goodEvenStates = computeEvenStates(tree);
 		this.goodStates = new HashSet<>();
-		this.maxOdd = initializeMaxOdd();
 		this.goodTransitions = new Stack<>();
+		this.maxOdd = initializeMaxOdd();
 		this.minEven = initializeMinEven();
 	}
 
 	private Map<STATE, Integer> initializeMaxOdd() {
 		Map<STATE, Integer> maxOdd = new HashMap<>();
 		for (STATE state : tree.getStates()) {
-			if (state.getRank() % 2 == 0)
+			if (goodEvenStates.contains(state))
 				maxOdd.put(state, 0);
 			else
 				maxOdd.put(state, state.getRank());
@@ -55,7 +55,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 	private Map<STATE, Integer> initializeMinEven() {
 		Map<STATE, Integer> minEven = new HashMap<>();
 		for (STATE state : tree.getStates()) {
-			if (state.getRank() % 2 == 0)
+			if (goodEvenStates.contains(state))
 				minEven.put(state, state.getRank());
 			else
 				minEven.put(state, 0);
@@ -167,9 +167,9 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 			} else {
 				goodStates.clear();
 				goodTransitions.clear();
+				initializeGoodTransitions();
 				maxOdd = initializeMaxOdd();
 				minEven = initializeMinEven();
-				initializeGoodTransitions();
 				findAllGoodStates();
 			}
 		}
@@ -193,6 +193,9 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 
 	private void updateMaxOdd(STATE state, int oddValue) {
 		maxOdd.put(state, oddValue);
+		if (oddValue <= minEven.get(state)) {
+			maxOdd.put(state, 0);
+		}
 		Collection<ParityTreeAutomatonRule<LETTER, STATE>> ruleToSrc = tree.getChildMap().get(state);
 		if (ruleToSrc != null) {
 			for (ParityTreeAutomatonRule<LETTER, STATE> rule : ruleToSrc) {
@@ -307,14 +310,18 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 					evenValue = minEven.get(state);
 				}
 			}
+			maxOdd.put(src, oddValue);
+			if (evenValue > minEven.get(src)) {
+				minEven.put(src, evenValue);
+			}
 			if (evenValue >= maxOdd.get(src)) {
-				maxOdd.put(src, evenValue);
+				maxOdd.put(src, 0);
 			}
 			Collection<ParityTreeAutomatonRule<LETTER, STATE>> ruleToSrc = tree.getChildMap().get(src);
 			if (ruleToSrc != null) {
 				for (ParityTreeAutomatonRule<LETTER, STATE> rule : ruleToSrc) {
 					boolean isGoodTransition = true;
-					int maxOddValue = oddValue;
+					int maxOddValue = maxOdd.get(src);
 					for (STATE dest : rule.getDest()) {
 						if (!goodEvenStates.contains(dest) && !goodStates.contains(dest)) {
 							isGoodTransition = false;
