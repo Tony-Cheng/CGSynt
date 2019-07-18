@@ -153,74 +153,80 @@ public class ParityIntersectAndEmptinessCheck<LETTER extends IRankedLetter, STAT
 				int maxOddValue3_23 = 0;
 				int maxOddValue3_123 = 0;
 				for (ParityIntersectState<STATE1, STATE2, STATE3> dest : rule.getDests()) {
-					if (!goodStateCheck(dest, true, false, false)
-							&& !goodEvenStates.contains(dest.copy(true, false, false))) {
+					int maxOddValue1_1p = Integer.MAX_VALUE;
+					int maxOddValue1_12p = Integer.MAX_VALUE;
+					int maxOddValue1_13p = Integer.MAX_VALUE;
+					int maxOddValue1_123p = Integer.MAX_VALUE;
+					int maxOddValue2_2p = Integer.MAX_VALUE;
+					int maxOddValue2_12p = Integer.MAX_VALUE;
+					int maxOddValue2_23p = Integer.MAX_VALUE;
+					int maxOddValue2_123p = Integer.MAX_VALUE;
+					int maxOddValue3_3p = Integer.MAX_VALUE;
+					int maxOddValue3_13p = Integer.MAX_VALUE;
+					int maxOddValue3_23p = Integer.MAX_VALUE;
+					int maxOddValue3_123p = Integer.MAX_VALUE;
+					if (!goodStateCheck(dest, true, false, false)) {
 						isGoodTransition1 = false;
 					}
-					if (!goodStateCheck(dest, false, true, false)
-							&& !goodEvenStates.contains(dest.copy(false, true, false))) {
+					if (!goodStateCheck(dest, false, true, false)) {
 						isGoodTransition2 = false;
 					}
-					if (!goodStateCheck(dest, false, false, true)
-							&& !goodEvenStates.contains(dest.copy(false, false, true))) {
+					if (!goodStateCheck(dest, false, false, true)) {
 						isGoodTransition3 = false;
 					}
-					if (!goodStateCheck(dest, true, true, false)
-							&& !goodEvenStates.contains(dest.copy(true, true, false))) {
+					if (!goodStateCheck(dest, true, true, false)) {
 						isGoodTransition12 = false;
 					}
-					if (!goodStateCheck(dest, true, false, true)
-							&& !goodEvenStates.contains(dest.copy(true, false, true))) {
+					if (!goodStateCheck(dest, true, false, true)) {
 						isGoodTransition13 = false;
 					}
-					if (!goodStateCheck(dest, false, true, true)
-							&& !goodEvenStates.contains(dest.copy(false, true, true))) {
+					if (!goodStateCheck(dest, false, true, true)) {
 						isGoodTransition23 = false;
 					}
-					if (!goodStateCheck(dest, true, true, true)
-							&& !goodEvenStates.contains(dest.copy(true, true, true))) {
+					if (!goodStateCheck(dest, true, true, true)) {
 						isGoodTransition123 = false;
 					}
 
+					// TODO: Fix below
 					if (!goodStates.contains(dest.copy(true, false, false))
 							&& !goodEvenStates.contains(dest.copy(true, false, false))) {
-						maxOddValue1_1 = Math.max(maxOddValue1_1, maxOdd1.get(dest.copy(true, false, false)));
+						maxOddValue1_1p = Math.min(maxOddValue1_1p, maxOdd1.get(dest.copy(true, false, false)));
 					}
 					if (!goodStates.contains(dest.copy(false, true, false))
 							&& !goodEvenStates.contains(dest.copy(false, true, false))) {
-						maxOddValue2_2 = Math.max(maxOddValue2_2, maxOdd2.get(dest.copy(false, true, false)));
+						maxOddValue2_2p = Math.min(maxOddValue2_2p, maxOdd2.get(dest.copy(false, true, false)));
 					}
 					if (!goodStates.contains(dest.copy(false, false, true))
 							&& !goodEvenStates.contains(dest.copy(false, false, true))) {
-						maxOddValue3_3 = Math.max(maxOddValue1_1, maxOdd3.get(dest.copy(false, false, true)));
+						maxOddValue3_3 = Math.min(maxOddValue1_1, maxOdd3.get(dest.copy(false, false, true)));
 					}
 					if (!goodStates.contains(dest.copy(true, false, true))
 							&& !goodEvenStates.contains(dest.copy(true, false, true))) {
-						maxOddValue1_1 = Math.max(maxOddValue1_1, maxOdd1.get(dest.copy(true, false, true)));
-						maxOddValue1_13 = Math.max(maxOddValue1_13, maxOdd1.get(dest.copy(true, false, true)));
-						maxOddValue3_3 = Math.max(maxOddValue3_3, maxOdd3.get(dest.copy(true, false, true)));
-						maxOddValue3_13 = Math.max(maxOddValue3_13, maxOdd3.get(dest.copy(true, false, true)));
+						maxOddValue1_1 = Math.min(maxOddValue1_1, maxOdd1.get(dest.copy(true, false, true)));
+						maxOddValue1_13 = Math.min(maxOddValue1_13, maxOdd1.get(dest.copy(true, false, true)));
+						maxOddValue3_3 = Math.min(maxOddValue3_3, maxOdd3.get(dest.copy(true, false, true)));
+						maxOddValue3_13 = Math.min(maxOddValue3_13, maxOdd3.get(dest.copy(true, false, true)));
 					}
 					if (!goodStates.contains(dest.copy(true, true, false))
 							&& !goodEvenStates.contains(dest.copy(true, true, false))) {
-						maxOddValue1_1 = Math.max(maxOddValue1_1, maxOdd1.get(dest.copy(true, true, false)));
-						maxOddValue1_12 = Math.max(maxOddValue1_12, maxOdd1.get(dest.copy(true, true, false)));
-						maxOddValue2_2 = Math.max(maxOddValue2_2, maxOdd2.get(dest.copy(true, true, false)));
-						maxOddValue2_12 = Math.max(maxOddValue2_12, maxOdd2.get(dest.copy(true, true, false)));
+						maxOddValue1_1 = Math.min(maxOddValue1_1, maxOdd1.get(dest.copy(true, true, false)));
+						maxOddValue1_12 = Math.min(maxOddValue1_12, maxOdd1.get(dest.copy(true, true, false)));
+						maxOddValue2_2 = Math.min(maxOddValue2_2, maxOdd2.get(dest.copy(true, true, false)));
+						maxOddValue2_12 = Math.min(maxOddValue2_12, maxOdd2.get(dest.copy(true, true, false)));
 					}
 					if (!goodStates.contains(dest.copy(false, true, true))
 							&& !goodEvenStates.contains(dest.copy(false, true, true))) {
-						maxOddValue2_2 = Math.max(maxOddValue2_2, maxOdd2.get(dest.copy(false, true, true)));
-						maxOddValue2_23 = Math.max(maxOddValue2_23, maxOdd2.get(dest.copy(false, true, true)));
-						maxOddValue3_3 = Math.max(maxOddValue3_3, maxOdd3.get(dest.copy(false, true, true)));
-						maxOddValue3_23 = Math.max(maxOddValue3_23, maxOdd3.get(dest.copy(false, true, true)));
+						maxOddValue2_2 = Math.min(maxOddValue2_2, maxOdd2.get(dest.copy(false, true, true)));
+						maxOddValue2_23 = Math.min(maxOddValue2_23, maxOdd2.get(dest.copy(false, true, true)));
+						maxOddValue3_3 = Math.min(maxOddValue3_3, maxOdd3.get(dest.copy(false, true, true)));
+						maxOddValue3_23 = Math.min(maxOddValue3_23, maxOdd3.get(dest.copy(false, true, true)));
 					}
 					if (!goodStates.contains(dest.copy(true, true, true))
 							&& !goodEvenStates.contains(dest.copy(true, true, true))) {
-						maxOddValue1_1 = Math.max(maxOddValue1_1, maxOdd1.get(dest.copy(true, true, true)));
-						maxOddValue1_12 = Math.max(maxOddValue1_12, maxOdd1.get(dest.copy(true, true, true)));
-						maxOddValue1_13 = Math.max(maxOddValue1_13, maxOdd1.get(dest.copy(true, true, true)));
-						maxOddValue1_123 = Math.max(maxOddValue1_123, maxOdd1.get(dest.copy(true, true, true)));
+						maxOddValue1_1 = Math.min(maxOddValue1_1, maxOdd1.get(dest.copy(true, true, true)));
+						maxOddValue1_12 = Math.min(maxOddValue1_12, maxOdd1.get(dest.copy(true, true, true)));
+						maxOddValue1_13 = Math.min(maxOddValue1_13, maxOdd1.get(dest.copy(true, true, true)));
+						maxOddValue1_123 = Math.min(maxOddValue1_123, maxOdd1.get(dest.copy(true, true, true)));
 
 						maxOddValue2_2 = Math.max(maxOddValue2_2, maxOdd2.get(dest.copy(true, true, true)));
 						maxOddValue2_12 = Math.max(maxOddValue2_12, maxOdd2.get(dest.copy(true, true, true)));
@@ -234,8 +240,78 @@ public class ParityIntersectAndEmptinessCheck<LETTER extends IRankedLetter, STAT
 					}
 
 				}
-				
 
+				if (isGoodTransition1 && (!goodEvenStates.contains(rule.getSource().copy(true, false, false))
+						|| rule.getSource().state1.getRank() >= maxOddValue1_1)) {
+
+					if (goodStates.contains(rule.getSource().copy(true, false, false))) {
+						if (maxOdd.get(rule.getSource().copy(true, false, false)) > maxOddValue1_1) {
+							updateMaxOdd(rule.getSource().copy(true, false, false), maxOddValue1_1, maxOdd1);
+						}
+					} else {
+						goodTransitions.add(rule);
+						goodTransitionsState.add(rule.getSource().copy(true, false, false));
+					}
+				}
+
+				if (isGoodTransition2 && (!goodEvenStates.contains(rule.getSource().copy(false, true, false))
+						|| rule.getSource().state2.getRank() >= maxOddValue2_2)) {
+
+					if (goodStates.contains(rule.getSource().copy(false, true, false))) {
+						if (maxOdd.get(rule.getSource().copy(false, true, false)) > maxOddValue2_2) {
+							updateMaxOdd(rule.getSource().copy(false, true, false), maxOddValue2_2, maxOdd2);
+						}
+					} else {
+						goodTransitions.add(rule);
+						goodTransitionsState.add(rule.getSource().copy(false, true, false));
+					}
+				}
+
+				if (isGoodTransition3 && (!goodEvenStates.contains(rule.getSource().copy(false, false, true))
+						|| rule.getSource().state3.getRank() >= maxOddValue3_3)) {
+
+					if (goodStates.contains(rule.getSource().copy(false, false, true))) {
+						if (maxOdd.get(rule.getSource().copy(false, false, true)) > maxOddValue3_3) {
+							updateMaxOdd(rule.getSource().copy(false, false, true), maxOddValue3_3, maxOdd3);
+						}
+					} else {
+						goodTransitions.add(rule);
+						goodTransitionsState.add(rule.getSource().copy(false, false, true));
+					}
+				}
+				if (isGoodTransition12 && (!goodEvenStates.contains(rule.getSource().copy(true, true, false))
+						|| (rule.getSource().state1.getRank() >= maxOddValue1_12
+								&& rule.getSource().state2.getRank() >= maxOddValue2_12))) {
+
+					if (goodStates.contains(rule.getSource().copy(true, true, false))) {
+						if (maxOdd.get(rule.getSource().copy(true, true, false)) > maxOddValue1_12) {
+							updateMaxOdd(rule.getSource().copy(true, true, false), maxOddValue1_12, maxOdd1);
+						}
+						if (maxOdd.get(rule.getSource().copy(true, true, false)) > maxOddValue2_12) {
+							updateMaxOdd(rule.getSource().copy(true, true, false), maxOddValue2_12, maxOdd2);
+						}
+					} else {
+						goodTransitions.add(rule);
+						goodTransitionsState.add(rule.getSource().copy(true, true, false));
+					}
+				}
+
+				if (isGoodTransition13 && (!goodEvenStates.contains(rule.getSource().copy(true, false, true))
+						|| (rule.getSource().state1.getRank() >= maxOddValue1_13
+								&& rule.getSource().state3.getRank() >= maxOddValue3_13))) {
+
+					if (goodStates.contains(rule.getSource().copy(true, false, true))) {
+						if (maxOdd.get(rule.getSource().copy(true, false, true)) > maxOddValue1_13) {
+							updateMaxOdd(rule.getSource().copy(true, false, true), maxOddValue1_13, maxOdd1);
+						}
+						if (maxOdd.get(rule.getSource().copy(true, false, true)) > maxOddValue3_13) {
+							updateMaxOdd(rule.getSource().copy(true, false, true), maxOddValue3_13, maxOdd3);
+						}
+					} else {
+						goodTransitions.add(rule);
+						goodTransitionsState.add(rule.getSource().copy(true, false, true));
+					}
+				}
 			}
 		}
 	}
@@ -265,19 +341,19 @@ public class ParityIntersectAndEmptinessCheck<LETTER extends IRankedLetter, STAT
 			boolean isGoodTransition23 = true;
 			boolean isGoodTransition123 = true;
 			for (ParityIntersectState<STATE1, STATE2, STATE3> dest : dests) {
-				if (dest.state1.getRank() % 2 != 0) {
+				if (!goodEvenStates.contains(dest.copy(true, false, false))) {
 					isGoodTransition1 = false;
 					isGoodTransition12 = false;
 					isGoodTransition13 = false;
 					isGoodTransition123 = false;
 				}
-				if (dest.state2.getRank() % 2 != 0) {
+				if (!goodEvenStates.contains(dest.copy(false, true, false))) {
 					isGoodTransition2 = false;
 					isGoodTransition12 = false;
 					isGoodTransition23 = false;
 					isGoodTransition123 = false;
 				}
-				if (dest.state3.getRank() % 2 != 0) {
+				if (!goodEvenStates.contains(dest.copy(false, false, true))) {
 					isGoodTransition3 = false;
 					isGoodTransition13 = false;
 					isGoodTransition23 = false;
@@ -319,36 +395,57 @@ public class ParityIntersectAndEmptinessCheck<LETTER extends IRankedLetter, STAT
 			boolean isGood3) {
 		if (isGood1 && !isGood2 && !isGood3) {
 			return goodStates.contains(state.copy(isGood1, !isGood2, !isGood3))
-					|| goodStates.contains(state.copy(isGood1, !isGood2, isGood3))
-					|| goodStates.contains(state.copy(isGood1, isGood2, !isGood3))
-					|| goodStates.contains(state.copy(isGood1, isGood2, isGood3));
+					|| goodEvenStates.contains(state.copy(isGood1, !isGood2, !isGood3));
 		}
 		if (!isGood1 && isGood2 && !isGood3) {
 			return goodStates.contains(state.copy(!isGood1, isGood2, !isGood3))
-					|| goodStates.contains(state.copy(!isGood1, isGood2, isGood3))
-					|| goodStates.contains(state.copy(isGood1, isGood2, !isGood3))
-					|| goodStates.contains(state.copy(isGood1, isGood2, isGood3));
+					|| goodEvenStates.contains(state.copy(!isGood1, isGood2, !isGood3));
 		}
 		if (!isGood1 && !isGood2 && isGood3) {
 			return goodStates.contains(state.copy(!isGood1, !isGood2, isGood3))
-					|| goodStates.contains(state.copy(!isGood1, isGood2, isGood3))
-					|| goodStates.contains(state.copy(isGood1, !isGood2, isGood3))
-					|| goodStates.contains(state.copy(isGood1, isGood2, isGood3));
+					|| goodEvenStates.contains(state.copy(!isGood1, !isGood2, isGood3));
 		}
 		if (isGood1 && isGood2 && !isGood3) {
 			return goodStates.contains(state.copy(isGood1, isGood2, !isGood3))
-					|| goodStates.contains(state.copy(isGood1, isGood2, isGood3));
+					|| (goodStates.contains(state.copy(isGood1, !isGood2, !isGood3))
+							&& goodEvenStates.contains(state.copy(!isGood1, isGood2, !isGood3)))
+					|| (goodStates.contains(state.copy(!isGood1, isGood2, !isGood3))
+							&& goodEvenStates.contains(state.copy(isGood1, !isGood2, !isGood3)))
+					|| (goodStates.contains(state.copy(!isGood1, !isGood2, !isGood3))
+							&& goodEvenStates.contains(state.copy(isGood1, isGood2, !isGood3)));
 		}
 		if (isGood1 && !isGood2 && isGood3) {
 			return goodStates.contains(state.copy(isGood1, !isGood2, isGood3))
-					|| goodStates.contains(state.copy(isGood1, isGood2, isGood3));
+					|| (goodStates.contains(state.copy(isGood1, !isGood2, !isGood3))
+							&& goodEvenStates.contains(state.copy(!isGood1, !isGood2, isGood3)))
+					|| (goodStates.contains(state.copy(!isGood1, !isGood2, isGood3))
+							&& goodEvenStates.contains(state.copy(isGood1, !isGood2, !isGood3)))
+					|| (goodStates.contains(state.copy(!isGood1, !isGood2, !isGood3))
+							&& goodEvenStates.contains(state.copy(isGood1, !isGood2, isGood3)));
 		}
 		if (!isGood1 && isGood2 && isGood3) {
 			return goodStates.contains(state.copy(!isGood1, isGood2, isGood3))
-					|| goodStates.contains(state.copy(isGood1, isGood2, isGood3));
+					|| (goodStates.contains(state.copy(!isGood1, !isGood2, isGood3))
+							&& goodEvenStates.contains(state.copy(!isGood1, isGood2, !isGood3)))
+					|| (goodStates.contains(state.copy(!isGood1, isGood2, !isGood3))
+							&& goodEvenStates.contains(state.copy(!isGood1, !isGood2, isGood3)))
+					|| (goodStates.contains(state.copy(!isGood1, !isGood2, !isGood3))
+							&& goodEvenStates.contains(state.copy(!isGood1, isGood2, isGood3)));
 		}
 		if (isGood1 && isGood2 && isGood3) {
-			return goodStates.contains(state.copy(isGood1, isGood2, isGood3));
+			return goodStates.contains(state.copy(isGood1, isGood2, isGood3))
+					|| (goodStates.contains(state.copy(!isGood1, !isGood2, isGood3))
+							&& goodEvenStates.contains(state.copy(isGood1, isGood2, !isGood3)))
+					|| (goodStates.contains(state.copy(!isGood1, isGood2, !isGood3))
+							&& goodEvenStates.contains(state.copy(!isGood1, isGood2, isGood3)))
+					|| (goodStates.contains(state.copy(isGood1, !isGood2, !isGood3))
+							&& goodEvenStates.contains(state.copy(!isGood1, isGood2, isGood3)))
+					|| (goodStates.contains(state.copy(!isGood1, isGood2, isGood3))
+							&& goodEvenStates.contains(state.copy(isGood1, !isGood2, !isGood3)))
+					|| (goodStates.contains(state.copy(isGood1, !isGood2, isGood3))
+							&& goodEvenStates.contains(state.copy(!isGood1, isGood2, !isGood3)))
+					|| (goodStates.contains(state.copy(isGood1, isGood2, !isGood3))
+							&& goodEvenStates.contains(state.copy(!isGood1, !isGood2, isGood3)));
 		}
 		return false;
 	}
