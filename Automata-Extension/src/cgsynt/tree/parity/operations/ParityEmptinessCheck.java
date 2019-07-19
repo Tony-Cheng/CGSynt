@@ -153,7 +153,6 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 			STATE nextInitState = iterInitStates.next();
 			if (!goodStates.contains(nextInitState)) {
 				iterInitStates.remove();
-				tree.removeState(nextInitState);
 			}
 		}
 	}
