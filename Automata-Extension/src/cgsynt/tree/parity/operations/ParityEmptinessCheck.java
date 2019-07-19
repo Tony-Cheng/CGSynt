@@ -297,6 +297,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 				if (evenValue > minEven.get(src)) {
 					updateMinEven(src, evenValue);
 				}
+				continue;
 			}
 			int oddValue = maxOdd.get(src);
 			for (STATE state : nextRule.getDest()) {
