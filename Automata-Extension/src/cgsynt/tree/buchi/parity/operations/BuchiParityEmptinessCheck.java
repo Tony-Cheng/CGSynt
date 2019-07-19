@@ -3,6 +3,7 @@ package cgsynt.tree.buchi.parity.operations;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -426,6 +427,116 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 			if (isGoodTransitionBuchi && isGoodTransitionParity) {
 				goodTransitions.add(rule);
 				goodTransitionsState.add(rule.getSource().copy(true, true));
+			}
+		}
+	}
+
+	private boolean removeLeavesNotGoodStates() {
+		boolean stateRemoved = false;
+
+		Iterator<BuchiParityIntersectState<STATE1, STATE2>> iterStates = goodLeavesStates.iterator();
+		while (iterStates.hasNext()) {
+			BuchiParityIntersectState<STATE1, STATE2> nextState = iterStates.next();
+			if (!goodStates.contains(nextState.copy(true, true))) {
+				iterStates.remove();
+				if (goodParityStates.contains(nextState)) {
+					goodParityStates.remove(nextState);
+				}
+				if (goodBuchiStates.contains(nextState)) {
+					goodBuchiStates.remove(nextState);
+				}
+				stateRemoved = true;
+			}
+		}
+		return stateRemoved;
+	}
+
+	private void findAllGoodStates() {
+		while (!goodTransitions.isEmpty()) {
+			BuchiParityIntersectRule<LETTER, STATE1, STATE2> nextRule = goodTransitions.pop();
+			BuchiParityIntersectState<STATE1, STATE2> src = goodTransitionsState.pop();
+			if (goodStates.contains(src)) {
+				int oddValue = src.getState2().getRank();
+				for (BuchiParityIntersectState<STATE1, STATE2> state : nextRule.getDests()) {
+					if (maxOdd.get(state) > oddValue) {
+						oddValue = maxOdd.get(state);
+					}
+				}
+				if (oddValue < maxOdd.get(src)) {
+					updateMaxOdd(src, oddValue);
+				}
+				int evenValue = Integer.MAX_VALUE;
+				for (BuchiParityIntersectState<STATE1, STATE2> state : nextRule.getDests()) {
+					if (minEven.get(state) < evenValue) {
+						evenValue = minEven.get(state);
+					}
+				}
+				if (evenValue > minEven.get(src)) {
+					updateMinEven(src, evenValue);
+				}
+				continue;
+			}
+			if (src.isGood1()) {
+				goodStates.add(src.copy(true, false));
+			}
+			if (src.isGood2()) {
+				goodStates.add(src.copy(false, true));
+			}
+			if (src.isGood1() && src.isGood2()) {
+				goodStates.add(src.copy(true, true));
+			}
+			goodStates.add(src.copy(false, false));
+			if (goodParityStates.contains(src)) {
+				int evenValue = Integer.MAX_VALUE;
+				for (BuchiParityIntersectState<STATE1, STATE2> state : nextRule.getDests()) {
+					if (minEven.get(state) < evenValue) {
+						evenValue = minEven.get(state);
+					}
+				}
+				if (evenValue > minEven.get(src)) {
+					updateMinEven(src, evenValue);
+				}
+				continue;
+			}
+			if (goodBuchiStates.contains(src)) {
+				int oddValue = src.getState2().getRank();
+				for (BuchiParityIntersectState<STATE1, STATE2> state : nextRule.getDests()) {
+					if (maxOdd.get(state) > oddValue) {
+						oddValue = maxOdd.get(state);
+					}
+				}
+				if (oddValue < maxOdd.get(src)) {
+					updateMaxOdd(src, oddValue);
+				}
+				int evenValue = Integer.MAX_VALUE;
+				for (BuchiParityIntersectState<STATE1, STATE2> state : nextRule.getDests()) {
+					if (minEven.get(state) < evenValue) {
+						evenValue = minEven.get(state);
+					}
+				}
+				if (evenValue > minEven.get(src)) {
+					updateMinEven(src, evenValue);
+				}
+				continue;
+			}
+			int oddValue = maxOdd.get(src);
+			for (BuchiParityIntersectState<STATE1, STATE2> state : nextRule.getDests()) {
+				if (maxOdd.get(state) > oddValue) {
+					oddValue = maxOdd.get(state);
+				}
+			}
+			int evenValue = Integer.MAX_VALUE;
+			for (BuchiParityIntersectState<STATE1, STATE2> state : nextRule.getDests()) {
+				if (minEven.get(state) < evenValue) {
+					evenValue = minEven.get(state);
+				}
+			}
+			updateMaxOdd(src, oddValue);
+			if (evenValue > minEven.get(src)) {
+				updateMinEven(src, evenValue);
+			}
+			if (evenValue >= maxOdd.get(src)) {
+				updateMaxOdd(src, 0);
 			}
 		}
 	}
