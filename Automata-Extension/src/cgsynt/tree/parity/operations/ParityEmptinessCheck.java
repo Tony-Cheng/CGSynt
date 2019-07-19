@@ -51,7 +51,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		return maxOdd;
 
 	}
-	
+
 	private Map<STATE, Integer> initializeMinEven() {
 		Map<STATE, Integer> minEven = new HashMap<>();
 		for (STATE state : tree.getStates()) {
@@ -90,7 +90,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 			return;
 		}
 	}
-	
+
 	public boolean getResult() {
 		return result;
 	}
@@ -223,7 +223,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 			}
 		}
 	}
-	
+
 	private void updateMinEven(STATE state, int evenValue) {
 		minEven.put(state, evenValue);
 		if (evenValue >= maxOdd.get(state)) {
@@ -297,6 +297,7 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 				if (evenValue > minEven.get(src)) {
 					updateMinEven(src, evenValue);
 				}
+				continue;
 			}
 			int oddValue = maxOdd.get(src);
 			for (STATE state : nextRule.getDest()) {
@@ -310,32 +311,12 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 					evenValue = minEven.get(state);
 				}
 			}
-			maxOdd.put(src, oddValue);
+			updateMaxOdd(src, oddValue);
 			if (evenValue > minEven.get(src)) {
-				minEven.put(src, evenValue);
+				updateMinEven(src, evenValue);
 			}
 			if (evenValue >= maxOdd.get(src)) {
-				maxOdd.put(src, 0);
-			}
-			Collection<ParityTreeAutomatonRule<LETTER, STATE>> ruleToSrc = tree.getChildMap().get(src);
-			if (ruleToSrc != null) {
-				for (ParityTreeAutomatonRule<LETTER, STATE> rule : ruleToSrc) {
-					boolean isGoodTransition = true;
-					int maxOddValue = maxOdd.get(src);
-					for (STATE dest : rule.getDest()) {
-						if (!goodEvenStates.contains(dest) && !goodStates.contains(dest)) {
-							isGoodTransition = false;
-							break;
-						}
-						if (maxOdd.get(dest) > maxOddValue) {
-							maxOddValue = maxOdd.get(dest);
-						}
-					}
-					if (isGoodTransition
-							&& (!goodEvenStates.contains(rule.getSource()) || rule.getSource().getRank() >= maxOddValue)) {
-						goodTransitions.add(rule);
-					}
-				}
+				updateMaxOdd(src, 0);
 			}
 		}
 	}
@@ -348,7 +329,6 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 			STATE nextEvenState = iterEvenStates.next();
 			if (!goodStates.contains(nextEvenState)) {
 				iterEvenStates.remove();
-				goodEvenStates.remove(nextEvenState);
 				evenStateRemoved = true;
 			}
 		}

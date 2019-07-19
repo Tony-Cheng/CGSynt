@@ -23,6 +23,7 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 	private final Set<BuchiParityIntersectState<STATE1, STATE2>> mStates;
 	private final Set<BuchiParityIntersectState<STATE1, STATE2>> mAltStates;
 	private final Set<BuchiParityIntersectState<STATE1, STATE2>> mInitStates;
+	private final Set<STATE1> mFinalStates;
 
 	public BuchiParityIntersectAutomaton(BuchiTreeAutomaton<LETTER, STATE1> tree1,
 			ParityTreeAutomaton<LETTER, STATE2> tree2) {
@@ -32,6 +33,7 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 		this.mStates = new HashSet<>();
 		this.mInitStates = new HashSet<>();
 		this.mAltStates = new HashSet<>();
+		this.mFinalStates = tree1.getFinalStates();
 		initializeStates(tree1.getStates(), tree2.getStates());
 		initializeInitStates(tree1.getInitStates(), tree2.getInitStates());
 		initializeRules(tree1, tree2);
@@ -128,5 +130,13 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 
 	public Set<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> getRules() {
 		return mRules;
+	}
+
+	public boolean isFinal(BuchiParityIntersectState<STATE1, STATE2> state) {
+		return mFinalStates.contains(state.getState1());
+	}
+
+	public boolean isEven(BuchiParityIntersectState<STATE1, STATE2> state) {
+		return state.getState2().getRank() % 2 == 0;
 	}
 }
