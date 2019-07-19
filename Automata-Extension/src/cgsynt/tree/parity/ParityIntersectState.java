@@ -80,4 +80,5 @@ public class ParityIntersectState<STATE1 extends IParityState, STATE2 extends IP
 			return false;
 		return true;
 	}
+
 }
