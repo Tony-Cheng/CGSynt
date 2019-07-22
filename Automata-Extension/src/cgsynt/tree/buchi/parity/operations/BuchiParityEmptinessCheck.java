@@ -180,7 +180,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					if (!isGoodTransitionBuchip)
 						isGoodTransitionBuchi = false;
 					if (!isGoodTransitionBuchiParityp)
-						isGoodTransitionParity = false;
+						isGoodTransitionBuchiParity = false;
 				}
 				if (isGoodTransitionBuchi) {
 					if (goodStates.contains(rule.getSource().copy(true, false))) {
@@ -353,7 +353,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					if (!isGoodTransitionBuchip)
 						isGoodTransitionBuchi = false;
 					if (!isGoodTransitionBuchiParityp)
-						isGoodTransitionParity = false;
+						isGoodTransitionBuchiParity = false;
 				}
 				if (isGoodTransitionBuchi) {
 					if (goodStates.contains(rule.getSource().copy(true, false))) {
