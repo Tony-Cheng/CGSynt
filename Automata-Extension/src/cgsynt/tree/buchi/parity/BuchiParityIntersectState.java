@@ -3,6 +3,12 @@ package cgsynt.tree.buchi.parity;
 import cgsynt.tree.parity.IParityState;
 
 public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> {
+	@Override
+	public String toString() {
+		return "BuchiParityIntersectState [state1=" + state1 + ", state2=" + state2 + ", isGood1=" + isGood1
+				+ ", isGood2=" + isGood2 + "]";
+	}
+
 	private final STATE1 state1;
 	private final STATE2 state2;
 	private final boolean isGood1;

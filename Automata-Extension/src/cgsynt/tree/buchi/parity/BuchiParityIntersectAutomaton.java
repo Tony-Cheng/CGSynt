@@ -17,6 +17,13 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
 public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
 
+	@Override
+	public String toString() {
+		return "BuchiParityIntersectAutomaton \n[mSourceMap=" + mSourceMap + ", \nmRules=" + mRules + ", \nmChildMap="
+				+ mChildMap + ", \nmStates=" + mStates + ", \nmAltStates=" + mAltStates + ", \nmInitStates=" + mInitStates
+				+ ", \nmFinalStates=" + mFinalStates + "\n]";
+	}
+
 	private final Map<BuchiParityIntersectState<STATE1, STATE2>, Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>>> mSourceMap;
 	private final Set<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> mRules;
 	private final Map<BuchiParityIntersectState<STATE1, STATE2>, Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>>> mChildMap;

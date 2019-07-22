@@ -9,6 +9,11 @@ import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
 public class BuchiParityIntersectRule<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
+	@Override
+	public String toString() {
+		return "BuchiParityIntersectRule [source=" + source + ", dests=" + dests + "]";
+	}
+
 	private BuchiParityIntersectState<STATE1, STATE2> source;
 	private List<BuchiParityIntersectState<STATE1, STATE2>> dests;
 
