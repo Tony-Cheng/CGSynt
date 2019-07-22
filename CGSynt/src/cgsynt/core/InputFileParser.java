@@ -40,7 +40,6 @@ public class InputFileParser {
 			linePointer++;
 		}
 		
-		
 		// Create Specification file using the parsed data.
 		Specification spec = new Specification(null, null, null, null);
 		

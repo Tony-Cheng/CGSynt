@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cgsynt.synthesis.SynthesisLoop;
+
 public class Core {
 	public Core(String[] args) throws Exception {
 		Map<String, List<String>> argsMap = parseArgs(args);
@@ -26,16 +28,15 @@ public class Core {
 				
 				ArrayList<String> lines = new ArrayList<>();
 				String line;
-				while ((line = reader.readLine()) != null) {
+				while ((line = reader.readLine()) != null)
 					lines.add(line);
-				}
 				
 				InputFileParser parser = new InputFileParser();
 				Specification spec = parser.parseFile(lines);
-				//SynthesisLoop synthesis = new SynthesisLoop(spec);
-				//synthesis.computeMainLoop();
-				//System.out.println(synthesis.isCorrect());
-				//synthesis.printProgram();
+				SynthesisLoop synthesis = new SynthesisLoop(spec);
+				synthesis.computeMainLoop();
+				System.out.println(synthesis.isCorrect());
+				synthesis.printProgram();
 			}
 		}
 		else {

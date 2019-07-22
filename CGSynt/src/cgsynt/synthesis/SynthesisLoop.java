@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cgsynt.core.Specification;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.interpol.IStatement;
@@ -60,6 +61,37 @@ public class SynthesisLoop {
 
 	public SynthesisLoop(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions,
 			TraceGlobalVariables globalVars) throws Exception {
+		this.globalVars = globalVars;
+		RankedBool.setRank(transitionAlphabet.size());
+		globalVars.getTraceInterpolator().setPreconditions(preconditions);
+		globalVars.getTraceInterpolator().setPostconditions(postconditions);
+		preconditions = globalVars.getTraceInterpolator().getPreconditions();
+		postconditions = globalVars.getTraceInterpolator().getPostconditions();
+		this.mService = globalVars.getService();
+		this.mAutService = new AutomataLibraryServices(mService);
+		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet));
+		construction.computeResult();
+		RankedBool.setRank(construction.getAlphabet().size());
+		this.mPrograms = construction.getResult();
+		this.mResultComputed = false;
+		this.mTransitionAlphabet = construction.getAlphabet();
+		this.mAllInterpolants = new HashSet<>();
+		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
+		this.mAllInterpolants.add(preconditions);
+		this.mAllInterpolants.add(postconditions);
+		this.mPI = createPI(preconditions, postconditions);
+		this.visitedCounterexamples = new HashSet<>();
+		this.logs = new ArrayList<>();
+		this.printLogs = false;
+		this.printedLogsSize = 0;
+	}
+	
+	public SynthesisLoop(Specification spec) throws Exception {
+		List<IStatement> transitionAlphabet = spec.getTransitionAlphabet();
+		IPredicate preconditions = spec.getPreconditions();
+		IPredicate postconditions = spec.getPostconditions();
+		TraceGlobalVariables globalVars = spec.getGlobalVars();
+		
 		this.globalVars = globalVars;
 		RankedBool.setRank(transitionAlphabet.size());
 		globalVars.getTraceInterpolator().setPreconditions(preconditions);
