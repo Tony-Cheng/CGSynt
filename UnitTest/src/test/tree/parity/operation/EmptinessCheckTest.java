@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
+import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
@@ -444,5 +445,38 @@ public class EmptinessCheckTest {
 		ParityEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityEmptinessCheck<>(aut);
 		emptinessCheck.computeResult();
 		assertFalse(emptinessCheck.getResult());
+	}
+	
+	@Test
+	void test13() {
+		// An empty parity aut
+		RankedBool.setRank(2);
+		ParityTreeAutomaton<RankedBool, ParityState<String>> aut = new ParityTreeAutomaton<>(2);
+
+
+		ParityState<String> ps0 = new ParityState<>("parity state 0", 0);
+		ParityState<String> ps1 = new ParityState<>("parity state 1", 1);
+
+		aut.addInitState(ps1);
+
+		List<ParityState<String>> plist0 = new ArrayList<>();
+		plist0.add(ps0);
+		plist0.add(ps1);
+
+		List<ParityState<String>> plist1 = new ArrayList<>();
+		plist1.add(ps0);
+		plist1.add(ps0);
+
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> prule0 = new ParityTreeAutomatonRule<>(RankedBool.TRUE,
+				ps0, plist0);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> prule1 = new ParityTreeAutomatonRule<>(RankedBool.TRUE,
+				ps1, plist1);
+
+		aut.addRule(prule0);
+		aut.addRule(prule1);
+
+		ParityEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityEmptinessCheck<>(aut);
+		emptinessCheck.computeResult();
+		assertTrue(emptinessCheck.getResult());
 	}
 }

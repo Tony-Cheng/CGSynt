@@ -85,6 +85,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 	}
 
 	private void updateMaxOdd(BuchiParityIntersectState<STATE1, STATE2> state, int oddValue) {
+		maxOdd.put(state, oddValue);
 		if (state.isGood1() && maxOdd.get(state.copy(true, false)) > oddValue) {
 			maxOdd.put(state.copy(true, false), oddValue);
 			if (oddValue <= minEven.get(state.copy(true, false))) {
@@ -189,7 +190,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 						}
 					} else {
 						goodTransitions.add(rule);
-						goodTransitionsState.add(state.copy(true, false));
+						goodTransitionsState.add(rule.getSource().copy(true, false));
 					}
 				}
 				if (isGoodTransitionParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
@@ -200,7 +201,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 						}
 					} else {
 						goodTransitions.add(rule);
-						goodTransitionsState.add(state.copy(false, true));
+						goodTransitionsState.add(rule.getSource().copy(false, true));
 					}
 				}
 				if (isGoodTransitionBuchiParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
@@ -211,7 +212,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 						}
 					} else {
 						goodTransitions.add(rule);
-						goodTransitionsState.add(state.copy(true, true));
+						goodTransitionsState.add(rule.getSource().copy(true, true));
 					}
 				}
 
@@ -228,6 +229,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 	}
 
 	private void updateMinEven(BuchiParityIntersectState<STATE1, STATE2> state, int evenValue) {
+		minEven.put(state, evenValue);
 		if (state.isGood1() && minEven.get(state.copy(true, false)) < evenValue) {
 			minEven.put(state.copy(true, false), evenValue);
 			if (maxOdd.get(state.copy(true, false)) <= minEven.get(state.copy(true, false))) {
@@ -362,7 +364,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 						}
 					} else {
 						goodTransitions.add(rule);
-						goodTransitionsState.add(state.copy(true, false));
+						goodTransitionsState.add(rule.getSource().copy(true, false));
 					}
 				}
 				if (isGoodTransitionParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
@@ -373,7 +375,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 						}
 					} else {
 						goodTransitions.add(rule);
-						goodTransitionsState.add(state.copy(false, true));
+						goodTransitionsState.add(rule.getSource().copy(false, true));
 					}
 				}
 				if (isGoodTransitionBuchiParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
@@ -384,7 +386,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 						}
 					} else {
 						goodTransitions.add(rule);
-						goodTransitionsState.add(state.copy(true, true));
+						goodTransitionsState.add(rule.getSource().copy(true, true));
 					}
 				}
 
@@ -394,7 +396,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					}
 				} else {
 					goodTransitions.add(rule);
-					goodTransitionsState.add(state.copy(false, false));
+					goodTransitionsState.add(rule.getSource().copy(false, false));
 				}
 			}
 		}
