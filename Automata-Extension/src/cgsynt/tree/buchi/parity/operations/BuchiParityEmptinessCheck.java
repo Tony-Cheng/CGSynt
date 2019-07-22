@@ -583,4 +583,61 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 			}
 		}
 	}
+
+	private void findAllDecentStates() {
+		while (!goodTransitions.isEmpty()) {
+			BuchiParityIntersectRule<LETTER, STATE1, STATE2> nextRule = goodTransitions.pop();
+			BuchiParityIntersectState<STATE1, STATE2> src = goodTransitionsState.pop();
+			if (!goodStates.contains(src)) {
+				goodStates.add(src);
+				Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> ruleToSrc = tree.getForChildMap(src);
+				if (ruleToSrc != null && !goodLeavesStates.contains(src)) {
+					for (BuchiParityIntersectRule<LETTER, STATE1, STATE2> rule : ruleToSrc) {
+						boolean isGoodTransition = true;
+						for (BuchiParityIntersectState<STATE1, STATE2> dest : rule.getDests()) {
+							if (!goodLeavesStates.contains(dest) && !goodStates.contains(dest)) {
+								isGoodTransition = false;
+								break;
+							}
+						}
+						if (isGoodTransition) {
+							goodTransitions.add(rule);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private boolean computeDecentTree() {
+		initializeDecentTransitions();
+		findAllDecentStates();
+		removeInitialNotDecentStates();
+		if (tree.getInitStates().isEmpty()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void computeResult() {
+		if (resultComputed)
+			return;
+		computeGoodTree();
+		goodStates.clear();
+		goodTransitions.clear();
+		if (computeDecentTree()) {
+			result = true;
+			resultComputed = true;
+			return;
+		} else {
+			result = false;
+			resultComputed = false;
+			return;
+		}
+	}
+
+	public boolean getResult() {
+		return result;
+	}
 }
