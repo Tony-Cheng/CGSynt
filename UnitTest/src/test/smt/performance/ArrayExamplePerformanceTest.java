@@ -12,7 +12,6 @@ import java.util.TreeMap;
 
 import org.junit.jupiter.api.Test;
 
-import cgsynt.Verification.MainVerificationLoop;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.ScriptAssumptionStatement;
@@ -30,6 +29,7 @@ import cgsynt.trace2.Statement;
 import cgsynt.trace2.Trace;
 import cgsynt.trace2.TraceToCraigInterpolant;
 import cgsynt.trace2.Variable;
+import cgsynt.verification.MainVerificationLoop;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.boogie.type.BoogieType;
 import de.uni_freiburg.informatik.ultimate.core.model.models.IBoogieType;
