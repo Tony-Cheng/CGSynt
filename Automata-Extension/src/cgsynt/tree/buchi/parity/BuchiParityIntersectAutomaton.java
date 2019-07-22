@@ -139,4 +139,8 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 	public boolean isEven(BuchiParityIntersectState<STATE1, STATE2> state) {
 		return state.getState2().getRank() % 2 == 0;
 	}
+
+	public Set<BuchiParityIntersectState<STATE1, STATE2>> getInitStates() {
+		return mInitStates;
+	}
 }

@@ -540,4 +540,47 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 			}
 		}
 	}
+
+	private void computeGoodTree() {
+		initializeGoodTransitions();
+		findAllGoodStates();
+		while (!goodStates.isEmpty()) {
+			if (!removeLeavesNotGoodStates()) {
+				return;
+			} else {
+				goodStates.clear();
+				goodTransitions.clear();
+				initializeGoodTransitions();
+				maxOdd = initializeMaxOdd();
+				minEven = initializeMinEven();
+				findAllGoodStates();
+			}
+		}
+	}
+
+	private void initializeDecentTransitions() {
+		Set<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> allRules = tree.getRules();
+		for (BuchiParityIntersectRule<LETTER, STATE1, STATE2> rule : allRules) {
+			List<BuchiParityIntersectState<STATE1, STATE2>> dests = rule.getDests();
+			boolean isGoodTransition = true;
+			for (BuchiParityIntersectState<STATE1, STATE2> dest : dests) {
+				if (!goodLeavesStates.contains(dest)) {
+					isGoodTransition = false;
+					break;
+				}
+			}
+			if (isGoodTransition)
+				goodTransitions.add(rule);
+		}
+	}
+
+	private void removeInitialNotDecentStates() {
+		Iterator<BuchiParityIntersectState<STATE1, STATE2>> iterInitStates = tree.getInitStates().iterator();
+		while (iterInitStates.hasNext()) {
+			BuchiParityIntersectState<STATE1, STATE2> nextInitState = iterInitStates.next();
+			if (!goodStates.contains(nextInitState)) {
+				iterInitStates.remove();
+			}
+		}
+	}
 }
