@@ -85,7 +85,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 	}
 
 	private void updateMaxOdd(BuchiParityIntersectState<STATE1, STATE2> state, int oddValue) {
-		maxOdd.put(state, oddValue);
 		if (state.isGood1() && maxOdd.get(state.copy(true, false)) > oddValue) {
 			maxOdd.put(state.copy(true, false), oddValue);
 			if (oddValue <= minEven.get(state.copy(true, false))) {
@@ -116,10 +115,10 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 				boolean isGoodTransitionParity = true;
 				boolean isGoodTransitionBuchi = true;
 				boolean isGoodTransitionBuchiParity = true;
-				int maxOddValueBuchi = 0;
-				int maxOddValueParity = 0;
-				int maxOddValueBuchiParity = 0;
-				int maxOddValueNone = 0;
+				int maxOddValueBuchi = rule.getSource().getState2().getRank();
+				int maxOddValueParity = rule.getSource().getState2().getRank();
+				int maxOddValueBuchiParity = rule.getSource().getState2().getRank();
+				int maxOddValueNone = rule.getSource().getState2().getRank();
 				for (BuchiParityIntersectState<STATE1, STATE2> dest : rule.getDests()) {
 					boolean isGoodTransitionParityp = false;
 					boolean isGoodTransitionBuchip = false;
@@ -229,7 +228,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 	}
 
 	private void updateMinEven(BuchiParityIntersectState<STATE1, STATE2> state, int evenValue) {
-		minEven.put(state, evenValue);
 		if (state.isGood1() && minEven.get(state.copy(true, false)) < evenValue) {
 			minEven.put(state.copy(true, false), evenValue);
 			if (maxOdd.get(state.copy(true, false)) <= minEven.get(state.copy(true, false))) {
@@ -260,10 +258,10 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 				boolean isGoodTransitionParity = true;
 				boolean isGoodTransitionBuchi = true;
 				boolean isGoodTransitionBuchiParity = true;
-				int maxOddValueBuchi = 0;
-				int maxOddValueParity = 0;
-				int maxOddValueBuchiParity = 0;
-				int maxOddValueNone = 0;
+				int maxOddValueBuchi = rule.getSource().getState2().getRank();
+				int maxOddValueParity = rule.getSource().getState2().getRank();
+				int maxOddValueBuchiParity = rule.getSource().getState2().getRank();
+				int maxOddValueNone = rule.getSource().getState2().getRank();
 				int minEvenValueBuchi = Integer.MAX_VALUE;
 				int minEvenValueParity = Integer.MAX_VALUE;
 				int minEvenValueBuchiParity = Integer.MAX_VALUE;
