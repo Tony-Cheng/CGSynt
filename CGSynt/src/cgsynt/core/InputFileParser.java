@@ -40,6 +40,9 @@ public class InputFileParser {
 			linePointer++;
 		}
 		
+		// NOTE FOR TONY: linePointer points to the current line in the lines arraylist, so juzt update the 
+		//				  to move down the file. Also I was throwing new ParseErrors for errors so that can be used
+		//				  for throwing new errors.
 		// Create Specification file using the parsed data.
 		Specification spec = new Specification(null, null, null, null);
 		
