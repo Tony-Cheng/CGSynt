@@ -5,13 +5,13 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import cgsynt.Verification.MainVerificationLoop;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.ScriptAssumptionStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.VariableFactory;
 import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
+import cgsynt.verification.MainVerificationLoop;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 

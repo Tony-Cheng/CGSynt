@@ -1,41 +1,44 @@
-package cgsynt.synthesis;
+package cgsynt.verification;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
-import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
+import cgsynt.interpol.IAssumption;
 import cgsynt.interpol.IStatement;
+import cgsynt.interpol.ScriptPredicateAssumptionStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
+import cgsynt.interpol.VariableFactory;
 import cgsynt.nfa.GeneralizeStateFactory;
+import cgsynt.nfa.MultiThreadGeneralization;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.operations.CounterExamplesToInterpolants;
-import cgsynt.operations.ProgramRetrieval;
-import cgsynt.probability.ConfidenceIntervalCalculator;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
-import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
-import cgsynt.tree.buchi.IntersectState;
+import cgsynt.tree.buchi.lta.LTAIntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
-import cgsynt.tree.buchi.operations.BuchiIntersection;
 import cgsynt.tree.buchi.operations.ConvertToStringState;
-import cgsynt.tree.buchi.operations.EmptinessCheck;
-import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
+import cgsynt.tree.buchi.operations.LTAEmptinessCheck;
+import cgsynt.tree.buchi.operations.LTAIntersection;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
+import de.uni_freiburg.informatik.ultimate.automata.AutomataOperationCanceledException;
 import de.uni_freiburg.informatik.ultimate.automata.LibraryIdentifiers;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
-import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
+import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.PredicateUnifier;
 
-public class SynthesisLoop {
+public class MainVerificationLoop {
 
 	private BuchiTreeAutomaton<RankedBool, String> mPrograms;
 	private NestedWordAutomaton<IStatement, IPredicate> mPI;
@@ -43,46 +46,36 @@ public class SynthesisLoop {
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
-	private BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> result;
-	private Set<List<IStatement>> visitedCounterexamples;
-	private int prevSize;
-
-	// For probability testing
-	private INestedWordAutomaton<IStatement, String> dfa;
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
 	private List<String> logs;
 	private boolean printLogs;
-	private int printedLogsSize;
+	private int prevLogLen;
 	private TraceGlobalVariables globalVars;
-	private Map<IntersectState<String, String>, BuchiTreeAutomatonRule<RankedBool, IntersectState<String, String>>> goodProgram;
 
-	public SynthesisLoop(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions,
-			TraceGlobalVariables globalVars) throws Exception {
-		this.globalVars = globalVars;
+	public MainVerificationLoop(BuchiTreeAutomaton<RankedBool, String> programs, List<IStatement> transitionAlphabet,
+			IPredicate preconditions, IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
 		RankedBool.setRank(transitionAlphabet.size());
+		this.globalVars = globalVars;
 		globalVars.getTraceInterpolator().setPreconditions(preconditions);
 		globalVars.getTraceInterpolator().setPostconditions(postconditions);
 		preconditions = globalVars.getTraceInterpolator().getPreconditions();
 		postconditions = globalVars.getTraceInterpolator().getPostconditions();
 		this.mService = globalVars.getService();
 		this.mAutService = new AutomataLibraryServices(mService);
-		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet));
-		construction.computeResult();
-		RankedBool.setRank(construction.getAlphabet().size());
-		this.mPrograms = construction.getResult();
+		this.mPrograms = programs;
 		this.mResultComputed = false;
-		this.mTransitionAlphabet = construction.getAlphabet();
+		this.mTransitionAlphabet = transitionAlphabet;
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
 		this.mAllInterpolants.add(preconditions);
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
-		this.visitedCounterexamples = new HashSet<>();
 		this.logs = new ArrayList<>();
 		this.printLogs = false;
-		this.printedLogsSize = 0;
+		this.prevLogLen = 0;
+
 	}
 
 	public void setPrintLogs(boolean printLogs) {
@@ -107,16 +100,17 @@ public class SynthesisLoop {
 		return pi;
 	}
 
-	private void computeOneIteration(int k, int bs) throws Exception {
+	private void computeOneIteration() throws Exception {
 		// Turn PI into a NFA that has String states.
+		long time = System.nanoTime();
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
 		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
 
 		// Determinize the String state version of PI.
 		Determinize<IStatement, String> determinize = new Determinize<>(mAutService, new StringFactory(), stringNFAPI);
 
-		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();//addDeadStates((NestedWordAutomaton<IStatement, String>)determinize.getResult());
-		
+		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();
+
 		// Dead State
 		String deadState = "DeadState";
 
@@ -126,39 +120,54 @@ public class SynthesisLoop {
 
 		BuchiTreeAutomaton<RankedBool, String> powerSet = dfaToLta.getResult();
 
-		BuchiIntersection<RankedBool, String, String> intersection = new BuchiIntersection<>(mPrograms, powerSet);
-		BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> intersectedAut = intersection.computeResult();
-		EmptinessCheck<RankedBool, IntersectState<String, String>> emptinessCheck = new EmptinessCheck<>(
+		LTAIntersection<RankedBool, String, String> intersection = new LTAIntersection<>(mPrograms, powerSet);
+		BuchiTreeAutomaton<RankedBool, LTAIntersectState<String, String>> intersectedAut = intersection.computeResult();
+		LTAEmptinessCheck<RankedBool, LTAIntersectState<String, String>> emptinessCheck = new LTAEmptinessCheck<>(
 				intersectedAut);
 		emptinessCheck.computeResult();
 		if (!emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
-			result = emptinessCheck.getGoodAutomaton();
-			this.goodProgram = emptinessCheck.getGoodProgram();
 			return;
 		}
-		prevSize = k * stringDFAPI.getStates().size();
-		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI,
-				k * stringDFAPI.getStates().size(), visitedCounterexamples, bs, this.mTransitionAlphabet);
-		generator.computeResult();
-		Set<List<IStatement>> counterExamples = generator.getResult();
+		logs.add("Start to emptiness check: " + (System.nanoTime() - time) / 1000000);
+		time = System.nanoTime();
+		Set<List<IStatement>> counterExamples = emptinessCheck.findCounterExamples(mTransitionAlphabet);
+		logs.add("Find counter examples: " + (System.nanoTime() - time) / 1000000);
+		time = System.nanoTime();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples,
 				globalVars.getTraceInterpolator());
 		counterExampleToInterpolants.computeResult();
+		logs.add("Number of counterexamples: " + (counterExampleToInterpolants.getCorrectTraces().size()
+				+ counterExampleToInterpolants.getIncorrectTrace().size()));
+		logs.add("Find interpolants: " + (System.nanoTime() - time) / 1000000);
+		time = System.nanoTime();
+		if (counterExampleToInterpolants.getIncorrectTrace().size() > 0) {
+			mIsCorrect = false;
+			mResultComputed = true;
+			return;
+		}
 
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI,
 				globalVars.getTraceInterpolator());
 		mPI = generalization.getResult();
+		logs.add("Generalization: " + (System.nanoTime() - time) / 1000000);
+		time = System.nanoTime();
 
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
 	}
 
-	public BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> getResult() {
-		return result;
+	public void printLogs() {
+		for (String log : logs) {
+			System.out.println(log);
+		}
+	}
+
+	public List<String> getLogs() {
+		return logs;
 	}
 
 	private Set<IPredicate> flatten(List<Set<IPredicate>> interpolants) {
@@ -178,76 +187,30 @@ public class SynthesisLoop {
 	public void computeMainLoop() throws Exception {
 		int i = 0;
 		while (!mResultComputed) {
-			logs.add("Iteration: " + i);
-			computeOneIteration(i + 1, -1);
+			logs.add("Iteration:" + i);
+			computeOneIteration();
 			logs.add("Number of interpolants: " + this.mAllInterpolants.size());
 			i++;
-			if (this.printLogs)
-				printLogsIteration();
+			if (printLogs)
+				printLogsOnIteration();
 		}
-	}
-
-	public void printRootConfidenceInterval() throws Exception {
-		ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, this.prevSize, 3000,
-				this.mTransitionAlphabet, globalVars.getTraceInterpolator());
-		double[] traceInterval = calc.calculate95TraceConfIntervals();
-		double[] piInterval = calc.calculate95PiConfIntervals();
-		System.out.println("Size: " + prevSize);
-		System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
-		System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
+		logs.add("The process took " + i + " iterations.");
+		if (printLogs)
+			printLogsOnIteration();
 
 	}
 
-	public void printLogs() {
-		for (String log : logs)
-			System.out.println(log);
-	}
-
-	private void printLogsIteration() {
-		for (int i = this.printedLogsSize; i < logs.size(); i++) {
+	private void printLogsOnIteration() {
+		for (int i = this.prevLogLen; i < this.logs.size(); i++) {
 			System.out.println(logs.get(i));
 		}
-		this.printedLogsSize = logs.size();
+		this.prevLogLen = this.logs.size();
 	}
 
-	public void printAllInterpolants() {
+	private void printAllInterpolants() {
 		for (IPredicate interpol : this.mAllInterpolants) {
 			System.out.println(interpol);
 		}
 	}
 
-	public void printProgram() {
-		IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
-		for (int i = 0; i < statements.length; i++) {
-			statements[i] = mTransitionAlphabet.get(i);
-		}
-		ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result, statements, goodProgram);
-		retrieve.computeResult();
-		for (String statement : retrieve.getResult()) {
-			System.out.println(statement);
-		}
-	}
-	
-//	public NestedWordAutomaton<IStatement, String> addDeadStates(NestedWordAutomaton<IStatement, String> aut){
-//		NestedWordAutomaton<IStatement, String> newDFA = aut;
-//		
-//		newDFA.addState(false, false, "DeadState");
-//		
-//		for (String state : aut.getStates()) {
-//			@SuppressWarnings("unchecked")
-//			Iterator<OutgoingInternalTransition<IStatement,String>> trans = (Iterator<OutgoingInternalTransition<IStatement, String>>) aut.internalSuccessors(state);
-//			
-//			Set<IStatement> lettersUsed = new HashSet<>();
-//			while (trans.hasNext())
-//				lettersUsed.add(trans.next().getLetter());
-//			
-//			for (IStatement letter : this.mTransitionAlphabet) {
-//				if (!lettersUsed.contains(letter)) {
-//					newDFA.addInternalTransition(state, letter, "DeadState");
-//				}
-//			}
-//		}
-//		
-//		return newDFA;
-//	}
 }
