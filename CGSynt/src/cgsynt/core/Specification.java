@@ -16,7 +16,7 @@ public class Specification {
 		mTransitionAlphabet = transitionAlphabet;
 		mPreconditions = preconditions;
 		mPostconditions = postconditions;
-		mTransitionAlphabet = transitionAlphabet;
+		mGlobalVars = globalVars;
 	}
 
 	public List<IStatement> getTransitionAlphabet() {

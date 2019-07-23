@@ -94,6 +94,7 @@ public class SynthesisLoop {
 		
 		this.globalVars = globalVars;
 		RankedBool.setRank(transitionAlphabet.size());
+		
 		globalVars.getTraceInterpolator().setPreconditions(preconditions);
 		globalVars.getTraceInterpolator().setPostconditions(postconditions);
 		preconditions = globalVars.getTraceInterpolator().getPreconditions();
