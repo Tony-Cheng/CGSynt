@@ -11,36 +11,37 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOld
 
 public class InputFileParser {	
 	private String[] mVariableTypes = {"int", "bool", "array"};
+	private String[] mComparators = {">", ">=", "<", "<=", "==", "!="};
+	
+	private TraceGlobalVariables mGlobalVars;
+	private VariableFactory mVf;
+	private Script mScript;
+	private ArrayList<BoogieNonOldVar> mVariables;
+	private Map<String, Integer> mVariableMap;
+	private int mLinePointer;
+	
+	private void init() throws Exception {
+		mGlobalVars = new TraceGlobalVariables();
+		mVf = mGlobalVars.getVariableFactory();
+		mScript = mGlobalVars.getManagedScript().getScript();
+		
+		mVariables = new ArrayList<BoogieNonOldVar>();
+		mVariableMap = new HashMap<>();
+		
+		mLinePointer = 1;
+	}
 	
 	public Specification parseFile(ArrayList<String> lines) throws Exception {
-		TraceGlobalVariables globalVars = new TraceGlobalVariables();
-		VariableFactory vf = globalVars.getVariableFactory();
-		Script script = globalVars.getManagedScript().getScript();
-		
-		ArrayList<BoogieNonOldVar> variables = new ArrayList<BoogieNonOldVar>();
-		Map<String, Integer> mVariableMap = new HashMap<>();
-		
-		int linePointer = 1;
+		init();
 		
 		// Check that the file starts with Vars marker
 		if (!lines.get(0).equals("Vars"))
 			throw new ParseException("The specification file must begin with \"Vars\""); 
 		
-		while (variableDeclarationLine(lines.get(linePointer))) {
-			String[] tokens = lines.get(linePointer).split(" ");
-			if (tokens.length < 2)
-				throw new ParseException("Line" + linePointer + " must declare both variable type and variable name"); 
-			else if (tokens.length > 2)
-				throw new ParseException("Line" + linePointer + " must only declare variable type and variable name"); 
-			
-			int type = stringToVariableInt(tokens[0]);
-			variables.add(vf.constructVariable(tokens[1], type));
-			mVariableMap.put(tokens[1], linePointer - 1);
-			
-			linePointer++;
-		}
+		parseVariableDeclarations(lines);
+		parseStatements(lines);
 		
-		// NOTE FOR TONY: linePointer points to the current line in the lines arraylist, so juzt update the 
+		// NOTE FOR TONY: linePointer points to the current line in the lines arraylist, so just update the 
 		//				  to move down the file. Also I was throwing new ParseErrors for errors so that can be used
 		//				  for throwing new errors.
 		// Create Specification file using the parsed data.
@@ -49,13 +50,69 @@ public class InputFileParser {
 		return spec;
 	}
 	
-	private boolean variableDeclarationLine(String line) {
+	private void parseVariableDeclarations(ArrayList<String> lines) throws Exception {
+		while (isVariableDeclarationLine(lines.get(mLinePointer))) {
+			String[] tokens = lines.get(mLinePointer).split(" ");
+			if (tokens.length < 2)
+				throw new ParseException("Line" + mLinePointer + " must declare both variable type and variable name"); 
+			else if (tokens.length > 2)
+				throw new ParseException("Line" + mLinePointer + " must only declare variable type and variable name"); 
+			
+			int type = stringToVariableInt(tokens[0]);
+			mVariables.add(mVf.constructVariable(tokens[1], type));
+			mVariableMap.put(tokens[1], mLinePointer - 1);
+			
+			mLinePointer++;
+		}
+	}
+	
+	private void parseStatements(ArrayList<String> lines) throws ParseException {
+		if (!lines.get(mLinePointer).equals("Statements")) 
+			throw new ParseException("The file must have a \"Statements\" section label");
+		
+		mLinePointer++;
+		
+		while (!lines.get(mLinePointer).equals("Pre")) {
+			String[] tokens = lines.get(mLinePointer).split(" ");
+			if (isAssumption(tokens)) {
+				
+			}
+			
+			mLinePointer++;
+		}
+	}
+	
+	private boolean isVariableDeclarationLine(String line) {
 		for (int i = 0; i < mVariableTypes.length; i++) {
 			if (line.startsWith(mVariableTypes[i]))
 				return true;
 		}
 		
 		return false;
+	}
+	
+	private boolean isAssumption(String[] tokens) throws ParseException {
+		boolean found = false;
+		int tokenNum = -1;
+		for (int j = 0; j < tokens.length; j++) {
+			for (int i = 0; i < mComparators.length; i++) {
+				if (tokens[j].equals(mComparators[i])) {
+					found = true;
+					tokenNum = j;
+					break;
+				}
+			}
+			
+			if (found)
+				break;
+		}
+		
+		if (tokenNum != 1 && tokenNum != -1)
+			throw new ParseException("The synthesizer only supports monomial terms on the left hand side");
+		
+		if (tokenNum == -1)
+			return false;
+		else return true;
 	}
 	
 	private int stringToVariableInt(String type) {
