@@ -17,7 +17,6 @@ import cgsynt.interpol.VariableFactory;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
-import cgsynt.verification.AlternateVerification;
 import cgsynt.verification.MainVerificationLoop;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
