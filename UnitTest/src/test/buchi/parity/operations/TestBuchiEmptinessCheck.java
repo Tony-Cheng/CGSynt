@@ -37,7 +37,7 @@ public class TestBuchiEmptinessCheck {
 	@Test
 	void testSingleNonEmpty() {
 		BuchiTreeAutomaton<RankedLetter, String> single = BuchiTreeAutomatonFactory.single();
-
+		
 		ParityTreeAutomaton<RankedLetter, ParityState<String>> aut2 = new ParityTreeAutomaton<>(2);
 		ParityState<String> q0 = new ParityState<String>("q0", 0);
 		List<ParityState<String>> list = new ArrayList<>();
