@@ -10,6 +10,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomat
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 
 public class TestRankingFunctionSynt {
 
@@ -25,7 +26,8 @@ public class TestRankingFunctionSynt {
 		Script script = globalVars.getManagedScript().getScript();
 		
 		// Build automaton letters
-		BoogieNonOldVar i = vf.constructVariable("j", VariableFactory.INT);
+		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
+		BoogieNonOldVar j = vf.constructVariable("j", VariableFactory.INT);
 		
 		VpAlphabet<IStatement> alphabet = new VpAlphabet<>();
 		NestedWordAutomaton<String, IStatement> lassoBuchi = new NestedWordAutomaton<>(libraryServices, );
