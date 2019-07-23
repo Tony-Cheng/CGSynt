@@ -576,7 +576,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 		Iterator<BuchiParityIntersectState<STATE1, STATE2>> iterInitStates = tree.getInitStates().iterator();
 		while (iterInitStates.hasNext()) {
 			BuchiParityIntersectState<STATE1, STATE2> nextInitState = iterInitStates.next();
-			if (!goodStates.contains(nextInitState.copy(false, false))) {
+			if (!goodStates.contains(nextInitState)) {
 				iterInitStates.remove();
 			}
 		}
@@ -586,8 +586,8 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 		while (!goodTransitions.isEmpty()) {
 			BuchiParityIntersectRule<LETTER, STATE1, STATE2> nextRule = goodTransitions.pop();
 			BuchiParityIntersectState<STATE1, STATE2> src = nextRule.getSource();
-			if (!goodStates.contains(src.copy(false, false))) {
-				goodStates.add(src.copy(false, false));
+			if (!goodStates.contains(src)) {
+				goodStates.add(src);
 				Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> ruleToSrc = tree.getForChildMap(src);
 				if (ruleToSrc != null && !goodLeavesStates.contains(src)) {
 					for (BuchiParityIntersectRule<LETTER, STATE1, STATE2> rule : ruleToSrc) {
