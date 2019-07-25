@@ -15,5 +15,7 @@
 	<classpathentry kind="src" path="/Library-ModelCheckerUtils"/>
 	<classpathentry kind="src" path="/TraceAbstraction"/>
 	<classpathentry kind="src" path="/CGSynt"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/LassoRanker"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Library-LassoRanker"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
