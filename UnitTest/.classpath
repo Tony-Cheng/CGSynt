@@ -17,5 +17,6 @@
 	<classpathentry kind="src" path="/CGSynt"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/LassoRanker"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-LassoRanker"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/BuchiAutomizer"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
