@@ -1,16 +1,34 @@
 package test.synthesis.rankingfunction;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 
 import cgsynt.interpol.IStatement;
+import cgsynt.interpol.ScriptAssignmentStatement;
+import cgsynt.interpol.ScriptAssumptionStatement;
 import cgsynt.interpol.TraceGlobalVariables;
+import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
+import cgsynt.nfa.GeneralizeStateFactory;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.INwaOutgoingLetterAndTransitionProvider;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.BuchiIsEmpty;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLassoRun;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLassoWord;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.lassoranker.LassoAnalysis;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SmtUtils.SimplificationTechnique;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SmtUtils.XnfConversionTechnique;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
+import de.uni_freiburg.informatik.ultimate.plugins.analysis.lassoranker.LassoAutomatonBuilder;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 
 public class TestRankingFunctionSynt {
 
@@ -28,9 +46,45 @@ public class TestRankingFunctionSynt {
 		// Build automaton letters
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
 		BoogieNonOldVar j = vf.constructVariable("j", VariableFactory.INT);
+		IStatement igz = new ScriptAssumptionStatement(i, script.numeral("0"), ">", globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement jeo = new ScriptAssignmentStatement(j, script.numeral("1"), globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement jli = new ScriptAssumptionStatement(j, i.getTerm(), "<", globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement jpp = new ScriptAssignmentStatement(j, script.term("+", script.numeral("1"), j.getTerm()), globalVars.getManagedScript(), vf.getSymbolTable());
 		
-		VpAlphabet<IStatement> alphabet = new VpAlphabet<>();
-		NestedWordAutomaton<String, IStatement> lassoBuchi = new NestedWordAutomaton<>(libraryServices, );
+		Set<IStatement> letters = new HashSet<>(Arrays.asList(igz, jeo, jli, jpp));
+		VpAlphabet<IStatement> alphabet = new VpAlphabet<>(letters);
+	
+		// Setup buchi automaton from "Termination Analysis by Learning Terminating Programs" Paper -> Page 8
+		NestedWordAutomaton<IStatement, String> lassoBuchi = new NestedWordAutomaton<>(libraryServices, alphabet,
+				new LassoStateFactory());
+		
+		// Add states
+		lassoBuchi.addState(true, false, "l0");
+		lassoBuchi.addState(false, false, "l1");
+		lassoBuchi.addState(false, true, "l2");
+		lassoBuchi.addState(false, false, "l3");
+		
+		// Add transitions
+		lassoBuchi.addInternalTransition("l0", igz, "l1");
+		lassoBuchi.addInternalTransition("l1", jeo, "l2");
+		lassoBuchi.addInternalTransition("l2", jli, "l3");
+		lassoBuchi.addInternalTransition("l3", jpp, "l2");
+		
+		// Make Lasso Run
+		NestedLassoRun<IStatement, String> run =
+				new BuchiIsEmpty<>(libraryServices, lassoBuchi).getAcceptingNestedLassoRun();
+		
+		// Make Lasso Word
+		NestedLassoWord<IStatement> lw = run.getNestedLassoWord();
+		
+//		PredicateFactory pf = new PredicateFactory(serviceProvider, globalVars.getManagedScript(), vf.getSymbolTable(), 
+//				SimplificationTechnique.SIMPLIFY_BDD_FIRST_ORDER, XnfConversionTechnique.BDD_BASED);
+//		INwaOutgoingLetterAndTransitionProvider<IStatement, IPredicate> lassoAutomaton;
+//		lassoAutomaton = new LassoAutomatonBuilder<>(alphabet, new GeneralizeStateFactory(globalVars.getPredicateFactory()),
+//				pf, lw.getStem(), lw.getLoop(), serviceProvider).getResult();
+		
+		TraceToInterpolants tti = new TraceToInterpolants(globalVars.getManagedScript(), serviceProvider, vf.getSymbolTable());
+		//LassoAnalysis la = new LassoAnalysis(tti.getCfgSmtToolkit(),);
 	}
 }
 //TraceGlobalVariables globalVars = new TraceGlobalVariables();

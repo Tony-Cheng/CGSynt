@@ -171,6 +171,10 @@ public class TraceToInterpolants implements IInterpol {
 		return postconditions;
 	}
 
+	public CfgSmtToolkit getCfgSmtToolkit() {
+		return this.toolkit;
+	}
+	
 	private List<IStatement> buildStatementList(IStatement statement) {
 		List<IStatement> statements = new ArrayList<>();
 		statements.add(statement);
