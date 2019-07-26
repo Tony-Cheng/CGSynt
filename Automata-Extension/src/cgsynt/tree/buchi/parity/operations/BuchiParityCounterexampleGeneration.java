@@ -81,11 +81,12 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 						len - 1);
 				for (int j = 0; j < triplets.size(); j++) {
 					if (triplets.get(j).repeatedState.equals(state)) {
+						triplets.get(j).states.push(state);
 						triplets.get(j).transitions.push(null);
+					} else {
+						triplets.get(j).transitions.push(transitionAlphabet.get(i));
 					}
 					triplets.get(j).states.push(state);
-					if (!(triplets.get(j).repeatedState.equals(state) && len == this.maxLength))
-						triplets.get(j).transitions.push(transitionAlphabet.get(i));
 				}
 				allTriplets.addAll(triplets);
 			}
@@ -105,7 +106,6 @@ class Triplet<STATE1, STATE2 extends IParityState, TransitionLETTER> {
 		this.transitions = new Stack<>();
 		this.states = new Stack<>();
 		this.repeatedState = repeatedState;
-		this.states.push(repeatedState);
 	}
 
 	public Triplet(Stack<TransitionLETTER> transitions, Stack<BuchiParityIntersectState<STATE1, STATE2>> states,
