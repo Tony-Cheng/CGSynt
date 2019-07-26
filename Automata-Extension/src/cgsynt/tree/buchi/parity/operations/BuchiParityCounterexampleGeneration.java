@@ -77,14 +77,15 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 		for (BuchiParityIntersectRule<LETTER, STATE1, STATE2> transition : tree.getForSourceMap(state)) {
 			List<BuchiParityIntersectState<STATE1, STATE2>> dests = transition.getDests();
 			for (int i = 0; i < transitionAlphabet.size(); i++) {
-				List<Triplet<STATE1, STATE2, TransitionLETTER>> triplets = generateCounterexamples(dests.get(i), len - 1);
+				List<Triplet<STATE1, STATE2, TransitionLETTER>> triplets = generateCounterexamples(dests.get(i),
+						len - 1);
 				for (int j = 0; j < triplets.size(); j++) {
 					if (triplets.get(j).repeatedState.equals(state)) {
-						triplets.get(j).states.push(triplets.get(j).states.peek());
 						triplets.get(j).transitions.push(null);
 					}
 					triplets.get(j).states.push(state);
-					triplets.get(j).transitions.push(transitionAlphabet.get(i));
+					if (!(triplets.get(j).repeatedState.equals(state) && len == this.maxLength))
+						triplets.get(j).transitions.push(transitionAlphabet.get(i));
 				}
 				allTriplets.addAll(triplets);
 			}
