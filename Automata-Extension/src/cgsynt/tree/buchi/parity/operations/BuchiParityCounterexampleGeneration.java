@@ -14,16 +14,16 @@ import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLassoRun;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
-public class LassoCounterExampleGeneration<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
+public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
 
 	private BuchiParityIntersectAutomaton<LETTER, STATE1, STATE2> tree;
 	int maxLength;
 	private List<IStatement> transitionAlphabet;
 	private Set<BuchiParityIntersectState<STATE1, STATE2>> visitedStates;
-	private List<NestedLassoRun<LETTER, BuchiParityIntersectState<STATE1, STATE2>>> result;
+	private List<Triplet<STATE1, STATE2>> result;
 	private boolean resultComputed;
 
-	public LassoCounterExampleGeneration(BuchiParityIntersectAutomaton<LETTER, STATE1, STATE2> tree, int maxLength,
+	public BuchiParityCounterexampleGeneration(BuchiParityIntersectAutomaton<LETTER, STATE1, STATE2> tree, int maxLength,
 			List<IStatement> transitionAlphabet) {
 		this.tree = tree;
 		this.maxLength = maxLength;
@@ -39,6 +39,28 @@ public class LassoCounterExampleGeneration<LETTER extends IRankedLetter, STATE1,
 		for (BuchiParityIntersectState<STATE1, STATE2> initialState : tree.getInitStates()) {
 			tripletCounterexamples.addAll(generateCounterexamples(initialState, maxLength));
 		}
+		result = tripletCounterexamples;
+		resultComputed = true;
+	}
+	
+	public List<Stack<IStatement>> getResultTransition() {
+		if (!resultComputed)
+			return null;
+		List<Stack<IStatement>> resultTransitions = new ArrayList<>();
+		for (int i = 0; i < result.size(); i++) {
+			resultTransitions.add(result.get(i).transitions);
+		}
+		return resultTransitions;
+	}
+	
+	public List<Stack<BuchiParityIntersectState<STATE1, STATE2>>> getResultStates() {
+		if (!resultComputed)
+			return null;
+		List<Stack<BuchiParityIntersectState<STATE1, STATE2>>> resultStates = new ArrayList<>();
+		for (int i = 0; i < result.size(); i++) {
+			resultStates.add(result.get(i).states);
+		}
+		return resultStates;
 	}
 
 	private List<Triplet<STATE1, STATE2>> generateCounterexamples(BuchiParityIntersectState<STATE1, STATE2> state,
