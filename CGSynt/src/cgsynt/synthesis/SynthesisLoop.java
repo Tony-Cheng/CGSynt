@@ -38,13 +38,13 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPre
 
 public class SynthesisLoop {
 
-	private BuchiTreeAutomaton<RankedBool, String> mPrograms;
+	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
 	private NestedWordAutomaton<IStatement, IPredicate> mPI;
 	private List<IStatement> mTransitionAlphabet;
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
-	private BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> result;
+	private BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> result;
 	private Set<List<IStatement>> visitedCounterexamples;
 	private int prevSize;
 
@@ -57,7 +57,7 @@ public class SynthesisLoop {
 	private boolean printLogs;
 	private int printedLogsSize;
 	private TraceGlobalVariables globalVars;
-	private Map<IntersectState<String, String>, BuchiTreeAutomatonRule<RankedBool, IntersectState<String, String>>> goodProgram;
+	private Map<IntersectState<IPredicate, IPredicate>, BuchiTreeAutomatonRule<RankedBool, IntersectState<IPredicate, IPredicate>>> goodProgram;
 
 	public SynthesisLoop(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions,
 			TraceGlobalVariables globalVars) throws Exception {
@@ -69,7 +69,7 @@ public class SynthesisLoop {
 		postconditions = globalVars.getTraceInterpolator().getPostconditions();
 		this.mService = globalVars.getService();
 		this.mAutService = new AutomataLibraryServices(mService);
-		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet));
+		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet), globalVars.getPredicateFactory());
 		construction.computeResult();
 		RankedBool.setRank(construction.getAlphabet().size());
 		this.mPrograms = construction.getResult();
@@ -101,7 +101,7 @@ public class SynthesisLoop {
 		postconditions = globalVars.getTraceInterpolator().getPostconditions();
 		this.mService = globalVars.getService();
 		this.mAutService = new AutomataLibraryServices(mService);
-		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet));
+		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet), globalVars.getPredicateFactory());
 		construction.computeResult();
 		RankedBool.setRank(construction.getAlphabet().size());
 		this.mPrograms = construction.getResult();
@@ -141,27 +141,24 @@ public class SynthesisLoop {
 	}
 
 	private void computeOneIteration(int k, int bs) throws Exception {
-		// Turn PI into a NFA that has String states.
-		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
-		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
-
 		// Determinize the String state version of PI.
-		Determinize<IStatement, String> determinize = new Determinize<>(mAutService, new StringFactory(), stringNFAPI);
+		Determinize<IStatement, IPredicate> determinize = new Determinize<>(mAutService, new PDeterminizeStateFactory(
+				globalVars.getPredicateFactory()), mPI);
 
-		INestedWordAutomaton<IStatement, String> stringDFAPI = determinize.getResult();//addDeadStates((NestedWordAutomaton<IStatement, String>)determinize.getResult());
+		INestedWordAutomaton<IStatement, IPredicate> dfaPI = determinize.getResult();//addDeadStates((NestedWordAutomaton<IStatement, String>)determinize.getResult());
 		
 		// Dead State
-		String deadState = "DeadState";
-
+		IPredicate deadState = globalVars.getPredicateFactory().newDebugPredicate("deadState");
+		
 		// Transform the DFA into an LTA
-		DfaToLtaPowerSet<IStatement, String> dfaToLta = new DfaToLtaPowerSet<IStatement, String>(stringDFAPI,
+		DfaToLtaPowerSet<IStatement, IPredicate> dfaToLta = new DfaToLtaPowerSet<>(dfaPI,
 				mTransitionAlphabet, deadState);
 
-		BuchiTreeAutomaton<RankedBool, String> powerSet = dfaToLta.getResult();
+		BuchiTreeAutomaton<RankedBool, IPredicate> powerSet = dfaToLta.getResult();
 
-		BuchiIntersection<RankedBool, String, String> intersection = new BuchiIntersection<>(mPrograms, powerSet);
-		BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> intersectedAut = intersection.computeResult();
-		EmptinessCheck<RankedBool, IntersectState<String, String>> emptinessCheck = new EmptinessCheck<>(
+		BuchiIntersection<RankedBool, IPredicate, IPredicate> intersection = new BuchiIntersection<>(mPrograms, powerSet);
+		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> intersectedAut = intersection.computeResult();
+		EmptinessCheck<RankedBool, IntersectState<IPredicate, IPredicate>> emptinessCheck = new EmptinessCheck<>(
 				intersectedAut);
 		emptinessCheck.computeResult();
 		if (!emptinessCheck.getResult()) {
@@ -171,9 +168,9 @@ public class SynthesisLoop {
 			this.goodProgram = emptinessCheck.getGoodProgram();
 			return;
 		}
-		prevSize = k * stringDFAPI.getStates().size();
-		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(stringDFAPI,
-				k * stringDFAPI.getStates().size(), visitedCounterexamples, bs, this.mTransitionAlphabet);
+		prevSize = k * dfaPI.getStates().size();
+		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
+				k * dfaPI.getStates().size(), visitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples,
@@ -190,7 +187,7 @@ public class SynthesisLoop {
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
 	}
 
-	public BuchiTreeAutomaton<RankedBool, IntersectState<String, String>> getResult() {
+	public BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> getResult() {
 		return result;
 	}
 
@@ -249,38 +246,15 @@ public class SynthesisLoop {
 		}
 	}
 
-	public void printProgram() {
-		IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
-		for (int i = 0; i < statements.length; i++) {
-			statements[i] = mTransitionAlphabet.get(i);
-		}
-		ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result, statements, goodProgram);
-		retrieve.computeResult();
-		for (String statement : retrieve.getResult()) {
-			System.out.println(statement);
-		}
-	}
-	
-//	public NestedWordAutomaton<IStatement, String> addDeadStates(NestedWordAutomaton<IStatement, String> aut){
-//		NestedWordAutomaton<IStatement, String> newDFA = aut;
-//		
-//		newDFA.addState(false, false, "DeadState");
-//		
-//		for (String state : aut.getStates()) {
-//			@SuppressWarnings("unchecked")
-//			Iterator<OutgoingInternalTransition<IStatement,String>> trans = (Iterator<OutgoingInternalTransition<IStatement, String>>) aut.internalSuccessors(state);
-//			
-//			Set<IStatement> lettersUsed = new HashSet<>();
-//			while (trans.hasNext())
-//				lettersUsed.add(trans.next().getLetter());
-//			
-//			for (IStatement letter : this.mTransitionAlphabet) {
-//				if (!lettersUsed.contains(letter)) {
-//					newDFA.addInternalTransition(state, letter, "DeadState");
-//				}
-//			}
+//	public void printProgram() {
+//		IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
+//		for (int i = 0; i < statements.length; i++) {
+//			statements[i] = mTransitionAlphabet.get(i);
 //		}
-//		
-//		return newDFA;
+//		ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result, statements, goodProgram);
+//		retrieve.computeResult();
+//		for (String statement : retrieve.getResult()) {
+//			System.out.println(statement);
+//		}
 //	}
 }

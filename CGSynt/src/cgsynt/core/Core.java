@@ -25,7 +25,7 @@ public class Core {
 		SynthesisLoop synthesis = new SynthesisLoop(spec);
 		synthesis.computeMainLoop();
 		System.out.println(synthesis.isCorrect());
-		synthesis.printProgram();
+		//synthesis.printProgram();
 
 	}
 

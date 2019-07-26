@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-SMTLIB"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SMTInterpol"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Trace"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Library-ModelCheckerUtils"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

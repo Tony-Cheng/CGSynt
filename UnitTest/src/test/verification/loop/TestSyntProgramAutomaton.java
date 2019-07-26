@@ -38,7 +38,7 @@ public class TestSyntProgramAutomaton {
 		statements.add(ige0);
 		statements.add(ie1);
 		statements.add(ie2);
-		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements);
+		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements, globalVars.getPredicateFactory());
 		construct.computeResult();
 		System.out.println("Test 1");
 		System.out.println(construct.getResult());

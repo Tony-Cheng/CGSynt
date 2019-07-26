@@ -11,23 +11,27 @@ import cgsynt.interpol.IStatement;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class ProgramAutomatonConstruction {
 	private Set<IStatement> statements;
-	private String stateLeft;
-	private String stateRight;
-	private String stateBottom;
+	private IPredicate stateLeft;
+	private IPredicate stateRight;
+	private IPredicate stateBottom;
 	private boolean resultComputed;
 	private List<IStatement> assignments;
 	private List<Pair<IAssumption, IAssumption>> assumptions;
 	private List<IStatement> alphabet;
 	private Map<IStatement, Integer> assignmentsMap;
 	private Map<Pair<IAssumption, IAssumption>, Integer> assumptionsMap;
-	private BuchiTreeAutomaton<RankedBool, String> result;
+	private BuchiTreeAutomaton<RankedBool, IPredicate> result;
+	private BasicPredicateFactory mPredicateFactory;
 
-	public ProgramAutomatonConstruction(Set<IStatement> statements) {
+	public ProgramAutomatonConstruction(Set<IStatement> statements, BasicPredicateFactory predicateFactory) {
 		this.statements = statements;
 		this.resultComputed = false;
+		this.mPredicateFactory = predicateFactory;
 	}
 
 	public void computeResult() {
@@ -74,18 +78,18 @@ public class ProgramAutomatonConstruction {
 	}
 
 	private void computeRightStateEdges() {
-		List<String> dest = new ArrayList<>();
+		List<IPredicate> dest = new ArrayList<>();
 		for (int i = 0; i < alphabet.size(); i++) {
 			dest.add(stateRight);
 		}
-		BuchiTreeAutomatonRule<RankedBool, String> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateRight,
+		BuchiTreeAutomatonRule<RankedBool, IPredicate> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateRight,
 				dest);
 		result.addRule(rule);
 	}
 
 	private void computeBottomStateEdges() {
 		for (IStatement statement : assignments) {
-			List<String> dest = new ArrayList<>();
+			List<IPredicate> dest = new ArrayList<>();
 			int index = assignmentsMap.get(statement);
 			for (int i = 0; i < alphabet.size(); i++) {
 				if (i == index) {
@@ -94,13 +98,13 @@ public class ProgramAutomatonConstruction {
 					dest.add(stateRight);
 				}
 			}
-			BuchiTreeAutomatonRule<RankedBool, String> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
 					dest);
 			result.addRule(rule);
 		}
 		for (Pair<IAssumption, IAssumption> statement : assumptions) {
-			List<String> dest1 = new ArrayList<>();
-			List<String> dest2 = new ArrayList<>();
+			List<IPredicate> dest1 = new ArrayList<>();
+			List<IPredicate> dest2 = new ArrayList<>();
 			int index = assumptionsMap.get(statement);
 			for (int i = 0; i < alphabet.size(); i++) {
 				if (i == index) {
@@ -114,26 +118,26 @@ public class ProgramAutomatonConstruction {
 					dest2.add(stateRight);
 				}
 			}
-			BuchiTreeAutomatonRule<RankedBool, String> rule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
 					dest1);
-			BuchiTreeAutomatonRule<RankedBool, String> rule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
 					dest2);
 			result.addRule(rule1);
 			result.addRule(rule2);
 		}
 
-		List<String> dest = new ArrayList<>();
+		List<IPredicate> dest = new ArrayList<>();
 		for (int i = 0; i < alphabet.size(); i++) {
 			dest.add(stateRight);
 		}
-		BuchiTreeAutomatonRule<RankedBool, String> rule = new BuchiTreeAutomatonRule<>(RankedBool.TRUE, stateBottom,
+		BuchiTreeAutomatonRule<RankedBool, IPredicate> rule = new BuchiTreeAutomatonRule<>(RankedBool.TRUE, stateBottom,
 				dest);
 		result.addRule(rule);
 	}
 
 	private void computeLeftStateEdges() {
 		for (IStatement statement : assignments) {
-			List<String> dest = new ArrayList<>();
+			List<IPredicate> dest = new ArrayList<>();
 			int index = assignmentsMap.get(statement);
 			for (int i = 0; i < alphabet.size(); i++) {
 				if (i == index) {
@@ -142,13 +146,13 @@ public class ProgramAutomatonConstruction {
 					dest.add(stateRight);
 				}
 			}
-			BuchiTreeAutomatonRule<RankedBool, String> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
 					dest);
 			result.addRule(rule);
 		}
 		for (Pair<IAssumption, IAssumption> statement : assumptions) {
-			List<String> dest1 = new ArrayList<>();
-			List<String> dest2 = new ArrayList<>();
+			List<IPredicate> dest1 = new ArrayList<>();
+			List<IPredicate> dest2 = new ArrayList<>();
 			int index = assumptionsMap.get(statement);
 			for (int i = 0; i < alphabet.size(); i++) {
 				if (i == index) {
@@ -162,33 +166,33 @@ public class ProgramAutomatonConstruction {
 					dest2.add(stateRight);
 				}
 			}
-			BuchiTreeAutomatonRule<RankedBool, String> rule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
 					dest1);
-			BuchiTreeAutomatonRule<RankedBool, String> rule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
 					dest2);
 			result.addRule(rule1);
 			result.addRule(rule2);
 		}
 
-		List<String> dest = new ArrayList<>();
+		List<IPredicate> dest = new ArrayList<>();
 		for (int i = 0; i < alphabet.size(); i++) {
 			dest.add(stateRight);
 		}
-		BuchiTreeAutomatonRule<RankedBool, String> rule = new BuchiTreeAutomatonRule<>(RankedBool.TRUE, stateLeft,
+		BuchiTreeAutomatonRule<RankedBool, IPredicate> rule = new BuchiTreeAutomatonRule<>(RankedBool.TRUE, stateLeft,
 				dest);
 		result.addRule(rule);
 	}
 
 	private void computeStates() {
-		this.stateLeft = "left";
-		this.stateBottom = "bottom";
-		this.stateRight = "right";
+		this.stateLeft = mPredicateFactory.newDebugPredicate("left");
+		this.stateBottom = mPredicateFactory.newDebugPredicate("bottom");
+		this.stateRight = mPredicateFactory.newDebugPredicate("right");
 		result.addInitState(stateLeft);
 		result.addFinalState(stateRight);
 		result.addFinalState(stateBottom);
 	}
 
-	public BuchiTreeAutomaton<RankedBool, String> getResult() {
+	public BuchiTreeAutomaton<RankedBool, IPredicate> getResult() {
 		if (!resultComputed)
 			return null;
 		return result;
