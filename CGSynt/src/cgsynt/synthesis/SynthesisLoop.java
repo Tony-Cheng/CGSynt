@@ -69,7 +69,8 @@ public class SynthesisLoop {
 		postconditions = globalVars.getTraceInterpolator().getPostconditions();
 		this.mService = globalVars.getService();
 		this.mAutService = new AutomataLibraryServices(mService);
-		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet), globalVars.getPredicateFactory());
+		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet),
+				globalVars.getPredicateFactory());
 		construction.computeResult();
 		RankedBool.setRank(construction.getAlphabet().size());
 		this.mPrograms = construction.getResult();
@@ -85,23 +86,24 @@ public class SynthesisLoop {
 		this.printLogs = false;
 		this.printedLogsSize = 0;
 	}
-	
+
 	public SynthesisLoop(Specification spec) throws Exception {
 		List<IStatement> transitionAlphabet = spec.getTransitionAlphabet();
 		IPredicate preconditions = spec.getPreconditions();
 		IPredicate postconditions = spec.getPostconditions();
 		TraceGlobalVariables globalVars = spec.getGlobalVars();
-		
+
 		this.globalVars = globalVars;
 		RankedBool.setRank(transitionAlphabet.size());
-		
+
 		globalVars.getTraceInterpolator().setPreconditions(preconditions);
 		globalVars.getTraceInterpolator().setPostconditions(postconditions);
 		preconditions = globalVars.getTraceInterpolator().getPreconditions();
 		postconditions = globalVars.getTraceInterpolator().getPostconditions();
 		this.mService = globalVars.getService();
 		this.mAutService = new AutomataLibraryServices(mService);
-		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet), globalVars.getPredicateFactory());
+		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet),
+				globalVars.getPredicateFactory());
 		construction.computeResult();
 		RankedBool.setRank(construction.getAlphabet().size());
 		this.mPrograms = construction.getResult();
@@ -122,6 +124,14 @@ public class SynthesisLoop {
 		this.printLogs = printLogs;
 	}
 
+	/**
+	 * Create an empty proof.
+	 * 
+	 * @param prePred
+	 * @param postPred
+	 * @return
+	 * @throws Exception
+	 */
 	private NestedWordAutomaton<IStatement, IPredicate> createPI(IPredicate prePred, IPredicate postPred)
 			throws Exception {
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
@@ -140,24 +150,36 @@ public class SynthesisLoop {
 		return pi;
 	}
 
+	/**
+	 * Compute one iteration of the loop.
+	 * 
+	 * @param k
+	 *            the number of iterations that have been completed.
+	 * @param bs
+	 *            the batch size of the number of traces to check.
+	 * @throws Exception
+	 */
 	private void computeOneIteration(int k, int bs) throws Exception {
 		// Determinize the String state version of PI.
-		Determinize<IStatement, IPredicate> determinize = new Determinize<>(mAutService, new PDeterminizeStateFactory(
-				globalVars.getPredicateFactory()), mPI);
+		Determinize<IStatement, IPredicate> determinize = new Determinize<>(mAutService,
+				new PDeterminizeStateFactory(globalVars.getPredicateFactory()), mPI);
 
-		INestedWordAutomaton<IStatement, IPredicate> dfaPI = determinize.getResult();//addDeadStates((NestedWordAutomaton<IStatement, String>)determinize.getResult());
-		
+		INestedWordAutomaton<IStatement, IPredicate> dfaPI = determinize.getResult();// addDeadStates((NestedWordAutomaton<IStatement,
+																						// String>)determinize.getResult());
+
 		// Dead State
 		IPredicate deadState = globalVars.getPredicateFactory().newDebugPredicate("deadState");
-		
+
 		// Transform the DFA into an LTA
-		DfaToLtaPowerSet<IStatement, IPredicate> dfaToLta = new DfaToLtaPowerSet<>(dfaPI,
-				mTransitionAlphabet, deadState);
+		DfaToLtaPowerSet<IStatement, IPredicate> dfaToLta = new DfaToLtaPowerSet<>(dfaPI, mTransitionAlphabet,
+				deadState);
 
 		BuchiTreeAutomaton<RankedBool, IPredicate> powerSet = dfaToLta.getResult();
 
-		BuchiIntersection<RankedBool, IPredicate, IPredicate> intersection = new BuchiIntersection<>(mPrograms, powerSet);
-		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> intersectedAut = intersection.computeResult();
+		BuchiIntersection<RankedBool, IPredicate, IPredicate> intersection = new BuchiIntersection<>(mPrograms,
+				powerSet);
+		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> intersectedAut = intersection
+				.computeResult();
 		EmptinessCheck<RankedBool, IntersectState<IPredicate, IPredicate>> emptinessCheck = new EmptinessCheck<>(
 				intersectedAut);
 		emptinessCheck.computeResult();
@@ -187,6 +209,11 @@ public class SynthesisLoop {
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
 	}
 
+	/**
+	 * Return an automaton that contains a correct program.
+	 * 
+	 * @return
+	 */
 	public BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> getResult() {
 		return result;
 	}
@@ -205,6 +232,11 @@ public class SynthesisLoop {
 		return mIsCorrect;
 	}
 
+	/**
+	 * Compute the main loop until a correct program is found.
+	 * 
+	 * @throws Exception
+	 */
 	public void computeMainLoop() throws Exception {
 		int i = 0;
 		while (!mResultComputed) {
@@ -246,15 +278,16 @@ public class SynthesisLoop {
 		}
 	}
 
-//	public void printProgram() {
-//		IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
-//		for (int i = 0; i < statements.length; i++) {
-//			statements[i] = mTransitionAlphabet.get(i);
-//		}
-//		ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result, statements, goodProgram);
-//		retrieve.computeResult();
-//		for (String statement : retrieve.getResult()) {
-//			System.out.println(statement);
-//		}
-//	}
+	// public void printProgram() {
+	// IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
+	// for (int i = 0; i < statements.length; i++) {
+	// statements[i] = mTransitionAlphabet.get(i);
+	// }
+	// ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result,
+	// statements, goodProgram);
+	// retrieve.computeResult();
+	// for (String statement : retrieve.getResult()) {
+	// System.out.println(statement);
+	// }
+	// }
 }

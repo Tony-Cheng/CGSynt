@@ -95,6 +95,12 @@ public class TraceToInterpolants implements IInterpol {
 		this.numSamples = 0;
 	}
 
+	/**
+	 * Create a nested word that is used to represent a trace.
+	 * 
+	 * @param statements
+	 * @return
+	 */
 	private NestedWord<IAction> buildTrace(List<IStatement> statements) {
 		int len = statements.size();
 		IAction[] word = new IAction[len];
@@ -107,6 +113,12 @@ public class TraceToInterpolants implements IInterpol {
 		return new NestedWord<>(word, nestingRelation);
 	}
 
+	/**
+	 * Generate the control location sequence that is required for the trace check.
+	 * 
+	 * @param n
+	 * @return
+	 */
 	private List<Object> generateControlLocationSequence(int n) {
 		List<Object> controlLocationSequence = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
@@ -147,6 +159,11 @@ public class TraceToInterpolants implements IInterpol {
 		return pUnifier.getTruePredicate();
 	}
 
+	/**
+	 * Get the predicate unifier.
+	 * 
+	 * @return
+	 */
 	public PredicateUnifier getPUnifier() {
 		return this.pUnifier;
 	}
@@ -156,10 +173,21 @@ public class TraceToInterpolants implements IInterpol {
 		return pUnifier.getFalsePredicate();
 	}
 
+	/**
+	 * Return the preconditions.
+	 * 
+	 * @return
+	 */
 	public IPredicate getPreconditions() {
 		return preconditions;
 	}
 
+	/**
+	 * Set the preconditions.
+	 * 
+	 * @param preconditions
+	 * @throws Exception
+	 */
 	public void setPreconditions(IPredicate preconditions) throws Exception {
 		if (preconditions == null)
 			this.preconditions = pUnifier.getTruePredicate();
@@ -167,6 +195,11 @@ public class TraceToInterpolants implements IInterpol {
 			this.preconditions = pUnifier.getOrConstructPredicate(preconditions);
 	}
 
+	/**
+	 * Return the postconditions.
+	 * 
+	 * @return
+	 */
 	public IPredicate getPostconditions() {
 		return postconditions;
 	}
@@ -174,7 +207,13 @@ public class TraceToInterpolants implements IInterpol {
 	public CfgSmtToolkit getCfgSmtToolkit() {
 		return this.toolkit;
 	}
-	
+
+	/**
+	 * Return a list of statements representing the trace.
+	 * 
+	 * @param statement
+	 * @return
+	 */
 	private List<IStatement> buildStatementList(IStatement statement) {
 		List<IStatement> statements = new ArrayList<>();
 		statements.add(statement);
@@ -192,6 +231,12 @@ public class TraceToInterpolants implements IInterpol {
 		return interpolate.isCorrect() == LBool.UNSAT;
 	}
 
+	/**
+	 * Set the postconditions.
+	 * 
+	 * @param postconditions
+	 * @throws Exception
+	 */
 	public void setPostconditions(IPredicate postconditions) throws Exception {
 		if (postconditions == null)
 			this.postconditions = pUnifier.getTruePredicate();
@@ -199,6 +244,11 @@ public class TraceToInterpolants implements IInterpol {
 			this.postconditions = pUnifier.getOrConstructPredicate(postconditions);
 	}
 
+	/**
+	 * Return the predicate factory.
+	 * 
+	 * @return
+	 */
 	public BasicPredicateFactory getPredicateFactory() {
 		return predicateFactory;
 	}

@@ -82,6 +82,14 @@ public class MainVerificationLoop {
 		this.printLogs = printLogs;
 	}
 
+	/**
+	 * Create an empty program proof.
+	 * 
+	 * @param prePred
+	 * @param postPred
+	 * @return
+	 * @throws Exception
+	 */
 	private NestedWordAutomaton<IStatement, IPredicate> createPI(IPredicate prePred, IPredicate postPred)
 			throws Exception {
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
@@ -100,6 +108,11 @@ public class MainVerificationLoop {
 		return pi;
 	}
 
+	/**
+	 * Compute one iteration of the loop.
+	 * 
+	 * @throws Exception
+	 */
 	private void computeOneIteration() throws Exception {
 		// Turn PI into a NFA that has String states.
 		long time = System.nanoTime();
@@ -184,6 +197,11 @@ public class MainVerificationLoop {
 		return mIsCorrect;
 	}
 
+	/**
+	 * Compute the main loop until the program is verified.
+	 * 
+	 * @throws Exception
+	 */
 	public void computeMainLoop() throws Exception {
 		int i = 0;
 		while (!mResultComputed) {

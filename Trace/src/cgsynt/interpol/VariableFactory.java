@@ -39,6 +39,7 @@ public class VariableFactory {
 	}
 
 	/**
+	 * Return a variable given its identifier.
 	 * 
 	 * @param identifier
 	 * @return
@@ -50,6 +51,12 @@ public class VariableFactory {
 			return null;
 	}
 
+	/**
+	 * Return true if there is a variable with identifier as its name.
+	 * 
+	 * @param identifier
+	 * @return
+	 */
 	public boolean isVariable(String identifier) {
 		return getVariable(identifier) != null;
 	}
@@ -67,6 +74,14 @@ public class VariableFactory {
 		}
 	}
 
+	/**
+	 * Construct a variable with identifier as its name.
+	 * 
+	 * @param identifier
+	 * @param type
+	 * @return
+	 * @throws Exception
+	 */
 	public BoogieNonOldVar constructVariable(String identifier, int type) throws Exception {
 		if (isVariable(identifier)) {
 			throw new Exception("Variable already defined.");
@@ -79,6 +94,13 @@ public class VariableFactory {
 		return var;
 	}
 
+	/**
+	 * Construct a variable.
+	 * 
+	 * @param type
+	 * @return
+	 * @throws Exception
+	 */
 	public BoogieNonOldVar constructVariable(int type) throws Exception {
 		String var = "var";
 		while (isVariable(var + curID)) {
