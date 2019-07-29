@@ -2,6 +2,13 @@ package cgsynt.tree.buchi.parity;
 
 import cgsynt.tree.parity.IParityState;
 
+/**
+ * A representation of a state in the intersection between a buchi tree
+ * automaton and a parity tree automaton.
+ *
+ * @param <STATE1>
+ * @param <STATE2>
+ */
 public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> {
 	@Override
 	public String toString() {
@@ -9,9 +16,24 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> {
 				+ ", isGood2=" + isGood2 + "]";
 	}
 
+	/**
+	 * A state in the buchi tree automaton.
+	 */
 	private final STATE1 state1;
+
+	/**
+	 * A state in the parity tree automaton.
+	 */
 	private final STATE2 state2;
+
+	/**
+	 * Whether or not state1 is a good state in the emptiness check.
+	 */
 	private final boolean isGood1;
+
+	/**
+	 * Whether or not state2 is a good state in the emptiness check.
+	 */
 	private final boolean isGood2;
 
 	public BuchiParityIntersectState(STATE1 state1, STATE2 state2) {
@@ -28,10 +50,22 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> {
 		this.isGood2 = isGood2;
 	}
 
+	/**
+	 * Return a copy of this state where state1 and state2 are considered good.
+	 * 
+	 * @return
+	 */
 	public BuchiParityIntersectState<STATE1, STATE2> getGoodIntersectState() {
 		return new BuchiParityIntersectState<STATE1, STATE2>(state1, state2);
 	}
 
+	/**
+	 * Make a copy of this state.
+	 * 
+	 * @param isGood1
+	 * @param isGood2
+	 * @return
+	 */
 	public BuchiParityIntersectState<STATE1, STATE2> copy(boolean isGood1, boolean isGood2) {
 		return new BuchiParityIntersectState<STATE1, STATE2>(state1, state2, isGood1, isGood2);
 	}
@@ -73,18 +107,40 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> {
 		return true;
 	}
 
+	/**
+	 * Return the buchi state.
+	 * 
+	 * @return
+	 */
 	public STATE1 getState1() {
 		return state1;
 	}
 
+	/**
+	 * Return the parity state.
+	 * 
+	 * @return
+	 */
 	public STATE2 getState2() {
 		return state2;
 	}
 
+	/**
+	 * Return whether or not the buchi state is considered good in the emptiness
+	 * check.
+	 * 
+	 * @return
+	 */
 	public boolean isGood1() {
 		return isGood1;
 	}
 
+	/**
+	 * Return whether or not the parity state is considered good in the emptiness
+	 * check.
+	 * 
+	 * @return
+	 */
 	public boolean isGood2() {
 		return isGood2;
 	}

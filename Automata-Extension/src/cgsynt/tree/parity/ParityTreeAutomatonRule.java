@@ -6,6 +6,12 @@ import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import de.uni_freiburg.informatik.ultimate.util.HashUtils;
 
+/**
+ * A transition rule for the parity tree automaton.
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class ParityTreeAutomatonRule<LETTER extends IRankedLetter, STATE extends IParityState> {
 
 	private final LETTER mLetter;
@@ -29,7 +35,7 @@ public class ParityTreeAutomatonRule<LETTER extends IRankedLetter, STATE extends
 	}
 
 	/**
-	 * Get
+	 * Return the source state of the rule.
 	 * 
 	 * @return
 	 */
@@ -37,14 +43,29 @@ public class ParityTreeAutomatonRule<LETTER extends IRankedLetter, STATE extends
 		return mSrc;
 	}
 
+	/**
+	 * Return the transition letter of the rule.
+	 * 
+	 * @return
+	 */
 	public LETTER getLetter() {
 		return mLetter;
 	}
 
+	/**
+	 * Return the destination of the rule.
+	 * 
+	 * @return
+	 */
 	public List<STATE> getDest() {
 		return mDest;
 	}
 
+	/**
+	 * Return the arity (number of states in the destination) of the rule.
+	 * 
+	 * @return
+	 */
 	public int getArity() {
 		return mLetter.getRank();
 	}

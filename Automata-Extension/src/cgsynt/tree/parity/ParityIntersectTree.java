@@ -10,6 +10,14 @@ import java.util.Set;
 
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * A representation of the intersection between three parity trees.
+ *
+ * @param <LETTER>
+ * @param <STATE1>
+ * @param <STATE2>
+ * @param <STATE3>
+ */
 public class ParityIntersectTree<LETTER extends IRankedLetter, STATE1 extends IParityState, STATE2 extends IParityState, STATE3 extends IParityState> {
 	private final Map<ParityIntersectState<STATE1, STATE2, STATE3>, Collection<ParityIntersectRule<LETTER, STATE1, STATE2, STATE3>>> mSourceMap;
 	private final Set<ParityIntersectRule<LETTER, STATE1, STATE2, STATE3>> mRules;
@@ -31,6 +39,13 @@ public class ParityIntersectTree<LETTER extends IRankedLetter, STATE1 extends IP
 		initializeRules(tree1, tree2, tree3);
 	}
 
+	/**
+	 * Compute all the rules in the intersection.
+	 * 
+	 * @param tree1
+	 * @param tree2
+	 * @param tree3
+	 */
 	private void initializeRules(ParityTreeAutomaton<LETTER, STATE1> tree1, ParityTreeAutomaton<LETTER, STATE2> tree2,
 			ParityTreeAutomaton<LETTER, STATE3> tree3) {
 		for (LETTER letter : tree1.getAlphabet()) {
@@ -50,6 +65,13 @@ public class ParityIntersectTree<LETTER extends IRankedLetter, STATE1 extends IP
 		}
 	}
 
+	/**
+	 * Add a rule to the intersection.
+	 * 
+	 * @param rule1
+	 * @param rule2
+	 * @param rule3
+	 */
 	private void addRule(ParityTreeAutomatonRule<LETTER, STATE1> rule1, ParityTreeAutomatonRule<LETTER, STATE2> rule2,
 			ParityTreeAutomatonRule<LETTER, STATE3> rule3) {
 		STATE1 src1 = rule1.getSource();

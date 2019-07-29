@@ -8,16 +8,32 @@ import java.util.Map;
 import java.util.Set;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * A parity tree automaton.
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IParityState> {
+
 	private final Set<LETTER> mAlphabet;
+
 	private final Map<List<STATE>, Map<LETTER, Collection<ParityTreeAutomatonRule<LETTER, STATE>>>> mChildrenMap;
+
 	private final Map<LETTER, Collection<ParityTreeAutomatonRule<LETTER, STATE>>> mLettersMap;
+
 	private final Map<STATE, Map<LETTER, Collection<ParityTreeAutomatonRule<LETTER, STATE>>>> mParentsMap;
+
 	private final Set<ParityTreeAutomatonRule<LETTER, STATE>> mRules;
+
 	private final Map<STATE, Collection<ParityTreeAutomatonRule<LETTER, STATE>>> mSourceMap;
+
 	private final Map<STATE, Collection<ParityTreeAutomatonRule<LETTER, STATE>>> mChildMap;
+
 	private final Set<STATE> mStates;
+
 	private final Set<STATE> mInitStates;
+
 	private final int rank;
 
 	public ParityTreeAutomaton(int rank) {
@@ -33,26 +49,50 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		mChildMap = new HashMap<>();
 	}
 
+	/**
+	 * Return the alphabet.
+	 * 
+	 * @return
+	 */
 	public Set<LETTER> getAlphabet() {
 		return mAlphabet;
 	}
 
+	/**
+	 * Return all the states.
+	 * 
+	 * @return
+	 */
 	public Set<STATE> getStates() {
 		return mStates;
 	}
 
+	/**
+	 * Return the number of states.
+	 * 
+	 * @return
+	 */
 	public int size() {
 		return mStates.size();
 	}
 
+	/**
+	 * Add rules to this automaton.
+	 * 
+	 * @param rules
+	 */
 	public void addRules(ParityTreeAutomatonRule<LETTER, STATE>... rules) {
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : rules) {
 			addRule(rule);
 		}
 	}
 
+	/**
+	 * Add a rule to this automaton.
+	 * 
+	 * @param rule
+	 */
 	public void addRule(ParityTreeAutomatonRule<LETTER, STATE> rule) {
-		// TODO Auto-generated method stub
 		if (mRules.contains(rule)) {
 			return;
 		}
@@ -282,10 +322,21 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 
 	}
 
+	/**
+	 * Return true if automaton contains this state and false otherwise.
+	 * 
+	 * @param state
+	 * @return
+	 */
 	public boolean contains(STATE state) {
 		return mStates.contains(state);
 	}
 
+	/**
+	 * Remove a state from the automaton.
+	 * 
+	 * @param state
+	 */
 	public void removeState(STATE state) {
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : mSourceMap.get(state)) {
 			mChildrenMap.get(rule.getDest()).get(rule.getLetter()).remove(rule);

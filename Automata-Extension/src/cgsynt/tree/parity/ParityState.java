@@ -1,5 +1,10 @@
 package cgsynt.tree.parity;
 
+/**
+ * Represents a state in the parity tree automaton.
+ *
+ * @param <STATE>
+ */
 public class ParityState<STATE> implements IParityState {
 	private STATE state;
 	private int rank;
@@ -9,6 +14,11 @@ public class ParityState<STATE> implements IParityState {
 		this.rank = rank;
 	}
 
+	/**
+	 * Return the state that this parity state represents.
+	 * 
+	 * @return
+	 */
 	public STATE getState() {
 		return state;
 	}

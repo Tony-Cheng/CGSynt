@@ -15,13 +15,21 @@ import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * An automaton that represents the intersection between a buchi tree and a
+ * parity tree.
+ *
+ * @param <LETTER>
+ * @param <STATE1>
+ * @param <STATE2>
+ */
 public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
 
 	@Override
 	public String toString() {
 		return "BuchiParityIntersectAutomaton \n[mSourceMap=" + mSourceMap + ", \nmRules=" + mRules + ", \nmChildMap="
-				+ mChildMap + ", \nmStates=" + mStates + ", \nmAltStates=" + mAltStates + ", \nmInitStates=" + mInitStates
-				+ ", \nmFinalStates=" + mFinalStates + "\n]";
+				+ mChildMap + ", \nmStates=" + mStates + ", \nmAltStates=" + mAltStates + ", \nmInitStates="
+				+ mInitStates + ", \nmFinalStates=" + mFinalStates + "\n]";
 	}
 
 	private final Map<BuchiParityIntersectState<STATE1, STATE2>, Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>>> mSourceMap;
@@ -46,6 +54,11 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 		initializeRules(tree1, tree2);
 	}
 
+	/**
+	 * Add an intersected state to the automaton.
+	 * 
+	 * @param state
+	 */
 	private void addState(BuchiParityIntersectState<STATE1, STATE2> state) {
 		if (mStates.contains(state))
 			return;
@@ -55,6 +68,12 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 		mChildMap.put(state, new HashSet<>());
 	}
 
+	/**
+	 * Intialize all possible combination of states.
+	 * 
+	 * @param states1
+	 * @param states2
+	 */
 	private void initializeStates(Set<STATE1> states1, Set<STATE2> states2) {
 		for (STATE1 state1 : states1) {
 			for (STATE2 state2 : states2) {
@@ -69,6 +88,11 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 		}
 	}
 
+	/**
+	 * Add an intersected state that is a good buchi and parity state.
+	 * 
+	 * @param state
+	 */
 	private void addAltState(BuchiParityIntersectState<STATE1, STATE2> state) {
 		if (mAltStates.contains(state))
 			return;
@@ -77,6 +101,12 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 		mChildMap.put(state, new HashSet<>());
 	}
 
+	/**
+	 * Initialize all the initial states.
+	 * 
+	 * @param init1
+	 * @param init2
+	 */
 	private void initializeInitStates(Set<STATE1> init1, Set<STATE2> init2) {
 		for (STATE1 state1 : init1) {
 			for (STATE2 state2 : init2) {
@@ -87,6 +117,12 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 		}
 	}
 
+	/**
+	 * Initialize all the rules.
+	 * 
+	 * @param tree1
+	 * @param tree2
+	 */
 	private void initializeRules(BuchiTreeAutomaton<LETTER, STATE1> tree1, ParityTreeAutomaton<LETTER, STATE2> tree2) {
 		for (LETTER letter : tree1.getAlphabet()) {
 			if (tree1.getSuccessors(letter) == null || tree2.getSuccessors(letter) == null) {
@@ -101,6 +137,12 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 		}
 	}
 
+	/**
+	 * Add a rule to this automaton.
+	 * 
+	 * @param rule1
+	 * @param rule2
+	 */
 	private void addRule(BuchiTreeAutomatonRule<LETTER, STATE1> rule1, ParityTreeAutomatonRule<LETTER, STATE2> rule2) {
 		STATE1 src1 = rule1.getSource();
 		STATE2 src2 = rule2.getSource();
