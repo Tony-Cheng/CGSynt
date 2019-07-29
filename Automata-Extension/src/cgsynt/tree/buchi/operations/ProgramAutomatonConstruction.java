@@ -14,6 +14,11 @@ import cgsynt.tree.buchi.lta.RankedBool;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
+/**
+ * Construct a buchi tree automaton that represents a set of well-formed
+ * programs.
+ *
+ */
 public class ProgramAutomatonConstruction {
 	private Set<IStatement> statements;
 	private IPredicate stateLeft;
@@ -34,6 +39,9 @@ public class ProgramAutomatonConstruction {
 		this.mPredicateFactory = predicateFactory;
 	}
 
+	/**
+	 * Compute the buchi automaton that represents the program.
+	 */
 	public void computeResult() {
 		if (resultComputed)
 			return;
@@ -48,6 +56,9 @@ public class ProgramAutomatonConstruction {
 		resultComputed = true;
 	}
 
+	/**
+	 * Separate the list of statements in the assignments and assumptions.
+	 */
 	private void computeAssignmentsAndAssumptions() {
 		assumptions = new ArrayList<>();
 		assignments = new ArrayList<>();
@@ -62,6 +73,9 @@ public class ProgramAutomatonConstruction {
 		}
 	}
 
+	/**
+	 * Compute the alphabet for the automaotn.
+	 */
 	private void computeAlphabet() {
 		alphabet = new ArrayList<>();
 		assignmentsMap = new HashMap<>();
@@ -77,6 +91,9 @@ public class ProgramAutomatonConstruction {
 		}
 	}
 
+	/**
+	 * Compute all the transitions coming out of the right state.
+	 */
 	private void computeRightStateEdges() {
 		List<IPredicate> dest = new ArrayList<>();
 		for (int i = 0; i < alphabet.size(); i++) {
@@ -87,6 +104,9 @@ public class ProgramAutomatonConstruction {
 		result.addRule(rule);
 	}
 
+	/**
+	 * Compute all the transitions coming out of the bottom state.
+	 */
 	private void computeBottomStateEdges() {
 		for (IStatement statement : assignments) {
 			List<IPredicate> dest = new ArrayList<>();
@@ -98,8 +118,8 @@ public class ProgramAutomatonConstruction {
 					dest.add(stateRight);
 				}
 			}
-			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
-					dest);
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
+					stateBottom, dest);
 			result.addRule(rule);
 		}
 		for (Pair<IAssumption, IAssumption> statement : assumptions) {
@@ -118,10 +138,10 @@ public class ProgramAutomatonConstruction {
 					dest2.add(stateRight);
 				}
 			}
-			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
-					dest1);
-			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateBottom,
-					dest2);
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
+					stateBottom, dest1);
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
+					stateBottom, dest2);
 			result.addRule(rule1);
 			result.addRule(rule2);
 		}
@@ -135,6 +155,9 @@ public class ProgramAutomatonConstruction {
 		result.addRule(rule);
 	}
 
+	/**
+	 * Compute all the transitions coming out of the left state.
+	 */
 	private void computeLeftStateEdges() {
 		for (IStatement statement : assignments) {
 			List<IPredicate> dest = new ArrayList<>();
@@ -146,8 +169,8 @@ public class ProgramAutomatonConstruction {
 					dest.add(stateRight);
 				}
 			}
-			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
-					dest);
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
+					stateLeft, dest);
 			result.addRule(rule);
 		}
 		for (Pair<IAssumption, IAssumption> statement : assumptions) {
@@ -166,10 +189,10 @@ public class ProgramAutomatonConstruction {
 					dest2.add(stateRight);
 				}
 			}
-			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
-					dest1);
-			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateLeft,
-					dest2);
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
+					stateLeft, dest1);
+			BuchiTreeAutomatonRule<RankedBool, IPredicate> rule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
+					stateLeft, dest2);
 			result.addRule(rule1);
 			result.addRule(rule2);
 		}
@@ -183,6 +206,9 @@ public class ProgramAutomatonConstruction {
 		result.addRule(rule);
 	}
 
+	/**
+	 * Compute all the states.
+	 */
 	private void computeStates() {
 		this.stateLeft = mPredicateFactory.newDebugPredicate("left");
 		this.stateBottom = mPredicateFactory.newDebugPredicate("bottom");
@@ -192,12 +218,22 @@ public class ProgramAutomatonConstruction {
 		result.addFinalState(stateBottom);
 	}
 
+	/**
+	 * Return the buchi tree automaton that represents a program.
+	 * 
+	 * @return
+	 */
 	public BuchiTreeAutomaton<RankedBool, IPredicate> getResult() {
 		if (!resultComputed)
 			return null;
 		return result;
 	}
 
+	/**
+	 * Return the destination alphabet.
+	 * 
+	 * @return
+	 */
 	public List<IStatement> getAlphabet() {
 		if (!resultComputed)
 			return null;

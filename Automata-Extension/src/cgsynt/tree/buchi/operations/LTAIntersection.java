@@ -9,6 +9,13 @@ import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.LTAIntersectState;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * Compute the intersection of two LTAs.
+ *
+ * @param <LETTER>
+ * @param <STATE1>
+ * @param <STATE2>
+ */
 public class LTAIntersection<LETTER extends IRankedLetter, STATE1, STATE2> {
 	private final BuchiTreeAutomaton<LETTER, STATE1> tree1;
 	private final BuchiTreeAutomaton<LETTER, STATE2> tree2;
@@ -21,6 +28,9 @@ public class LTAIntersection<LETTER extends IRankedLetter, STATE1, STATE2> {
 		result = new BuchiTreeAutomaton<LETTER, LTAIntersectState<STATE1, STATE2>>(tree1.getRank());
 	}
 
+	/**
+	 * Compute the alphabet for the LTA intersection automaton.
+	 */
 	private void computeAlphabet() {
 		Set<LETTER> alpha1 = tree1.getAlphabet();
 		Set<LETTER> alpha2 = tree2.getAlphabet();
@@ -32,6 +42,9 @@ public class LTAIntersection<LETTER extends IRankedLetter, STATE1, STATE2> {
 		}
 	}
 
+	/**
+	 * Compute the initial states.
+	 */
 	private void computeInitState() {
 		Set<STATE1> initStates1 = tree1.getInitStates();
 		Set<STATE2> initStates2 = tree2.getInitStates();
@@ -43,10 +56,16 @@ public class LTAIntersection<LETTER extends IRankedLetter, STATE1, STATE2> {
 		}
 	}
 
+	/**
+	 * Compute the final states.
+	 */
 	private void computeFinalState() {
 		result.setAllStatesFinal();
 	}
 
+	/**
+	 * Compute the transitions.
+	 */
 	private void computeTransitions() {
 		for (LETTER letter : tree1.getAlphabet()) {
 			Iterable<BuchiTreeAutomatonRule<LETTER, STATE1>> rules1 = tree1.getSuccessors(letter);
@@ -78,6 +97,11 @@ public class LTAIntersection<LETTER extends IRankedLetter, STATE1, STATE2> {
 
 	}
 
+	/**
+	 * Compute the LTA that is the result of the intersection.
+	 * 
+	 * @return
+	 */
 	public BuchiTreeAutomaton<LETTER, LTAIntersectState<STATE1, STATE2>> computeResult() {
 		computeAlphabet();
 		computeInitState();

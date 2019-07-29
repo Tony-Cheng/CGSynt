@@ -15,6 +15,14 @@ import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * An emptiness check operation for the intersection between a buchi tree
+ * automaton and a parity tree automaton.
+ *
+ * @param <LETTER>
+ * @param <STATE1>
+ * @param <STATE2>
+ */
 public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
 
 	private boolean result;
@@ -593,8 +601,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					for (BuchiParityIntersectRule<LETTER, STATE1, STATE2> rule : ruleToSrc) {
 						boolean isGoodTransition = true;
 						for (BuchiParityIntersectState<STATE1, STATE2> dest : rule.getDests()) {
-							if (!goodLeavesStates.contains(dest)
-									&& !goodStates.contains(dest)) {
+							if (!goodLeavesStates.contains(dest) && !goodStates.contains(dest)) {
 								isGoodTransition = false;
 								break;
 							}

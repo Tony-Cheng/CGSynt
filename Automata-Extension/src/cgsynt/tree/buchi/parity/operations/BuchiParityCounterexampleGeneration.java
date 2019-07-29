@@ -12,6 +12,15 @@ import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * Generate counterexamples from the intersection between a buchi tree automaton
+ * and a parity tree automaton.
+ *
+ * @param <LETTER>
+ * @param <STATE1>
+ * @param <STATE2>
+ * @param <TransitionLETTER>
+ */
 public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState, TransitionLETTER> {
 
 	private BuchiParityIntersectAutomaton<LETTER, STATE1, STATE2> tree;
@@ -27,9 +36,11 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 		this.maxLength = maxLength;
 		this.visitedStates = new HashSet<>();
 		this.transitionAlphabet = transitionAlphabet;
-
 	}
 
+	/**
+	 * Compute counterexamples.
+	 */
 	public void computeResult() {
 		if (resultComputed)
 			return;
@@ -41,6 +52,11 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 		resultComputed = true;
 	}
 
+	/**
+	 * Return the transitions of the counterexamples.
+	 * 
+	 * @return
+	 */
 	public List<Stack<TransitionLETTER>> getResultTransition() {
 		if (!resultComputed)
 			return null;
@@ -51,6 +67,11 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 		return resultTransitions;
 	}
 
+	/**
+	 * Return the states of the counterexamples.
+	 * 
+	 * @return
+	 */
 	public List<Stack<BuchiParityIntersectState<STATE1, STATE2>>> getResultStates() {
 		if (!resultComputed)
 			return null;
@@ -61,6 +82,14 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 		return resultStates;
 	}
 
+	/**
+	 * Generate all possible counterexamples rooted at state and with maximum length
+	 * len.
+	 * 
+	 * @param state
+	 * @param len
+	 * @return
+	 */
 	private List<Triplet<STATE1, STATE2, TransitionLETTER>> generateCounterexamples(
 			BuchiParityIntersectState<STATE1, STATE2> state, int len) {
 		if (len == 0) {
