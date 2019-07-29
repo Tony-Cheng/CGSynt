@@ -110,4 +110,26 @@ public class ScriptAssumptionStatement implements IAssumption {
 		copy.negated = negated;
 		return copy;
 	}
+
+	@Override
+	public UnmodifiableTransFormula getTransFormula(boolean negated) {
+		List<IProgramVar> lhs = new ArrayList<>();
+		List<Term> rhs = new ArrayList<>();
+		lhs.add(this.lhs);
+		rhs.add(this.rhs);
+		UnmodifiableTransFormula formula = ExtendedTransFormulaBuilder.constructAssumption(lhs, rhs, symbolTable,
+				managedScript, type, negated);
+		return formula;
+	}
+
+	@Override
+	public UnmodifiableTransFormula getTransFormula() {
+		try {
+			throw new Exception();
+		} catch(Exception e) {
+			System.err.println("For assumption statements you must use the version of the method that takes one parameter!");
+			System.exit(1);
+		}
+		return null;
+	}
 }

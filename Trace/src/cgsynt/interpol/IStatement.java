@@ -2,6 +2,7 @@ package cgsynt.interpol;
 
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IAction;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula;
 
 /**
  * A programming statement in a trace.
@@ -29,4 +30,6 @@ public interface IStatement {
 	public String toString();
 	
 	public boolean isAssumption();
+	
+	public UnmodifiableTransFormula getTransFormula();
 }

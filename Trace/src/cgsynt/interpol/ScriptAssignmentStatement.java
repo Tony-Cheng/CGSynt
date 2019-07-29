@@ -75,4 +75,15 @@ public class ScriptAssignmentStatement implements IStatement {
 	public boolean isAssumption() {
 		return false;
 	}
+
+	@Override
+	public UnmodifiableTransFormula getTransFormula() {
+		List<IProgramVar> lhs = new ArrayList<>();
+		List<Term> rhs = new ArrayList<>();
+		lhs.add(this.lhs);
+		rhs.add(this.rhs);
+		UnmodifiableTransFormula formula = TransFormulaBuilder.constructAssignment(lhs, rhs, symbolTable,
+				managedScript);
+		return formula;
+	}
 }

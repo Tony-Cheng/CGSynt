@@ -1,6 +1,6 @@
 package cgsynt.interpol;
 
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula;
 
 /**
  * The interface for an assumption statement.
@@ -21,4 +21,6 @@ public interface IAssumption extends IStatement {
 	 * Negate the assumption.
 	 */
 	void negate();
+	
+	public UnmodifiableTransFormula getTransFormula(boolean negated);
 }
