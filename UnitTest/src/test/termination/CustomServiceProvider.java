@@ -1,5 +1,6 @@
 package test.termination;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import de.uni_freiburg.informatik.ultimate.core.coreplugin.services.PreferenceLayer;
@@ -20,11 +21,12 @@ public class CustomServiceProvider implements IUltimateServiceProvider{
 	private final LogLevel mDefaultLevel;
 	private final IProgressMonitorService mProgressMonitorService = new CustomProgramMonitor();
 	private final IToolchainStorage mStorage;
-	private Map<String, PreferenceLayer> mPreferenceLayers;
+	private final Map<String, PreferenceLayer> mPreferenceLayers;
 
 	public CustomServiceProvider(final LogLevel defaultLevel) {
 		mDefaultLevel = defaultLevel;
 		mStorage = new ToolchainStorage();
+		mPreferenceLayers = new HashMap<>();
 	}
 
 	@Override
@@ -58,8 +60,8 @@ public class CustomServiceProvider implements IUltimateServiceProvider{
 		return mPreferenceLayers.get(pluginId);
 	}
 	
-	public void addPreferenceProvider(PreferenceLayer prefLayer, String preferenceId) {
-		mPreferenceLayers.put(preferenceId, prefLayer);
+	public void addPreferenceProvider(IPreferenceProvider prefLayer, String preferenceId) {
+		mPreferenceLayers.put(preferenceId, (PreferenceLayer)prefLayer);
 	}
 
 	@Override
