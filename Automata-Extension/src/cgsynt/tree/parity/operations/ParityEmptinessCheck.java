@@ -17,19 +17,60 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
 public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IParityState> {
 
+	/**
+	 * True if the parity automaton is empty and false otherwise.
+	 */
 	private boolean result;
+
+	/**
+	 * True if the result is computed and false otherwise.
+	 */
 	private boolean resultComputed;
+
+	/**
+	 * A parity tree to perform the emptiness check on.
+	 */
 	private ParityTreeAutomaton<LETTER, STATE> tree;
 
+	/**
+	 * A state is a good even state if the state is even and there's a subtree root
+	 * at that state such that the maximum number along every path of that subtree
+	 * is even.
+	 */
 	private Set<STATE> goodEvenStates;
 
+	/**
+	 * A state is a good state if it's the source of a transition where the
+	 * destination states are either good states or good even states. If the state
+	 * is a good even state, then it must satisfy the additional requirement that
+	 * its maxOdd value is greater than its minEven value to be a good state.
+	 */
 	private Set<STATE> goodStates;
 
+	/**
+	 * The smallest of the largest odd number of subtrees rooted at the key where
+	 * the leaves are good even states. Moreover, this number is zero if the minEven
+	 * of the key is greater than smallest max odd number.
+	 */
 	private Map<STATE, Integer> maxOdd;
+
+	/**
+	 * The largest of the smallest even number along every path of subtrees rooted
+	 * at the key where the leaves are good even states.
+	 */
 	private Map<STATE, Integer> minEven;
 
+	/**
+	 * A transition is good if the destination states are either good states or good
+	 * even states.
+	 */
 	private Stack<ParityTreeAutomatonRule<LETTER, STATE>> goodTransitions;
 
+	/**
+	 * Construct an object for checking the emptiness of a parity automaton.
+	 * 
+	 * @param tree
+	 */
 	public ParityEmptinessCheck(ParityTreeAutomaton<LETTER, STATE> tree) {
 		resultComputed = false;
 		this.tree = tree;
@@ -40,6 +81,11 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		this.minEven = initializeMinEven();
 	}
 
+	/**
+	 * Initialize the map maxOdd.
+	 * 
+	 * @return
+	 */
 	private Map<STATE, Integer> initializeMaxOdd() {
 		Map<STATE, Integer> maxOdd = new HashMap<>();
 		for (STATE state : tree.getStates()) {
@@ -49,9 +95,13 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 				maxOdd.put(state, state.getRank());
 		}
 		return maxOdd;
-
 	}
 
+	/**
+	 * Initialize the map minEven.
+	 * 
+	 * @return
+	 */
 	private Map<STATE, Integer> initializeMinEven() {
 		Map<STATE, Integer> minEven = new HashMap<>();
 		for (STATE state : tree.getStates()) {
@@ -61,9 +111,14 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 				minEven.put(state, 0);
 		}
 		return minEven;
-
 	}
 
+	/**
+	 * Return a set of all even states in the tree.
+	 * 
+	 * @param tree
+	 * @return
+	 */
 	private Set<STATE> computeEvenStates(ParityTreeAutomaton<LETTER, STATE> tree) {
 		Set<STATE> evenStates = new HashSet<>();
 		for (STATE state : tree.getStates()) {
@@ -74,6 +129,9 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		return evenStates;
 	}
 
+	/**
+	 * Compute whether the tree is empty or not.
+	 */
 	public void computeResult() {
 		if (resultComputed)
 			return;
@@ -91,10 +149,21 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		}
 	}
 
+	/**
+	 * Return true if the tree is empty and false otherwise.
+	 * 
+	 * @return
+	 */
 	public boolean getResult() {
 		return result;
 	}
 
+	/**
+	 * Remove all the states that are not the root of some subtrees whose
+	 * destination states are all good even states.
+	 * 
+	 * @return
+	 */
 	private boolean computeDecentTree() {
 		initializeDecentTransitions();
 		findAllDecentStates();
@@ -106,6 +175,9 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		}
 	}
 
+	/**
+	 * Find all transitions whose destination consists of good even states.
+	 */
 	private void initializeDecentTransitions() {
 		Set<ParityTreeAutomatonRule<LETTER, STATE>> allRules = tree.getRules();
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : allRules) {
@@ -122,6 +194,10 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		}
 	}
 
+	/**
+	 * Find all states that are the root of some subtrees whose destinations are
+	 * good even states.
+	 */
 	private void findAllDecentStates() {
 		while (!goodTransitions.isEmpty()) {
 			ParityTreeAutomatonRule<LETTER, STATE> nextRule = goodTransitions.pop();
@@ -147,6 +223,9 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		}
 	}
 
+	/**
+	 * Remove all initial states that are not decent states.
+	 */
 	private void removeInitialNotDecentStates() {
 		Iterator<STATE> iterInitStates = tree.getInitStates().iterator();
 		while (iterInitStates.hasNext()) {
@@ -157,6 +236,9 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		}
 	}
 
+	/**
+	 * Remove all states that are not good even states.
+	 */
 	private void computeGoodTree() {
 		initializeGoodTransitions();
 		findAllGoodStates();
@@ -174,6 +256,9 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		}
 	}
 
+	/**
+	 * Find all transitions whose destination consists of good even states.
+	 */
 	private void initializeGoodTransitions() {
 		Set<ParityTreeAutomatonRule<LETTER, STATE>> allRules = tree.getRules();
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : allRules) {
@@ -190,6 +275,12 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		}
 	}
 
+	/**
+	 * Update the max odd value of a state.
+	 * 
+	 * @param state
+	 * @param oddValue
+	 */
 	private void updateMaxOdd(STATE state, int oddValue) {
 		maxOdd.put(state, oddValue);
 		if (oddValue <= minEven.get(state)) {
@@ -223,6 +314,12 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		}
 	}
 
+	/**
+	 * Update the min even value of a state.
+	 * 
+	 * @param state
+	 * @param evenValue
+	 */
 	private void updateMinEven(STATE state, int evenValue) {
 		minEven.put(state, evenValue);
 		if (evenValue >= maxOdd.get(state)) {
@@ -260,6 +357,9 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		}
 	}
 
+	/**
+	 * Find all good states.
+	 */
 	private void findAllGoodStates() {
 		while (!goodTransitions.isEmpty()) {
 			ParityTreeAutomatonRule<LETTER, STATE> nextRule = goodTransitions.pop();
@@ -320,6 +420,11 @@ public class ParityEmptinessCheck<LETTER extends IRankedLetter, STATE extends IP
 		}
 	}
 
+	/**
+	 * Remove all good even states that are not good states.
+	 * 
+	 * @return
+	 */
 	private boolean removeEvenNotGoodStates() {
 		boolean evenStateRemoved = false;
 
