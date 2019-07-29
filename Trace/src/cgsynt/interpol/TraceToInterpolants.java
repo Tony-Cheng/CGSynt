@@ -94,6 +94,37 @@ public class TraceToInterpolants implements IInterpol {
 		this.totaltime = 0;
 		this.numSamples = 0;
 	}
+	
+	public TraceToInterpolants(ManagedScript managedScript, IUltimateServiceProvider service,
+			DefaultIcfgSymbolTable symbolTable, Set<String> procs) throws Exception {
+		ILogger logger = new ConsoleLogger();
+		logger.setLevel(LogLevel.OFF);
+		this.managedScript = managedScript;
+		this.service = service;
+		this.symbolTable = symbolTable;
+		procedures = procs;
+		HashRelation<String, IProgramNonOldVar> mProc2Globals = new HashRelation<>();
+		modifiableGlobalsTable = new ModifiableGlobalsTable(mProc2Globals);
+		inParams = new HashMap<>();
+		outParams = new HashMap<>();
+		icfgEdgeFactory = new IcfgEdgeFactory(new SerialProvider());
+		Map<IIcfgForkTransitionThreadCurrent<IcfgLocation>, ThreadInstance> threadInstanceMap = new HashMap<>();
+		Collection<IIcfgJoinTransitionThreadCurrent<IcfgLocation>> joinTransitions = new ArrayList<>();
+		concurInfo = new ConcurrencyInformation(threadInstanceMap, joinTransitions);
+		smtSymbols = new SmtSymbols(managedScript.getScript());
+
+		toolkit = new CfgSmtToolkit(modifiableGlobalsTable, managedScript, symbolTable, procedures, inParams, outParams,
+				icfgEdgeFactory, concurInfo, smtSymbols);
+		pendingContexts = new TreeMap<>();
+		predicateFactory = new BasicPredicateFactory(service, managedScript, symbolTable, SimplificationTechnique.NONE,
+				XnfConversionTechnique.BDD_BASED);
+		pUnifier = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
+				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
+		postconditions = pUnifier.getTruePredicate();
+		postconditions = pUnifier.getTruePredicate();
+		this.totaltime = 0;
+		this.numSamples = 0;
+	}
 
 	/**
 	 * Create a nested word that is used to represent a trace.

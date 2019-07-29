@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,6 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedRun;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLassoRun;
 import de.uni_freiburg.informatik.ultimate.core.coreplugin.services.PreferenceLayer;
-import de.uni_freiburg.informatik.ultimate.core.coreplugin.services.ToolchainStorage;
 import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
@@ -50,10 +50,10 @@ import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.Tr
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.interpolantautomata.builders.InterpolantAutomatonBuilderFactory;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TAPreferences;
-import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TAPreferences.Artifact;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TAPreferences.Concurrency;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TAPreferences.InterpolantAutomatonEnhancement;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.HoareAnnotationPositions;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.HoareTripleChecks;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.InterpolantAutomaton;
@@ -73,8 +73,8 @@ public class TestLassoCheck {
 		// Setting up the TAPreferences
 		RcpPreferenceProvider pref = new RcpPreferenceProvider(TraceAbstraction.class.getPackage().getName());
 		pref.put(TraceAbstractionPreferenceInitializer.LABEL_INTERPROCEDUTAL, false);
-		pref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_ITERATIONS, 0);
-		pref.put(TraceAbstractionPreferenceInitializer.LABEL_WATCHITERATION, 0);
+		pref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_ITERATIONS, 100);
+		pref.put(TraceAbstractionPreferenceInitializer.LABEL_WATCHITERATION, 100);
 		pref.put(TraceAbstractionPreferenceInitializer.LABEL_ARTIFACT, Artifact.INTERPOLANT_AUTOMATON);
 		pref.put(TraceAbstractionPreferenceInitializer.LABEL_HOARE, false);
 		pref.put(TraceAbstractionPreferenceInitializer.LABEL_HOARE_POSITIONS, HoareAnnotationPositions.All);
@@ -88,9 +88,9 @@ public class TestLassoCheck {
 		pref.put(TraceAbstractionPreferenceInitializer.LABEL_HOARE_TRIPLE_CHECKS, HoareTripleChecks.INCREMENTAL);
 		pref.put(TraceAbstractionPreferenceInitializer.LABEL_MINIMIZE, Minimization.DELAYED_SIMULATION);
 		pref.put(TraceAbstractionPreferenceInitializer.LABEL_CONCURRENCY, Concurrency.FINITE_AUTOMATA);
-		pref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_TRACE_HISTOGRAM, 0);
-		pref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_TIME, 0);
-		pref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_PATH_PROGRAM, 0);
+		pref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_TRACE_HISTOGRAM, 100);
+		pref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_TIME, 1000);
+		pref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_PATH_PROGRAM, 1000);
 		pref.put(TraceAbstractionPreferenceInitializer.LABEL_COMPUTE_INTERPOLANT_SEQUENCE_STATISTICS, false);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,11 @@ public class TestLassoCheck {
 		ManagedScript mScript = globalVars.getManagedScript();
 		VariableFactory vf = globalVars.getVariableFactory();
 		
-		TraceToInterpolants tti = new TraceToInterpolants(mScript, serviceProvider, vf.getSymbolTable());
+		Set<String> procs = new HashSet<>();
+		procs.add("l1");
+		procs.add("l2");
+		
+		TraceToInterpolants tti = new TraceToInterpolants(mScript, serviceProvider, vf.getSymbolTable(), procs);
 		
 		RankVarConstructor rankVarConstructor = new RankVarConstructor(tti.getCfgSmtToolkit());
 		
@@ -159,6 +163,9 @@ public class TestLassoCheck {
 		ArrayList<IPredicate> loopStates = new ArrayList<>();
 		stemStates.add(node2);
 		stemStates.add(node2);
+		
+		System.out.println("Letters: " + stemWord.length() + " , States: " + stemStates.size());
+		System.exit(1);
 		
 		NestedRun<IcfgInternalTransition, IPredicate> stem = new NestedRun<>(stemWord, stemStates);
 		
@@ -215,6 +222,6 @@ public class TestLassoCheck {
 				taskIdentifier,
 				benchmarker);
 		
-		check.getNonTerminationArgument();
+		System.out.println(check.getLassoCheckResult());
 	}
 }
