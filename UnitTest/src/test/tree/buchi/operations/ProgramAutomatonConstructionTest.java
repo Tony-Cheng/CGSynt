@@ -34,7 +34,8 @@ public class ProgramAutomatonConstructionTest {
 		Set<IStatement> statements = new HashSet<IStatement>();
 		statements.add(ie0);
 		statements.add(ige0);
-		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements);
+		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements,
+				globalVars.getPredicateFactory());
 		construct.computeResult();
 		System.out.println("Test 1");
 		System.out.println(construct.getResult());
@@ -64,7 +65,8 @@ public class ProgramAutomatonConstructionTest {
 		statements.add(ie0);
 		statements.add(ige0);
 		statements.add(ie1);
-		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements);
+		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements,
+				globalVars.getPredicateFactory());
 		construct.computeResult();
 		System.out.println("Test 2");
 		System.out.println(construct.getResult());
@@ -94,7 +96,8 @@ public class ProgramAutomatonConstructionTest {
 		statements.add(ie0);
 		statements.add(ige0);
 		statements.add(ige1);
-		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements);
+		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements,
+				globalVars.getPredicateFactory());
 		construct.computeResult();
 		System.out.println("Test 3");
 		System.out.println(construct.getResult());
@@ -124,7 +127,8 @@ public class ProgramAutomatonConstructionTest {
 		statements.add(ie0);
 		statements.add(ige0);
 		statements.add(ige1);
-		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements);
+		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements,
+				globalVars.getPredicateFactory());
 		construct.computeResult();
 		System.out.println("Test 4");
 		System.out.println(construct.getResult());
@@ -157,7 +161,8 @@ public class ProgramAutomatonConstructionTest {
 		statements.add(ige0);
 		statements.add(ige1);
 		statements.add(ie1);
-		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements);
+		ProgramAutomatonConstruction construct = new ProgramAutomatonConstruction(statements,
+				globalVars.getPredicateFactory());
 		construct.computeResult();
 		System.out.println("Test 5");
 		System.out.println(construct.getResult());
