@@ -41,6 +41,27 @@ public class TraceGlobalVariables {
 		traceInterpolator = new TraceToInterpolants(managedScript, service, variableFactory.getSymbolTable());
 	}
 
+	public TraceGlobalVariables(IUltimateServiceProvider provider) throws Exception{
+		this.service = provider;
+		LogProxy logger = new DefaultLogger();
+		Script interpolator;
+		try {
+			// logger.setLoglevel(LogProxy.LOGLEVEL_TRACE);
+			// interpolator = new LoggingScript("maxArray.smt2", true);
+			logger.setLoglevel(LogProxy.LOGLEVEL_OFF);
+			interpolator = new SMTInterpol(logger);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+		managedScript = new ManagedScript(service, interpolator);
+		managedScript.getScript().setOption(":produce-proofs", true);
+		managedScript.getScript().setLogic(Logics.QF_ALIA);
+		variableFactory = new VariableFactory(managedScript);
+		traceInterpolator = new TraceToInterpolants(managedScript, service, variableFactory.getSymbolTable());
+	}
+	
 	public TraceToInterpolants getTraceInterpolator() {
 		return traceInterpolator;
 	}

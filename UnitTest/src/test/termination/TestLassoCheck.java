@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
-import cgsynt.interpol.ScriptAssumptionStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
@@ -17,6 +16,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutoma
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedRun;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLassoRun;
+import de.uni_freiburg.informatik.ultimate.core.coreplugin.services.ToolchainStorage;
 import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
@@ -25,7 +25,6 @@ import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceP
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.BasicIcfg;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.CfgSmtToolkit;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgEdge;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgEdgeFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgInternalTransition;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
@@ -58,10 +57,13 @@ public class TestLassoCheck {
 	
 	@Test
 	public void test() throws Exception {
-		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		CustomServiceProvider serviceProvider = new CustomServiceProvider(LogLevel.OFF);
+		PreferenceLayer 
+		
+		TraceGlobalVariables globalVars = new TraceGlobalVariables(serviceProvider);
 		
 		ManagedScript mScript = globalVars.getManagedScript();
-		IUltimateServiceProvider serviceProvider = globalVars.getService();
+		//IUltimateServiceProvider serviceProvider = globalVars.getService();
 		VariableFactory vf = globalVars.getVariableFactory();
 		
 		TraceToInterpolants tti = new TraceToInterpolants(mScript, serviceProvider, vf.getSymbolTable());

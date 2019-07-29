@@ -18,5 +18,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/LassoRanker"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Library-LassoRanker"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/BuchiAutomizer"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CoreRCP"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
