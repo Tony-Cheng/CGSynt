@@ -13,6 +13,10 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.Unm
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 
+/**
+ * An assumption statement in the trace.
+ *
+ */
 public class ScriptAssumptionStatement implements IAssumption {
 
 	private BoogieNonOldVar lhs;
@@ -45,10 +49,20 @@ public class ScriptAssumptionStatement implements IAssumption {
 		return getFormulaInternal(false);
 	}
 
+	/**
+	 * Return the negated trace that consists of only the statement that this object
+	 * represents.
+	 * 
+	 * @return
+	 */
 	public NestedWord<IAction> getNegatedTrace() {
 		return getTraceInternal(true);
 	}
 
+	/**
+	 * Return the negated formula.
+	 * @return
+	 */
 	public IAction getNegatedFormula() {
 		if (negated)
 			return getFormulaInternal(false);
@@ -126,8 +140,9 @@ public class ScriptAssumptionStatement implements IAssumption {
 	public UnmodifiableTransFormula getTransFormula() {
 		try {
 			throw new Exception();
-		} catch(Exception e) {
-			System.err.println("For assumption statements you must use the version of the method that takes one parameter!");
+		} catch (Exception e) {
+			System.err.println(
+					"For assumption statements you must use the version of the method that takes one parameter!");
 			System.exit(1);
 		}
 		return null;

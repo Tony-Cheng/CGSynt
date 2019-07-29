@@ -15,12 +15,23 @@ public interface IAssumption extends IStatement {
 	 */
 	public boolean isNegated();
 
+	/**
+	 * Return a copy of this assumption statement.
+	 * 
+	 * @return
+	 */
 	public IAssumption copy();
 
 	/**
 	 * Negate the assumption.
 	 */
 	void negate();
-	
+
+	/**
+	 * Return the formula of this statement.
+	 * 
+	 * @param negated
+	 * @return
+	 */
 	public UnmodifiableTransFormula getTransFormula(boolean negated);
 }

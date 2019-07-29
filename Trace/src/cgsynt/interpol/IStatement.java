@@ -23,13 +23,23 @@ public interface IStatement {
 	 * @return
 	 */
 	public IAction getFormula();
-	
+
 	/**
 	 * Return the string representation of an IStatement.
 	 */
 	public String toString();
-	
+
+	/**
+	 * Return true if the statement is an assumption statement.
+	 * 
+	 * @return
+	 */
 	public boolean isAssumption();
-	
+
+	/**
+	 * Return the formula for this statement.
+	 * 
+	 * @return
+	 */
 	public UnmodifiableTransFormula getTransFormula();
 }

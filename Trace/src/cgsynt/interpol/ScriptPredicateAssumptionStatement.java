@@ -15,6 +15,9 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.Basi
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 
+/**
+ * An assumption statement in hte trace.
+ */
 public class ScriptPredicateAssumptionStatement implements IAssumption {
 	IPredicate predicate;
 	private ManagedScript managedScript;
@@ -89,8 +92,9 @@ public class ScriptPredicateAssumptionStatement implements IAssumption {
 	public UnmodifiableTransFormula getTransFormula() {
 		try {
 			throw new Exception();
-		} catch(Exception e) {
-			System.err.println("For assumption statements you must use the version of the method that takes one parameter!");
+		} catch (Exception e) {
+			System.err.println(
+					"For assumption statements you must use the version of the method that takes one parameter!");
 			System.exit(1);
 		}
 		return null;

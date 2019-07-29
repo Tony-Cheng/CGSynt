@@ -15,6 +15,10 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.Unm
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 
+/**
+ * An assignment statement in the trace.
+ *
+ */
 public class ScriptAssignmentStatement implements IStatement {
 
 	private BoogieNonOldVar lhs;
