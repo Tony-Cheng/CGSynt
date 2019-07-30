@@ -36,7 +36,7 @@ public class TraceGlobalVariables {
 		}
 		managedScript = new ManagedScript(service, interpolator);
 		managedScript.getScript().setOption(":produce-proofs", true);
-		managedScript.getScript().setLogic(Logics.QF_ALIA);
+		managedScript.getScript().setLogic(Logics.QF_AUFNIRA);
 		variableFactory = new VariableFactory(managedScript);
 		traceInterpolator = new TraceToInterpolants(managedScript, service, variableFactory.getSymbolTable());
 	}
@@ -57,7 +57,7 @@ public class TraceGlobalVariables {
 		}
 		managedScript = new ManagedScript(service, interpolator);
 		managedScript.getScript().setOption(":produce-proofs", true);
-		managedScript.getScript().setLogic(Logics.QF_ALIA);
+		managedScript.getScript().setLogic(Logics.QF_AUFNIRA);
 		variableFactory = new VariableFactory(managedScript);
 		traceInterpolator = new TraceToInterpolants(managedScript, service, variableFactory.getSymbolTable());
 	}

@@ -284,4 +284,7 @@ public class TraceToInterpolants implements IInterpol {
 		return predicateFactory;
 	}
 
+	public ModifiableGlobalsTable getModifiableGlobalsTable() {
+		return modifiableGlobalsTable;
+	}
 }

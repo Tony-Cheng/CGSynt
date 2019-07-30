@@ -23,6 +23,8 @@ import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.preferences.RcpPreferenceProvider;
+import de.uni_freiburg.informatik.ultimate.lassoranker.AnalysisType;
+import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.BasicIcfg;
@@ -34,17 +36,23 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.debug
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.debugidentifiers.StringDebugIdentifier;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SmtUtils.SimplificationTechnique;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SmtUtils.XnfConversionTechnique;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SolverBuilder.SolverMode;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.tracecheck.ITraceCheckPreferences.AssertCodeBlockOrder;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.tracecheck.ITraceCheckPreferences.UnsatCores;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.tracecheck.TraceCheckReasonUnknown.RefinementStrategyExceptionBlacklist;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.taskidentifier.SubtaskFileIdentifier;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.taskidentifier.TaskIdentifier;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.BinaryStatePredicateManager;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.BuchiAutomizer;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.BuchiCegarLoopBenchmarkGenerator;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.LassoCheck;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.RankVarConstructor;
-import de.uni_freiburg.informatik.ultimate.plugins.generator.rcfgbuilder.RCFGBuilder;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.rcfgbuilder.preferences.RcfgPreferenceInitializer;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.CFG2NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.CegarAbsIntRunner;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.HoareAnnotation;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.PathProgramCache;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.PredicateFactoryForInterpolantAutomata;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.TraceAbstraction;
@@ -99,19 +107,39 @@ public class TestLassoCheck {
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_SIMPLIFICATION_TECHNIQUE, SimplificationTechnique.SIMPLIFY_BDD_FIRST_ORDER);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_XNF_CONVERSION_TECHNIQUE, XnfConversionTechnique.BDD_BASED);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_REFINEMENT_STRATEGY, RefinementStrategy.BADGER);
+		taPref.put(RcfgPreferenceInitializer.LABEL_SOLVER, SolverMode.Internal_SMTInterpol);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_REFINEMENT_STRATEGY_EXCEPTION_BLACKLIST, 
+				RefinementStrategyExceptionBlacklist.NONE);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_ASSERT_CODEBLOCKS_INCREMENTALLY, 
+				AssertCodeBlockOrder.INSIDE_LOOP_FIRST1);
+		
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_UNSAT_CORES, UnsatCores.IGNORE);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_LIVE_VARIABLES, false);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_ABSTRACT_INTERPRETATION_FOR_PATH_INVARIANTS, false);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_INTERPOLANTS_CONSOLIDATION, false);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_NONLINEAR_CONSTRAINTS_IN_PATHINVARIANTS, false);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_UNSAT_CORES_IN_PATHINVARIANTS, false);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_WEAKEST_PRECONDITION_IN_PATHINVARIANTS, false);
+	    taPref.put(TraceAbstractionPreferenceInitializer.LABEL_COMPUTE_COUNTEREXAMPLE, false);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_USE_PREDICATE_TRIE_BASED_PREDICATE_UNIFIER, false);
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Setting up the Refinement
-		RcpPreferenceProvider rcfgPref = new RcpPreferenceProvider(RCFGBuilder.class.getPackage().getName());
+		// Setting up the BuchiAutomizer Preferences
+		RcpPreferenceProvider buchiPref = new RcpPreferenceProvider(BuchiAutomizer.class.getPackage().getName());
 		
-		//RcfgPreferenceInitializer
+		buchiPref.put("Rank analysis", AnalysisType.LINEAR);
+		buchiPref.put("GNTA analysis", AnalysisType.LINEAR);
+		buchiPref.put("Number of GNTA directions", 10);
+		buchiPref.put("Template benchmark mode", false);
+		buchiPref.put("Try to simplify termination arguments", false);
+		buchiPref.put("Try twofold refinement", false);
 		
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		PreferenceLayer taLayer = new PreferenceLayer(taPref, this.getClass());
+		PreferenceLayer buchiLayer = new PreferenceLayer(buchiPref, this.getClass());
 		
-		PreferenceLayer prefLayer = new PreferenceLayer(pref, this.getClass());
-		
-		serviceProvider.addPreferenceProvider(prefLayer, TraceAbstraction.class.getPackage().getName());
-		
+		serviceProvider.addPreferenceProvider(taLayer, TraceAbstraction.class.getPackage().getName());
+		serviceProvider.addPreferenceProvider(buchiLayer, BuchiAutomizer.class.getPackage().getName());
+
 		TraceGlobalVariables globalVars = new TraceGlobalVariables(serviceProvider);
 		
 		ManagedScript mScript = globalVars.getManagedScript();
@@ -164,8 +192,8 @@ public class TestLassoCheck {
 		IcfgInternalTransition e1 = edgeFactory.createInternalTransition(l1, l2, new Payload(), ipp.getTransFormula());
 		IcfgInternalTransition e2 = edgeFactory.createInternalTransition(l2, l2, new Payload(), ipp.getTransFormula());
 		
-		IPredicate node1 = predicateFactory.newDebugPredicate("l1");
-		IPredicate node2 = predicateFactory.newDebugPredicate("l2");
+		HoareAnnotation node1 = predicateFactory.getNewHoareAnnotation(l1, tti.getModifiableGlobalsTable());
+		HoareAnnotation node2 = predicateFactory.getNewHoareAnnotation(l2, tti.getModifiableGlobalsTable());
 			
 		NestedWord<IcfgInternalTransition> stemWord = new NestedWord<>(e1, NestedWord.INTERNAL_POSITION);
 		ArrayList<IPredicate> stemStates = new ArrayList<>();
@@ -232,6 +260,8 @@ public class TestLassoCheck {
 				taskIdentifier,
 				benchmarker);
 		
-		System.out.println(check.getLassoCheckResult());
+		
+		
+		System.out.println(omega);
 	}
 }
