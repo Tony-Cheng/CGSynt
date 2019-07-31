@@ -1,4 +1,4 @@
-package cgsynt.synthesis;
+package cgsynt.automaton.factory;
 
 import java.util.HashSet;
 import java.util.Map;
