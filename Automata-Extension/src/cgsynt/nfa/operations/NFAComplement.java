@@ -3,29 +3,27 @@ package cgsynt.nfa.operations;
 import java.util.HashSet;
 import java.util.Set;
 
-import cgsynt.automaton.factory.PDeterminizeStateFactory;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
-import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
+import de.uni_freiburg.informatik.ultimate.automata.statefactory.IEmptyStackStateFactory;
 
-public class NFAComplement<LETTER> {
 
-	private NestedWordAutomaton<LETTER, IPredicate> aut;
+public class NFAComplement<LETTER, STATE> {
+
+	private NestedWordAutomaton<LETTER, STATE> aut;
 	private boolean resultComputed;
-	private NestedWordAutomaton<LETTER, IPredicate> result;
+	private NestedWordAutomaton<LETTER, STATE> result;
 	private AutomataLibraryServices services;
-	private BasicPredicateFactory predFactory;
+	private IEmptyStackStateFactory<STATE> stateFactory;
 
-	public NFAComplement(NestedWordAutomaton<LETTER, IPredicate> aut, AutomataLibraryServices services,
-			BasicPredicateFactory predFactory) {
+	public NFAComplement(NestedWordAutomaton<LETTER, STATE> aut, AutomataLibraryServices services,
+			IEmptyStackStateFactory<STATE> stateFactory) {
 		this.aut = aut;
 		this.resultComputed = false;
 		this.services = services;
-		this.predFactory = predFactory;
+		this.stateFactory = stateFactory;
 	}
 
 	public void computeResult() {
@@ -36,8 +34,8 @@ public class NFAComplement<LETTER> {
 			internalAlphabet.add(transition);
 		}
 		VpAlphabet<LETTER> vpAlphabet = new VpAlphabet<>(internalAlphabet, new HashSet<>(), new HashSet<>());
-		result = new NestedWordAutomaton<>(services, vpAlphabet, new PDeterminizeStateFactory(predFactory));
-		for (IPredicate state : aut.getStates()) {
+		result = new NestedWordAutomaton<>(services, vpAlphabet, stateFactory);
+		for (STATE state : aut.getStates()) {
 			boolean isInitial = false;
 			boolean isFinal = true;
 			if (aut.isFinal(state)) {
@@ -48,15 +46,15 @@ public class NFAComplement<LETTER> {
 			}
 			result.addState(isInitial, isFinal, state);
 		}
-		for (IPredicate state : aut.getStates()) {
-			for (OutgoingInternalTransition<LETTER, IPredicate> transition : aut.internalSuccessors(state)) {
+		for (STATE state : aut.getStates()) {
+			for (OutgoingInternalTransition<LETTER, STATE> transition : aut.internalSuccessors(state)) {
 				result.addInternalTransition(state, transition.getLetter(), transition.getSucc());
 			}
 		}
 		resultComputed = true;
 	}
 
-	public NestedWordAutomaton<LETTER, IPredicate> getResult() {
+	public NestedWordAutomaton<LETTER, STATE> getResult() {
 		if (!resultComputed)
 			return null;
 		return result;
