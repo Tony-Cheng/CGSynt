@@ -57,9 +57,12 @@ public class NestedWordAutomatonConvsersion {
 						transition.getSucc().toString());
 			}
 		}
+		resultComputed = true;
 	}
 
 	public NestedWordAutomaton<IStatement, String> getResult() {
+		if (!resultComputed)
+			return null;
 		return result;
 	}
 }
