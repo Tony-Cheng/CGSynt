@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cgsynt.automaton.factory.PDeterminizeStateFactory;
 import cgsynt.core.Specification;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
