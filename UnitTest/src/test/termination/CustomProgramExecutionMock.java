@@ -33,7 +33,7 @@ public class CustomProgramExecutionMock<TE, E> implements IProgramExecution<TE, 
 
 	@Override
 	public ProgramState<E> getInitialProgramState() {
-		return new ProgramState<>(Collections.emptyMap(), null);
+		return null;
 	}
 
 	@Override

@@ -46,7 +46,6 @@ public class CustomBacktranslationService implements IBacktranslationService{
 		return null;
 	}
 
-	@Override
 	public <SE> String translateProgramStateToString(ProgramState<SE> programState) {
 		return null;
 	}
