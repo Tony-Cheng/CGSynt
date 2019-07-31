@@ -142,7 +142,7 @@ public class ScriptAssumptionStatement implements IAssumption {
 			throw new Exception();
 		} catch (Exception e) {
 			System.err.println(
-					"For assumption statements you must use the version of the method that takes one parameter!");
+					"ScriptAssumptionStatement.getTrasnFormula: For assumption statements you must use the version of the method that takes one parameter!");
 			System.exit(1);
 		}
 		return null;
