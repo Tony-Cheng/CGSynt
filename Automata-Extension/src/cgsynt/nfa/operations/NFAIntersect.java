@@ -74,7 +74,32 @@ public class NFAIntersect<LETTER, STATE1, STATE2> {
 								letter)) {
 							for (OutgoingInternalTransition<LETTER, STATE2> transition2 : aut2
 									.internalSuccessors(state2, letter)) {
-								
+								boolean isFinal1 = false;
+								boolean isFinal2 = false;
+								NFAIntersectedState<STATE1, STATE2> source1 = new NFAIntersectedState<>(state1, state2,
+										1);
+								NFAIntersectedState<STATE1, STATE2> source2 = new NFAIntersectedState<>(state1, state2,
+										2);
+								NFAIntersectedState<STATE1, STATE2> dest1 = new NFAIntersectedState<>(
+										transition1.getSucc(), transition2.getSucc(), 1);
+								NFAIntersectedState<STATE1, STATE2> dest2 = new NFAIntersectedState<>(
+										transition1.getSucc(), transition2.getSucc(), 2);
+								if (aut1.isFinal(transition1.getSucc())) {
+									isFinal1 = true;
+								}
+								if (aut2.isFinal(transition2.getSucc())) {
+									isFinal2 = true;
+								}
+								if (isFinal1) {
+									result.addInternalTransition(source1, letter, dest2);
+								} else {
+									result.addInternalTransition(source1, letter, dest1);
+								}
+								if (isFinal2) {
+									result.addInternalTransition(source2, letter, dest1);
+								} else {
+									result.addInternalTransition(source2, letter, dest2);
+								}
 							}
 						}
 					}
@@ -82,6 +107,12 @@ public class NFAIntersect<LETTER, STATE1, STATE2> {
 			}
 		}
 		resultComputed = true;
+	}
+	
+	public NestedWordAutomaton<LETTER, NFAIntersectedState<STATE1, STATE2>> getResult() {
+		if (!resultComputed)
+			return null;
+		return result;
 	}
 
 }

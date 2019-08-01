@@ -2,10 +2,8 @@ package cgsynt.nfa.operations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
@@ -54,6 +52,9 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 			NFACounterexample<LETTER, STATE> counterexample = new NFACounterexample<>();
 			counterexample.repeatedState = state;
 			counterexample.loopStates.push(state);
+			if (aut.isFinal(state)) {
+				counterexample.loopContainFinalState = true;
+			}
 			counterexamples.add(counterexample);
 		}
 		if (len == 0) {
@@ -65,9 +66,10 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 		visitedStates.put(state, visitedStates.get(state) + 1);
 		for (OutgoingInternalTransition<LETTER, STATE> transition : aut.internalSuccessors(state)) {
 			List<NFACounterexample<LETTER, STATE>> destCounterexamples = generateCounterexamples(transition.getSucc(),
-					maxLen);
+					len - 1);
 			for (int i = 0; i < destCounterexamples.size(); i++) {
-				if (state.equals(destCounterexamples.get(i).repeatedState)) {
+				if (state.equals(destCounterexamples.get(i).repeatedState)
+						&& destCounterexamples.get(i).loopContainFinalState) {
 					NFACounterexample<LETTER, STATE> copy = destCounterexamples.get(i).makeCopy();
 					copy.repeatedState = null;
 					copy.loopStates.push(state);
@@ -76,6 +78,9 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 					counterexamples.add(copy);
 				}
 				if (!state.equals(destCounterexamples.get(i).repeatedState) || visitedStates.get(state) > 1) {
+					if (aut.isFinal(state)) {
+						destCounterexamples.get(i).loopContainFinalState = true;
+					}
 					if (destCounterexamples.get(i).repeatedState == null) {
 						destCounterexamples.get(i).stemTransitions.push(transition.getLetter());
 						destCounterexamples.get(i).stemStates.push(state);
