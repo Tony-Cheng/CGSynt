@@ -8,6 +8,7 @@ public class NFACounterexample<LETTER, STATE> {
 	public Stack<LETTER> stemTransitions;
 	public Stack<STATE> stemStates;
 	public STATE repeatedState;
+	public boolean loopContainFinalState;
 
 	public NFACounterexample() {
 		this.loopTransitions = new Stack<>();
@@ -15,6 +16,7 @@ public class NFACounterexample<LETTER, STATE> {
 		this.stemTransitions = new Stack<>();
 		this.stemStates = new Stack<>();
 		this.repeatedState = null;
+		this.loopContainFinalState = false;
 	}
 
 	public NFACounterexample<LETTER, STATE> makeCopy() {
