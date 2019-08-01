@@ -66,7 +66,7 @@ public class TraceGlobalVariables {
 		return traceInterpolator;
 	}
 
-	public BasicPredicateFactory getPredicateFactory() {
+	public PredicateFactory getPredicateFactory() {
 		return traceInterpolator.getPredicateFactory();
 	}
 

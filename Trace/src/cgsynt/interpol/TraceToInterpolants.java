@@ -37,6 +37,7 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.Basi
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.PredicateUnifier;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.tracecheck.ITraceCheckPreferences.AssertCodeBlockOrder;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.InterpolationTechnique;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.singletracecheck.InterpolatingTraceCheckCraig;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.singletracecheck.TraceCheck;
@@ -57,7 +58,7 @@ public class TraceToInterpolants implements IInterpol {
 	private SmtSymbols smtSymbols;
 	private CfgSmtToolkit toolkit;
 	private SortedMap<Integer, IPredicate> pendingContexts;
-	private BasicPredicateFactory predicateFactory;
+	private PredicateFactory predicateFactory;
 	private PredicateUnifier pUnifier;
 	private IPredicate preconditions;
 	private IPredicate postconditions;
@@ -85,7 +86,7 @@ public class TraceToInterpolants implements IInterpol {
 		toolkit = new CfgSmtToolkit(modifiableGlobalsTable, managedScript, symbolTable, procedures, inParams, outParams,
 				icfgEdgeFactory, concurInfo, smtSymbols);
 		pendingContexts = new TreeMap<>();
-		predicateFactory = new BasicPredicateFactory(service, managedScript, symbolTable, SimplificationTechnique.NONE,
+		predicateFactory = new PredicateFactory(service, managedScript, symbolTable, SimplificationTechnique.NONE,
 				XnfConversionTechnique.BDD_BASED);
 		pUnifier = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
@@ -116,7 +117,7 @@ public class TraceToInterpolants implements IInterpol {
 		toolkit = new CfgSmtToolkit(modifiableGlobalsTable, managedScript, symbolTable, procedures, inParams, outParams,
 				icfgEdgeFactory, concurInfo, smtSymbols);
 		pendingContexts = new TreeMap<>();
-		predicateFactory = new BasicPredicateFactory(service, managedScript, symbolTable, SimplificationTechnique.NONE,
+		predicateFactory = new PredicateFactory(service, managedScript, symbolTable, SimplificationTechnique.NONE,
 				XnfConversionTechnique.BDD_BASED);
 		pUnifier = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
@@ -280,7 +281,7 @@ public class TraceToInterpolants implements IInterpol {
 	 * 
 	 * @return
 	 */
-	public BasicPredicateFactory getPredicateFactory() {
+	public PredicateFactory getPredicateFactory() {
 		return predicateFactory;
 	}
 
