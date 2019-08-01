@@ -16,7 +16,7 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 	private boolean resultComputed;
 	private int maxLen;
 	private Map<STATE, Integer> visitedStates;
-	private List<Counterexample<LETTER, STATE>> result;
+	private List<NFACounterexample<LETTER, STATE>> result;
 
 	public NFACounterexampleGeneration(NestedWordAutomaton<LETTER, STATE> aut, int maxLen) {
 		this.aut = aut;
@@ -31,7 +31,7 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 		this.visitedStates = new HashMap<>();
 		this.result = new ArrayList<>();
 		for (STATE initialState : aut.getInitialStates()) {
-			List<Counterexample<LETTER, STATE>> counterexamples = generateCounterexamples(initialState, maxLen);
+			List<NFACounterexample<LETTER, STATE>> counterexamples = generateCounterexamples(initialState, maxLen);
 			for (int i = counterexamples.size() - 1; i >= 0; i--) {
 				if (counterexamples.get(i).repeatedState != null) {
 					counterexamples.remove(i);
@@ -42,16 +42,16 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 		resultComputed = true;
 	}
 
-	public List<Counterexample<LETTER, STATE>> getResult() {
+	public List<NFACounterexample<LETTER, STATE>> getResult() {
 		if (!resultComputed)
 			return null;
 		return result;
 	}
 
-	private List<Counterexample<LETTER, STATE>> generateCounterexamples(STATE state, int len) {
-		List<Counterexample<LETTER, STATE>> counterexamples = new ArrayList<>();
+	private List<NFACounterexample<LETTER, STATE>> generateCounterexamples(STATE state, int len) {
+		List<NFACounterexample<LETTER, STATE>> counterexamples = new ArrayList<>();
 		if (visitedStates.containsKey(state) && visitedStates.get(state) > 0) {
-			Counterexample<LETTER, STATE> counterexample = new Counterexample<>();
+			NFACounterexample<LETTER, STATE> counterexample = new NFACounterexample<>();
 			counterexample.repeatedState = state;
 			counterexample.loopStates.push(state);
 			counterexamples.add(counterexample);
@@ -64,11 +64,11 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 		}
 		visitedStates.put(state, visitedStates.get(state) + 1);
 		for (OutgoingInternalTransition<LETTER, STATE> transition : aut.internalSuccessors(state)) {
-			List<Counterexample<LETTER, STATE>> destCounterexamples = generateCounterexamples(transition.getSucc(),
+			List<NFACounterexample<LETTER, STATE>> destCounterexamples = generateCounterexamples(transition.getSucc(),
 					maxLen);
 			for (int i = 0; i < destCounterexamples.size(); i++) {
 				if (state.equals(destCounterexamples.get(i).repeatedState)) {
-					Counterexample<LETTER, STATE> copy = destCounterexamples.get(i).makeCopy();
+					NFACounterexample<LETTER, STATE> copy = destCounterexamples.get(i).makeCopy();
 					copy.repeatedState = null;
 					copy.loopStates.push(state);
 					copy.loopTransitions.push(transition.getLetter());
@@ -91,31 +91,4 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 		visitedStates.put(state, visitedStates.get(state) - 1);
 		return counterexamples;
 	}
-}
-
-class Counterexample<LETTER, STATE> {
-	public Stack<LETTER> loopTransitions;
-	public Stack<STATE> loopStates;
-	public Stack<LETTER> stemTransitions;
-	public Stack<STATE> stemStates;
-	public STATE repeatedState;
-
-	public Counterexample() {
-		this.loopTransitions = new Stack<>();
-		this.loopStates = new Stack<>();
-		this.stemTransitions = new Stack<>();
-		this.stemStates = new Stack<>();
-		this.repeatedState = null;
-	}
-
-	public Counterexample<LETTER, STATE> makeCopy() {
-		Counterexample<LETTER, STATE> copy = new Counterexample<>();
-		copy.repeatedState = this.repeatedState;
-		copy.loopTransitions.addAll(this.loopTransitions);
-		copy.loopStates.addAll(this.loopStates);
-		copy.stemStates.addAll(this.stemStates);
-		copy.stemTransitions.addAll(this.stemTransitions);
-		return copy;
-	}
-
 }
