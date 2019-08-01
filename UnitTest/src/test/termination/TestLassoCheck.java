@@ -8,16 +8,20 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import cgsynt.automaton.factory.PDeterminizeStateFactory;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.ScriptAssumptionStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
+import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.AutomatonDefinitionPrinter.Format;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedRun;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLassoRun;
 import de.uni_freiburg.informatik.ultimate.core.coreplugin.services.PreferenceLayer;
 import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
@@ -25,6 +29,7 @@ import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.preferences.RcpPreferenceProvider;
 import de.uni_freiburg.informatik.ultimate.lassoranker.AnalysisType;
+import de.uni_freiburg.informatik.ultimate.lassoranker.termination.TerminationArgument;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.BasicIcfg;
@@ -894,6 +899,7 @@ public class TestLassoCheck {
 		System.out.println(omega);
 	}
 
+	@Test
 	public void testManualOmegaConstruction() throws Exception {
 		CustomServiceProvider serviceProvider = new CustomServiceProvider(LogLevel.OFF);
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -922,7 +928,7 @@ public class TestLassoCheck {
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_ABSINT_MODE, AbstractInterpretationMode.USE_CANONICAL);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_SIMPLIFICATION_TECHNIQUE, SimplificationTechnique.SIMPLIFY_BDD_FIRST_ORDER);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_XNF_CONVERSION_TECHNIQUE, XnfConversionTechnique.BDD_BASED);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_REFINEMENT_STRATEGY, RefinementStrategy.CAMEL);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_REFINEMENT_STRATEGY, RefinementStrategy.TAIPAN);
 		taPref.put(RcfgPreferenceInitializer.LABEL_SOLVER, SolverMode.Internal_SMTInterpol);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_REFINEMENT_STRATEGY_EXCEPTION_BLACKLIST, 
 				RefinementStrategyExceptionBlacklist.NONE);
@@ -1090,7 +1096,29 @@ public class TestLassoCheck {
 				taPrefs.interprocedural(), predicateFactory);
 		*/
 		
-		INestedWordAutomaton<IcfgInternalTransition, IPredicate> omega = new NestedWordAutomaton();
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Omega Construction
+		AutomataLibraryServices autLib = new AutomataLibraryServices(serviceProvider);
+		
+		Set<IcfgInternalTransition> letters = new HashSet<>();
+		letters.add(e1);
+		letters.add(e2);
+		letters.add(e3);
+		letters.add(e4);
+		VpAlphabet<IcfgInternalTransition> alphabet = new VpAlphabet<>(letters);
+		
+		NestedWordAutomaton<IcfgInternalTransition, IPredicate> omega = new NestedWordAutomaton<>(autLib, alphabet, 
+				new PDeterminizeStateFactory(predicateFactory));
+		omega.addState(true, false, node1);
+		omega.addState(false, false, node2);
+		omega.addState(false, true, node3);
+		omega.addState(false, false, node4);
+		omega.addInternalTransition(node1, e1, node2);
+		omega.addInternalTransition(node2, e2, node3);
+		omega.addInternalTransition(node3, e3, node4);
+		omega.addInternalTransition(node4, e4, node3);
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		System.out.println(omega);
 	
@@ -1111,6 +1139,7 @@ public class TestLassoCheck {
 				taskIdentifier,
 				benchmarker);
 		
-		System.out.println(omega);
+		TerminationArgument termArg = bspm.getTerminationArgument();
+		System.out.println(termArg.getRankingFunction());
 	}
 }
