@@ -15,7 +15,7 @@ import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
-public class CounterexampleGeneration {
+public class TestCounterexampleGeneration {
 
 	@Test
 	void test1() {
