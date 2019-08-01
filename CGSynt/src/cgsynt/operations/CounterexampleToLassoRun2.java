@@ -11,7 +11,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLasso
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IIcfgTransition;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
-public class CounterexampleToLassoRun2<LETTER extends IIcfgTransition<?>, STATE extends IPredicate> {
+public class CounterexampleToLassoRun2<LETTER, STATE> {
 	private List<NFACounterexample<LETTER, STATE>> counterexamples;
 	private boolean resultComputed;
 	private List<NestedLassoRun<LETTER, STATE>> result;
