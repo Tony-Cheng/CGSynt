@@ -12,5 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Trace"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SMTInterpol"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/TraceAbstraction"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/BuchiAutomizer"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
