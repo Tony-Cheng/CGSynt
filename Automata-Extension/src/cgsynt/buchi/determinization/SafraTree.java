@@ -22,9 +22,11 @@ public class SafraTree<STATE> {
 	private Set<STATE> initialStates;
 	private int e;
 	private int f;
+	private int minGreenNode;
+	private int numBuchiStates;
 	private int greatestName;
 
-	public SafraTree(Set<STATE> initialStates) {
+	public SafraTree(Set<STATE> initialStates, int numBuchiStates) {
 		this.initialStates = initialStates;
 		this.states = new HashSet<>();
 		this.nameMap = new HashMap<>();
@@ -36,6 +38,8 @@ public class SafraTree<STATE> {
 		this.greatestName = 0;
 		this.e = 2;
 		this.f = 1;
+		this.numBuchiStates = numBuchiStates;
+		this.minGreenNode = numBuchiStates + 1;
 		addRoot(initialStates);
 	}
 
@@ -106,8 +110,33 @@ public class SafraTree<STATE> {
 		return nameMap.get(node);
 	}
 
+	public void setGreenNode(Integer node) {
+		minGreenNode = Math.min(minGreenNode, node);
+		f = minGreenNode;
+		for (Integer child : childrenMap.get(node)) {
+			removeSubtree(child);
+		}
+		childrenMap.get(node).clear();
+	}
+	
+	public Set<Integer> getChildren(Integer node) {
+		return childrenMap.get(node);
+	}
+
+	private void removeSubtree(Integer node) {
+		Set<Integer> children = childrenMap.get(node);
+		states.remove(node);
+		parentMap.remove(node);
+		labelMap.remove(node);
+		nameMap.remove(node);
+		for (Integer child : children) {
+			removeSubtree(child);
+		}
+		children.remove(node);
+	}
+
 	public SafraTree<STATE> copy() {
-		SafraTree<STATE> tree = new SafraTree<>(initialStates);
+		SafraTree<STATE> tree = new SafraTree<>(initialStates, this.numBuchiStates);
 		tree.states.addAll(states);
 		tree.nameMap.putAll(nameMap);
 		tree.root = root;
@@ -117,6 +146,8 @@ public class SafraTree<STATE> {
 		tree.rem.putAll(rem);
 		tree.e = e;
 		tree.f = f;
+		tree.minGreenNode = minGreenNode;
+		tree.greatestName = greatestName;
 		return tree;
 	}
 

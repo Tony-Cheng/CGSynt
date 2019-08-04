@@ -44,7 +44,7 @@ public class BuchiDeterminization<LETTER, STATE> {
 		if (resultComputed)
 			return;
 		this.result = new ParityAutomaton<>(services, vpAlphabet, emptyStateFactory);
-		SafraTree<STATE> initialTree = new SafraTree<>(buchiAut.getInitialStates());
+		SafraTree<STATE> initialTree = new SafraTree<>(buchiAut.getInitialStates(), buchiAut.getStates().size());
 		this.visitedStates = new HashSet<>();
 		this.toVisitStates = new Stack<>();
 		toVisitStates.push(initialTree);
@@ -52,9 +52,11 @@ public class BuchiDeterminization<LETTER, STATE> {
 		while (!toVisitStates.isEmpty()) {
 			SafraTree<STATE> next = toVisitStates.pop();
 			for (LETTER letter : buchiAut.getAlphabet()) {
-				step1(next, letter);
-				step2(next);
-				step3(next);
+				SafraTree<STATE> copy = next.copy();
+				step1(copy, letter);
+				step2(copy);
+				step3(copy);
+				step4(copy);
 			}
 		}
 		resultComputed = true;
@@ -105,7 +107,23 @@ public class BuchiDeterminization<LETTER, STATE> {
 				}
 			}
 		}
+	}
 
+	private void step4(SafraTree<STATE> tree) {
+		for (Integer node : tree.getStates()) {
+			Set<STATE> union = getUnion(tree, tree.getChildren(node));
+			if (tree.getLabels(node).equals(union)) {
+				tree.setGreenNode(node);
+			}
+		}
+	}
+
+	private Set<STATE> getUnion(SafraTree<STATE> tree, Set<Integer> nodes) {
+		Set<STATE> union = new HashSet<>();
+		for (Integer node : nodes) {
+			union.addAll(tree.getLabels(node));
+		}
+		return union;
 	}
 
 	private Set<STATE> findIntersection(Collection<STATE> set1, Set<STATE> set2) {
