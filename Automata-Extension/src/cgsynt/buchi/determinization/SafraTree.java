@@ -14,15 +14,18 @@ public class SafraTree<STATE> {
 
 	private Set<Integer> states;
 	private Map<Integer, Integer> nameMap;
-	private final int root;
+	private int root;
 	private Map<Integer, Integer> parentMap;
 	private Map<Integer, Set<Integer>> childrenMap;
 	private Map<Integer, Set<STATE>> labelMap;
 	private Map<Integer, Integer> rem;
+	private Set<STATE> initialStates;
 	private int e;
 	private int f;
+	private int greatestName;
 
-	public SafraTree() {
+	public SafraTree(Set<STATE> initialStates) {
+		this.initialStates = initialStates;
 		this.states = new HashSet<>();
 		this.nameMap = new HashMap<>();
 		this.root = 1;
@@ -30,18 +33,44 @@ public class SafraTree<STATE> {
 		this.childrenMap = new HashMap<>();
 		this.labelMap = new HashMap<>();
 		this.rem = new HashMap<>();
+		this.greatestName = 0;
 		this.e = 2;
 		this.f = 1;
+		addRoot(initialStates);
 	}
 
-	private void addRoot() {
+	private void addRoot(Set<STATE> initialStates) {
 		states.add(root);
 		nameMap.put(root, 1);
 		childrenMap.put(root, new HashSet<>());
-		childrenMap.get(root).add(root);
-		parentMap.put(root, root);
-		labelMap.put(root, new HashSet<>());
+		parentMap.put(root, null);
+		labelMap.put(root, initialStates);
 		rem.put(root, 0);
+		this.greatestName++;
+	}
+
+	public Set<Integer> getStates() {
+		return this.states;
+	}
+
+	public Integer addNode(Integer parent, Set<STATE> label) {
+		Integer next = greatestName + 1;
+		greatestName += 1;
+		states.add(next);
+		nameMap.put(next, next);
+		parentMap.put(next, parent);
+		childrenMap.put(next, new HashSet<>());
+		childrenMap.get(parent).add(next);
+		labelMap.put(next, label);
+		return next;
+	}
+
+	public Set<Integer> getSiblings(Integer node) {
+		if (parentMap.get(node) != null) {
+			Integer parent = parentMap.get(node);
+			return childrenMap.get(parent);
+		}
+		return null;
 	}
 
 	public Set<STATE> getLabels(Integer node) {
@@ -71,6 +100,94 @@ public class SafraTree<STATE> {
 
 	public int getRem(Integer node) {
 		return rem.get(node);
+	}
+
+	public int getName(Integer node) {
+		return nameMap.get(node);
+	}
+
+	public SafraTree<STATE> copy() {
+		SafraTree<STATE> tree = new SafraTree<>(initialStates);
+		tree.states.addAll(states);
+		tree.nameMap.putAll(nameMap);
+		tree.root = root;
+		tree.parentMap.putAll(parentMap);
+		tree.childrenMap.putAll(childrenMap);
+		tree.labelMap.putAll(labelMap);
+		tree.rem.putAll(rem);
+		tree.e = e;
+		tree.f = f;
+		return tree;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((childrenMap == null) ? 0 : childrenMap.hashCode());
+		result = prime * result + e;
+		result = prime * result + f;
+		result = prime * result + ((initialStates == null) ? 0 : initialStates.hashCode());
+		result = prime * result + ((labelMap == null) ? 0 : labelMap.hashCode());
+		result = prime * result + ((nameMap == null) ? 0 : nameMap.hashCode());
+		result = prime * result + ((parentMap == null) ? 0 : parentMap.hashCode());
+		result = prime * result + ((rem == null) ? 0 : rem.hashCode());
+		result = prime * result + root;
+		result = prime * result + ((states == null) ? 0 : states.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SafraTree other = (SafraTree) obj;
+		if (childrenMap == null) {
+			if (other.childrenMap != null)
+				return false;
+		} else if (!childrenMap.equals(other.childrenMap))
+			return false;
+		if (e != other.e)
+			return false;
+		if (f != other.f)
+			return false;
+		if (initialStates == null) {
+			if (other.initialStates != null)
+				return false;
+		} else if (!initialStates.equals(other.initialStates))
+			return false;
+		if (labelMap == null) {
+			if (other.labelMap != null)
+				return false;
+		} else if (!labelMap.equals(other.labelMap))
+			return false;
+		if (nameMap == null) {
+			if (other.nameMap != null)
+				return false;
+		} else if (!nameMap.equals(other.nameMap))
+			return false;
+		if (parentMap == null) {
+			if (other.parentMap != null)
+				return false;
+		} else if (!parentMap.equals(other.parentMap))
+			return false;
+		if (rem == null) {
+			if (other.rem != null)
+				return false;
+		} else if (!rem.equals(other.rem))
+			return false;
+		if (root != other.root)
+			return false;
+		if (states == null) {
+			if (other.states != null)
+				return false;
+		} else if (!states.equals(other.states))
+			return false;
+		return true;
 	}
 
 }
