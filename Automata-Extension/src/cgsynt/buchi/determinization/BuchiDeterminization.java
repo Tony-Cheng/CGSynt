@@ -57,6 +57,14 @@ public class BuchiDeterminization<LETTER, STATE> {
 				step2(copy);
 				step3(copy);
 				step4(copy);
+				step5(copy);
+				step6(copy);
+				if (!visitedStates.contains(copy)) {
+					result.addState(false, false, copy);
+					result.addInternalTransition(next, letter, copy);
+					visitedStates.add(copy);
+					toVisitStates.add(copy);
+				}
 			}
 		}
 		resultComputed = true;
@@ -118,6 +126,18 @@ public class BuchiDeterminization<LETTER, STATE> {
 		}
 	}
 
+	private void step5(SafraTree<STATE> tree) {
+		for (Integer node : tree.getStates()) {
+			if (tree.getLabels(node).isEmpty()) {
+				tree.removeNode(node);
+			}
+		}
+	}
+
+	private void step6(SafraTree<STATE> tree) {
+		tree.compressTree();
+	}
+
 	private Set<STATE> getUnion(SafraTree<STATE> tree, Set<Integer> nodes) {
 		Set<STATE> union = new HashSet<>();
 		for (Integer node : nodes) {
@@ -135,4 +155,5 @@ public class BuchiDeterminization<LETTER, STATE> {
 		}
 		return intersection;
 	}
+
 }

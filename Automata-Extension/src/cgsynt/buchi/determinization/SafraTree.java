@@ -5,12 +5,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import cgsynt.tree.parity.IParityState;
+
 /**
  * An implementation of a compact Safra tree described in the paper below:
  * https://arxiv.org/pdf/0705.2205.pdf
  *
  */
-public class SafraTree<STATE> {
+public class SafraTree<STATE> implements IParityState {
 
 	private Set<Integer> states;
 	private Map<Integer, Integer> nameMap;
@@ -18,11 +20,12 @@ public class SafraTree<STATE> {
 	private Map<Integer, Integer> parentMap;
 	private Map<Integer, Set<Integer>> childrenMap;
 	private Map<Integer, Set<STATE>> labelMap;
-	private Map<Integer, Integer> rem;
+	private Set<Integer> rem;
 	private Set<STATE> initialStates;
 	private int e;
 	private int f;
 	private int minGreenNode;
+	private int minRemovedNode;
 	private int numBuchiStates;
 	private int greatestName;
 
@@ -34,12 +37,13 @@ public class SafraTree<STATE> {
 		this.parentMap = new HashMap<>();
 		this.childrenMap = new HashMap<>();
 		this.labelMap = new HashMap<>();
-		this.rem = new HashMap<>();
+		this.rem = new HashSet<>();
 		this.greatestName = 0;
 		this.e = 2;
 		this.f = 1;
 		this.numBuchiStates = numBuchiStates;
 		this.minGreenNode = numBuchiStates + 1;
+		this.minRemovedNode = numBuchiStates + 1;
 		addRoot(initialStates);
 	}
 
@@ -49,7 +53,6 @@ public class SafraTree<STATE> {
 		childrenMap.put(root, new HashSet<>());
 		parentMap.put(root, null);
 		labelMap.put(root, initialStates);
-		rem.put(root, 0);
 		this.greatestName++;
 	}
 
@@ -102,10 +105,6 @@ public class SafraTree<STATE> {
 		return union.equals(labelMap.get(node));
 	}
 
-	public int getRem(Integer node) {
-		return rem.get(node);
-	}
-
 	public int getName(Integer node) {
 		return nameMap.get(node);
 	}
@@ -118,9 +117,22 @@ public class SafraTree<STATE> {
 		}
 		childrenMap.get(node).clear();
 	}
-	
+
 	public Set<Integer> getChildren(Integer node) {
 		return childrenMap.get(node);
+	}
+
+	public void removeNode(Integer node) {
+		minRemovedNode = Math.min(minRemovedNode, node);
+		f = minRemovedNode;
+		states.remove(node);
+		nameMap.remove(node);
+		if (parentMap.get(node) != null) {
+			childrenMap.get(parentMap.get(node)).remove(node);
+		}
+		parentMap.remove(node);
+		labelMap.remove(node);
+		rem.add(node);
 	}
 
 	private void removeSubtree(Integer node) {
@@ -133,6 +145,7 @@ public class SafraTree<STATE> {
 			removeSubtree(child);
 		}
 		children.remove(node);
+		rem.add(node);
 	}
 
 	public SafraTree<STATE> copy() {
@@ -143,12 +156,36 @@ public class SafraTree<STATE> {
 		tree.parentMap.putAll(parentMap);
 		tree.childrenMap.putAll(childrenMap);
 		tree.labelMap.putAll(labelMap);
-		tree.rem.putAll(rem);
+		tree.rem.addAll(rem);
 		tree.e = e;
 		tree.f = f;
 		tree.minGreenNode = minGreenNode;
 		tree.greatestName = greatestName;
 		return tree;
+	}
+
+	public void compressTree() {
+		int sum = 0;
+		for (int i = 1; i < this.greatestName; i++) {
+			if (rem.contains(i)) {
+				sum++;
+			} else {
+				states.add(i - sum);
+				states.remove(i);
+				nameMap.put(i - sum, nameMap.get(i));
+				nameMap.remove(i);
+				for (Integer child : childrenMap.get(i)) {
+					parentMap.put(child, i - sum);
+				}
+				childrenMap.remove(i);
+				parentMap.put(i - sum, parentMap.get(i));
+				parentMap.remove(i);
+				labelMap.put(i - sum, labelMap.get(i));
+				labelMap.remove(i - sum);
+			}
+		}
+		greatestName = greatestName - sum;
+		rem.clear();
 	}
 
 	@Override
@@ -219,6 +256,21 @@ public class SafraTree<STATE> {
 		} else if (!states.equals(other.states))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int getRank() {
+		if (e == 1) {
+			return -1;
+		} else if (f == 1 && e > 1) {
+			return 0;
+		} else if (f >= e) {
+			int i = e - 2;
+			return 2 * i + 1;
+		} else {
+			int i = f - 2;
+			return 2 * i + 2;
+		}
 	}
 
 }
