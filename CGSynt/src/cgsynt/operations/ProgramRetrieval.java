@@ -12,6 +12,7 @@ import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.IntersectState;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 /**
  * A slow exponential approach is implemented. A faster approach requires
@@ -22,15 +23,16 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 public class ProgramRetrieval<LETTER extends IRankedLetter> {
 
 	private IStatement[] statements;
-	private BuchiTreeAutomaton<LETTER, IntersectState<String, String>> tree;
-	private Set<IntersectState<String, String>> visitedStates;
-	private Set<IntersectState<String, String>> repeatedStates;
+	private BuchiTreeAutomaton<LETTER, IntersectState<IPredicate, IPredicate>> tree;
+	private Set<IntersectState<IPredicate, IPredicate>> visitedStates;
+	private Set<IntersectState<IPredicate, IPredicate>> repeatedStates;
 	private List<String> currentStatements;
-	private Map<IntersectState<String, String>, BuchiTreeAutomatonRule<LETTER, IntersectState<String, String>>> goodProgram;
+	private Map<IntersectState<IPredicate, IPredicate>, BuchiTreeAutomatonRule<LETTER, IntersectState<IPredicate, IPredicate>>> goodProgram;
 	private boolean resultComputed;
 
-	public ProgramRetrieval(BuchiTreeAutomaton<LETTER, IntersectState<String, String>> tree, IStatement[] statements,
-			Map<IntersectState<String, String>, BuchiTreeAutomatonRule<LETTER, IntersectState<String, String>>> goodProgram) {
+	public ProgramRetrieval(BuchiTreeAutomaton<LETTER, IntersectState<IPredicate, IPredicate>> tree,
+			IStatement[] statements,
+			Map<IntersectState<IPredicate, IPredicate>, BuchiTreeAutomatonRule<LETTER, IntersectState<IPredicate, IPredicate>>> goodProgram) {
 		this.statements = statements;
 		this.tree = tree;
 		this.visitedStates = new HashSet<>();
@@ -44,7 +46,7 @@ public class ProgramRetrieval<LETTER extends IRankedLetter> {
 		if (resultComputed)
 			return;
 		resultComputed = true;
-		for (IntersectState<String, String> initial : tree.getInitStates()) {
+		for (IntersectState<IPredicate, IPredicate> initial : tree.getInitStates()) {
 			retrieveProgram(initial);
 			return;
 		}
@@ -57,17 +59,18 @@ public class ProgramRetrieval<LETTER extends IRankedLetter> {
 		return null;
 	}
 
-	private void retrieveProgram(IntersectState<String, String> state) {
+	private void retrieveProgram(IntersectState<IPredicate, IPredicate> state) {
 		if (visitedStates.contains(state)) {
 			repeatedStates.add(state);
 			return;
 		}
-		for (BuchiTreeAutomatonRule<LETTER, IntersectState<String, String>> transition : tree.getRulesBySource(state)) {
+		for (BuchiTreeAutomatonRule<LETTER, IntersectState<IPredicate, IPredicate>> transition : tree
+				.getRulesBySource(state)) {
 			if (!goodProgram.get(state).equals(transition))
 				continue;
 			Object[] retrievalResult = retrieveValidStatements(transition);
 			@SuppressWarnings("unchecked")
-			List<IntersectState<String, String>> validProgramStatements = (List<IntersectState<String, String>>) retrievalResult[0];
+			List<IntersectState<IPredicate, IPredicate>> validProgramStatements = (List<IntersectState<IPredicate, IPredicate>>) retrievalResult[0];
 			@SuppressWarnings("unchecked")
 			List<String> validStatementStrings = (List<String>) retrievalResult[1];
 			if (validProgramStatements.size() == 0) {
@@ -99,19 +102,20 @@ public class ProgramRetrieval<LETTER extends IRankedLetter> {
 		return;
 	}
 
-	public Object[] retrieveValidStatements(BuchiTreeAutomatonRule<LETTER, IntersectState<String, String>> transition) {
-		List<IntersectState<String, String>> validProgramStatements = new ArrayList<>();
+	public Object[] retrieveValidStatements(
+			BuchiTreeAutomatonRule<LETTER, IntersectState<IPredicate, IPredicate>> transition) {
+		List<IntersectState<IPredicate, IPredicate>> validProgramStatements = new ArrayList<>();
 		List<String> validStatementStrings = new ArrayList<>();
 		validProgramStatements.add(null);
 		validProgramStatements.add(null);
 		validStatementStrings.add(null);
 		validStatementStrings.add(null);
 		for (int i = 0; i < transition.getDest().size(); i++) {
-			if (transition.getDest().get(i).getState1().equals("bottom")) {
+			if (transition.getDest().get(i).getState1().toString().equals("bottom")) {
 				validProgramStatements.set(0, transition.getDest().get(i));
 				validStatementStrings.set(0, statements[i].toString());
 			}
-			if (transition.getDest().get(i).getState1().equals("left")) {
+			if (transition.getDest().get(i).getState1().toString().equals("left")) {
 				validProgramStatements.set(1, transition.getDest().get(i));
 				validStatementStrings.set(1, statements[i].toString());
 

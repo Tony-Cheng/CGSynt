@@ -279,16 +279,15 @@ public class SynthesisLoop {
 		}
 	}
 
-	// public void printProgram() {
-	// IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
-	// for (int i = 0; i < statements.length; i++) {
-	// statements[i] = mTransitionAlphabet.get(i);
-	// }
-	// ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result,
-	// statements, goodProgram);
-	// retrieve.computeResult();
-	// for (String statement : retrieve.getResult()) {
-	// System.out.println(statement);
-	// }
-	// }
+	public void printProgram() {
+		IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
+		for (int i = 0; i < statements.length; i++) {
+			statements[i] = mTransitionAlphabet.get(i);
+		}
+		ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result, statements, goodProgram);
+		retrieve.computeResult();
+		for (String statement : retrieve.getResult()) {
+			System.out.println(statement);
+		}
+	}
 }
