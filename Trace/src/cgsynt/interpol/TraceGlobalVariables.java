@@ -1,5 +1,6 @@
 package cgsynt.interpol;
 
+import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.logic.LoggingScript;
@@ -11,75 +12,90 @@ import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.pr
 import de.uni_freiburg.informatik.ultimate.smtinterpol.DefaultLogger;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
+import de.uni_freiburg.informatik.ultimate.test.mocks.ConsoleLogger;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
 public class TraceGlobalVariables {
 
-	private ManagedScript managedScript;
-	private VariableFactory variableFactory;
-	private IUltimateServiceProvider service;
-	private TraceToInterpolants traceInterpolator;
-
+	private ManagedScript mManagedScript;
+	private VariableFactory mVariableFactory;
+	private IUltimateServiceProvider mService;
+	private TraceToInterpolants mTraceInterpolator;
+	
+	private ILogger mLogger;
+	private LogProxy mProxyLogger;
+	
 	public TraceGlobalVariables() throws Exception {
-		this.service = UltimateMocks.createUltimateServiceProviderMock(LogLevel.OFF);
-		LogProxy logger = new DefaultLogger();
+		mService = UltimateMocks.createUltimateServiceProviderMock(LogLevel.OFF);
+		
+		mProxyLogger = new DefaultLogger();
+		mLogger = new ConsoleLogger();
+		mProxyLogger.setLoglevel(LogProxy.LOGLEVEL_OFF);
+		mLogger.setLevel(LogLevel.OFF);
+		
 		Script interpolator;
 		try {
-			// logger.setLoglevel(LogProxy.LOGLEVEL_TRACE);
-			// interpolator = new LoggingScript("maxArray.smt2", true);
-			logger.setLoglevel(LogProxy.LOGLEVEL_OFF);
-			interpolator = new SMTInterpol(logger);
+			interpolator = new SMTInterpol(mProxyLogger);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		managedScript = new ManagedScript(service, interpolator);
-		managedScript.getScript().setOption(":produce-proofs", true);
-		managedScript.getScript().setLogic(Logics.QF_AUFNIRA);
-		variableFactory = new VariableFactory(managedScript);
-		traceInterpolator = new TraceToInterpolants(managedScript, service, variableFactory.getSymbolTable());
+		mManagedScript = new ManagedScript(mService, interpolator);
+		mManagedScript.getScript().setOption(":produce-proofs", true);
+		mManagedScript.getScript().setLogic(Logics.QF_AUFNIRA);
+		mVariableFactory = new VariableFactory(mManagedScript);
+		mTraceInterpolator = new TraceToInterpolants(mManagedScript, mService, mVariableFactory.getSymbolTable());
 	}
 
 	public TraceGlobalVariables(IUltimateServiceProvider provider) throws Exception{
-		this.service = provider;
-		LogProxy logger = new DefaultLogger();
+		mService = provider;
+		
+		mProxyLogger = new DefaultLogger();
+		mLogger = new ConsoleLogger();
+		mProxyLogger.setLoglevel(LogProxy.LOGLEVEL_OFF);
+		mLogger.setLevel(LogLevel.OFF);
+		
 		Script interpolator;
 		try {
-			// logger.setLoglevel(LogProxy.LOGLEVEL_TRACE);
-			// interpolator = new LoggingScript("maxArray.smt2", true);
-			logger.setLoglevel(LogProxy.LOGLEVEL_OFF);
-			interpolator = new SMTInterpol(logger);
+			interpolator = new SMTInterpol(mProxyLogger);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		managedScript = new ManagedScript(service, interpolator);
-		managedScript.getScript().setOption(":produce-proofs", true);
-		managedScript.getScript().setLogic(Logics.QF_AUFNIRA);
-		variableFactory = new VariableFactory(managedScript);
-		traceInterpolator = new TraceToInterpolants(managedScript, service, variableFactory.getSymbolTable());
+		mManagedScript = new ManagedScript(mService, interpolator);
+		mManagedScript.getScript().setOption(":produce-proofs", true);
+		mManagedScript.getScript().setLogic(Logics.QF_AUFNIRA);
+		mVariableFactory = new VariableFactory(mManagedScript);
+		mTraceInterpolator = new TraceToInterpolants(mManagedScript, mService, mVariableFactory.getSymbolTable());
 	}
 	
 	public TraceToInterpolants getTraceInterpolator() {
-		return traceInterpolator;
+		return mTraceInterpolator;
 	}
 
 	public PredicateFactory getPredicateFactory() {
-		return traceInterpolator.getPredicateFactory();
+		return mTraceInterpolator.getPredicateFactory();
 	}
 
 	public ManagedScript getManagedScript() {
-		return managedScript;
+		return mManagedScript;
 	}
 
 	public VariableFactory getVariableFactory() {
-		return variableFactory;
+		return mVariableFactory;
 	}
 
 	public IUltimateServiceProvider getService() {
-		return service;
+		return mService;
 	}
-
+	
+	public LogProxy getLogProxy() {
+		return mProxyLogger;
+	}
+	
+	public ILogger getLogger() {
+		return mLogger;
+	}
 }
