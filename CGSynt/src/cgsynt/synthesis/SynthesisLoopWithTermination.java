@@ -8,23 +8,20 @@ import java.util.Set;
 
 import cgsynt.automaton.factory.PDeterminizeStateFactory;
 import cgsynt.core.Specification;
+import cgsynt.core.service.CustomServiceProvider;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
-import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.operations.CounterExamplesToInterpolants;
-import cgsynt.operations.ProgramRetrieval;
 import cgsynt.probability.ConfidenceIntervalCalculator;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.IntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.BuchiIntersection;
-import cgsynt.tree.buchi.operations.ConvertToStringState;
-import cgsynt.tree.buchi.operations.EmptinessCheck;
 import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
 import cgsynt.tree.buchi.parity.operations.BuchiParityEmptinessCheck;
@@ -36,7 +33,6 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutoma
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
-import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
@@ -67,6 +63,8 @@ public class SynthesisLoopWithTermination {
 	public SynthesisLoopWithTermination(List<IStatement> transitionAlphabet, IPredicate preconditions,
 			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
 		this.globalVars = globalVars;
+		assert globalVars.getService() instanceof CustomServiceProvider;
+		
 		RankedBool.setRank(transitionAlphabet.size());
 		globalVars.getTraceInterpolator().setPreconditions(preconditions);
 		globalVars.getTraceInterpolator().setPostconditions(postconditions);

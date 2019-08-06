@@ -1,5 +1,8 @@
 package cgsynt.interpol;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
@@ -37,7 +40,6 @@ public class TraceGlobalVariables {
 		try {
 			interpolator = new SMTInterpol(mProxyLogger);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
@@ -45,7 +47,10 @@ public class TraceGlobalVariables {
 		mManagedScript.getScript().setOption(":produce-proofs", true);
 		mManagedScript.getScript().setLogic(Logics.QF_AUFNIRA);
 		mVariableFactory = new VariableFactory(mManagedScript);
-		mTraceInterpolator = new TraceToInterpolants(mManagedScript, mService, mVariableFactory.getSymbolTable());
+		
+		Set<String> procs = new HashSet<>();
+		procs.add("p1");
+		mTraceInterpolator = new TraceToInterpolants(mManagedScript, mService, mVariableFactory.getSymbolTable(), procs);
 	}
 
 	public TraceGlobalVariables(IUltimateServiceProvider provider) throws Exception{
@@ -60,7 +65,6 @@ public class TraceGlobalVariables {
 		try {
 			interpolator = new SMTInterpol(mProxyLogger);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
@@ -68,7 +72,10 @@ public class TraceGlobalVariables {
 		mManagedScript.getScript().setOption(":produce-proofs", true);
 		mManagedScript.getScript().setLogic(Logics.QF_AUFNIRA);
 		mVariableFactory = new VariableFactory(mManagedScript);
-		mTraceInterpolator = new TraceToInterpolants(mManagedScript, mService, mVariableFactory.getSymbolTable());
+		
+		Set<String> procs = new HashSet<>();
+		procs.add("p1");
+		mTraceInterpolator = new TraceToInterpolants(mManagedScript, mService, mVariableFactory.getSymbolTable(), procs);
 	}
 	
 	public TraceToInterpolants getTraceInterpolator() {

@@ -1,9 +1,9 @@
 package cgsynt.core;
 
 import cgsynt.core.service.CustomServiceProvider;
+import cgsynt.interpol.TraceGlobalVariables;
 import de.uni_freiburg.informatik.ultimate.automata.AutomatonDefinitionPrinter.Format;
 import de.uni_freiburg.informatik.ultimate.core.coreplugin.services.PreferenceLayer;
-import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.preferences.RcpPreferenceProvider;
 import de.uni_freiburg.informatik.ultimate.lassoranker.AnalysisType;
@@ -28,8 +28,8 @@ import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.pr
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.Minimization;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.RefinementStrategy;
 
-public class ServiceProviderConfigurer {
-	public static IUltimateServiceProvider configureTerminationServiceProvider() {
+public class GlobalsConfigurer {
+	public static TraceGlobalVariables configureForTermination() throws Exception {
 		CustomServiceProvider serviceProvider = new CustomServiceProvider(LogLevel.OFF);
 		
 		RcpPreferenceProvider taPref = new RcpPreferenceProvider(TraceAbstraction.class.getPackage().getName());
@@ -82,12 +82,14 @@ public class ServiceProviderConfigurer {
 		buchiPref.put("Try to simplify termination arguments", false);
 		buchiPref.put("Try twofold refinement", false);
 		
-		PreferenceLayer taLayer = new PreferenceLayer(taPref, ServiceProviderConfigurer.class);
-		PreferenceLayer buchiLayer = new PreferenceLayer(buchiPref, ServiceProviderConfigurer.class);
+		PreferenceLayer taLayer = new PreferenceLayer(taPref, GlobalsConfigurer.class);
+		PreferenceLayer buchiLayer = new PreferenceLayer(buchiPref, GlobalsConfigurer.class);
 		
 		serviceProvider.addPreferenceProvider(taLayer, TraceAbstraction.class.getPackage().getName());
 		serviceProvider.addPreferenceProvider(buchiLayer, BuchiAutomizer.class.getPackage().getName());
 		
-		return serviceProvider;
+		TraceGlobalVariables globalVars = new TraceGlobalVariables(serviceProvider);
+		
+		return globalVars;
 	}
 }
