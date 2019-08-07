@@ -1,28 +1,47 @@
 package cgsynt.termination;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import cgsynt.dfa.parity.operations.ParityCounterexample;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
-import cgsynt.nfa.operations.NFACounterexample;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedRun;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLassoRun;
 import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
+import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.BasicIcfg;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.CfgSmtToolkit;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgEdgeFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgInternalTransition;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.debugidentifiers.StringDebugIdentifier;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SmtUtils.SimplificationTechnique;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.SmtUtils.XnfConversionTechnique;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.taskidentifier.SubtaskFileIdentifier;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.taskidentifier.TaskIdentifier;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.BinaryStatePredicateManager;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.BuchiCegarLoopBenchmarkGenerator;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.LassoCheck;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.RankVarConstructor;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.CegarAbsIntRunner;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.HoareAnnotation;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.PathProgramCache;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.PredicateFactoryForInterpolantAutomata;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.interpolantautomata.builders.InterpolantAutomatonBuilderFactory;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TAPreferences;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.InterpolationTechnique;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.tracehandling.RefinementStrategyFactory;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.tracehandling.TaCheckAndRefinementPreferences;
 import de.uni_freiburg.informatik.ultimate.util.datastructures.SerialProvider;
 
 public class OmegaRefiner {
@@ -33,9 +52,13 @@ public class OmegaRefiner {
 	private ManagedScript mMScript;
 	private VariableFactory mVf;
 	private TraceToInterpolants mTTI;
-	private PredicateFactory mOldPredicateFactory;
+	private PredicateFactory mOldPredicateFactory, mPredicateFactory;
 	private Script mScript;
 	private IcfgEdgeFactory mEdgeFactory;
+	private IUltimateServiceProvider mServiceProvider;
+	private CfgSmtToolkit mCsToolkitWithRankVars;
+	private BinaryStatePredicateManager mBspm;
+	private BuchiCegarLoopBenchmarkGenerator mBenchmarker;
 	
 	public OmegaRefiner(TraceGlobalVariables globalVars, NestedWordAutomaton<IcfgInternalTransition, IPredicate> omega) {
 		mGlobalVars = globalVars;
@@ -48,11 +71,26 @@ public class OmegaRefiner {
 		mOldPredicateFactory = mGlobalVars.getPredicateFactory();
 		mScript = mMScript.getScript();
 		mEdgeFactory = new IcfgEdgeFactory(new SerialProvider());
+		
+		RankVarConstructor rankVarConstructor = new RankVarConstructor(mTTI.getCfgSmtToolkit());
+		mPredicateFactory = new PredicateFactory(mServiceProvider, mMScript, 
+				rankVarConstructor.getCsToolkitWithRankVariables().getSymbolTable(),
+				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
+		
+		mCsToolkitWithRankVars = rankVarConstructor.getCsToolkitWithRankVariables();
+		
+		mBspm = new BinaryStatePredicateManager(mCsToolkitWithRankVars,
+				mPredicateFactory, rankVarConstructor.getUnseededVariable(), 
+				rankVarConstructor.getOldRankVariables(), mServiceProvider,
+				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
+		
+		mBenchmarker = new BuchiCegarLoopBenchmarkGenerator();
 	}
 	
-	public void certifyCE(NFACounterexample<IStatement, HoareAnnotation> ce) {
+	public void certifyCE(ParityCounterexample<IStatement, HoareAnnotation> ce) throws Exception {
+		
 		BasicIcfg<IcfgLocation> icfg = new BasicIcfg<>("certify", mTTI.getCfgSmtToolkit(), IcfgLocation.class);
-		NFACounterexample<IStatement, HoareAnnotation> trace = ce.makeCopy();
+		ParityCounterexample<IStatement, HoareAnnotation> trace = ce.makeCopy();
 		
 		TransitionStatePackage[] packages = getTransitionStatePackages(trace, icfg);
 		
@@ -93,10 +131,54 @@ public class OmegaRefiner {
 		// Set up Lasso Run
 		NestedLassoRun<IcfgInternalTransition, IPredicate> counterexample = new NestedLassoRun<>(stem, loop);
 		
+		TaskIdentifier taskIdentifier = new SubtaskFileIdentifier(null, icfg.getIdentifier());
 		
+		LassoCheck<IcfgInternalTransition> check = new LassoCheck<>(
+				InterpolationTechnique.Craig_NestedInterpolation,
+				mTTI.getCfgSmtToolkit(), 
+				mPredicateFactory,
+				mCsToolkitWithRankVars.getSymbolTable(),
+				mTTI.getCfgSmtToolkit().getModifiableGlobalsTable(),
+				mTTI.getCfgSmtToolkit().getSmtSymbols(),
+				mBspm, counterexample,
+				"LassoCheck", mServiceProvider,
+				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED,
+				setUpRefinementFactory(icfg),
+				mOmega,
+				taskIdentifier, mBenchmarker);
 	}
 	
-	private TransitionStatePackage[] getTransitionStatePackages(NFACounterexample<IStatement, HoareAnnotation> trace, BasicIcfg<IcfgLocation> icfg) {
+	private RefinementStrategyFactory<IcfgInternalTransition> setUpRefinementFactory(BasicIcfg<IcfgLocation> icfg){
+		TAPreferences taPrefs = new TAPreferences(mServiceProvider);
+		
+		PathProgramCache<IcfgInternalTransition> pathProgramCache = new PathProgramCache<>(mLogger);
+		
+		CegarAbsIntRunner<IcfgInternalTransition> absIntRunner =
+				new CegarAbsIntRunner<>(mServiceProvider, mBenchmarker, icfg, SimplificationTechnique.NONE,
+						XnfConversionTechnique.BDD_BASED, mTTI.getCfgSmtToolkit(), pathProgramCache, taPrefs);
+		
+		PredicateFactoryForInterpolantAutomata stateFactory = new PredicateFactoryForInterpolantAutomata(mCsToolkitWithRankVars.getManagedScript(),
+				mPredicateFactory, taPrefs.computeHoareAnnotation());
+		
+		InterpolantAutomatonBuilderFactory<IcfgInternalTransition> interpolantAutomatonBuilderFactory =
+				new InterpolantAutomatonBuilderFactory<>(mServiceProvider, mTTI.getCfgSmtToolkit(), stateFactory,
+						icfg, absIntRunner, taPrefs, InterpolationTechnique.Craig_NestedInterpolation, taPrefs.interpolantAutomaton(),
+						mBenchmarker);
+		
+		TaCheckAndRefinementPreferences<IcfgInternalTransition> taCheckAndRefinementPrefs =
+				new TaCheckAndRefinementPreferences<>(mServiceProvider, taPrefs, InterpolationTechnique.Craig_NestedInterpolation,
+						SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED,
+						mTTI.getCfgSmtToolkit(), mPredicateFactory, icfg,
+						interpolantAutomatonBuilderFactory);
+		
+		RefinementStrategyFactory<IcfgInternalTransition> refinementFactory = new RefinementStrategyFactory<>(
+				mLogger, mServiceProvider, taPrefs, taCheckAndRefinementPrefs, absIntRunner, icfg, mPredicateFactory,
+				pathProgramCache);
+		
+		return refinementFactory;
+	}
+	
+	private TransitionStatePackage[] getTransitionStatePackages(ParityCounterexample<IStatement, HoareAnnotation> trace, BasicIcfg<IcfgLocation> icfg) {
 		int stemStatesSize = trace.stemStates.size(); 
 		
 		IcfgLocation prevLocation;
