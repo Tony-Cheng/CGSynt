@@ -98,7 +98,7 @@ public class BuchiDeterminization<LETTER, STATE> {
 				intersectionNodes.push(node);
 			}
 		}
-		while(!intersectionNodes.isEmpty()) {
+		while (!intersectionNodes.isEmpty()) {
 			tree.addNode(intersectionNodes.pop(), intersectionLabels.pop());
 		}
 	}
@@ -162,5 +162,10 @@ public class BuchiDeterminization<LETTER, STATE> {
 		return intersection;
 	}
 
-	
+	public ParityAutomaton<LETTER, IParityState> getResult() {
+		if (!resultComputed)
+			return null;
+		return result;
+	}
+
 }
