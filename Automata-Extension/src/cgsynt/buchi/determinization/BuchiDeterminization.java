@@ -32,11 +32,11 @@ public class BuchiDeterminization<LETTER, STATE> {
 	private Stack<SafraTree<STATE>> toVisitStates;
 
 	public BuchiDeterminization(INestedWordAutomaton<LETTER, STATE> buchiAut, AutomataLibraryServices services,
-			VpAlphabet<LETTER> vpAlphabet, ParityStateFactory emptyStateFactory) {
+			ParityStateFactory emptyStateFactory) {
 		this.buchiAut = buchiAut;
 		this.resultComputed = false;
 		this.services = services;
-		this.vpAlphabet = vpAlphabet;
+		this.vpAlphabet = buchiAut.getVpAlphabet();
 		this.emptyStateFactory = emptyStateFactory;
 	}
 
@@ -61,8 +61,16 @@ public class BuchiDeterminization<LETTER, STATE> {
 				step4(copy);
 				step5(copy);
 				step6(copy);
+				System.out.println(initialTree.equals(next));
+				if (!result.contains(initialTree))
+					result.addState(true, false, initialTree);
+				System.out.println(result.contains(initialTree));
 				if (!result.contains(copy))
 					result.addState(false, false, copy);
+				if (!result.contains(next)) {
+					System.out.println(next);
+					result.addState(false, false, next);
+				}
 				if (!result.containsInternalTransition(next, letter, copy))
 					result.addInternalTransition(next, letter, copy);
 				if (!visitedStates.contains(copy)) {
@@ -73,7 +81,7 @@ public class BuchiDeterminization<LETTER, STATE> {
 		}
 		resultComputed = true;
 	}
-	
+
 	private void reset(SafraTree<STATE> tree) {
 		tree.resetEF();
 	}
@@ -145,10 +153,14 @@ public class BuchiDeterminization<LETTER, STATE> {
 	}
 
 	private void step5(SafraTree<STATE> tree) {
+		Set<Integer> toRemoveNodes = new HashSet<>();
 		for (Integer node : tree.getStates()) {
 			if (tree.getLabels(node).isEmpty()) {
-				tree.removeNode(node);
+				toRemoveNodes.add(node);
 			}
+		}
+		for (Integer node : toRemoveNodes) {
+			tree.removeNode(node);
 		}
 	}
 
