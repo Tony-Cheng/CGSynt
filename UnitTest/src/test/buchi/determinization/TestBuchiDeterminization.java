@@ -23,8 +23,8 @@ public class TestBuchiDeterminization {
 
 		Set<Character> letters = new HashSet<Character>();
 		letters.add('a');
-		letters.add('b');
-		letters.add('c');
+		// letters.add('b');
+		// letters.add('c');
 
 		VpAlphabet<Character> alpha = new VpAlphabet<>(letters);
 

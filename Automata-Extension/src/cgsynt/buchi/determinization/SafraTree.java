@@ -148,7 +148,7 @@ public class SafraTree<STATE> implements IParityState {
 		for (Integer child : children) {
 			removeSubtree(child);
 		}
-		children.remove(node);
+		childrenMap.remove(node);
 		rem.add(node);
 	}
 
@@ -168,10 +168,10 @@ public class SafraTree<STATE> implements IParityState {
 
 	public void compressTree() {
 		int sum = 0;
-		for (int i = 1; i < this.greatestName; i++) {
+		for (int i = 1; i <= this.greatestName; i++) {
 			if (rem.contains(i)) {
 				sum++;
-			} else {
+			} else if (sum > 0) {
 				states.add(i - sum);
 				states.remove(i);
 				nameMap.put(i - sum, nameMap.get(i));
@@ -187,9 +187,12 @@ public class SafraTree<STATE> implements IParityState {
 			}
 		}
 		greatestName = greatestName - sum;
+		rem.clear();
+	}
+	
+	public void resetEF() {
 		e = this.numBuchiStates + 1;
 		f = this.numBuchiStates + 1;
-		rem.clear();
 	}
 
 	@Override

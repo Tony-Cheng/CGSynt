@@ -54,21 +54,28 @@ public class BuchiDeterminization<LETTER, STATE> {
 			SafraTree<STATE> next = toVisitStates.pop();
 			for (LETTER letter : buchiAut.getAlphabet()) {
 				SafraTree<STATE> copy = next.copy();
+				reset(copy);
 				step1(copy, letter);
 				step2(copy);
 				step3(copy);
 				step4(copy);
 				step5(copy);
 				step6(copy);
-				if (!visitedStates.contains(copy)) {
+				if (!result.contains(copy))
 					result.addState(false, false, copy);
+				if (!result.containsInternalTransition(next, letter, copy))
 					result.addInternalTransition(next, letter, copy);
-					visitedStates.add(copy);
+				if (!visitedStates.contains(copy)) {
 					toVisitStates.add(copy);
+					visitedStates.add(copy);
 				}
 			}
 		}
 		resultComputed = true;
+	}
+	
+	private void reset(SafraTree<STATE> tree) {
+		tree.resetEF();
 	}
 
 	private void step1(SafraTree<STATE> tree, LETTER letter) {
