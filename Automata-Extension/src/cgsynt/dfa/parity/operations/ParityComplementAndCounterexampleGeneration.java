@@ -9,7 +9,7 @@ import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class ParityCounterexampleGeneration<LETTER> {
+public class ParityComplementAndCounterexampleGeneration<LETTER> {
 
 	private ParityAutomaton<LETTER, IParityState> aut;
 	private boolean resultComputed;
@@ -17,7 +17,7 @@ public class ParityCounterexampleGeneration<LETTER> {
 	private Map<IParityState, Integer> visitedStates;
 	private List<ParityCounterexample<LETTER, IParityState>> result;
 
-	public ParityCounterexampleGeneration(ParityAutomaton<LETTER, IParityState> aut, int maxLen) {
+	public ParityComplementAndCounterexampleGeneration(ParityAutomaton<LETTER, IParityState> aut, int maxLen) {
 		this.aut = aut;
 		this.resultComputed = false;
 		this.maxLen = maxLen;
@@ -68,7 +68,7 @@ public class ParityCounterexampleGeneration<LETTER> {
 					transition.getSucc(), len - 1);
 			for (int i = 0; i < destCounterexamples.size(); i++) {
 				if (state.equals(destCounterexamples.get(i).repeatedState)
-						&& destCounterexamples.get(i).maxRepeatingNumber % 2 == 0) {
+						&& destCounterexamples.get(i).maxRepeatingNumber % 2 == 1) {
 					ParityCounterexample<LETTER, IParityState> copy = destCounterexamples.get(i).makeCopy();
 					copy.repeatedState = null;
 					copy.loopStates.push(state);

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.dfa.parity.operations.ParityCounterexample;
-import cgsynt.dfa.parity.operations.ParityCounterexampleGeneration;
+import cgsynt.dfa.parity.operations.ParityComplementAndCounterexampleGeneration;
 import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityStateFactory;
@@ -35,10 +35,10 @@ public class TestCounterexampleGeneration {
 
 		ParityAutomaton<Character, IParityState> nwa = new ParityAutomaton<>(service, alpha, new ParityStateFactory());
 
-		ParityState<String> q0 = new ParityState<String>("q0", 0);
+		ParityState<String> q0 = new ParityState<String>("q0", 1);
 		nwa.addState(true, true, q0);
 		nwa.addInternalTransition(q0, 'a', q0);
-		ParityCounterexampleGeneration<Character> generation = new ParityCounterexampleGeneration<>(nwa, 2);
+		ParityComplementAndCounterexampleGeneration<Character> generation = new ParityComplementAndCounterexampleGeneration<>(nwa, 2);
 		generation.computeResult();
 
 		List<ParityCounterexample<Character, IParityState>> counterexamples = generation.getResult();
