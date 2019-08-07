@@ -106,7 +106,7 @@ public class SafraTree<STATE> implements IParityState {
 	}
 
 	public void setGreenNode(Integer node) {
-		if (!states.contains(node)) 
+		if (!states.contains(node))
 			return;
 		f = Math.min(f, node);
 		for (Integer child : childrenMap.get(node)) {
@@ -120,7 +120,7 @@ public class SafraTree<STATE> implements IParityState {
 		return "SafraTree [states=" + states + ", nameMap=" + nameMap + ", root=" + root + ", parentMap=" + parentMap
 				+ ", childrenMap=" + childrenMap + ", labelMap=" + labelMap + ", rem=" + rem + ", initialStates="
 				+ initialStates + ", e=" + e + ", f=" + f + ", numBuchiStates=" + numBuchiStates + ", greatestName="
-				+ greatestName + "]";
+				+ greatestName + ", rank=" + getRank() + "]";
 	}
 
 	public Set<Integer> getChildren(Integer node) {
@@ -128,6 +128,8 @@ public class SafraTree<STATE> implements IParityState {
 	}
 
 	public void removeNode(Integer node) {
+		if (!states.contains(node))
+			return;
 		e = Math.min(e, node);
 		states.remove(node);
 		nameMap.remove(node);
@@ -158,11 +160,18 @@ public class SafraTree<STATE> implements IParityState {
 		tree.nameMap.putAll(nameMap);
 		tree.root = root;
 		tree.parentMap.putAll(parentMap);
-		tree.childrenMap.putAll(childrenMap);
-		tree.labelMap.putAll(labelMap);
+		for (Integer key : this.childrenMap.keySet()) {
+			tree.childrenMap.put(key, new HashSet<>());
+			tree.childrenMap.get(key).addAll(this.childrenMap.get(key));
+		}
+		for (Integer key : this.labelMap.keySet()) {
+			tree.labelMap.put(key, new HashSet<>());
+			tree.labelMap.get(key).addAll(this.labelMap.get(key));
+		}
 		tree.rem.addAll(rem);
 		tree.e = e;
 		tree.f = f;
+		tree.greatestName = this.greatestName;
 		return tree;
 	}
 
@@ -174,7 +183,7 @@ public class SafraTree<STATE> implements IParityState {
 			} else if (sum > 0) {
 				states.add(i - sum);
 				states.remove(i);
-				nameMap.put(i - sum, nameMap.get(i));
+				nameMap.put(i - sum, nameMap.get(i) - sum);
 				nameMap.remove(i);
 				for (Integer child : childrenMap.get(i)) {
 					parentMap.put(child, i - sum);
@@ -183,13 +192,13 @@ public class SafraTree<STATE> implements IParityState {
 				parentMap.put(i - sum, parentMap.get(i));
 				parentMap.remove(i);
 				labelMap.put(i - sum, labelMap.get(i));
-				labelMap.remove(i - sum);
+				labelMap.remove(i);
 			}
 		}
 		greatestName = greatestName - sum;
 		rem.clear();
 	}
-	
+
 	public void resetEF() {
 		e = this.numBuchiStates + 1;
 		f = this.numBuchiStates + 1;

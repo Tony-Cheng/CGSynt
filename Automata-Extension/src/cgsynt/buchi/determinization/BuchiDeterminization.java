@@ -61,16 +61,8 @@ public class BuchiDeterminization<LETTER, STATE> {
 				step4(copy);
 				step5(copy);
 				step6(copy);
-				System.out.println(initialTree.equals(next));
-				if (!result.contains(initialTree))
-					result.addState(true, false, initialTree);
-				System.out.println(result.contains(initialTree));
 				if (!result.contains(copy))
 					result.addState(false, false, copy);
-				if (!result.contains(next)) {
-					System.out.println(next);
-					result.addState(false, false, next);
-				}
 				if (!result.containsInternalTransition(next, letter, copy))
 					result.addInternalTransition(next, letter, copy);
 				if (!visitedStates.contains(copy)) {
