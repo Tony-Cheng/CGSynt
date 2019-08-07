@@ -1,6 +1,5 @@
 package cgsynt.termination;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import cgsynt.dfa.parity.operations.ParityCounterexample;
