@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import cgsynt.nfa.operations.NFACounterexample;
+import cgsynt.dfa.parity.operations.ParityCounterexample;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedRun;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLassoRun;
@@ -12,11 +12,11 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IIcfg
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class CounterexampleToLassoRun2<LETTER, STATE> {
-	private List<NFACounterexample<LETTER, STATE>> counterexamples;
+	private List<ParityCounterexample<LETTER, STATE>> counterexamples;
 	private boolean resultComputed;
 	private List<NestedLassoRun<LETTER, STATE>> result;
 
-	public CounterexampleToLassoRun2(List<NFACounterexample<LETTER, STATE>> counterexamples) {
+	public CounterexampleToLassoRun2(List<ParityCounterexample<LETTER, STATE>> counterexamples) {
 		this.counterexamples = counterexamples;
 		this.resultComputed = false;
 	}

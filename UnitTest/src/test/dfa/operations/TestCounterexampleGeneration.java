@@ -7,8 +7,8 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import cgsynt.dfa.parity.ParityAutomaton;
-import cgsynt.nfa.operations.NFACounterexample;
-import cgsynt.nfa.operations.NFACounterexampleGeneration;
+import cgsynt.dfa.parity.operations.ParityCounterexample;
+import cgsynt.dfa.parity.operations.ParityCounterexampleGeneration;
 import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityStateFactory;
@@ -38,12 +38,12 @@ public class TestCounterexampleGeneration {
 		ParityState<String> q0 = new ParityState<String>("q0", 0);
 		nwa.addState(true, true, q0);
 		nwa.addInternalTransition(q0, 'a', q0);
-		NFACounterexampleGeneration<Character> generation = new NFACounterexampleGeneration<>(nwa, 2);
+		ParityCounterexampleGeneration<Character> generation = new ParityCounterexampleGeneration<>(nwa, 2);
 		generation.computeResult();
 
-		List<NFACounterexample<Character, IParityState>> counterexamples = generation.getResult();
+		List<ParityCounterexample<Character, IParityState>> counterexamples = generation.getResult();
 
-		for (NFACounterexample<Character, IParityState> counterexample : counterexamples) {
+		for (ParityCounterexample<Character, IParityState> counterexample : counterexamples) {
 			System.out.println("Test 1");
 			System.out.println("Stem");
 			while (!counterexample.stemTransitions.isEmpty()) {

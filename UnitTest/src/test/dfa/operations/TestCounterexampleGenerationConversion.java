@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
-import cgsynt.nfa.operations.NFACounterexample;
-import cgsynt.nfa.operations.NFACounterexampleGeneration;
+import cgsynt.dfa.parity.operations.ParityCounterexample;
+import cgsynt.dfa.parity.operations.ParityCounterexampleGeneration;
 import cgsynt.operations.CounterexampleToLassoRun2;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;

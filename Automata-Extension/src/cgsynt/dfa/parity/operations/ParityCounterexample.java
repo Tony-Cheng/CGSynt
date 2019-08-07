@@ -1,8 +1,8 @@
-package cgsynt.nfa.operations;
+package cgsynt.dfa.parity.operations;
 
 import java.util.Stack;
 
-public class NFACounterexample<LETTER, STATE> {
+public class ParityCounterexample<LETTER, STATE> {
 	public Stack<LETTER> loopTransitions;
 	public Stack<STATE> loopStates;
 	public Stack<LETTER> stemTransitions;
@@ -10,7 +10,7 @@ public class NFACounterexample<LETTER, STATE> {
 	public STATE repeatedState;
 	public int maxRepeatingNumber;
 
-	public NFACounterexample(int maxRepeatingNumber) {
+	public ParityCounterexample(int maxRepeatingNumber) {
 		this.loopTransitions = new Stack<>();
 		this.loopStates = new Stack<>();
 		this.stemTransitions = new Stack<>();
@@ -19,8 +19,8 @@ public class NFACounterexample<LETTER, STATE> {
 		this.maxRepeatingNumber = maxRepeatingNumber;
 	}
 
-	public NFACounterexample<LETTER, STATE> makeCopy() {
-		NFACounterexample<LETTER, STATE> copy = new NFACounterexample<>(maxRepeatingNumber);
+	public ParityCounterexample<LETTER, STATE> makeCopy() {
+		ParityCounterexample<LETTER, STATE> copy = new ParityCounterexample<>(maxRepeatingNumber);
 		copy.repeatedState = this.repeatedState;
 		copy.loopTransitions.addAll(this.loopTransitions);
 		copy.loopStates.addAll(this.loopStates);

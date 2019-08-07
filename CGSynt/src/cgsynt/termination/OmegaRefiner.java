@@ -1,10 +1,10 @@
 package cgsynt.termination;
 
+import cgsynt.dfa.parity.operations.ParityCounterexample;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
-import cgsynt.nfa.operations.NFACounterexample;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
@@ -44,7 +44,7 @@ public class OmegaRefiner {
 		mEdgeFactory = new IcfgEdgeFactory(new SerialProvider());
 	}
 	
-	public void certifyCE(NFACounterexample<IStatement, HoareAnnotation> ce) {
+	public void certifyCE(ParityCounterexample<IStatement, HoareAnnotation> ce) {
 		BasicIcfg<IcfgLocation> icfg = new BasicIcfg<>("certify", mTTI.getCfgSmtToolkit(), IcfgLocation.class);
 		
 		IcfgLocation[] stemLocations = new IcfgLocation[ce.stemStates.size()];
@@ -53,7 +53,7 @@ public class OmegaRefiner {
 		HoareAnnotation[] stemPredicates = new HoareAnnotation[ce.stemStates.size()];
 		HoareAnnotation[] loopPredicates = new HoareAnnotation[ce.loopStates.size() - 1];
 		
-		NFACounterexample<IStatement, HoareAnnotation> trace = ce.makeCopy();
+		ParityCounterexample<IStatement, HoareAnnotation> trace = ce.makeCopy();
 
 		IcfgLocation start = new IcfgLocation(new StringDebugIdentifier("p1l0"), "p1");
 		icfg.addLocation(start, true, false, true, false, false);

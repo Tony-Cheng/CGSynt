@@ -1,4 +1,4 @@
-package cgsynt.nfa.operations;
+package cgsynt.dfa.parity.operations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,15 +9,15 @@ import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class NFACounterexampleGeneration<LETTER> {
+public class ParityCounterexampleGeneration<LETTER> {
 
 	private ParityAutomaton<LETTER, IParityState> aut;
 	private boolean resultComputed;
 	private int maxLen;
 	private Map<IParityState, Integer> visitedStates;
-	private List<NFACounterexample<LETTER, IParityState>> result;
+	private List<ParityCounterexample<LETTER, IParityState>> result;
 
-	public NFACounterexampleGeneration(ParityAutomaton<LETTER, IParityState> aut, int maxLen) {
+	public ParityCounterexampleGeneration(ParityAutomaton<LETTER, IParityState> aut, int maxLen) {
 		this.aut = aut;
 		this.resultComputed = false;
 		this.maxLen = maxLen;
@@ -30,7 +30,7 @@ public class NFACounterexampleGeneration<LETTER> {
 		this.visitedStates = new HashMap<>();
 		this.result = new ArrayList<>();
 		for (IParityState initialState : aut.getInitialStates()) {
-			List<NFACounterexample<LETTER, IParityState>> counterexamples = generateCounterexamples(initialState,
+			List<ParityCounterexample<LETTER, IParityState>> counterexamples = generateCounterexamples(initialState,
 					maxLen);
 			for (int i = counterexamples.size() - 1; i >= 0; i--) {
 				if (counterexamples.get(i).repeatedState != null) {
@@ -42,16 +42,16 @@ public class NFACounterexampleGeneration<LETTER> {
 		resultComputed = true;
 	}
 
-	public List<NFACounterexample<LETTER, IParityState>> getResult() {
+	public List<ParityCounterexample<LETTER, IParityState>> getResult() {
 		if (!resultComputed)
 			return null;
 		return result;
 	}
 
-	private List<NFACounterexample<LETTER, IParityState>> generateCounterexamples(IParityState state, int len) {
-		List<NFACounterexample<LETTER, IParityState>> counterexamples = new ArrayList<>();
+	private List<ParityCounterexample<LETTER, IParityState>> generateCounterexamples(IParityState state, int len) {
+		List<ParityCounterexample<LETTER, IParityState>> counterexamples = new ArrayList<>();
 		if (visitedStates.containsKey(state) && visitedStates.get(state) > 0) {
-			NFACounterexample<LETTER, IParityState> counterexample = new NFACounterexample<>(state.getRank());
+			ParityCounterexample<LETTER, IParityState> counterexample = new ParityCounterexample<>(state.getRank());
 			counterexample.repeatedState = state;
 			counterexample.loopStates.push(state);
 			counterexamples.add(counterexample);
@@ -64,12 +64,12 @@ public class NFACounterexampleGeneration<LETTER> {
 		}
 		visitedStates.put(state, visitedStates.get(state) + 1);
 		for (OutgoingInternalTransition<LETTER, IParityState> transition : aut.internalSuccessors(state)) {
-			List<NFACounterexample<LETTER, IParityState>> destCounterexamples = generateCounterexamples(
+			List<ParityCounterexample<LETTER, IParityState>> destCounterexamples = generateCounterexamples(
 					transition.getSucc(), len - 1);
 			for (int i = 0; i < destCounterexamples.size(); i++) {
 				if (state.equals(destCounterexamples.get(i).repeatedState)
 						&& destCounterexamples.get(i).maxRepeatingNumber % 2 == 0) {
-					NFACounterexample<LETTER, IParityState> copy = destCounterexamples.get(i).makeCopy();
+					ParityCounterexample<LETTER, IParityState> copy = destCounterexamples.get(i).makeCopy();
 					copy.repeatedState = null;
 					copy.loopStates.push(state);
 					copy.loopTransitions.push(transition.getLetter());
