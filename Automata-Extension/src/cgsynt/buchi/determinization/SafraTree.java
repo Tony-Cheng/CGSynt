@@ -115,6 +115,14 @@ public class SafraTree<STATE> implements IParityState {
 		childrenMap.get(node).clear();
 	}
 
+	@Override
+	public String toString() {
+		return "SafraTree [states=" + states + ", nameMap=" + nameMap + ", root=" + root + ", parentMap=" + parentMap
+				+ ", childrenMap=" + childrenMap + ", labelMap=" + labelMap + ", rem=" + rem + ", initialStates="
+				+ initialStates + ", e=" + e + ", f=" + f + ", numBuchiStates=" + numBuchiStates + ", greatestName="
+				+ greatestName + "]";
+	}
+
 	public Set<Integer> getChildren(Integer node) {
 		return childrenMap.get(node);
 	}
