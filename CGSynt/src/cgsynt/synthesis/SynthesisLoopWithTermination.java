@@ -14,6 +14,8 @@ import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.dfa.parity.operations.ParityAutomatonToTree;
+import cgsynt.dfa.parity.operations.ParityComplementAndCounterexampleGeneration;
+import cgsynt.dfa.parity.operations.ParityCounterexample;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
@@ -40,6 +42,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgInternalTransition;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.debugidentifiers.StringDebugIdentifier;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
@@ -48,7 +51,7 @@ public class SynthesisLoopWithTermination {
 
 	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
 	private NestedWordAutomaton<IStatement, IPredicate> mPI;
-	private NestedWordAutomaton<IStatement, IPredicate> mOmega;
+	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> mOmega;
 	
 	private List<IStatement> mTransitionAlphabet;
 	private IUltimateServiceProvider mService;
@@ -164,10 +167,10 @@ public class SynthesisLoopWithTermination {
 		return pi;
 	}
 
-	private NestedWordAutomaton<IStatement, IPredicate> createOmega(IPredicate precondition){
+	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> createOmega(IPredicate precondition){
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alphabet = new VpAlphabet<>(letters);
-		NestedWordAutomaton<IStatement, IPredicate> omega = new NestedWordAutomaton<>(mAutService, alphabet,
+		NestedWordAutomaton<IcfgInternalTransition, IPredicate> omega = new NestedWordAutomaton<>(mAutService, alphabet,
 				new GeneralizeStateFactory(globalVars.getPredicateFactory()));
 		
 		omega.addState(true, false, precondition);
@@ -246,6 +249,18 @@ public class SynthesisLoopWithTermination {
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
+		
+		///////////////////////////////////////////////////////////////////////////////////////////////
+		// 						Omega Refinement Process
+		int minOmegaLen = Math.min(mOmega.size(), parityOmega.size());
+		ParityComplementAndCounterexampleGeneration<IStatement> omegaCounterexampleGenerator =
+				new ParityComplementAndCounterexampleGeneration<>(parityOmega, k * minOmegaLen);
+		omegaCounterexampleGenerator.computeResult();
+		
+		List<ParityCounterexample<IStatement, IParityState>> omegaCounterexamples = omegaCounterexampleGenerator.getResult();
+		
+		OmegaRefiner<>
+		
 	}
 
 	/**

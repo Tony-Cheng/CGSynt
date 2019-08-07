@@ -7,6 +7,7 @@ import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
+import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedRun;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
@@ -86,10 +87,10 @@ public class OmegaRefiner {
 		mBenchmarker = new BuchiCegarLoopBenchmarkGenerator();
 	}
 	
-	public void certifyCE(ParityCounterexample<IStatement, HoareAnnotation> ce) throws Exception {
+	public void certifyCE(ParityCounterexample<IStatement, IParityState> ce) throws Exception {
 		
 		BasicIcfg<IcfgLocation> icfg = new BasicIcfg<>("certify", mTTI.getCfgSmtToolkit(), IcfgLocation.class);
-		ParityCounterexample<IStatement, HoareAnnotation> trace = ce.makeCopy();
+		ParityCounterexample<IStatement, IParityState> trace = ce.makeCopy();
 		
 		TransitionStatePackage[] packages = getTransitionStatePackages(trace, icfg);
 		
@@ -177,7 +178,7 @@ public class OmegaRefiner {
 		return refinementFactory;
 	}
 	
-	private TransitionStatePackage[] getTransitionStatePackages(ParityCounterexample<IStatement, HoareAnnotation> trace, BasicIcfg<IcfgLocation> icfg) {
+	private TransitionStatePackage[] getTransitionStatePackages(ParityCounterexample<IStatement, IParityState> trace, BasicIcfg<IcfgLocation> icfg) {
 		int stemStatesSize = trace.stemStates.size(); 
 		
 		IcfgLocation prevLocation;
