@@ -5,18 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
+import cgsynt.dfa.parity.ParityAutomaton;
+import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class NFACounterexampleGeneration<LETTER, STATE> {
+public class NFACounterexampleGeneration<LETTER> {
 
-	private NestedWordAutomaton<LETTER, STATE> aut;
+	private ParityAutomaton<LETTER, IParityState> aut;
 	private boolean resultComputed;
 	private int maxLen;
-	private Map<STATE, Integer> visitedStates;
-	private List<NFACounterexample<LETTER, STATE>> result;
+	private Map<IParityState, Integer> visitedStates;
+	private List<NFACounterexample<LETTER, IParityState>> result;
 
-	public NFACounterexampleGeneration(NestedWordAutomaton<LETTER, STATE> aut, int maxLen) {
+	public NFACounterexampleGeneration(ParityAutomaton<LETTER, IParityState> aut, int maxLen) {
 		this.aut = aut;
 		this.resultComputed = false;
 		this.maxLen = maxLen;
@@ -28,8 +29,9 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 		}
 		this.visitedStates = new HashMap<>();
 		this.result = new ArrayList<>();
-		for (STATE initialState : aut.getInitialStates()) {
-			List<NFACounterexample<LETTER, STATE>> counterexamples = generateCounterexamples(initialState, maxLen);
+		for (IParityState initialState : aut.getInitialStates()) {
+			List<NFACounterexample<LETTER, IParityState>> counterexamples = generateCounterexamples(initialState,
+					maxLen);
 			for (int i = counterexamples.size() - 1; i >= 0; i--) {
 				if (counterexamples.get(i).repeatedState != null) {
 					counterexamples.remove(i);
@@ -40,21 +42,18 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 		resultComputed = true;
 	}
 
-	public List<NFACounterexample<LETTER, STATE>> getResult() {
+	public List<NFACounterexample<LETTER, IParityState>> getResult() {
 		if (!resultComputed)
 			return null;
 		return result;
 	}
 
-	private List<NFACounterexample<LETTER, STATE>> generateCounterexamples(STATE state, int len) {
-		List<NFACounterexample<LETTER, STATE>> counterexamples = new ArrayList<>();
+	private List<NFACounterexample<LETTER, IParityState>> generateCounterexamples(IParityState state, int len) {
+		List<NFACounterexample<LETTER, IParityState>> counterexamples = new ArrayList<>();
 		if (visitedStates.containsKey(state) && visitedStates.get(state) > 0) {
-			NFACounterexample<LETTER, STATE> counterexample = new NFACounterexample<>();
+			NFACounterexample<LETTER, IParityState> counterexample = new NFACounterexample<>(state.getRank());
 			counterexample.repeatedState = state;
 			counterexample.loopStates.push(state);
-			if (aut.isFinal(state)) {
-				counterexample.loopContainFinalState = true;
-			}
 			counterexamples.add(counterexample);
 		}
 		if (len == 0) {
@@ -64,13 +63,13 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 			visitedStates.put(state, 0);
 		}
 		visitedStates.put(state, visitedStates.get(state) + 1);
-		for (OutgoingInternalTransition<LETTER, STATE> transition : aut.internalSuccessors(state)) {
-			List<NFACounterexample<LETTER, STATE>> destCounterexamples = generateCounterexamples(transition.getSucc(),
-					len - 1);
+		for (OutgoingInternalTransition<LETTER, IParityState> transition : aut.internalSuccessors(state)) {
+			List<NFACounterexample<LETTER, IParityState>> destCounterexamples = generateCounterexamples(
+					transition.getSucc(), len - 1);
 			for (int i = 0; i < destCounterexamples.size(); i++) {
 				if (state.equals(destCounterexamples.get(i).repeatedState)
-						&& destCounterexamples.get(i).loopContainFinalState) {
-					NFACounterexample<LETTER, STATE> copy = destCounterexamples.get(i).makeCopy();
+						&& destCounterexamples.get(i).maxRepeatingNumber % 2 == 0) {
+					NFACounterexample<LETTER, IParityState> copy = destCounterexamples.get(i).makeCopy();
 					copy.repeatedState = null;
 					copy.loopStates.push(state);
 					copy.loopTransitions.push(transition.getLetter());
@@ -78,9 +77,9 @@ public class NFACounterexampleGeneration<LETTER, STATE> {
 					counterexamples.add(copy);
 				}
 				if (!state.equals(destCounterexamples.get(i).repeatedState) || visitedStates.get(state) > 1) {
-					if (aut.isFinal(state)) {
-						destCounterexamples.get(i).loopContainFinalState = true;
-					}
+					destCounterexamples.get(i).maxRepeatingNumber = Math
+							.max(destCounterexamples.get(i).maxRepeatingNumber, state.getRank());
+
 					if (destCounterexamples.get(i).repeatedState == null) {
 						destCounterexamples.get(i).stemTransitions.push(transition.getLetter());
 						destCounterexamples.get(i).stemStates.push(state);

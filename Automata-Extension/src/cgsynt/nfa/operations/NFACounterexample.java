@@ -8,19 +8,19 @@ public class NFACounterexample<LETTER, STATE> {
 	public Stack<LETTER> stemTransitions;
 	public Stack<STATE> stemStates;
 	public STATE repeatedState;
-	public boolean loopContainFinalState;
+	public int maxRepeatingNumber;
 
-	public NFACounterexample() {
+	public NFACounterexample(int maxRepeatingNumber) {
 		this.loopTransitions = new Stack<>();
 		this.loopStates = new Stack<>();
 		this.stemTransitions = new Stack<>();
 		this.stemStates = new Stack<>();
 		this.repeatedState = null;
-		this.loopContainFinalState = false;
+		this.maxRepeatingNumber = maxRepeatingNumber;
 	}
 
 	public NFACounterexample<LETTER, STATE> makeCopy() {
-		NFACounterexample<LETTER, STATE> copy = new NFACounterexample<>();
+		NFACounterexample<LETTER, STATE> copy = new NFACounterexample<>(maxRepeatingNumber);
 		copy.repeatedState = this.repeatedState;
 		copy.loopTransitions.addAll(this.loopTransitions);
 		copy.loopStates.addAll(this.loopStates);
