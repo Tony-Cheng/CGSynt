@@ -1,11 +1,17 @@
 package cgsynt.termination;
 
-import cgsynt.dfa.parity.operations.ParityCounterexample;
+import java.util.ArrayList;
+
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.interpol.VariableFactory;
+import cgsynt.nfa.operations.NFACounterexample;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedRun;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLassoRun;
+import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.BasicIcfg;
@@ -44,21 +50,67 @@ public class OmegaRefiner {
 		mEdgeFactory = new IcfgEdgeFactory(new SerialProvider());
 	}
 	
-	public void certifyCE(ParityCounterexample<IStatement, HoareAnnotation> ce) {
+	public void certifyCE(NFACounterexample<IStatement, HoareAnnotation> ce) {
 		BasicIcfg<IcfgLocation> icfg = new BasicIcfg<>("certify", mTTI.getCfgSmtToolkit(), IcfgLocation.class);
+		NFACounterexample<IStatement, HoareAnnotation> trace = ce.makeCopy();
 		
-		IcfgLocation[] stemLocations = new IcfgLocation[ce.stemStates.size()];
-		IcfgLocation[] loopLocations = new IcfgLocation[ce.loopStates.size() - 1];
+		TransitionStatePackage[] packages = getTransitionStatePackages(trace, icfg);
 		
-		HoareAnnotation[] stemPredicates = new HoareAnnotation[ce.stemStates.size()];
-		HoareAnnotation[] loopPredicates = new HoareAnnotation[ce.loopStates.size() - 1];
+		////////////////////
+		// Set up stem
+		IcfgInternalTransition[] stemTransitions = packages[0].getTransitions();
+		HoareAnnotation[] stemPredicates = packages[0].getAnnotations();
 		
-		ParityCounterexample<IStatement, HoareAnnotation> trace = ce.makeCopy();
+		int[] stemNestingRelation = new int[stemTransitions.length];
+		for (int i = 0; i < stemTransitions.length; i++) 
+			stemNestingRelation[i] = NestedWord.INTERNAL_POSITION;
+		
+		ArrayList<IPredicate> stemStates = new ArrayList<>();
+		for (int i = 0; i < stemPredicates.length; i++)
+			stemStates.add(stemPredicates[i]);
+		
+		NestedWord<IcfgInternalTransition> stemWord = new NestedWord<IcfgInternalTransition>(stemTransitions, stemNestingRelation);
+		NestedRun<IcfgInternalTransition, IPredicate> stem = new NestedRun<>(stemWord, stemStates);
+		
+		////////////////////
+		// Set up Loop
+		IcfgInternalTransition[] loopTransitions = packages[1].getTransitions();
+		HoareAnnotation[] loopPredicates = packages[1].getAnnotations();
+		
+		int[] loopNestingRelation = new int[loopTransitions.length];
+		for (int i = 0; i < loopTransitions.length; i++)
+			loopNestingRelation[i] = NestedWord.INTERNAL_POSITION;
+		
+		ArrayList<IPredicate> loopStates = new ArrayList<>();
+		loopStates.add(stemPredicates[stemPredicates.length - 1]);
+		for (int i = 0; i < loopPredicates.length; i++)
+			loopStates.add(loopPredicates[i]);
+		
+		NestedWord<IcfgInternalTransition> loopWord = new NestedWord<IcfgInternalTransition>(loopTransitions, loopNestingRelation);
+		NestedRun<IcfgInternalTransition, IPredicate> loop = new NestedRun<>(loopWord, loopStates);
+		
+		////////////////////
+		// Set up Lasso Run
+		NestedLassoRun<IcfgInternalTransition, IPredicate> counterexample = new NestedLassoRun<>(stem, loop);
+		
+		
+	}
+	
+	private TransitionStatePackage[] getTransitionStatePackages(NFACounterexample<IStatement, HoareAnnotation> trace, BasicIcfg<IcfgLocation> icfg) {
+		int stemStatesSize = trace.stemStates.size(); 
+		
+		IcfgLocation prevLocation;
+		
+		IcfgInternalTransition[] stemTransitions = new IcfgInternalTransition[stemStatesSize - 1];
+		HoareAnnotation[] stemPredicates = new HoareAnnotation[stemStatesSize];
+		
+		IcfgInternalTransition[] loopTransitions = new IcfgInternalTransition[trace.loopStates.size()];
+		HoareAnnotation[] loopPredicates = new HoareAnnotation[trace.loopStates.size() - 1];
 
-		IcfgLocation start = new IcfgLocation(new StringDebugIdentifier("p1l0"), "p1");
-		icfg.addLocation(start, true, false, true, false, false);
-		HoareAnnotation startAnnot = mOldPredicateFactory.getNewHoareAnnotation(start, mTTI.getModifiableGlobalsTable());
-		stemLocations[0] = start;
+		// Add the first location
+		prevLocation = new IcfgLocation(new StringDebugIdentifier("p1l0"), "p1");
+		icfg.addLocation(prevLocation, true, false, true, false, false);
+		HoareAnnotation startAnnot = mOldPredicateFactory.getNewHoareAnnotation(prevLocation, mTTI.getModifiableGlobalsTable());
 		stemPredicates[0] = startAnnot;
 		trace.stemStates.pop();
 		
@@ -66,15 +118,62 @@ public class OmegaRefiner {
 		while (!trace.stemStates.isEmpty()) {
 			trace.stemStates.pop();
 			
-			IcfgLocation location = new IcfgLocation(new StringDebugIdentifier("p1l" + stemCount), "p1");
-			icfg.addLocation(location, false, false, false, false, (stemCount == stemLocations.length - 1) ? true : false);
-			stemLocations[stemCount] = location;
+			IcfgLocation curLocation = new IcfgLocation(new StringDebugIdentifier("p1l" + stemCount), "p1");
+			icfg.addLocation(curLocation, false, false, false, false, (stemCount == stemStatesSize - 1) ? true : false);
+			HoareAnnotation annot = mOldPredicateFactory.getNewHoareAnnotation(curLocation, mTTI.getModifiableGlobalsTable());
 			
-			//
+			stemTransitions[stemCount - 1] = mEdgeFactory.createInternalTransition(prevLocation, curLocation, new Payload(), trace.stemTransitions.pop().getTransFormula());
+			stemPredicates[stemCount] = annot;
 			
-			HoareAnnotation annot = mOldPredicateFactory.getNewHoareAnnotation(location, mTTI.getModifiableGlobalsTable());
-			
+			prevLocation = curLocation;
 			stemCount++;
+		}
+		
+		// Create loop transitions
+		IcfgLocation loopLocation = prevLocation;
+		trace.loopStates.pop();
+		
+		int loopCount = 0;
+		while (!trace.loopStates.empty()) {
+			trace.loopStates.pop();
+			
+			IcfgLocation curLocation = new IcfgLocation(new StringDebugIdentifier("p1l" + (stemCount + loopCount)), "p1");
+			icfg.addLocation(curLocation, false, false, false, false, false);
+			HoareAnnotation annot = mOldPredicateFactory.getNewHoareAnnotation(curLocation, mTTI.getModifiableGlobalsTable());
+			
+			loopTransitions[loopCount] = mEdgeFactory.createInternalTransition(prevLocation, curLocation, new Payload(), trace.loopTransitions.pop().getTransFormula()); 
+			loopPredicates[loopCount] = annot;
+			
+			prevLocation = curLocation;
+			
+			loopCount++;
+		}
+		
+		// Add last transition
+		loopTransitions[loopCount] = mEdgeFactory.createInternalTransition(prevLocation, loopLocation, new Payload(), trace.loopTransitions.pop().getTransFormula());
+		
+		TransitionStatePackage[] packages = new TransitionStatePackage[2];
+		packages[0] = new TransitionStatePackage(stemTransitions, stemPredicates);
+		packages[1] = new TransitionStatePackage(loopTransitions, loopPredicates);
+		
+		return packages;
+	}
+	
+	class TransitionStatePackage{
+		private IcfgInternalTransition[] mTransitions;
+		private HoareAnnotation[] mAnnotations;
+		
+		public TransitionStatePackage(IcfgInternalTransition[] transitions, HoareAnnotation[] annotations) {
+			mTransitions = transitions;
+			mAnnotations = annotations;
+		}
+		
+		public IcfgInternalTransition[] getTransitions() {
+			return mTransitions;
+		}
+		
+		public HoareAnnotation[] getAnnotations() {
+			return mAnnotations;
 		}
 	}
 }
