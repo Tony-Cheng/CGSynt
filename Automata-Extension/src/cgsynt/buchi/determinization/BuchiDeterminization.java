@@ -83,6 +83,8 @@ public class BuchiDeterminization<LETTER, STATE> {
 	}
 
 	private void step2(SafraTree<STATE> tree) {
+		Stack<Set<STATE>> intersectionLabels = new Stack<>();
+		Stack<Integer> intersectionNodes = new Stack<>();
 		for (Integer node : tree.getStates()) {
 			Collection<STATE> finalStates = buchiAut.getFinalStates();
 			Set<STATE> intersection = findIntersection(finalStates, tree.getLabels(node));
@@ -92,8 +94,12 @@ public class BuchiDeterminization<LETTER, STATE> {
 				}
 			}
 			if (!intersection.isEmpty()) {
-				tree.addNode(node, intersection);
+				intersectionLabels.push(intersection);
+				intersectionNodes.push(node);
 			}
+		}
+		while(!intersectionNodes.isEmpty()) {
+			tree.addNode(intersectionNodes.pop(), intersectionLabels.pop());
 		}
 	}
 
@@ -156,4 +162,5 @@ public class BuchiDeterminization<LETTER, STATE> {
 		return intersection;
 	}
 
+	
 }

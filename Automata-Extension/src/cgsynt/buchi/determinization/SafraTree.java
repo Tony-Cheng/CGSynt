@@ -24,8 +24,6 @@ public class SafraTree<STATE> implements IParityState {
 	private Set<STATE> initialStates;
 	private int e;
 	private int f;
-	private int minGreenNode;
-	private int minRemovedNode;
 	private int numBuchiStates;
 	private int greatestName;
 
@@ -42,8 +40,6 @@ public class SafraTree<STATE> implements IParityState {
 		this.e = 2;
 		this.f = 1;
 		this.numBuchiStates = numBuchiStates;
-		this.minGreenNode = numBuchiStates + 1;
-		this.minRemovedNode = numBuchiStates + 1;
 		addRoot(initialStates);
 	}
 
@@ -110,8 +106,7 @@ public class SafraTree<STATE> implements IParityState {
 	}
 
 	public void setGreenNode(Integer node) {
-		minGreenNode = Math.min(minGreenNode, node);
-		f = minGreenNode;
+		f = Math.min(f, node);
 		for (Integer child : childrenMap.get(node)) {
 			removeSubtree(child);
 		}
@@ -123,8 +118,7 @@ public class SafraTree<STATE> implements IParityState {
 	}
 
 	public void removeNode(Integer node) {
-		minRemovedNode = Math.min(minRemovedNode, node);
-		f = minRemovedNode;
+		e = Math.min(e, node);
 		states.remove(node);
 		nameMap.remove(node);
 		if (parentMap.get(node) != null) {
@@ -159,8 +153,6 @@ public class SafraTree<STATE> implements IParityState {
 		tree.rem.addAll(rem);
 		tree.e = e;
 		tree.f = f;
-		tree.minGreenNode = minGreenNode;
-		tree.greatestName = greatestName;
 		return tree;
 	}
 
@@ -185,6 +177,8 @@ public class SafraTree<STATE> implements IParityState {
 			}
 		}
 		greatestName = greatestName - sum;
+		e = this.numBuchiStates + 1;
+		f = this.numBuchiStates + 1;
 		rem.clear();
 	}
 
@@ -195,9 +189,11 @@ public class SafraTree<STATE> implements IParityState {
 		result = prime * result + ((childrenMap == null) ? 0 : childrenMap.hashCode());
 		result = prime * result + e;
 		result = prime * result + f;
+		result = prime * result + greatestName;
 		result = prime * result + ((initialStates == null) ? 0 : initialStates.hashCode());
 		result = prime * result + ((labelMap == null) ? 0 : labelMap.hashCode());
 		result = prime * result + ((nameMap == null) ? 0 : nameMap.hashCode());
+		result = prime * result + numBuchiStates;
 		result = prime * result + ((parentMap == null) ? 0 : parentMap.hashCode());
 		result = prime * result + ((rem == null) ? 0 : rem.hashCode());
 		result = prime * result + root;
@@ -223,6 +219,8 @@ public class SafraTree<STATE> implements IParityState {
 			return false;
 		if (f != other.f)
 			return false;
+		if (greatestName != other.greatestName)
+			return false;
 		if (initialStates == null) {
 			if (other.initialStates != null)
 				return false;
@@ -237,6 +235,8 @@ public class SafraTree<STATE> implements IParityState {
 			if (other.nameMap != null)
 				return false;
 		} else if (!nameMap.equals(other.nameMap))
+			return false;
+		if (numBuchiStates != other.numBuchiStates)
 			return false;
 		if (parentMap == null) {
 			if (other.parentMap != null)
@@ -260,17 +260,19 @@ public class SafraTree<STATE> implements IParityState {
 
 	@Override
 	public int getRank() {
+		int invertedPriority;
 		if (e == 1) {
-			return -1;
+			invertedPriority = 2 * this.numBuchiStates - 1;
 		} else if (f == 1 && e > 1) {
-			return 0;
+			invertedPriority = 0;
 		} else if (f >= e) {
 			int i = e - 2;
-			return 2 * i + 1;
+			invertedPriority = 2 * i + 1;
 		} else {
 			int i = f - 2;
-			return 2 * i + 2;
+			invertedPriority = 2 * i + 2;
 		}
+		return this.numBuchiStates * 2 - invertedPriority;
 	}
 
 }
