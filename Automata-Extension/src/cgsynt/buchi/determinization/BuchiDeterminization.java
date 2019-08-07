@@ -44,7 +44,7 @@ public class BuchiDeterminization<LETTER, STATE> {
 		if (resultComputed)
 			return;
 		this.result = new ParityAutomaton<>(services, vpAlphabet, emptyStateFactory);
-		SafraTree<STATE> initialTree = new SafraTree<>(buchiAut.getInitialStates(), buchiAut.getStates().size());
+		SafraTree<STATE> initialTree = new SafraTree<>(buchiAut.getInitialStates(), buchiAut.getStates().size(), true);
 		this.visitedStates = new HashSet<>();
 		this.toVisitStates = new Stack<>();
 		toVisitStates.push(initialTree);

@@ -27,7 +27,7 @@ public class SafraTree<STATE> implements IParityState {
 	private int numBuchiStates;
 	private int greatestName;
 
-	public SafraTree(Set<STATE> initialStates, int numBuchiStates) {
+	public SafraTree(Set<STATE> initialStates, int numBuchiStates, boolean initializeRoot) {
 		this.initialStates = initialStates;
 		this.states = new HashSet<>();
 		this.nameMap = new HashMap<>();
@@ -40,7 +40,8 @@ public class SafraTree<STATE> implements IParityState {
 		this.e = 2;
 		this.f = 1;
 		this.numBuchiStates = numBuchiStates;
-		addRoot(initialStates);
+		if (initializeRoot)
+			addRoot(initialStates);
 	}
 
 	private void addRoot(Set<STATE> initialStates) {
@@ -131,17 +132,20 @@ public class SafraTree<STATE> implements IParityState {
 		if (!states.contains(node))
 			return;
 		e = Math.min(e, node);
-		states.remove(node);
-		nameMap.remove(node);
-		if (parentMap.get(node) != null) {
-			childrenMap.get(parentMap.get(node)).remove(node);
-		}
-		parentMap.remove(node);
-		labelMap.remove(node);
-		rem.add(node);
+		removeSubtree(node);
+		// states.remove(node);
+		// nameMap.remove(node);
+		// if (parentMap.get(node) != null) {
+		// childrenMap.get(parentMap.get(node)).remove(node);
+		// }
+		// parentMap.remove(node);
+		// labelMap.remove(node);
+		// rem.add(node);
 	}
 
 	private void removeSubtree(Integer node) {
+		if (!states.contains(node))
+			return;
 		Set<Integer> children = childrenMap.get(node);
 		states.remove(node);
 		parentMap.remove(node);
@@ -155,7 +159,7 @@ public class SafraTree<STATE> implements IParityState {
 	}
 
 	public SafraTree<STATE> copy() {
-		SafraTree<STATE> tree = new SafraTree<>(initialStates, this.numBuchiStates);
+		SafraTree<STATE> tree = new SafraTree<>(initialStates, this.numBuchiStates, false);
 		tree.states.addAll(states);
 		tree.nameMap.putAll(nameMap);
 		tree.root = root;
@@ -188,7 +192,12 @@ public class SafraTree<STATE> implements IParityState {
 				for (Integer child : childrenMap.get(i)) {
 					parentMap.put(child, i - sum);
 				}
+				childrenMap.put(i - sum, childrenMap.get(i));
 				childrenMap.remove(i);
+				if (parentMap.get(i) != null) {
+					childrenMap.get(parentMap.get(i)).remove(i);
+					childrenMap.get(parentMap.get(i)).add(i- sum);
+				}
 				parentMap.put(i - sum, parentMap.get(i));
 				parentMap.remove(i);
 				labelMap.put(i - sum, labelMap.get(i));
