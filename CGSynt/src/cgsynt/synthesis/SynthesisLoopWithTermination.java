@@ -7,10 +7,13 @@ import java.util.Map;
 import java.util.Set;
 
 import cgsynt.automaton.factory.PDeterminizeStateFactory;
+import cgsynt.buchi.determinization.BuchiDeterminization;
 import cgsynt.core.Specification;
 import cgsynt.core.service.CustomServiceProvider;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
+import cgsynt.dfa.parity.ParityAutomaton;
+import cgsynt.dfa.parity.operations.ParityAutomatonToTree;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
@@ -26,6 +29,8 @@ import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
 import cgsynt.tree.buchi.parity.operations.BuchiParityEmptinessCheck;
 import cgsynt.tree.parity.IParityState;
+import cgsynt.tree.parity.ParityState;
+import cgsynt.tree.parity.ParityStateFactory;
 import cgsynt.tree.parity.ParityTreeAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.LibraryIdentifiers;
@@ -35,12 +40,16 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.debugidentifiers.StringDebugIdentifier;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
 public class SynthesisLoopWithTermination {
 
 	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
 	private NestedWordAutomaton<IStatement, IPredicate> mPI;
+	private NestedWordAutomaton<IStatement, IPredicate> mOmega;
+	
 	private List<IStatement> mTransitionAlphabet;
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
@@ -84,6 +93,7 @@ public class SynthesisLoopWithTermination {
 		this.mAllInterpolants.add(preconditions);
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
+		this.mOmega = createOmega(preconditions);
 		this.visitedCounterexamples = new HashSet<>();
 		this.logs = new ArrayList<>();
 		this.printLogs = false;
@@ -117,6 +127,7 @@ public class SynthesisLoopWithTermination {
 		this.mAllInterpolants.add(preconditions);
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
+		this.mOmega = createOmega(preconditions);
 		this.visitedCounterexamples = new HashSet<>();
 		this.logs = new ArrayList<>();
 		this.printLogs = false;
@@ -153,6 +164,17 @@ public class SynthesisLoopWithTermination {
 		return pi;
 	}
 
+	private NestedWordAutomaton<IStatement, IPredicate> createOmega(IPredicate precondition){
+		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
+		VpAlphabet<IStatement> alphabet = new VpAlphabet<>(letters);
+		NestedWordAutomaton<IStatement, IPredicate> omega = new NestedWordAutomaton<>(mAutService, alphabet,
+				new GeneralizeStateFactory(globalVars.getPredicateFactory()));
+		
+		omega.addState(true, false, precondition);
+		
+		return omega;
+	}
+	
 	/**
 	 * Compute one iteration of the loop.
 	 * 
@@ -163,22 +185,33 @@ public class SynthesisLoopWithTermination {
 	 * @throws Exception
 	 */
 	private void computeOneIteration(int k, int bs) throws Exception {
-		// TODO: Implement the construction for the parity automaton.
-		ParityTreeAutomaton<RankedBool, IParityState> termTree = null;
+		// Dead states
+		IPredicate deadPredicateState = globalVars.getPredicateFactory().newDebugPredicate("deadState");
+		IParityState deadParityState = new ParityState<>(deadPredicateState, 1);
+		
+		////////////////////////////////////////////////
+		// Building PTA Omega from Buchi Omega
+		BuchiDeterminization<IStatement, IPredicate> determinizeBuchi = new BuchiDeterminization<>(mOmega, mAutService,
+				new ParityStateFactory());
+		determinizeBuchi.computeResult();
+		
+		ParityAutomaton<IStatement, IParityState> parityOmega = determinizeBuchi.getResult();
+		
+		ParityAutomatonToTree<IStatement, IParityState> parityOmegaToParityTreeOmega = new ParityAutomatonToTree<>(parityOmega,
+				mTransitionAlphabet, deadParityState);
+		
+		ParityTreeAutomaton<RankedBool, IParityState> termTree = parityOmegaToParityTreeOmega.getResult();
+		////////////////////////////////////////////////
 
 		// Determinize the String state version of PI.
 		Determinize<IStatement, IPredicate> determinize = new Determinize<>(mAutService,
 				new PDeterminizeStateFactory(globalVars.getPredicateFactory()), mPI);
 
-		INestedWordAutomaton<IStatement, IPredicate> dfaPI = determinize.getResult();// addDeadStates((NestedWordAutomaton<IStatement,
-																						// String>)determinize.getResult());
-
-		// Dead State
-		IPredicate deadState = globalVars.getPredicateFactory().newDebugPredicate("deadState");
+		INestedWordAutomaton<IStatement, IPredicate> dfaPI = determinize.getResult();
 
 		// Transform the DFA into an LTA
 		DfaToLtaPowerSet<IStatement, IPredicate> dfaToLta = new DfaToLtaPowerSet<>(dfaPI, mTransitionAlphabet,
-				deadState);
+				deadPredicateState);
 
 		BuchiTreeAutomaton<RankedBool, IPredicate> powerSet = dfaToLta.getResult();
 
