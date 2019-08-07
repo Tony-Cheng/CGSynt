@@ -49,6 +49,7 @@ public class BuchiDeterminization<LETTER, STATE> {
 		this.toVisitStates = new Stack<>();
 		toVisitStates.push(initialTree);
 		visitedStates.add(initialTree);
+		result.addState(true, false, initialTree);
 		while (!toVisitStates.isEmpty()) {
 			SafraTree<STATE> next = toVisitStates.pop();
 			for (LETTER letter : buchiAut.getAlphabet()) {
@@ -124,11 +125,15 @@ public class BuchiDeterminization<LETTER, STATE> {
 	}
 
 	private void step4(SafraTree<STATE> tree) {
+		Set<Integer> greenNodes = new HashSet<>();
 		for (Integer node : tree.getStates()) {
 			Set<STATE> union = getUnion(tree, tree.getChildren(node));
 			if (tree.getLabels(node).equals(union)) {
-				tree.setGreenNode(node);
+				greenNodes.add(node);
 			}
+		}
+		for (Integer node : greenNodes) {
+			tree.setGreenNode(node);
 		}
 	}
 

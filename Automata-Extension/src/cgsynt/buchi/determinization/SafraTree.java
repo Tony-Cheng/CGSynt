@@ -106,6 +106,8 @@ public class SafraTree<STATE> implements IParityState {
 	}
 
 	public void setGreenNode(Integer node) {
+		if (!states.contains(node)) 
+			return;
 		f = Math.min(f, node);
 		for (Integer child : childrenMap.get(node)) {
 			removeSubtree(child);
