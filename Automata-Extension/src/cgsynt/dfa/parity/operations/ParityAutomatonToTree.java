@@ -12,7 +12,7 @@ import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class ParityAutomatonToTree<LETTER, STATE extends IParityState, STATE2> {
+public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
 	private ParityAutomaton<LETTER, STATE> mInAutomaton;
 	private List<LETTER> mLetterOrder;
 	private STATE mDeadState;

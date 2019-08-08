@@ -217,6 +217,10 @@ public class SynthesisLoopWithTermination {
 		IPredicate deadPredicateState = globalVars.getPredicateFactory().newDebugPredicate("deadState");
 		IParityState deadParityState = new ParityState<>(deadPredicateState, 1);
 		
+		// Dummy State
+		IPredicate dummyPredicateState = globalVars.getPredicateFactory().newDebugPredicate("dummState");
+		IParityState dummyParityState = new ParityState<>(dummyPredicateState, 0);
+		
 		////////////////////////////////////////////////
 		// Building PTA Omega from Buchi Omega
 		BuchiDeterminization<IcfgInternalTransition, IPredicate> determinizeBuchi = new BuchiDeterminization<>(mOmega, mAutService,
@@ -226,7 +230,7 @@ public class SynthesisLoopWithTermination {
 		ParityAutomaton<IcfgInternalTransition, IParityState> parityOmega = determinizeBuchi.getResult();
 		
 		ParityAutomatonToTree<IcfgInternalTransition, IParityState> parityOmegaToParityTreeOmega = new ParityAutomatonToTree<>(parityOmega,
-				mIcfgTransitionAlphabet, deadParityState);
+				mIcfgTransitionAlphabet, deadParityState, dummyParityState);
 		
 		ParityTreeAutomaton<RankedBool, IParityState> termTree = parityOmegaToParityTreeOmega.getResult();
 		////////////////////////////////////////////////
@@ -290,7 +294,7 @@ public class SynthesisLoopWithTermination {
 		
 		}
 		
-		System.out.println(mOmega);
+		System.out.println(termTree);
 	}
 
 	/**
