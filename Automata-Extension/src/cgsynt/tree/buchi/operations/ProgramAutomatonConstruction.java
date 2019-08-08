@@ -101,7 +101,10 @@ public class ProgramAutomatonConstruction {
 		}
 		BuchiTreeAutomatonRule<RankedBool, IPredicate> rule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, stateRight,
 				dest);
+		BuchiTreeAutomatonRule<RankedBool, IPredicate> trueRule = new BuchiTreeAutomatonRule<>(RankedBool.TRUE, stateRight,
+				dest);
 		result.addRule(rule);
+		result.addRule(trueRule);
 	}
 
 	/**
