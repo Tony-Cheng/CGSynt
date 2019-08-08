@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectRule;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
@@ -40,6 +41,8 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 
 	private Stack<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> goodTransitions;
 	private Stack<BuchiParityIntersectState<STATE1, STATE2>> goodTransitionsState;
+
+	private Map<BuchiParityIntersectState<STATE1, STATE2>, BuchiParityIntersectRule<LETTER, STATE1, STATE2>> goodProgram;
 
 	public BuchiParityEmptinessCheck(BuchiParityIntersectAutomaton<LETTER, STATE1, STATE2> tree) {
 		resultComputed = false;
@@ -607,6 +610,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 							}
 						}
 						if (isGoodTransition) {
+							goodProgram.put(rule.getSource(), rule);
 							goodTransitions.add(rule);
 						}
 					}
@@ -616,6 +620,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 	}
 
 	private boolean computeDecentTree() {
+		this.goodProgram = new HashMap<>();
 		initializeDecentTransitions();
 		findAllDecentStates();
 		removeInitialNotDecentStates();
@@ -645,5 +650,9 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 
 	public boolean getResult() {
 		return result;
+	}
+
+	public Map<BuchiParityIntersectState<STATE1, STATE2>, BuchiParityIntersectRule<LETTER, STATE1, STATE2>> getGoodProgram() {
+		return goodProgram;
 	}
 }

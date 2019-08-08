@@ -163,6 +163,11 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 			BuchiParityIntersectState<STATE1, STATE2> intersectState) {
 		return mSourceMap.get(intersectState.getGoodIntersectState());
 	}
+	
+	public Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> getRulesBySource(
+			BuchiParityIntersectState<STATE1, STATE2> intersectState) {
+		return getForSourceMap(intersectState);
+	}
 
 	public Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> getForChildMap(
 			BuchiParityIntersectState<STATE1, STATE2> intersectState) {
