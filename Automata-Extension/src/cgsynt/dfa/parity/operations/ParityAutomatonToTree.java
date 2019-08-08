@@ -29,6 +29,17 @@ public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
 		mOutAutomaton = new ParityTreeAutomaton<>(letterOrder.size());
 		mOutAutomaton.addState(deadState);
 		
+		List<STATE> deadStateList = new ArrayList<>();
+		for (int i = 0; i < letterOrder.size(); i++) 
+			deadStateList.add(deadState);
+		ParityTreeAutomatonRule<RankedBool, STATE> deadTrue = 
+				new ParityTreeAutomatonRule<>(RankedBool.TRUE, deadState, deadStateList);
+		ParityTreeAutomatonRule<RankedBool, STATE> deadFalse = 
+				new ParityTreeAutomatonRule<>(RankedBool.FALSE, deadState, deadStateList);
+		
+		mOutAutomaton.addRule(deadTrue);
+		mOutAutomaton.addRule(deadFalse);
+		
 		mDummyState = dummyState;
 		
 		mDummyDestList = new ArrayList<>();
