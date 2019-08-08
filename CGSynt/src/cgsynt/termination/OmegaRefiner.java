@@ -119,7 +119,6 @@ public class OmegaRefiner {
 			loopNestingRelation[i] = NestedWord.INTERNAL_POSITION;
 		
 		ArrayList<IPredicate> loopStates = new ArrayList<>();
-		loopStates.add(stemPredicates[stemPredicates.length - 1]);
 		for (int i = 0; i < loopPredicates.length; i++)
 			loopStates.add(loopPredicates[i]);
 		
@@ -178,8 +177,6 @@ public class OmegaRefiner {
 	}
 	
 	private TransitionStatePackage[] getTransitionStatePackages(ParityCounterexample<IcfgInternalTransition, IParityState> trace, BasicIcfg<IcfgLocation> icfg) {
-		System.out.println("Stem: States " + trace.stemStates.size() + " Letters " + trace.stemTransitions.size());
-		System.out.println("Loop: States " + trace.loopStates.size() + " Letters " + trace.loopTransitions.size());
 		
 		int stemStatesSize = trace.stemStates.size(); 
 		
@@ -189,7 +186,7 @@ public class OmegaRefiner {
 		HoareAnnotation[] stemPredicates = new HoareAnnotation[stemStatesSize];
 		
 		IcfgInternalTransition[] loopTransitions = new IcfgInternalTransition[trace.loopStates.size()];
-		HoareAnnotation[] loopPredicates = new HoareAnnotation[trace.loopStates.size() - 1];
+		HoareAnnotation[] loopPredicates = new HoareAnnotation[trace.loopStates.size() + 1];
 
 		// Add the first location
 		prevLocation = new IcfgLocation(new StringDebugIdentifier("0"/*"p1l0"*/), "p1");
@@ -214,10 +211,11 @@ public class OmegaRefiner {
 		}
 		
 		// Create loop transitions
+		loopPredicates[0] = stemPredicates[stemPredicates.length - 1]; 
 		IcfgLocation loopLocation = prevLocation;
 		trace.loopStates.pop();
 		
-		int loopCount = 0;
+		int loopCount = 1;
 		while (!trace.loopStates.empty()) {
 			trace.loopStates.pop();
 			
@@ -225,13 +223,17 @@ public class OmegaRefiner {
 			icfg.addLocation(curLocation, false, false, false, false, false);
 			HoareAnnotation annot = mOldPredicateFactory.getNewHoareAnnotation(curLocation, mTTI.getModifiableGlobalsTable());
 			
-			loopTransitions[loopCount] = mEdgeFactory.createInternalTransition(prevLocation, curLocation, new Payload(), trace.loopTransitions.pop().getTransformula()); 
+			loopTransitions[loopCount - 1] = mEdgeFactory.createInternalTransition(prevLocation, curLocation, new Payload(), trace.loopTransitions.pop().getTransformula()); 
 			loopPredicates[loopCount] = annot;
 			
 			prevLocation = curLocation;
 			
 			loopCount++;
 		}
+		
+		// Add final transition
+		loopTransitions[loopCount - 1] = mEdgeFactory.createInternalTransition(prevLocation, loopLocation, new Payload(), trace.loopTransitions.pop().getTransformula());
+		loopPredicates[loopCount] = loopPredicates[0];
 		
 		// Add last transition
 		TransitionStatePackage[] packages = new TransitionStatePackage[2];

@@ -10,7 +10,6 @@ import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.VariableFactory;
-import cgsynt.synthesis.SynthesisLoop;
 import cgsynt.synthesis.SynthesisLoopWithTermination;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOldVar;
