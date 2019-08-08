@@ -12,20 +12,32 @@ import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
+public class ParityAutomatonToTree<LETTER, STATE extends IParityState, STATE2> {
 	private ParityAutomaton<LETTER, STATE> mInAutomaton;
 	private List<LETTER> mLetterOrder;
 	private STATE mDeadState;
 	
 	private ParityTreeAutomaton<RankedBool, STATE> mOutAutomaton;
+	private STATE mDummyState;
+	private List<STATE> mDummyDestList;
 	
-	public ParityAutomatonToTree(final ParityAutomaton<LETTER, STATE> automaton, List<LETTER> letterOrder, STATE deadState){
+	public ParityAutomatonToTree(final ParityAutomaton<LETTER, STATE> automaton, List<LETTER> letterOrder, STATE deadState, STATE dummyState){
 		mInAutomaton = automaton;
 		mLetterOrder = letterOrder;
 		mDeadState = deadState;
 		
 		mOutAutomaton = new ParityTreeAutomaton<>(letterOrder.size());
 		mOutAutomaton.addState(deadState);
+		
+		mDummyState = dummyState;
+		
+		mDummyDestList = new ArrayList<>();
+		for (int i = 0; i < letterOrder.size(); i++)
+			mDummyDestList.add(mDummyState);
+		
+		ParityTreeAutomatonRule<RankedBool, STATE> dummyLoop = 
+				new ParityTreeAutomatonRule<>(RankedBool.TRUE, mDummyState, mDummyDestList);
+		mOutAutomaton.addRule(dummyLoop);
 		
 		computeResult();
 	}
@@ -46,12 +58,17 @@ public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
 			else if (!existant)
 				mOutAutomaton.addState(newState);
 			
+			/*
 			if (mInAutomaton.isFinal(state)) {
 				ParityTreeAutomatonRule<RankedBool, STATE> trueRule = 
 						new ParityTreeAutomatonRule<>(RankedBool.TRUE, newState, createDestinationList(state));
 				
 				mOutAutomaton.addRule(trueRule);
-			}
+			}*/
+			ParityTreeAutomatonRule<RankedBool, STATE> trueRule = 
+					new ParityTreeAutomatonRule<>(RankedBool.TRUE, newState, mDummyDestList);
+			
+			mOutAutomaton.addRule(trueRule);
 			
 			ParityTreeAutomatonRule<RankedBool, STATE> falseRule = 
 					new ParityTreeAutomatonRule<>(RankedBool.FALSE, newState, createDestinationList(state));

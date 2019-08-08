@@ -33,7 +33,7 @@ public class TestSynthesisLoopWithTermination {
 				globalVars.getManagedScript(), vf.getSymbolTable());
 
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
-		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("2")));
+		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("1")));
 		List<IStatement> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add(ipp);
 		transitionAlphabet.add(imm);

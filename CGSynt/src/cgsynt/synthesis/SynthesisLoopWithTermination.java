@@ -287,8 +287,10 @@ public class SynthesisLoopWithTermination {
 		// Refinement
 		for (int i = 0; i < omegaCounterexamples.size(); i++) {
 			mOmegaRefiner.certifyCE(omegaCounterexamples.get(i));
+		
 		}
 		
+		System.out.println(mOmega);
 	}
 
 	/**
