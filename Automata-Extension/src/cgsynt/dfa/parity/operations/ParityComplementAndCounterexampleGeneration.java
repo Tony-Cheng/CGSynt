@@ -53,7 +53,7 @@ public class ParityComplementAndCounterexampleGeneration<LETTER> {
 		if (visitedStates.containsKey(state) && visitedStates.get(state) > 0) {
 			ParityCounterexample<LETTER, IParityState> counterexample = new ParityCounterexample<>(state.getRank());
 			counterexample.repeatedState = state;
-			counterexample.loopStates.push(state);
+			// counterexample.loopStates.push(state);
 			counterexamples.add(counterexample);
 		}
 		if (len == 0) {
