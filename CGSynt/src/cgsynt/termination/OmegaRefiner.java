@@ -45,15 +45,15 @@ import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.tr
 import de.uni_freiburg.informatik.ultimate.util.datastructures.SerialProvider;
 
 public class OmegaRefiner {
+	public static final SerialProvider SERIAL_PROVIDER = new SerialProvider();
+	
 	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> mOmega;
 	private TraceGlobalVariables mGlobalVars;
 	
 	private ILogger mLogger;
 	private ManagedScript mMScript;
-	private VariableFactory mVf;
 	private TraceToInterpolants mTTI;
 	private PredicateFactory mOldPredicateFactory, mPredicateFactory;
-	private Script mScript;
 	private IcfgEdgeFactory mEdgeFactory;
 	private IUltimateServiceProvider mServiceProvider;
 	private CfgSmtToolkit mCsToolkitWithRankVars;
@@ -66,11 +66,9 @@ public class OmegaRefiner {
 		
 		mLogger = mGlobalVars.getLogger();
 		mMScript = mGlobalVars.getManagedScript();
-		mVf = mGlobalVars.getVariableFactory();
 		mTTI = mGlobalVars.getTraceInterpolator();
 		mOldPredicateFactory = mGlobalVars.getPredicateFactory();
-		mScript = mMScript.getScript();
-		mEdgeFactory = new IcfgEdgeFactory(new SerialProvider());
+		mEdgeFactory = new IcfgEdgeFactory(SERIAL_PROVIDER);
 		
 		RankVarConstructor rankVarConstructor = new RankVarConstructor(mTTI.getCfgSmtToolkit());
 		mPredicateFactory = new PredicateFactory(mServiceProvider, mMScript, 
@@ -87,10 +85,10 @@ public class OmegaRefiner {
 		mBenchmarker = new BuchiCegarLoopBenchmarkGenerator();
 	}
 	
-	public void certifyCE(ParityCounterexample<IStatement, IParityState> ce) throws Exception {
+	public void certifyCE(ParityCounterexample<IcfgInternalTransition, IParityState> ce) throws Exception {
 		
 		BasicIcfg<IcfgLocation> icfg = new BasicIcfg<>("certify", mTTI.getCfgSmtToolkit(), IcfgLocation.class);
-		ParityCounterexample<IStatement, IParityState> trace = ce.makeCopy();
+		ParityCounterexample<IcfgInternalTransition, IParityState> trace = ce.makeCopy();
 		
 		TransitionStatePackage[] packages = getTransitionStatePackages(trace, icfg);
 		
@@ -178,7 +176,7 @@ public class OmegaRefiner {
 		return refinementFactory;
 	}
 	
-	private TransitionStatePackage[] getTransitionStatePackages(ParityCounterexample<IStatement, IParityState> trace, BasicIcfg<IcfgLocation> icfg) {
+	private TransitionStatePackage[] getTransitionStatePackages(ParityCounterexample<IcfgInternalTransition, IParityState> trace, BasicIcfg<IcfgLocation> icfg) {
 		int stemStatesSize = trace.stemStates.size(); 
 		
 		IcfgLocation prevLocation;
@@ -190,7 +188,7 @@ public class OmegaRefiner {
 		HoareAnnotation[] loopPredicates = new HoareAnnotation[trace.loopStates.size() - 1];
 
 		// Add the first location
-		prevLocation = new IcfgLocation(new StringDebugIdentifier("p1l0"), "p1");
+		prevLocation = new IcfgLocation(new StringDebugIdentifier("0"/*"p1l0"*/), "p1");
 		icfg.addLocation(prevLocation, true, false, true, false, false);
 		HoareAnnotation startAnnot = mOldPredicateFactory.getNewHoareAnnotation(prevLocation, mTTI.getModifiableGlobalsTable());
 		stemPredicates[0] = startAnnot;
@@ -200,11 +198,11 @@ public class OmegaRefiner {
 		while (!trace.stemStates.isEmpty()) {
 			trace.stemStates.pop();
 			
-			IcfgLocation curLocation = new IcfgLocation(new StringDebugIdentifier("p1l" + stemCount), "p1");
+			IcfgLocation curLocation = new IcfgLocation(new StringDebugIdentifier("0"/*"p1l" + stemCount*/), "p1");
 			icfg.addLocation(curLocation, false, false, false, false, (stemCount == stemStatesSize - 1) ? true : false);
 			HoareAnnotation annot = mOldPredicateFactory.getNewHoareAnnotation(curLocation, mTTI.getModifiableGlobalsTable());
 			
-			stemTransitions[stemCount - 1] = mEdgeFactory.createInternalTransition(prevLocation, curLocation, new Payload(), trace.stemTransitions.pop().getTransFormula());
+			stemTransitions[stemCount - 1] = mEdgeFactory.createInternalTransition(prevLocation, curLocation, new Payload(), trace.stemTransitions.pop().getTransformula());
 			stemPredicates[stemCount] = annot;
 			
 			prevLocation = curLocation;
@@ -219,11 +217,11 @@ public class OmegaRefiner {
 		while (!trace.loopStates.empty()) {
 			trace.loopStates.pop();
 			
-			IcfgLocation curLocation = new IcfgLocation(new StringDebugIdentifier("p1l" + (stemCount + loopCount)), "p1");
+			IcfgLocation curLocation = new IcfgLocation(new StringDebugIdentifier("0"/*"p1l" + (stemCount + loopCount)*/), "p1");
 			icfg.addLocation(curLocation, false, false, false, false, false);
 			HoareAnnotation annot = mOldPredicateFactory.getNewHoareAnnotation(curLocation, mTTI.getModifiableGlobalsTable());
 			
-			loopTransitions[loopCount] = mEdgeFactory.createInternalTransition(prevLocation, curLocation, new Payload(), trace.loopTransitions.pop().getTransFormula()); 
+			loopTransitions[loopCount] = mEdgeFactory.createInternalTransition(prevLocation, curLocation, new Payload(), trace.loopTransitions.pop().getTransformula()); 
 			loopPredicates[loopCount] = annot;
 			
 			prevLocation = curLocation;
@@ -232,7 +230,7 @@ public class OmegaRefiner {
 		}
 		
 		// Add last transition
-		loopTransitions[loopCount] = mEdgeFactory.createInternalTransition(prevLocation, loopLocation, new Payload(), trace.loopTransitions.pop().getTransFormula());
+		loopTransitions[loopCount] = mEdgeFactory.createInternalTransition(prevLocation, loopLocation, new Payload(), trace.loopTransitions.pop().getTransformula());
 		
 		TransitionStatePackage[] packages = new TransitionStatePackage[2];
 		packages[0] = new TransitionStatePackage(stemTransitions, stemPredicates);
