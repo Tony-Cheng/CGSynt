@@ -75,7 +75,8 @@ public class SynthesisLoopWithTermination {
 	private int printedLogsSize;
 	private TraceGlobalVariables globalVars;
 	private Map<IntersectState<IPredicate, IPredicate>, BuchiTreeAutomatonRule<RankedBool, IntersectState<IPredicate, IPredicate>>> goodProgram;
-
+	private OmegaRefiner mOmegaRefiner;
+	
 	public SynthesisLoopWithTermination(List<IStatement> transitionAlphabet, IPredicate preconditions,
 			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
 		this.globalVars = globalVars;
@@ -106,6 +107,7 @@ public class SynthesisLoopWithTermination {
 		this.logs = new ArrayList<>();
 		this.printLogs = false;
 		this.printedLogsSize = 0;
+		this.mOmegaRefiner = new OmegaRefiner(this.globalVars, this.mOmega);
 	}
 
 	public SynthesisLoopWithTermination(Specification spec) throws Exception {
@@ -130,6 +132,7 @@ public class SynthesisLoopWithTermination {
 		this.mPrograms = construction.getResult();
 		this.mResultComputed = false;
 		this.mTransitionAlphabet = construction.getAlphabet();
+		this.mIcfgTransitionAlphabet = createIcfgTransitionAlphabet(mTransitionAlphabet);
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
 		this.mAllInterpolants.add(preconditions);
@@ -140,6 +143,7 @@ public class SynthesisLoopWithTermination {
 		this.logs = new ArrayList<>();
 		this.printLogs = false;
 		this.printedLogsSize = 0;
+		this.mOmegaRefiner = new OmegaRefiner(this.globalVars, this.mOmega);
 	}
 
 	public void setPrintLogs(boolean printLogs) {
@@ -280,9 +284,9 @@ public class SynthesisLoopWithTermination {
 		
 		List<ParityCounterexample<IcfgInternalTransition, IParityState>> omegaCounterexamples = omegaCounterexampleGenerator.getResult();
 		
-		OmegaRefiner omegaRefiner = new OmegaRefiner(this.globalVars, this.mOmega);
+		// Refinement
 		for (int i = 0; i < omegaCounterexamples.size(); i++) {
-			omegaRefiner.certifyCE(omegaCounterexamples.get(i));
+			mOmegaRefiner.certifyCE(omegaCounterexamples.get(i));
 		}
 		
 	}
