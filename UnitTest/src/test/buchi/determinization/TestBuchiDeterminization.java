@@ -121,4 +121,34 @@ public class TestBuchiDeterminization {
 		System.out.println("Test 4");
 		System.out.println(determinization.getResult());
 	}
+	
+	@Test
+	void test5() {
+		IUltimateServiceProvider mock = UltimateMocks.createUltimateServiceProviderMock();
+		AutomataLibraryServices service = new AutomataLibraryServices(mock);
+
+		Set<Character> letters = new HashSet<Character>();
+		letters.add('a');
+		letters.add('b');
+		// letters.add('c');
+
+		VpAlphabet<Character> alpha = new VpAlphabet<>(letters);
+
+		NestedWordAutomaton<Character, String> nwa = new NestedWordAutomaton<>(service, alpha, new StringFactory());
+
+		nwa.addState(true, false, "q0");
+		nwa.addState(false, true, "q1");
+
+		nwa.addInternalTransition("q0", 'a', "q0");
+		nwa.addInternalTransition("q0", 'a', "q1");
+		nwa.addInternalTransition("q1", 'b', "q1");
+
+
+
+		BuchiDeterminization<Character, String> determinization = new BuchiDeterminization<>(nwa, service,
+				new ParityStateFactory());
+		determinization.computeResult();
+		System.out.println("Test 5");
+		System.out.println(determinization.getResult());
+	}
 }
