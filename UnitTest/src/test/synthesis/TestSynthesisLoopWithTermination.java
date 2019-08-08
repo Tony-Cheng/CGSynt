@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import cgsynt.core.GlobalsConfigurer;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.TraceGlobalVariables;
@@ -20,7 +21,7 @@ public class TestSynthesisLoopWithTermination {
 
 	@Test
 	void test1() throws Exception {
-		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		TraceGlobalVariables globalVars = GlobalsConfigurer.configureForTermination();
 		VariableFactory vf = globalVars.getVariableFactory();
 		Script script = globalVars.getManagedScript().getScript();
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);

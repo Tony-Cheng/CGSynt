@@ -64,6 +64,7 @@ public class OmegaRefiner {
 		mGlobalVars = globalVars;
 		mOmega = omega;
 		
+		mServiceProvider = globalVars.getService();
 		mLogger = mGlobalVars.getLogger();
 		mMScript = mGlobalVars.getManagedScript();
 		mTTI = mGlobalVars.getTraceInterpolator();
@@ -177,6 +178,9 @@ public class OmegaRefiner {
 	}
 	
 	private TransitionStatePackage[] getTransitionStatePackages(ParityCounterexample<IcfgInternalTransition, IParityState> trace, BasicIcfg<IcfgLocation> icfg) {
+		System.out.println("Stem: States " + trace.stemStates.size() + " Letters " + trace.stemTransitions.size());
+		System.out.println("Loop: States " + trace.loopStates.size() + " Letters " + trace.loopTransitions.size());
+		
 		int stemStatesSize = trace.stemStates.size(); 
 		
 		IcfgLocation prevLocation;
@@ -230,8 +234,6 @@ public class OmegaRefiner {
 		}
 		
 		// Add last transition
-		loopTransitions[loopCount] = mEdgeFactory.createInternalTransition(prevLocation, loopLocation, new Payload(), trace.loopTransitions.pop().getTransformula());
-		
 		TransitionStatePackage[] packages = new TransitionStatePackage[2];
 		packages[0] = new TransitionStatePackage(stemTransitions, stemPredicates);
 		packages[1] = new TransitionStatePackage(loopTransitions, loopPredicates);
