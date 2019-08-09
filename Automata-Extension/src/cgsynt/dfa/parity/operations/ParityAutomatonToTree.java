@@ -69,13 +69,14 @@ public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
 			else if (!existant)
 				mOutAutomaton.addState(newState);
 			
-			/*
+			
 			if (mInAutomaton.isFinal(state)) {
 				ParityTreeAutomatonRule<RankedBool, STATE> trueRule = 
 						new ParityTreeAutomatonRule<>(RankedBool.TRUE, newState, createDestinationList(state));
 				
 				mOutAutomaton.addRule(trueRule);
-			}*/
+			}
+			
 			ParityTreeAutomatonRule<RankedBool, STATE> trueRule = 
 					new ParityTreeAutomatonRule<>(RankedBool.TRUE, newState, mDummyDestList);
 			

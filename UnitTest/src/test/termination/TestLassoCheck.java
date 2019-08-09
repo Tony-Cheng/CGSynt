@@ -82,7 +82,7 @@ import de.uni_freiburg.informatik.ultimate.util.datastructures.SerialProvider;
 
 public class TestLassoCheck {
 	
-	//@Test
+	@Test
 	public void testTerm() throws Exception {
 		CustomServiceProvider serviceProvider = new CustomServiceProvider(LogLevel.OFF);
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,41 +92,41 @@ public class TestLassoCheck {
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_ITERATIONS, 100);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_WATCHITERATION, 100);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_ARTIFACT, Artifact.INTERPOLANT_AUTOMATON);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_HOARE, false);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_HOARE, true);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_HOARE_POSITIONS, HoareAnnotationPositions.All);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_INTERPOLATED_LOCS, InterpolationTechnique.Craig_NestedInterpolation);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_INTERPOLANT_AUTOMATON, InterpolantAutomaton.CANONICAL);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_DUMPAUTOMATA, false);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_AUTOMATAFORMAT, Format.ATS);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_AUTOMATAFORMAT, Format.ATS_NUMERATE);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_DUMPPATH, "label");
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_DUMP_ONLY_REUSE, false);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_INTERPOLANT_AUTOMATON_ENHANCEMENT, InterpolantAutomatonEnhancement.NONE);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_HOARE_TRIPLE_CHECKS, HoareTripleChecks.INCREMENTAL);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_HOARE_TRIPLE_CHECKS, HoareTripleChecks.MONOLITHIC);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_MINIMIZE, Minimization.DELAYED_SIMULATION);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_CONCURRENCY, Concurrency.FINITE_AUTOMATA);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_TRACE_HISTOGRAM, 100);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_TIME, 1000);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_PATH_PROGRAM, 1000);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_TIME, 0);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_USERLIMIT_PATH_PROGRAM, 0);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_COMPUTE_INTERPOLANT_SEQUENCE_STATISTICS, false);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_ABSINT_MODE, AbstractInterpretationMode.USE_CANONICAL);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_ABSINT_MODE, AbstractInterpretationMode.USE_PREDICATES);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_SIMPLIFICATION_TECHNIQUE, SimplificationTechnique.SIMPLIFY_BDD_FIRST_ORDER);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_XNF_CONVERSION_TECHNIQUE, XnfConversionTechnique.BDD_BASED);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_REFINEMENT_STRATEGY, RefinementStrategy.CAMEL);
 		taPref.put(RcfgPreferenceInitializer.LABEL_SOLVER, SolverMode.Internal_SMTInterpol);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_REFINEMENT_STRATEGY_EXCEPTION_BLACKLIST, 
-				RefinementStrategyExceptionBlacklist.NONE);
+				RefinementStrategyExceptionBlacklist.ALL);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_ASSERT_CODEBLOCKS_INCREMENTALLY, 
-				AssertCodeBlockOrder.INSIDE_LOOP_FIRST1);
+				AssertCodeBlockOrder.NOT_INCREMENTALLY);
 		
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_UNSAT_CORES, UnsatCores.IGNORE);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_LIVE_VARIABLES, false);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_ABSTRACT_INTERPRETATION_FOR_PATH_INVARIANTS, false);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_INTERPOLANTS_CONSOLIDATION, false);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_NONLINEAR_CONSTRAINTS_IN_PATHINVARIANTS, false);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_UNSAT_CORES_IN_PATHINVARIANTS, false);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_WEAKEST_PRECONDITION_IN_PATHINVARIANTS, false);
-	    taPref.put(TraceAbstractionPreferenceInitializer.LABEL_COMPUTE_COUNTEREXAMPLE, false);
-		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_USE_PREDICATE_TRIE_BASED_PREDICATE_UNIFIER, false);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_LIVE_VARIABLES, true);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_ABSTRACT_INTERPRETATION_FOR_PATH_INVARIANTS, true);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_INTERPOLANTS_CONSOLIDATION, true);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_NONLINEAR_CONSTRAINTS_IN_PATHINVARIANTS, true);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_UNSAT_CORES_IN_PATHINVARIANTS, true);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_WEAKEST_PRECONDITION_IN_PATHINVARIANTS, true);
+	    taPref.put(TraceAbstractionPreferenceInitializer.LABEL_COMPUTE_COUNTEREXAMPLE, true);
+		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_USE_PREDICATE_TRIE_BASED_PREDICATE_UNIFIER, true);
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Setting up the BuchiAutomizer Preferences
@@ -275,6 +275,8 @@ public class TestLassoCheck {
 		
 		TaskIdentifier taskIdentifier = new SubtaskFileIdentifier(null, icfg.getIdentifier());
 		
+		System.out.println("Before:\n" + omega);
+		
 		LassoCheck<IcfgInternalTransition> check = new LassoCheck<>(
 				InterpolationTechnique.Craig_NestedInterpolation,
 				tti.getCfgSmtToolkit(), 
@@ -290,6 +292,7 @@ public class TestLassoCheck {
 				taskIdentifier,
 				benchmarker);
 		
+		System.out.println("After:\n" + omega);
 		System.out.println(check.getNonTerminationArgument());
 	}
 	
@@ -899,7 +902,7 @@ public class TestLassoCheck {
 		System.out.println(omega);
 	}
 
-	@Test
+	//@Test
 	public void testManualOmegaConstruction() throws Exception {
 		CustomServiceProvider serviceProvider = new CustomServiceProvider(LogLevel.OFF);
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
