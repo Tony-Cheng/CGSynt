@@ -504,7 +504,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		        }
 		    }
 		    
-		    result.append(value + " = " + matchingKey);
+		    result.append(value + " = " + matchingKey + "\n");
 		}
 		
 		result.append("\n");

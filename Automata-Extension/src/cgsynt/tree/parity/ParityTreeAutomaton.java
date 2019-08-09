@@ -341,7 +341,7 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		        }
 		    }
 		    
-		    result.append(value + " = " + matchingKey);
+		    result.append(value + " = " + matchingKey + "\n");
 		}
 		
 		result.append("\n");
