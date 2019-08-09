@@ -2,11 +2,14 @@ package cgsynt.tree.parity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import cgsynt.StateRepCondenser;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
@@ -327,7 +330,19 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		}
 		result.append("\n");
 
-		result.append(map.toString());
+		List<String> values = new ArrayList<>(map.values());
+		Collections.sort(values);
+		result.append("Mappings:\n");
+		for (String value : values) {
+			String matchingKey = "";
+		    for (Entry<String, String> entry : map.entrySet()) {
+		        if (Objects.equals(value, entry.getValue())) {
+		        	matchingKey = entry.getKey();
+		        }
+		    }
+		    
+		    result.append(value + " = " + matchingKey);
+		}
 		
 		result.append("\n");
 		
