@@ -22,6 +22,8 @@ import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.operations.CounterExamplesToInterpolants;
+import cgsynt.operations.ProgramRetrieval;
+import cgsynt.operations.TerminatingProgramExtraction;
 import cgsynt.probability.ConfidenceIntervalCalculator;
 import cgsynt.termination.OmegaRefiner;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
@@ -31,6 +33,8 @@ import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.BuchiIntersection;
 import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiParityIntersectRule;
+import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
 import cgsynt.tree.buchi.parity.operations.BuchiParityEmptinessCheck;
 import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityState;
@@ -62,7 +66,7 @@ public class SynthesisLoopWithTermination {
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
-	private BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> result;
+	private BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> result;
 	private Set<List<IStatement>> visitedCounterexamples;
 	private int prevSize;
 
@@ -75,7 +79,7 @@ public class SynthesisLoopWithTermination {
 	private boolean printLogs;
 	private int printedLogsSize;
 	private TraceGlobalVariables globalVars;
-	private Map<IntersectState<IPredicate, IPredicate>, BuchiTreeAutomatonRule<RankedBool, IntersectState<IPredicate, IPredicate>>> goodProgram;
+	private Map<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, IParityState>, BuchiParityIntersectRule<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState>> goodProgram;
 	private OmegaRefiner mOmegaRefiner;
 
 	public SynthesisLoopWithTermination(List<IStatement> transitionAlphabet, IPredicate preconditions,
@@ -268,6 +272,8 @@ public class SynthesisLoopWithTermination {
 		if (!emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
+			result = buchiParityIntersectedAut;
+			goodProgram = emptinessCheck.getGoodProgram();
 			return;
 		}
 		prevSize = k * dfaPI.getStates().size();
@@ -301,10 +307,9 @@ public class SynthesisLoopWithTermination {
 		// Refinement
 		for (int i = 0; i < omegaCounterexamples.size(); i++) {
 			mOmegaRefiner.certifyCE(omegaCounterexamples.get(i));
-
 		}
 
-		System.out.println(termTree);
+		// System.out.println(termTree);
 	}
 
 	/**
@@ -312,7 +317,7 @@ public class SynthesisLoopWithTermination {
 	 * 
 	 * @return
 	 */
-	public BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> getResult() {
+	public BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> getResult() {
 		return result;
 	}
 
@@ -376,16 +381,16 @@ public class SynthesisLoopWithTermination {
 		}
 	}
 
-	// public void printProgram() {
-	// IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
-	// for (int i = 0; i < statements.length; i++) {
-	// statements[i] = mTransitionAlphabet.get(i);
-	// }
-	// ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result,
-	// statements, goodProgram);
-	// retrieve.computeResult();
-	// for (String statement : retrieve.getResult()) {
-	// System.out.println(statement);
-	// }
-	// }
+	public void printProgram() {
+		IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
+		for (int i = 0; i < statements.length; i++) {
+			statements[i] = mTransitionAlphabet.get(i);
+		}
+		TerminatingProgramExtraction<RankedBool, IParityState> retrieve = new TerminatingProgramExtraction<>(result,
+				statements, goodProgram);
+		retrieve.computeResult();
+		for (String statement : retrieve.getResult()) {
+			System.out.println(statement);
+		}
+	}
 }

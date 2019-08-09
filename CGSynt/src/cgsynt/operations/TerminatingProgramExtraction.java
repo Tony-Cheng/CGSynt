@@ -24,20 +24,20 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPre
  *
  * @param <LETTER>
  */
-public class TerminatingProgramExtraction<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
+public class TerminatingProgramExtraction<LETTER extends IRankedLetter, STATE extends IParityState> {
 
 	private IStatement[] statements;
-	private BuchiParityIntersectAutomaton<LETTER, IntersectState<IPredicate, STATE1>, STATE2> tree;
-	private Set<BuchiParityIntersectState<IntersectState<IPredicate, STATE1>, STATE2>> visitedStates;
-	private Set<BuchiParityIntersectState<IntersectState<IPredicate, STATE1>, STATE2>> repeatedStates;
+	private BuchiParityIntersectAutomaton<LETTER, IntersectState<IPredicate, IPredicate>, STATE> tree;
+	private Set<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> visitedStates;
+	private Set<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> repeatedStates;
 	private List<String> currentStatements;
-	private Map<BuchiParityIntersectState<IntersectState<IPredicate, STATE1>, STATE2>, BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, STATE1>, STATE2>> goodProgram;
+	private Map<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>, BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE>> goodProgram;
 	private boolean resultComputed;
 
 	public TerminatingProgramExtraction(
-			BuchiParityIntersectAutomaton<LETTER, IntersectState<IPredicate, STATE1>, STATE2> tree,
+			BuchiParityIntersectAutomaton<LETTER, IntersectState<IPredicate, IPredicate>, STATE> tree,
 			IStatement[] statements,
-			Map<BuchiParityIntersectState<IntersectState<IPredicate, STATE1>, STATE2>, BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, STATE1>, STATE2>> goodProgram) {
+			Map<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>, BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE>> goodProgram) {
 		this.statements = statements;
 		this.tree = tree;
 		this.visitedStates = new HashSet<>();
@@ -51,7 +51,7 @@ public class TerminatingProgramExtraction<LETTER extends IRankedLetter, STATE1, 
 		if (resultComputed)
 			return;
 		resultComputed = true;
-		for (BuchiParityIntersectState<IntersectState<IPredicate, STATE1>, STATE2> initial : tree.getInitStates()) {
+		for (BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE> initial : tree.getInitStates()) {
 			retrieveProgram(initial);
 			return;
 		}
@@ -64,18 +64,18 @@ public class TerminatingProgramExtraction<LETTER extends IRankedLetter, STATE1, 
 		return null;
 	}
 
-	private void retrieveProgram(BuchiParityIntersectState<IntersectState<IPredicate, STATE1>, STATE2> state) {
+	private void retrieveProgram(BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE> state) {
 		if (visitedStates.contains(state)) {
 			repeatedStates.add(state);
 			return;
 		}
-		for (BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, STATE1>, STATE2> transition : tree
+		for (BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE> transition : tree
 				.getRulesBySource(state)) {
 			if (!goodProgram.get(state).equals(transition))
 				continue;
 			Object[] retrievalResult = retrieveValidStatements(transition);
 			@SuppressWarnings("unchecked")
-			List<BuchiParityIntersectState<IntersectState<IPredicate, STATE1>, STATE2>> validProgramStatements = (List<BuchiParityIntersectState<IntersectState<IPredicate, STATE1>, STATE2>>) retrievalResult[0];
+			List<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> validProgramStatements = (List<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>>) retrievalResult[0];
 			@SuppressWarnings("unchecked")
 			List<String> validStatementStrings = (List<String>) retrievalResult[1];
 			if (validProgramStatements.size() == 0) {
@@ -108,19 +108,19 @@ public class TerminatingProgramExtraction<LETTER extends IRankedLetter, STATE1, 
 	}
 
 	public Object[] retrieveValidStatements(
-			BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, STATE1>, STATE2> transition) {
-		List<BuchiParityIntersectState<IntersectState<IPredicate, STATE1>, STATE2>> validProgramStatements = new ArrayList<>();
+			BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE> transition) {
+		List<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> validProgramStatements = new ArrayList<>();
 		List<String> validStatementStrings = new ArrayList<>();
 		validProgramStatements.add(null);
 		validProgramStatements.add(null);
 		validStatementStrings.add(null);
 		validStatementStrings.add(null);
 		for (int i = 0; i < transition.getDests().size(); i++) {
-			if (transition.getDests().get(i).getState1().toString().equals("bottom")) {
+			if (transition.getDests().get(i).getState1().getState1().toString().equals("bottom")) {
 				validProgramStatements.set(0, transition.getDests().get(i));
 				validStatementStrings.set(0, statements[i].toString());
 			}
-			if (transition.getDests().get(i).getState1().toString().equals("left")) {
+			if (transition.getDests().get(i).getState1().getState1().toString().equals("left")) {
 				validProgramStatements.set(1, transition.getDests().get(i));
 				validStatementStrings.set(1, statements[i].toString());
 
