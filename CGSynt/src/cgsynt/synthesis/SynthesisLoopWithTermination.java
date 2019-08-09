@@ -258,15 +258,13 @@ public class SynthesisLoopWithTermination {
 		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> intersectedAut = intersection
 				.computeResult();
 
-		// FiniteTracesAcceptanceConversion conversion = new
-		// FiniteTracesAcceptanceConversion(intersectedAut);
-		// conversion.computeResult();
-		// BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>>
-		// convertedIntersectedAut = conversion
-		// .getResult();
+		FiniteTracesAcceptanceConversion conversion = new FiniteTracesAcceptanceConversion(intersectedAut);
+		conversion.computeResult();
+		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> convertedIntersectedAut = conversion
+				.getResult();
 
 		BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomaton<>(
-				intersectedAut, termTree);
+				convertedIntersectedAut, termTree);
 
 		BuchiParityEmptinessCheck<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> emptinessCheck = new BuchiParityEmptinessCheck<>(
 				buchiParityIntersectedAut);
