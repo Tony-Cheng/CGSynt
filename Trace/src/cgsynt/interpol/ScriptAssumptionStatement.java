@@ -139,7 +139,8 @@ public class ScriptAssumptionStatement implements IAssumption {
 	@Override
 	public UnmodifiableTransFormula getTransFormula() {
 		try {
-			throw new Exception();
+			return getTransFormula(false);
+			// throw new Exception();
 		} catch (Exception e) {
 			System.err.println(
 					"ScriptAssumptionStatement.getTrasnFormula: For assumption statements you must use the version of the method that takes one parameter!");

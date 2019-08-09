@@ -27,7 +27,6 @@ public class FiniteTracesAcceptanceConversion {
 				BuchiTreeAutomatonRule<RankedBool, IntersectState<IPredicate, IPredicate>> trueRule = new BuchiTreeAutomatonRule<RankedBool, IntersectState<IPredicate, IPredicate>>(
 						RankedBool.TRUE, rule.getSource(), rule.getDest());
 				intersectedAut.addRule(trueRule);
-				;
 			}
 		}
 		this.resultComputed = true;
