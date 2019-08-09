@@ -12,6 +12,7 @@ import cgsynt.core.Specification;
 import cgsynt.core.service.CustomServiceProvider;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
+import cgsynt.dfa.operations.FiniteTracesAcceptanceConversion;
 import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.dfa.parity.operations.ParityAutomatonToTree;
 import cgsynt.dfa.parity.operations.ParityComplementAndCounterexampleGeneration;
@@ -55,7 +56,7 @@ public class SynthesisLoopWithTermination {
 	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
 	private NestedWordAutomaton<IStatement, IPredicate> mPI;
 	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> mOmega;
-	
+
 	private List<IStatement> mTransitionAlphabet;
 	private List<IcfgInternalTransition> mIcfgTransitionAlphabet;
 	private IUltimateServiceProvider mService;
@@ -76,12 +77,12 @@ public class SynthesisLoopWithTermination {
 	private TraceGlobalVariables globalVars;
 	private Map<IntersectState<IPredicate, IPredicate>, BuchiTreeAutomatonRule<RankedBool, IntersectState<IPredicate, IPredicate>>> goodProgram;
 	private OmegaRefiner mOmegaRefiner;
-	
+
 	public SynthesisLoopWithTermination(List<IStatement> transitionAlphabet, IPredicate preconditions,
 			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
 		this.globalVars = globalVars;
 		assert globalVars.getService() instanceof CustomServiceProvider;
-		
+
 		RankedBool.setRank(transitionAlphabet.size());
 		globalVars.getTraceInterpolator().setPreconditions(preconditions);
 		globalVars.getTraceInterpolator().setPostconditions(postconditions);
@@ -149,18 +150,19 @@ public class SynthesisLoopWithTermination {
 	public void setPrintLogs(boolean printLogs) {
 		this.printLogs = printLogs;
 	}
-	
-	public List<IcfgInternalTransition> createIcfgTransitionAlphabet(List<IStatement> alphabet){
+
+	public List<IcfgInternalTransition> createIcfgTransitionAlphabet(List<IStatement> alphabet) {
 		List<IcfgInternalTransition> icfgAlphabet = new ArrayList<>();
-		
+
 		IcfgEdgeFactory factory = new IcfgEdgeFactory(OmegaRefiner.SERIAL_PROVIDER);
 		IcfgLocation location = new IcfgLocation(new StringDebugIdentifier("0"), "p1");
-		
+
 		for (IStatement statement : alphabet) {
-			IcfgInternalTransition trans = factory.createInternalTransition(location, location, new Payload(), statement.getTransFormula());
+			IcfgInternalTransition trans = factory.createInternalTransition(location, location, new Payload(),
+					statement.getTransFormula());
 			icfgAlphabet.add(trans);
 		}
-		
+
 		return icfgAlphabet;
 	}
 
@@ -190,19 +192,19 @@ public class SynthesisLoopWithTermination {
 		return pi;
 	}
 
-	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> createOmega(IPredicate precondition){
+	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> createOmega(IPredicate precondition) {
 		Set<IcfgInternalTransition> letters = new HashSet<>(this.mIcfgTransitionAlphabet);
-		
+
 		VpAlphabet<IcfgInternalTransition> alphabet = new VpAlphabet<>(letters);
-		
+
 		NestedWordAutomaton<IcfgInternalTransition, IPredicate> omega = new NestedWordAutomaton<>(mAutService, alphabet,
 				new GeneralizeStateFactory(globalVars.getPredicateFactory()));
-		
+
 		omega.addState(true, false, precondition);
-		
+
 		return omega;
 	}
-	
+
 	/**
 	 * Compute one iteration of the loop.
 	 * 
@@ -216,22 +218,22 @@ public class SynthesisLoopWithTermination {
 		// Dead states
 		IPredicate deadPredicateState = globalVars.getPredicateFactory().newDebugPredicate("deadState");
 		IParityState deadParityState = new ParityState<>(deadPredicateState, 1);
-		
+
 		// Dummy State
 		IPredicate dummyPredicateState = globalVars.getPredicateFactory().newDebugPredicate("dummState");
 		IParityState dummyParityState = new ParityState<>(dummyPredicateState, 0);
-		
+
 		////////////////////////////////////////////////
 		// Building PTA Omega from Buchi Omega
-		BuchiDeterminization<IcfgInternalTransition, IPredicate> determinizeBuchi = new BuchiDeterminization<>(mOmega, mAutService,
-				new ParityStateFactory());
+		BuchiDeterminization<IcfgInternalTransition, IPredicate> determinizeBuchi = new BuchiDeterminization<>(mOmega,
+				mAutService, new ParityStateFactory());
 		determinizeBuchi.computeResult();
-		
+
 		ParityAutomaton<IcfgInternalTransition, IParityState> parityOmega = determinizeBuchi.getResult();
-		
-		ParityAutomatonToTree<IcfgInternalTransition, IParityState> parityOmegaToParityTreeOmega = new ParityAutomatonToTree<>(parityOmega,
-				mIcfgTransitionAlphabet, deadParityState, dummyParityState);
-		
+
+		ParityAutomatonToTree<IcfgInternalTransition, IParityState> parityOmegaToParityTreeOmega = new ParityAutomatonToTree<>(
+				parityOmega, mIcfgTransitionAlphabet, deadParityState, dummyParityState);
+
 		ParityTreeAutomaton<RankedBool, IParityState> termTree = parityOmegaToParityTreeOmega.getResult();
 		////////////////////////////////////////////////
 
@@ -251,8 +253,15 @@ public class SynthesisLoopWithTermination {
 				powerSet);
 		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> intersectedAut = intersection
 				.computeResult();
+
+		FiniteTracesAcceptanceConversion conversion = new FiniteTracesAcceptanceConversion(intersectedAut);
+		conversion.computeResult();
+		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> convertedIntersectedAut = conversion
+				.getResult();
+
 		BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomaton<>(
-				intersectedAut, termTree);
+				convertedIntersectedAut, termTree);
+
 		BuchiParityEmptinessCheck<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> emptinessCheck = new BuchiParityEmptinessCheck<>(
 				buchiParityIntersectedAut);
 		emptinessCheck.computeResult();
@@ -278,22 +287,23 @@ public class SynthesisLoopWithTermination {
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////////
-		// 						Omega Refinement Process
+		// Omega Refinement Process
 		int minOmegaLen = Math.min(mOmega.size(), parityOmega.size());
-		ParityComplementAndCounterexampleGeneration<IcfgInternalTransition> omegaCounterexampleGenerator =
-				new ParityComplementAndCounterexampleGeneration<>(parityOmega, k * minOmegaLen);
+		ParityComplementAndCounterexampleGeneration<IcfgInternalTransition> omegaCounterexampleGenerator = new ParityComplementAndCounterexampleGeneration<>(
+				parityOmega, k * minOmegaLen);
 		omegaCounterexampleGenerator.computeResult();
-		
-		List<ParityCounterexample<IcfgInternalTransition, IParityState>> omegaCounterexamples = omegaCounterexampleGenerator.getResult();
-		
+
+		List<ParityCounterexample<IcfgInternalTransition, IParityState>> omegaCounterexamples = omegaCounterexampleGenerator
+				.getResult();
+
 		// Refinement
 		for (int i = 0; i < omegaCounterexamples.size(); i++) {
 			mOmegaRefiner.certifyCE(omegaCounterexamples.get(i));
-		
+
 		}
-		
+
 		System.out.println(termTree);
 	}
 
