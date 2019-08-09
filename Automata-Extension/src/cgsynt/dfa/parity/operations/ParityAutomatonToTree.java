@@ -47,7 +47,7 @@ public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
 			mDummyDestList.add(mDummyState);
 		
 		ParityTreeAutomatonRule<RankedBool, STATE> dummyLoop = 
-				new ParityTreeAutomatonRule<>(RankedBool.TRUE, mDummyState, mDummyDestList);
+				new ParityTreeAutomatonRule<>(RankedBool.FALSE, mDummyState, mDummyDestList);
 		mOutAutomaton.addRule(dummyLoop);
 		
 		computeResult();
