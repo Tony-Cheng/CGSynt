@@ -31,6 +31,8 @@ public class BuchiParityIntersectRule<LETTER extends IRankedLetter, STATE1, STAT
 	 * The destination of this rule.
 	 */
 	private List<BuchiParityIntersectState<STATE1, STATE2>> dests;
+	
+	private LETTER mLetter;
 
 	public BuchiParityIntersectRule(BuchiTreeAutomatonRule<LETTER, STATE1> rule1,
 			ParityTreeAutomatonRule<LETTER, STATE2> rule2) {
@@ -39,8 +41,14 @@ public class BuchiParityIntersectRule<LETTER extends IRankedLetter, STATE1, STAT
 		for (int i = 0; i < rule1.getDest().size(); i++) {
 			dests.add(new BuchiParityIntersectState<>(rule1.getDest().get(i), rule2.getDest().get(i)));
 		}
+		
+		this.mLetter = rule1.getLetter();
 	}
-
+ 
+	public LETTER getLetter() {
+		return mLetter;
+	}
+	
 	/**
 	 * Return the source state of this rule.
 	 * 
