@@ -15,40 +15,50 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.Outgo
 public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
 	private ParityAutomaton<LETTER, STATE> mInAutomaton;
 	private List<LETTER> mLetterOrder;
-	private STATE mDeadState;
 	
 	private ParityTreeAutomaton<RankedBool, STATE> mOutAutomaton;
-	private STATE mDummyState;
-	private List<STATE> mDummyDestList;
 	
-	public ParityAutomatonToTree(final ParityAutomaton<LETTER, STATE> automaton, List<LETTER> letterOrder, STATE deadState, STATE dummyState){
+	private STATE mOffState;
+	private STATE mShutdownState;
+	private List<STATE> mShutdownDestList;
+	
+	public ParityAutomatonToTree(final ParityAutomaton<LETTER, STATE> automaton, List<LETTER> letterOrder, STATE shutdownState, STATE offState){
 		mInAutomaton = automaton;
 		mLetterOrder = letterOrder;
-		mDeadState = deadState;
+		mOffState = offState;
+		mShutdownState = shutdownState;
 		
 		mOutAutomaton = new ParityTreeAutomaton<>(letterOrder.size());
-		mOutAutomaton.addState(deadState);
+		mOutAutomaton.addState(mOffState);
+		mOutAutomaton.addState(mShutdownState);
 		
-		List<STATE> deadStateList = new ArrayList<>();
-		for (int i = 0; i < letterOrder.size(); i++) 
-			deadStateList.add(deadState);
-		ParityTreeAutomatonRule<RankedBool, STATE> deadTrue = 
-				new ParityTreeAutomatonRule<>(RankedBool.TRUE, deadState, deadStateList);
-		ParityTreeAutomatonRule<RankedBool, STATE> deadFalse = 
-				new ParityTreeAutomatonRule<>(RankedBool.FALSE, deadState, deadStateList);
-		
-		mOutAutomaton.addRule(deadTrue);
-		mOutAutomaton.addRule(deadFalse);
-		
-		mDummyState = dummyState;
-		
-		mDummyDestList = new ArrayList<>();
+		mShutdownDestList = new ArrayList<>();
 		for (int i = 0; i < letterOrder.size(); i++)
-			mDummyDestList.add(mDummyState);
+			mShutdownDestList.add(shutdownState);
 		
-		ParityTreeAutomatonRule<RankedBool, STATE> dummyLoop = 
-				new ParityTreeAutomatonRule<>(RankedBool.TRUE, mDummyState, mDummyDestList);
-		mOutAutomaton.addRule(dummyLoop);
+		ParityTreeAutomatonRule<RankedBool, STATE> shutdownToShutdownTrue = 
+				new ParityTreeAutomatonRule<>(RankedBool.TRUE, mShutdownState, mShutdownDestList);
+		mOutAutomaton.addRule(shutdownToShutdownTrue);
+		
+		ParityTreeAutomatonRule<RankedBool, STATE> shutdownToShutdownFalse = 
+				new ParityTreeAutomatonRule<>(RankedBool.FALSE, mShutdownState, mShutdownDestList);
+		mOutAutomaton.addRule(shutdownToShutdownFalse);
+		
+		List<STATE> offDestList = new ArrayList<>();
+		for (int i = 0; i < letterOrder.size(); i++)
+			offDestList.add(mOffState);
+		
+		ParityTreeAutomatonRule<RankedBool, STATE> shutdownToOffTrue = 
+				new ParityTreeAutomatonRule<>(RankedBool.TRUE, mShutdownState, offDestList);
+		mOutAutomaton.addRule(shutdownToOffTrue);
+		
+		ParityTreeAutomatonRule<RankedBool, STATE> shutdownToOffFalse = 
+				new ParityTreeAutomatonRule<>(RankedBool.FALSE, mShutdownState, offDestList);
+		mOutAutomaton.addRule(shutdownToOffFalse);
+		
+		ParityTreeAutomatonRule<RankedBool, STATE> offToOffFalse = 
+				new ParityTreeAutomatonRule<>(RankedBool.FALSE, mOffState, offDestList);
+		mOutAutomaton.addRule(offToOffFalse);
 		
 		computeResult();
 	}
@@ -69,23 +79,21 @@ public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
 			else if (!existant)
 				mOutAutomaton.addState(newState);
 			
-			
-			if (mInAutomaton.isFinal(state)) {
-				ParityTreeAutomatonRule<RankedBool, STATE> trueRule = 
-						new ParityTreeAutomatonRule<>(RankedBool.TRUE, newState, createDestinationList(state));
-				
-				mOutAutomaton.addRule(trueRule);
-			}
-			
 			ParityTreeAutomatonRule<RankedBool, STATE> trueRule = 
-					new ParityTreeAutomatonRule<>(RankedBool.TRUE, newState, mDummyDestList);
-			
+					new ParityTreeAutomatonRule<>(RankedBool.TRUE, newState, createDestinationList(state));
 			mOutAutomaton.addRule(trueRule);
 			
 			ParityTreeAutomatonRule<RankedBool, STATE> falseRule = 
 					new ParityTreeAutomatonRule<>(RankedBool.FALSE, newState, createDestinationList(state));
-			
 			mOutAutomaton.addRule(falseRule);
+			
+			ParityTreeAutomatonRule<RankedBool, STATE> trueShutdownRule = 
+					new ParityTreeAutomatonRule<>(RankedBool.TRUE, newState, mShutdownDestList);
+			mOutAutomaton.addRule(trueShutdownRule);
+			
+			ParityTreeAutomatonRule<RankedBool, STATE> falseShutdownRule = 
+					new ParityTreeAutomatonRule<>(RankedBool.FALSE, newState, mShutdownDestList);
+			mOutAutomaton.addRule(falseShutdownRule);
 		}
 	}
 	
@@ -120,7 +128,7 @@ public class ParityAutomatonToTree<LETTER, STATE extends IParityState> {
 			}
 			
 			if (!found)
-				destList.add(mDeadState);
+				destList.add(mShutdownState);
 		}
 		
 		return destList;

@@ -29,7 +29,7 @@ public class BuchiToParity<LETTER, STATE> {
 		Set<STATE> allStates = mInAutomaton.getStates();
 		for (STATE state : allStates) {
 			ParityState<STATE> newState =
-					new ParityState<>(state, (mInAutomaton.isFinal(state)) ? 0 : 1);
+					new ParityState<>(state, (mInAutomaton.isFinal(state)) ? 2 : 1);
 			
 			if (!mOutAutomaton.contains(newState))
 				mOutAutomaton.addState(mInAutomaton.isInitial(state), mInAutomaton.isFinal(state), newState);
@@ -38,7 +38,7 @@ public class BuchiToParity<LETTER, STATE> {
 				STATE oldSucc = transition.getSucc();
 				
 				ParityState<STATE> succ = 
-						new ParityState<>(oldSucc, (mInAutomaton.isFinal(oldSucc) ? 0 : 1));
+						new ParityState<>(oldSucc, (mInAutomaton.isFinal(oldSucc) ? 2 : 1));
 				
 				if (mOutAutomaton.contains(succ))
 					succ = (ParityState<STATE>) mOutAutomaton.fetchEqualState(succ);

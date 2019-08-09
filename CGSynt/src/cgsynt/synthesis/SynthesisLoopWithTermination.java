@@ -221,12 +221,15 @@ public class SynthesisLoopWithTermination {
 	private void computeOneIteration(int k, int bs) throws Exception {
 		// Dead states
 		IPredicate deadPredicateState = globalVars.getPredicateFactory().newDebugPredicate("deadState");
-		IParityState deadParityState = new ParityState<>(deadPredicateState, 1);
+		
+		// Shutdown State
+		IPredicate shutdownPredicateState = globalVars.getPredicateFactory().newDebugPredicate("shutdownState");
+		IParityState shutdownParityState = new ParityState<>(shutdownPredicateState, 1);
 
-		// Dummy State
-		IPredicate dummyPredicateState = globalVars.getPredicateFactory().newDebugPredicate("dummState");
-		IParityState dummyParityState = new ParityState<>(dummyPredicateState, 0);
-
+		// Off State
+		IPredicate offPredicateState = globalVars.getPredicateFactory().newDebugPredicate("offState");
+		IParityState offParityState = new ParityState<>(offPredicateState, 2);
+		
 		////////////////////////////////////////////////
 		// Building PTA Omega from Buchi Omega
 		BuchiDeterminization<IcfgInternalTransition, IPredicate> determinizeBuchi = new BuchiDeterminization<>(mOmega,
@@ -236,7 +239,7 @@ public class SynthesisLoopWithTermination {
 		ParityAutomaton<IcfgInternalTransition, IParityState> parityOmega = determinizeBuchi.getResult();
 
 		ParityAutomatonToTree<IcfgInternalTransition, IParityState> parityOmegaToParityTreeOmega = new ParityAutomatonToTree<>(
-				parityOmega, mIcfgTransitionAlphabet, deadParityState, dummyParityState);
+				parityOmega, mIcfgTransitionAlphabet, shutdownParityState, offParityState);
 
 		ParityTreeAutomaton<RankedBool, IParityState> termTree = parityOmegaToParityTreeOmega.getResult();
 		////////////////////////////////////////////////
