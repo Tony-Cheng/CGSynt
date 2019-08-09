@@ -1,11 +1,14 @@
 package cgsynt.tree.parity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import cgsynt.StateRepCondenser;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
 /**
@@ -310,9 +313,16 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		}
 		result.append("\n");
 
+		StateRepCondenser<STATE> condenser = new StateRepCondenser<>(new ArrayList<>(this.mStates));
+		Map<String, String> map = condenser.getMapping();
 		result.append("Transitions:\n");
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : mRules) {
-			result.append(rule.toString());
+			String dests = "";
+			for (int i = 0; i < rule.getDest().size(); i++) {
+				dests += map.get(rule.getDest().get(i).toString()) + " ";
+			}
+		
+			result.append("(" + map.get(rule.getSource().toString()) + " | " + rule.getLetter().toString() + " | " + dests + ")");
 			result.append("\n");
 		}
 		result.append("\n");
