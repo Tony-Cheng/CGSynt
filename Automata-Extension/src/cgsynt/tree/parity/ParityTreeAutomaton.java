@@ -322,10 +322,10 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : mRules) {
 			String dests = "";
 			for (int i = 0; i < rule.getDest().size(); i++) {
-				dests += map.get(rule.getDest().get(i).toString()) + " ";
+				dests += "(" + map.get(rule.getDest().get(i).toString()) + ": " + rule.getDest().get(i).getRank() + ") ";
 			}
 		
-			result.append("(" + map.get(rule.getSource().toString()) + " | " + rule.getLetter().toString() + " | " + dests + ")");
+			result.append("((" + map.get(rule.getSource().toString()) + ": " + rule.getSource().getRank() + ") | " + rule.getLetter().toString() + " | " + dests + ")");
 			result.append("\n");
 		}
 		result.append("\n");
