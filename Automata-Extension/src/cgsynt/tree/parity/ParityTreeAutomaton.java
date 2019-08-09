@@ -291,17 +291,19 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-
+		StateRepCondenser<STATE> condenser = new StateRepCondenser<>(new ArrayList<>(this.mStates));
+		Map<String, String> map = condenser.getMapping();
+		
 		result.append("States:\n");
 		for (STATE state : mStates) {
-			result.append(state.toString());
+			result.append(map.get(state.toString()));
 			result.append("\n");
 		}
 		result.append("\n");
 
 		result.append("Initial States:\n");
 		for (STATE state : mInitStates) {
-			result.append(state.toString());
+			result.append(map.get(state.toString()));
 			result.append("\n");
 		}
 		result.append("\n");
@@ -313,8 +315,6 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		}
 		result.append("\n");
 
-		StateRepCondenser<STATE> condenser = new StateRepCondenser<>(new ArrayList<>(this.mStates));
-		Map<String, String> map = condenser.getMapping();
 		result.append("Transitions:\n");
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : mRules) {
 			String dests = "";
@@ -327,9 +327,11 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		}
 		result.append("\n");
 
+		result.append(map.toString());
+		
 		result.append("\n");
+		
 		return result.toString();
-
 	}
 
 	/**

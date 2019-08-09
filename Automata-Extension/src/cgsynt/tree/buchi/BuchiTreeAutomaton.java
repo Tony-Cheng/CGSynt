@@ -447,24 +447,26 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
+		StateRepCondenser<STATE> condenser = new StateRepCondenser<>(new ArrayList<>(this.mStates));
+		Map<String, String> map = condenser.getMapping();
 
 		result.append("States:\n");
 		for (STATE state : mStates) {
-			result.append(state.toString());
+			result.append(map.get(state.toString()));
 			result.append("\n");
 		}
 		result.append("\n");
 
 		result.append("Initial States:\n");
 		for (STATE state : mInitStates) {
-			result.append(state.toString());
+			result.append(map.get(state.toString()));
 			result.append("\n");
 		}
 		result.append("\n");
 
 		result.append("Final States:\n");
 		for (STATE state : mFinalStates) {
-			result.append(state.toString());
+			result.append(map.get(state.toString()));
 			result.append("\n");
 		}
 		result.append("\n");
@@ -476,8 +478,6 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		}
 		result.append("\n");
 		
-		StateRepCondenser<STATE> condenser = new StateRepCondenser<>(new ArrayList<>(this.mStates));
-		Map<String, String> map = condenser.getMapping();
 		result.append("Transitions:\n");
 		for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mRules) {
 			String dests = "";
@@ -490,8 +490,10 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 		}
 		result.append("\n");
 
+		result.append(map.toString());
+		
 		result.append("\n");
+		
 		return result.toString();
-
 	}
 }
