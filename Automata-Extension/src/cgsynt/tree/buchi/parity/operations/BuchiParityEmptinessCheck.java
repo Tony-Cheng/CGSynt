@@ -42,8 +42,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 	private Stack<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> goodTransitions;
 	private Stack<BuchiParityIntersectState<STATE1, STATE2>> goodTransitionsState;
 
-	private Map<BuchiParityIntersectState<STATE1, STATE2>, BuchiParityIntersectRule<LETTER, STATE1, STATE2>> goodProgram;
-
 	public BuchiParityEmptinessCheck(BuchiParityIntersectAutomaton<LETTER, STATE1, STATE2> tree) {
 		resultComputed = false;
 		this.tree = tree;
@@ -234,8 +232,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					} else {
 						goodTransitions.add(rule);
 						goodTransitionsState.add(rule.getSource().copy(true, false));
-						goodProgram.put(rule.getSource(), rule);
-
 					}
 				}
 				if (isGoodTransitionParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
@@ -247,7 +243,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					} else {
 						goodTransitions.add(rule);
 						goodTransitionsState.add(rule.getSource().copy(false, true));
-						goodProgram.put(rule.getSource(), rule);
 
 					}
 				}
@@ -260,8 +255,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					} else {
 						goodTransitions.add(rule);
 						goodTransitionsState.add(rule.getSource().copy(true, true));
-						goodProgram.put(rule.getSource(), rule);
-
 					}
 				}
 
@@ -272,8 +265,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 				} else {
 					goodTransitions.add(rule);
 					goodTransitionsState.add(rule.getSource().copy(false, false));
-					goodProgram.put(rule.getSource(), rule);
-
 				}
 			}
 		}
@@ -414,7 +405,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					} else {
 						goodTransitions.add(rule);
 						goodTransitionsState.add(rule.getSource().copy(true, false));
-						goodProgram.put(rule.getSource(), rule);
 					}
 				}
 				if (isGoodTransitionParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
@@ -426,7 +416,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					} else {
 						goodTransitions.add(rule);
 						goodTransitionsState.add(rule.getSource().copy(false, true));
-						goodProgram.put(rule.getSource(), rule);
 					}
 				}
 				if (isGoodTransitionBuchiParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
@@ -438,7 +427,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					} else {
 						goodTransitions.add(rule);
 						goodTransitionsState.add(rule.getSource().copy(true, true));
-						goodProgram.put(rule.getSource(), rule);
 
 					}
 				}
@@ -450,7 +438,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 				} else {
 					goodTransitions.add(rule);
 					goodTransitionsState.add(rule.getSource().copy(false, false));
-					goodProgram.put(rule.getSource(), rule);
 				}
 			}
 		}
@@ -698,7 +685,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 							}
 						}
 						if (isGoodTransition) {
-							goodProgram.put(rule.getSource(), rule);
 							goodTransitions.add(rule);
 						}
 					}
@@ -721,7 +707,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 	public void computeResult() {
 		if (resultComputed)
 			return;
-		this.goodProgram = new HashMap<>();
 		computeGoodTree();
 		goodStates.clear();
 		goodTransitions.clear();
@@ -738,9 +723,5 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 
 	public boolean getResult() {
 		return result;
-	}
-
-	public Map<BuchiParityIntersectState<STATE1, STATE2>, BuchiParityIntersectRule<LETTER, STATE1, STATE2>> getGoodProgram() {
-		return goodProgram;
 	}
 }

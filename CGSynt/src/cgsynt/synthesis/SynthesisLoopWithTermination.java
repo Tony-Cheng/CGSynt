@@ -68,10 +68,6 @@ public class SynthesisLoopWithTermination {
 	private AutomataLibraryServices mAutService;
 	private BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> result;
 	private Set<List<IStatement>> visitedCounterexamples;
-	private int prevSize;
-
-	// For probability testing
-	private INestedWordAutomaton<IStatement, String> dfa;
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
@@ -79,7 +75,6 @@ public class SynthesisLoopWithTermination {
 	private boolean printLogs;
 	private int printedLogsSize;
 	private TraceGlobalVariables globalVars;
-	private Map<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, IParityState>, BuchiParityIntersectRule<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState>> goodProgram;
 	private OmegaRefiner mOmegaRefiner;
 
 	public SynthesisLoopWithTermination(List<IStatement> transitionAlphabet, IPredicate preconditions,
@@ -276,10 +271,8 @@ public class SynthesisLoopWithTermination {
 			mIsCorrect = true;
 			mResultComputed = true;
 			result = buchiParityIntersectedAut;
-			goodProgram = emptinessCheck.getGoodProgram();
 			return;
 		}
-		prevSize = k * dfaPI.getStates().size();
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
 				k * dfaPI.getStates().size(), visitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
@@ -355,17 +348,6 @@ public class SynthesisLoopWithTermination {
 		}
 	}
 
-	public void printRootConfidenceInterval() throws Exception {
-		ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, this.prevSize, 3000,
-				this.mTransitionAlphabet, globalVars.getTraceInterpolator());
-		double[] traceInterval = calc.calculate95TraceConfIntervals();
-		double[] piInterval = calc.calculate95PiConfIntervals();
-		System.out.println("Size: " + prevSize);
-		System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
-		System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
-
-	}
-
 	public void printLogs() {
 		for (String log : logs)
 			System.out.println(log);
@@ -384,16 +366,17 @@ public class SynthesisLoopWithTermination {
 		}
 	}
 
-	public void printProgram() {
-		IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
-		for (int i = 0; i < statements.length; i++) {
-			statements[i] = mTransitionAlphabet.get(i);
-		}
-		TerminatingProgramExtraction<RankedBool, IParityState> retrieve = new TerminatingProgramExtraction<>(result,
-				statements, goodProgram);
-		retrieve.computeResult();
-		for (String statement : retrieve.getResult()) {
-			System.out.println(statement);
-		}
-	}
+	// public void printProgram() {
+	// IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
+	// for (int i = 0; i < statements.length; i++) {
+	// statements[i] = mTransitionAlphabet.get(i);
+	// }
+	// TerminatingProgramExtraction<RankedBool, IParityState> retrieve = new
+	// TerminatingProgramExtraction<>(result,
+	// statements, goodProgram);
+	// retrieve.computeResult();
+	// for (String statement : retrieve.getResult()) {
+	// System.out.println(statement);
+	// }
+	// }
 }
