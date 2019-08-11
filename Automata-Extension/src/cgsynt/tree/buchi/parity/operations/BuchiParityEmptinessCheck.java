@@ -62,7 +62,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 	private Map<BuchiParityIntersectState<STATE1, STATE2>, Integer> initializeMaxOdd() {
 		Map<BuchiParityIntersectState<STATE1, STATE2>, Integer> maxOdd = new HashMap<>();
 		for (BuchiParityIntersectState<STATE1, STATE2> state : tree.getAltStates()) {
-			if (goodParityStates.contains(state))
+			if (goodParityStates.contains(state.copy(false, false)))
 				maxOdd.put(state, 0);
 			else
 				maxOdd.put(state, state.getState2().getRank());
@@ -126,10 +126,16 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 				boolean isGoodTransitionParity = true;
 				boolean isGoodTransitionBuchi = true;
 				boolean isGoodTransitionBuchiParity = true;
+
 				int maxOddValueBuchi = rule.getSource().getState2().getRank();
 				int maxOddValueParity = rule.getSource().getState2().getRank();
 				int maxOddValueBuchiParity = rule.getSource().getState2().getRank();
 				int maxOddValueNone = rule.getSource().getState2().getRank();
+
+				int minEvenValueBuchi = Integer.MAX_VALUE;
+				int minEvenValueParity = Integer.MAX_VALUE;
+				int minEvenValueBuchiParity = Integer.MAX_VALUE;
+				int minEvenValueNone = Integer.MAX_VALUE;
 				for (BuchiParityIntersectState<STATE1, STATE2> dest : rule.getDests()) {
 					boolean isGoodTransitionParityp = false;
 					boolean isGoodTransitionBuchip = false;
@@ -138,54 +144,81 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					int maxOddValueParityp = Integer.MAX_VALUE;
 					int maxOddValueBuchiParityp = Integer.MAX_VALUE;
 					int maxOddValueNonep = Integer.MAX_VALUE;
+					int minEvenValueBuchip = 0;
+					int minEvenValueParityp = 0;
+					int minEvenValueBuchiParityp = 0;
+					int minEvenValueNonep = 0;
 
 					if (goodStates.contains(dest.copy(false, true))) {
 						isGoodTransitionParityp = true;
 						maxOddValueParityp = Math.min(maxOddValueParityp, maxOdd.get(dest.copy(false, true)));
 						maxOddValueNonep = Math.min(maxOddValueNonep, maxOdd.get(dest.copy(false, true)));
+						minEvenValueParityp = Math.max(minEvenValueParityp, minEven.get(dest.copy(false, true)));
+						minEvenValueNonep = Math.max(minEvenValueNonep, minEven.get(dest.copy(false, true)));
 					}
 					if (goodStates.contains(dest.copy(true, false))) {
 						isGoodTransitionBuchip = true;
 						maxOddValueBuchip = Math.min(maxOddValueBuchip, maxOdd.get(dest.copy(true, false)));
 						maxOddValueNonep = Math.min(maxOddValueNonep, maxOdd.get(dest.copy(true, false)));
+						minEvenValueBuchip = Math.max(minEvenValueBuchip, minEven.get(dest.copy(true, false)));
+						minEvenValueNonep = Math.max(minEvenValueNonep, minEven.get(dest.copy(true, false)));
 					}
 					if (goodParityStates.contains(dest.copy(false, false))) {
 						isGoodTransitionParityp = true;
 						maxOddValueParityp = Math.min(maxOddValueParityp, maxOdd.get(dest.copy(false, false)));
+						minEvenValueParityp = Math.max(minEvenValueParityp, minEven.get(dest.copy(false, false)));
 					}
 					if (goodBuchiStates.contains(dest.copy(false, false))) {
 						isGoodTransitionBuchip = true;
 						maxOddValueBuchip = Math.min(maxOddValueBuchip, maxOdd.get(dest.copy(false, false)));
+						minEvenValueBuchip = Math.max(minEvenValueBuchip, minEven.get(dest.copy(false, false)));
 					}
 					if (goodBuchiStates.contains(dest.copy(false, false))
 							&& goodParityStates.contains(dest.copy(false, false))) {
 						isGoodTransitionBuchiParityp = true;
 						maxOddValueBuchiParityp = Math.min(maxOddValueBuchiParityp,
 								maxOdd.get(dest.copy(false, false)));
+						minEvenValueBuchiParityp = Math.max(minEvenValueBuchiParityp,
+								minEven.get(dest.copy(false, false)));
 					}
 					if (goodBuchiStates.contains(dest.copy(false, false))
 							&& goodStates.contains(state.copy(false, true))) {
 						isGoodTransitionBuchiParityp = true;
 						maxOddValueBuchiParityp = Math.min(maxOddValueBuchiParityp,
 								Math.max(maxOdd.get(dest.copy(false, true)), maxOdd.get(dest.copy(false, false))));
+						minEvenValueBuchiParityp = Math.max(minEvenValueBuchiParityp,
+								Math.max(minEven.get(dest.copy(false, true)), minEven.get(dest.copy(false, false))));
 					}
 					if (goodParityStates.contains(dest.copy(false, false))
 							&& goodStates.contains(state.copy(true, false))) {
 						isGoodTransitionBuchiParityp = true;
 						maxOddValueBuchiParityp = Math.min(maxOddValueBuchiParityp,
 								Math.max(maxOdd.get(dest.copy(true, false)), maxOdd.get(dest.copy(false, false))));
+						minEvenValueBuchiParityp = Math.max(minEvenValueBuchiParityp,
+								Math.max(minEven.get(dest.copy(true, false)), minEven.get(dest.copy(false, false))));
 					}
 					if (goodStates.contains(state.copy(true, true))) {
 						isGoodTransitionBuchiParityp = true;
 						maxOddValueBuchiParityp = Math.min(maxOddValueBuchiParityp, maxOdd.get(dest.copy(true, true)));
 						maxOddValueNonep = Math.min(maxOddValueNonep, maxOdd.get(dest.copy(true, true)));
-
+						minEvenValueBuchiParityp = Math.max(minEvenValueBuchiParityp,
+								minEven.get(dest.copy(true, true)));
+						minEvenValueNonep = Math.max(minEvenValueNonep, minEven.get(dest.copy(true, true)));
 					}
 					maxOddValueNonep = Math.min(maxOddValueNonep, maxOdd.get(dest.copy(false, false)));
+
 					maxOddValueBuchi = Math.max(maxOddValueBuchi, maxOddValueBuchip);
 					maxOddValueParity = Math.max(maxOddValueParity, maxOddValueParityp);
 					maxOddValueBuchiParity = Math.max(maxOddValueBuchiParity, maxOddValueBuchiParityp);
 					maxOddValueNone = Math.max(maxOddValueNone, maxOddValueNonep);
+
+					minEvenValueNonep = Math.max(maxOddValueNonep, minEven.get(dest.copy(false, false)));
+
+					minEvenValueBuchi = Math.min(minEvenValueBuchi, minEvenValueBuchip);
+					minEvenValueParity = Math.min(minEvenValueParity, minEvenValueParityp);
+					minEvenValueBuchiParity = Math.min(minEvenValueBuchiParity, minEvenValueBuchiParityp);
+					minEvenValueNone = Math.min(minEvenValueNone, maxOddValueNonep);
+
 					if (!isGoodTransitionParityp)
 						isGoodTransitionParity = false;
 					if (!isGoodTransitionBuchip)
@@ -206,7 +239,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					}
 				}
 				if (isGoodTransitionParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
-						|| rule.getSource().getState2().getRank() >= maxOddValueParity)) {
+						|| maxOddValueParity <= minEvenValueParity)) {
 					if (goodStates.contains(rule.getSource().copy(false, true))) {
 						if (maxOdd.get(rule.getSource().copy(false, true)) > maxOddValueParity) {
 							updateMaxOdd(rule.getSource().copy(false, true), maxOddValueParity);
@@ -219,7 +252,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					}
 				}
 				if (isGoodTransitionBuchiParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
-						|| rule.getSource().getState2().getRank() >= maxOddValueParity)) {
+						|| maxOddValueBuchiParity <= minEvenValueBuchiParity)) {
 					if (goodStates.contains(rule.getSource().copy(true, true))) {
 						if (maxOdd.get(rule.getSource().copy(true, true)) > maxOddValueBuchiParity) {
 							updateMaxOdd(rule.getSource().copy(true, true), maxOddValueBuchiParity);
@@ -238,7 +271,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					}
 				} else {
 					goodTransitions.add(rule);
-					goodTransitionsState.add(state.copy(false, false));
+					goodTransitionsState.add(rule.getSource().copy(false, false));
 					goodProgram.put(rule.getSource(), rule);
 
 				}
@@ -337,7 +370,6 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 								Math.max(maxOdd.get(dest.copy(false, true)), maxOdd.get(dest.copy(false, false))));
 						minEvenValueBuchiParityp = Math.max(minEvenValueBuchiParityp,
 								Math.max(minEven.get(dest.copy(false, true)), minEven.get(dest.copy(false, false))));
-
 					}
 					if (goodParityStates.contains(dest.copy(false, false))
 							&& goodStates.contains(state.copy(true, false))) {
@@ -386,7 +418,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 					}
 				}
 				if (isGoodTransitionParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
-						|| rule.getSource().getState2().getRank() >= maxOddValueParity)) {
+						|| maxOddValueParity <= minEvenValueParity)) {
 					if (goodStates.contains(rule.getSource().copy(false, true))) {
 						if (minEven.get(rule.getSource().copy(false, true)) < minEvenValueParity) {
 							updateMinEven(rule.getSource().copy(false, true), minEvenValueParity);
@@ -395,11 +427,10 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 						goodTransitions.add(rule);
 						goodTransitionsState.add(rule.getSource().copy(false, true));
 						goodProgram.put(rule.getSource(), rule);
-
 					}
 				}
 				if (isGoodTransitionBuchiParity && (!goodParityStates.contains(rule.getSource().copy(false, false))
-						|| rule.getSource().getState2().getRank() >= maxOddValueParity)) {
+						|| maxOddValueBuchiParity <= minEvenValueBuchiParity)) {
 					if (goodStates.contains(rule.getSource().copy(true, true))) {
 						if (minEven.get(rule.getSource().copy(true, true)) < minEvenValueBuchiParity) {
 							updateMinEven(rule.getSource().copy(true, true), minEvenValueBuchiParity);
@@ -431,25 +462,68 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 			List<BuchiParityIntersectState<STATE1, STATE2>> dests = rule.getDests();
 			boolean isGoodTransitionBuchi = true;
 			boolean isGoodTransitionParity = true;
+			int minEvenValue = Integer.MAX_VALUE;
 			for (BuchiParityIntersectState<STATE1, STATE2> dest : dests) {
 				if (!goodBuchiStates.contains(dest.copy(false, false))) {
 					isGoodTransitionBuchi = false;
 				}
 				if (!goodParityStates.contains(dest.copy(false, false))) {
 					isGoodTransitionParity = false;
+				} else {
+					minEvenValue = Math.min(minEvenValue, minEven.get(dest.copy(false, false)));
 				}
 			}
 			if (isGoodTransitionBuchi) {
 				goodTransitions.add(rule);
 				goodTransitionsState.add(rule.getSource().copy(true, false));
+				if (minEven.get(rule.getSource().copy(true, false)) < minEvenValue) {
+					minEven.put(rule.getSource().copy(true, false), minEvenValue);
+				}
 			}
 			if (isGoodTransitionParity) {
 				goodTransitions.add(rule);
 				goodTransitionsState.add(rule.getSource().copy(false, true));
+				if (maxOdd.get(rule.getSource().copy(false, true)) <= minEvenValue) {
+					maxOdd.put(rule.getSource().copy(false, true), 0);
+					maxOdd.put(rule.getSource().copy(false, false), 0);
+				}
+				if (minEven.get(rule.getSource().copy(false, true)) < minEvenValue) {
+					minEven.put(rule.getSource().copy(false, true), minEvenValue);
+				}
+				if (minEven.get(rule.getSource().copy(false, false)) < minEvenValue) {
+					minEven.put(rule.getSource().copy(false, false), minEvenValue);
+				}
+				if (goodParityStates.contains(rule.getSource().copy(false, false))) {
+					minEven.put(rule.getSource().copy(false, true), Integer.MAX_VALUE);
+					minEven.put(rule.getSource().copy(false, false), Integer.MAX_VALUE);
+				}
 			}
 			if (isGoodTransitionBuchi && isGoodTransitionParity) {
 				goodTransitions.add(rule);
 				goodTransitionsState.add(rule.getSource().copy(true, true));
+				if (maxOdd.get(rule.getSource().copy(true, true)) <= minEvenValue) {
+					maxOdd.put(rule.getSource().copy(true, true), 0);
+					maxOdd.put(rule.getSource().copy(true, false), 0);
+					maxOdd.put(rule.getSource().copy(false, true), 0);
+					maxOdd.put(rule.getSource().copy(false, false), 0);
+				}
+				if (minEven.get(rule.getSource().copy(true, true)) < minEvenValue) {
+					minEven.put(rule.getSource().copy(true, true), minEvenValue);
+				}
+				if (minEven.get(rule.getSource().copy(true, false)) < minEvenValue) {
+					minEven.put(rule.getSource().copy(true, false), minEvenValue);
+				}
+				if (minEven.get(rule.getSource().copy(false, true)) < minEvenValue) {
+					minEven.put(rule.getSource().copy(false, true), minEvenValue);
+				}
+				if (minEven.get(rule.getSource().copy(false, false)) < minEvenValue) {
+					minEven.put(rule.getSource().copy(false, false), minEvenValue);
+				}
+				if (goodParityStates.contains(rule.getSource().copy(false, false))) {
+					minEven.put(rule.getSource().copy(true, true), Integer.MAX_VALUE);
+					minEven.put(rule.getSource().copy(false, true), Integer.MAX_VALUE);
+					minEven.put(rule.getSource().copy(false, false), Integer.MAX_VALUE);
+				}
 			}
 		}
 	}
