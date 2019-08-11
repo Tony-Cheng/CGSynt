@@ -555,6 +555,9 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 						evenValue = minEven.get(state);
 					}
 				}
+				if (goodParityStates.contains(src.copy(false, false)) && src.isGood2()) {
+					evenValue = Integer.MAX_VALUE;
+				}
 				if (evenValue > minEven.get(src)) {
 					updateMinEven(src, evenValue);
 				}
@@ -703,6 +706,18 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 			return false;
 		}
 	}
+	
+	private void removeNotGoodParityStates(Set<BuchiParityIntersectState<STATE1, STATE2>> states) {
+		Set<BuchiParityIntersectState<STATE1, STATE2>> toRemove = new HashSet<>();
+		for (BuchiParityIntersectState<STATE1, STATE2> state : states) {
+			if (!goodParityStates.contains(state.copy(false, false))) {
+				toRemove.add(state);
+			}
+		}
+		for (BuchiParityIntersectState<STATE1, STATE2> state : toRemove) {
+			states.remove(state);
+		}
+	}
 
 	public void computeResult() {
 		if (resultComputed)
@@ -710,6 +725,7 @@ public class BuchiParityEmptinessCheck<LETTER extends IRankedLetter, STATE1, STA
 		computeGoodTree();
 		goodStates.clear();
 		goodTransitions.clear();
+		removeNotGoodParityStates(this.goodLeavesStates);
 		if (computeDecentTree()) {
 			result = true;
 			resultComputed = true;
