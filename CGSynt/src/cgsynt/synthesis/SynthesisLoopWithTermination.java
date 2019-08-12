@@ -257,7 +257,7 @@ public class SynthesisLoopWithTermination {
 		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> intersectedAut = intersection
 				.computeResult();
 
-		
+		parityOmega.toString();
 		
 		/*
 		BuchiTreeAutomaton<RankedBool, String> aut1 = new BuchiTreeAutomaton<>(2);
