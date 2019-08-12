@@ -216,6 +216,7 @@ public class SynthesisLoopWithTermination {
 	private void computeOneIteration(int k, int bs) throws Exception {
 		// Dead states
 		IPredicate deadPredicateState = globalVars.getPredicateFactory().newDebugPredicate("deadState");
+		IParityState deadParityState = new ParityState<>(deadPredicateState, 1);
 		
 		// Shutdown State
 		IPredicate shutdownPredicateState = globalVars.getPredicateFactory().newDebugPredicate("shutdownState");
@@ -234,7 +235,7 @@ public class SynthesisLoopWithTermination {
 		ParityAutomaton<IcfgInternalTransition, IParityState> parityOmega = determinizeBuchi.getResult();
 
 		ParityAutomatonToTree<IcfgInternalTransition, IParityState> parityOmegaToParityTreeOmega = new ParityAutomatonToTree<>(
-				parityOmega, mIcfgTransitionAlphabet, shutdownParityState, offParityState);
+				parityOmega, mIcfgTransitionAlphabet, shutdownParityState, offParityState, deadParityState);
 
 		ParityTreeAutomaton<RankedBool, IParityState> termTree = parityOmegaToParityTreeOmega.getResult();
 		////////////////////////////////////////////////
