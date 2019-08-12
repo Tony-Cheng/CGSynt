@@ -258,7 +258,7 @@ public class SynthesisLoopWithTermination {
 
 		
 		
-		
+		/*
 		BuchiTreeAutomaton<RankedBool, String> aut1 = new BuchiTreeAutomaton<>(2);
 		String bs1 = "buchi state 1";
 		aut1.addInitState(bs1);
@@ -268,13 +268,13 @@ public class SynthesisLoopWithTermination {
 		blist1.add(bs1);
 		BuchiTreeAutomatonRule<RankedBool, String> brule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
+		*/
 		
 		
-		
-		BuchiParityIntersectAutomaton<RankedBool, String, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomaton<>(
-				aut1, termTree);
+		BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomaton<>(
+				intersectedAut, termTree);
 
-		BuchiParityEmptinessCheck<RankedBool, String, IParityState> emptinessCheck = new BuchiParityEmptinessCheck<>(
+		BuchiParityEmptinessCheck<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> emptinessCheck = new BuchiParityEmptinessCheck<>(
 				buchiParityIntersectedAut);
 		emptinessCheck.computeResult();
 		
@@ -293,6 +293,8 @@ public class SynthesisLoopWithTermination {
 			mIsCorrect = true;
 			mResultComputed = true;
 			// result = buchiParityIntersectedAut;
+			
+			System.out.println("Probably Wrong");
 			return;
 		}
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
