@@ -1,4 +1,4 @@
-package cgsynt.dfa.buchi;
+package cgsynt.dfa.parity.intersect;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,13 +10,13 @@ import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class DFABuchiIntersectAutomaton<LETTER, STATE1, STATE2 extends IParityState> {
+public class DfaBuchiIntersectAutomaton<LETTER, STATE1, STATE2 extends IParityState> {
 
 	private INestedWordAutomaton<LETTER, STATE1> dfa;
 	private ParityAutomaton<LETTER, STATE2> parityAut;
 	private Map<DfaBuchiIntersectState<STATE1, STATE2>, List<DfaBuchiIntersectRule<LETTER, STATE1, STATE2>>> sourceMap;
 
-	public DFABuchiIntersectAutomaton(INestedWordAutomaton<LETTER, STATE1> dfa,
+	public DfaBuchiIntersectAutomaton(INestedWordAutomaton<LETTER, STATE1> dfa,
 			ParityAutomaton<LETTER, STATE2> parityAut) {
 		super();
 		this.dfa = dfa;

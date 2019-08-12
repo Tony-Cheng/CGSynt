@@ -1,4 +1,4 @@
-package cgsynt.dfa.buchi;
+package cgsynt.dfa.parity.intersect;
 
 import cgsynt.tree.parity.IParityState;
 

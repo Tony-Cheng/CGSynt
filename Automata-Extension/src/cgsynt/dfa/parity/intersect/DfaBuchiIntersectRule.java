@@ -1,4 +1,4 @@
-package cgsynt.dfa.buchi;
+package cgsynt.dfa.parity.intersect;
 
 public class DfaBuchiIntersectRule<LETTER, STATE1, STATE2> {
 
