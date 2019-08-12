@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.tree.parity.IParityState;
@@ -14,7 +15,8 @@ public class DfaBuchiIntersectAutomaton<LETTER, STATE1, STATE2 extends IParitySt
 
 	private INestedWordAutomaton<LETTER, STATE1> dfa;
 	private ParityAutomaton<LETTER, STATE2> parityAut;
-	private Map<DfaBuchiIntersectState<STATE1, STATE2>, List<DfaBuchiIntersectRule<LETTER, STATE1, STATE2>>> sourceMap;
+	private Map<DfaBuchiIntersectState<STATE1, STATE2>, Set<DfaBuchiIntersectRule<LETTER, STATE1, STATE2>>> sourceMap;
+	private Set<DfaBuchiIntersectState<STATE1, STATE2>> initialStates;
 
 	public DfaBuchiIntersectAutomaton(INestedWordAutomaton<LETTER, STATE1> dfa,
 			ParityAutomaton<LETTER, STATE2> parityAut) {
@@ -22,6 +24,7 @@ public class DfaBuchiIntersectAutomaton<LETTER, STATE1, STATE2 extends IParitySt
 		this.dfa = dfa;
 		this.parityAut = parityAut;
 		computeSourceMap();
+		computeInitialStates();
 	}
 
 	private void computeSourceMap() {
@@ -43,12 +46,36 @@ public class DfaBuchiIntersectAutomaton<LETTER, STATE1, STATE2 extends IParitySt
 			for (OutgoingInternalTransition<LETTER, STATE2> parityTransition : parityAut.internalSuccessors(parityState,
 					letter)) {
 				if (!sourceMap.containsKey(new DfaBuchiIntersectState<>(dfaState, parityState))) {
-					sourceMap.put(new DfaBuchiIntersectState<>(dfaState, parityState), new ArrayList<>());
+					sourceMap.put(new DfaBuchiIntersectState<>(dfaState, parityState), new HashSet<>());
 				}
 				sourceMap.get(new DfaBuchiIntersectState<>(dfaState, parityState))
-						.add(new DfaBuchiIntersectRule<>(dfaTransition.getSucc(), parityTransition.getSucc(), letter));
+						.add(new DfaBuchiIntersectRule<>(new DfaBuchiIntersectState<>(dfaState, parityState),
+								new DfaBuchiIntersectState<>(dfaTransition.getSucc(), parityTransition.getSucc()),
+								letter));
 			}
 		}
 	}
 
+	public Set<DfaBuchiIntersectRule<LETTER, STATE1, STATE2>> internalSuccessors(
+			DfaBuchiIntersectState<STATE1, STATE2> state) {
+		return sourceMap.get(state);
+
+	}
+
+	public boolean isFinal(DfaBuchiIntersectState<STATE1, STATE2> state) {
+		return dfa.isFinal(state.state1);
+	}
+
+	private void computeInitialStates() {
+		this.initialStates = new HashSet<>();
+		for (STATE1 state1 : dfa.getInitialStates()) {
+			for (STATE2 state2 : parityAut.getInitialStates()) {
+				this.initialStates.add(new DfaBuchiIntersectState<STATE1, STATE2>(state1, state2));
+			}
+		}
+	}
+
+	public Set<DfaBuchiIntersectState<STATE1, STATE2>> getInitialStates() {
+		return initialStates;
+	}
 }

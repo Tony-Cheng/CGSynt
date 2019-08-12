@@ -1,16 +1,27 @@
 package cgsynt.dfa.parity.intersect;
 
-public class DfaBuchiIntersectRule<LETTER, STATE1, STATE2> {
+import cgsynt.tree.parity.IParityState;
 
-	public final STATE1 state1;
-	public final STATE2 state2;
+public class DfaBuchiIntersectRule<LETTER, STATE1, STATE2 extends IParityState> {
+
+	public final DfaBuchiIntersectState<STATE1, STATE2> source;
+	public final DfaBuchiIntersectState<STATE1, STATE2> dest;
 	public final LETTER letter;
 
-	public DfaBuchiIntersectRule(STATE1 state1, STATE2 state2, LETTER letter) {
+	public DfaBuchiIntersectRule(DfaBuchiIntersectState<STATE1, STATE2> source,
+			DfaBuchiIntersectState<STATE1, STATE2> dest, LETTER letter) {
 		super();
-		this.state1 = state1;
-		this.state2 = state2;
+		this.source = source;
+		this.dest = dest;
 		this.letter = letter;
+	}
+
+	public DfaBuchiIntersectState<STATE1, STATE2> getSucc() {
+		return dest;
+	}
+
+	public LETTER getLetter() {
+		return letter;
 	}
 
 }
