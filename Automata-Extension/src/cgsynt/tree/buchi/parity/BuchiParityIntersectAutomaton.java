@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import cgsynt.StateRepCondenser;
+import cgsynt.RepCondenser;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.parity.IParityState;
@@ -202,7 +202,7 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		StateRepCondenser<BuchiParityIntersectState<STATE1, STATE2>> condenser = new StateRepCondenser<>(new ArrayList<>(this.mStates));
+		RepCondenser<BuchiParityIntersectState<STATE1, STATE2>> condenser = new RepCondenser<>(new ArrayList<>(this.mStates));
 		Map<String, String> map = condenser.getMapping();
 		
 		result.append("States:\n");

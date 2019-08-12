@@ -1,7 +1,10 @@
 package cgsynt.dfa.parity;
 
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 
+import cgsynt.RepCondenser;
 import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityStateFactory;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
@@ -13,10 +16,14 @@ import de.uni_freiburg.informatik.ultimate.automata.statefactory.IEmptyStackStat
  * Wrapper class for NestedWordAutomaton that ensures that each state is a ParityState 
  * */
 public class ParityAutomaton<LETTER, STATE extends IParityState> extends NestedWordAutomaton<LETTER, STATE>{
-	@SuppressWarnings("unchecked")
+	private VpAlphabet<LETTER> mPrivateAlphabet;
+	
+	@SuppressWarnings("unchecked")	
 	public ParityAutomaton(AutomataLibraryServices services, VpAlphabet<LETTER> vpAlphabet,
 			ParityStateFactory emptyStateFactory) {
 		super(services, vpAlphabet, (IEmptyStackStateFactory<STATE>)emptyStateFactory);
+	
+		mPrivateAlphabet = vpAlphabet;
 	}
 	
 	public IParityState fetchEqualState(STATE query) {
@@ -28,5 +35,28 @@ public class ParityAutomaton<LETTER, STATE extends IParityState> extends NestedW
 		}
 
 		return null;
+	}
+	
+	public String toString() {
+		String rep = ""; 
+		
+		RepCondenser<IParityState> condenser = new RepCondenser<>(new ArrayList<>(this.getStates()));
+		Map<String, String> mapping = condenser.getMapping();
+		
+		rep += "States:\n";
+		for (String key : mapping.keySet()) 
+			rep += mapping.get(key) + "\n";
+		
+		rep += "\nAlphabet:\n";
+		for (LETTER letter : this.mPrivateAlphabet.getInternalAlphabet())
+			rep += letter.toString() + "\n";
+		
+		rep += "\nInital States:\n";
+		for (STATE initState : this.getInitialStates())
+			rep += mapping.get(initState.toString()) + "\n";
+		
+		rep += "\nFinal States:\n";
+		
+		return rep;
 	}
 }

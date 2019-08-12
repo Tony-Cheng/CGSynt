@@ -11,7 +11,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
-import cgsynt.StateRepCondenser;
+import cgsynt.RepCondenser;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataOperationCanceledException;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
@@ -450,7 +450,7 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		StateRepCondenser<STATE> condenser = new StateRepCondenser<>(new ArrayList<>(this.mStates));
+		RepCondenser<STATE> condenser = new RepCondenser<>(new ArrayList<>(this.mStates));
 		Map<String, String> map = condenser.getMapping();
 
 		result.append("States:\n");

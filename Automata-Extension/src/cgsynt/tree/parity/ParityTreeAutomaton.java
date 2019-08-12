@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import cgsynt.StateRepCondenser;
+import cgsynt.RepCondenser;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
 /**
@@ -294,7 +294,7 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		StateRepCondenser<STATE> condenser = new StateRepCondenser<>(new ArrayList<>(this.mStates));
+		RepCondenser<STATE> condenser = new RepCondenser<>(new ArrayList<>(this.mStates));
 		Map<String, String> map = condenser.getMapping();
 		
 		result.append("States:\n");
