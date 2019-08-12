@@ -2,15 +2,15 @@ package cgsynt.dfa.parity.intersect.operations;
 
 import java.util.Stack;
 
-import cgsynt.dfa.parity.intersect.DfaBuchiIntersectState;
+import cgsynt.dfa.parity.intersect.DfaParityIntersectState;
 import cgsynt.tree.parity.IParityState;
 
 public class DfaParityCounterexample<LETTER, STATE1, STATE2 extends IParityState> {
 	public Stack<LETTER> loopTransitions;
-	public Stack<DfaBuchiIntersectState<STATE1, STATE2>> loopStates;
+	public Stack<DfaParityIntersectState<STATE1, STATE2>> loopStates;
 	public Stack<LETTER> stemTransitions;
-	public Stack<DfaBuchiIntersectState<STATE1, STATE2>> stemStates;
-	public DfaBuchiIntersectState<STATE1, STATE2> repeatedState;
+	public Stack<DfaParityIntersectState<STATE1, STATE2>> stemStates;
+	public DfaParityIntersectState<STATE1, STATE2> repeatedState;
 	public int maxRepeatingNumber;
 
 	public DfaParityCounterexample(int maxRepeatingNumber) {

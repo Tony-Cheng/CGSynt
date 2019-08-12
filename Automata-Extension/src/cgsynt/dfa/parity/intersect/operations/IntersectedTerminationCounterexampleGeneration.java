@@ -5,20 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cgsynt.dfa.parity.intersect.DfaBuchiIntersectAutomaton;
-import cgsynt.dfa.parity.intersect.DfaBuchiIntersectRule;
-import cgsynt.dfa.parity.intersect.DfaBuchiIntersectState;
+import cgsynt.dfa.parity.intersect.DfaParityIntersectAutomaton;
+import cgsynt.dfa.parity.intersect.DfaParityIntersectRule;
+import cgsynt.dfa.parity.intersect.DfaParityIntersectState;
 import cgsynt.tree.parity.IParityState;
 
 public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STATE2 extends IParityState> {
 
-	private DfaBuchiIntersectAutomaton<LETTER, STATE1, STATE2> aut;
+	private DfaParityIntersectAutomaton<LETTER, STATE1, STATE2> aut;
 	private boolean resultComputed;
 	private int maxLen;
-	private Map<DfaBuchiIntersectState<STATE1, STATE2>, Integer> visitedStates;
+	private Map<DfaParityIntersectState<STATE1, STATE2>, Integer> visitedStates;
 	private List<DfaParityCounterexample<LETTER, STATE1, STATE2>> result;
 
-	public IntersectedTerminationCounterexampleGeneration(DfaBuchiIntersectAutomaton<LETTER, STATE1, STATE2> aut,
+	public IntersectedTerminationCounterexampleGeneration(DfaParityIntersectAutomaton<LETTER, STATE1, STATE2> aut,
 			int maxLen) {
 		this.aut = aut;
 		this.resultComputed = false;
@@ -31,7 +31,7 @@ public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STAT
 		}
 		this.visitedStates = new HashMap<>();
 		this.result = new ArrayList<>();
-		for (DfaBuchiIntersectState<STATE1, STATE2> initialState : aut.getInitialStates()) {
+		for (DfaParityIntersectState<STATE1, STATE2> initialState : aut.getInitialStates()) {
 			List<DfaParityCounterexample<LETTER, STATE1, STATE2>> counterexamples = generateCounterexamples(initialState,
 					maxLen);
 			for (int i = counterexamples.size() - 1; i >= 0; i--) {
@@ -51,7 +51,7 @@ public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STAT
 	}
 
 	private List<DfaParityCounterexample<LETTER, STATE1, STATE2>> generateCounterexamples(
-			DfaBuchiIntersectState<STATE1, STATE2> state, int len) {
+			DfaParityIntersectState<STATE1, STATE2> state, int len) {
 		List<DfaParityCounterexample<LETTER, STATE1, STATE2>> counterexamples = new ArrayList<>();
 		if (visitedStates.containsKey(state) && visitedStates.get(state) > 0 && aut.isFinal(state)) {
 			DfaParityCounterexample<LETTER, STATE1, STATE2> counterexample = new DfaParityCounterexample<>(
@@ -67,7 +67,7 @@ public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STAT
 			visitedStates.put(state, 0);
 		}
 		visitedStates.put(state, visitedStates.get(state) + 1);
-		for (DfaBuchiIntersectRule<LETTER, STATE1, STATE2> transition : aut.internalSuccessors(state)) {
+		for (DfaParityIntersectRule<LETTER, STATE1, STATE2> transition : aut.internalSuccessors(state)) {
 			List<DfaParityCounterexample<LETTER, STATE1, STATE2>> destCounterexamples = generateCounterexamples(
 					transition.getSucc(), len - 1);
 			for (int i = 0; i < destCounterexamples.size(); i++) {

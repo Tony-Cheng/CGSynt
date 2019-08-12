@@ -11,14 +11,14 @@ import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class DfaBuchiIntersectAutomaton<LETTER, STATE1, STATE2 extends IParityState> {
+public class DfaParityIntersectAutomaton<LETTER, STATE1, STATE2 extends IParityState> {
 
 	private INestedWordAutomaton<LETTER, STATE1> dfa;
 	private ParityAutomaton<LETTER, STATE2> parityAut;
-	private Map<DfaBuchiIntersectState<STATE1, STATE2>, Set<DfaBuchiIntersectRule<LETTER, STATE1, STATE2>>> sourceMap;
-	private Set<DfaBuchiIntersectState<STATE1, STATE2>> initialStates;
+	private Map<DfaParityIntersectState<STATE1, STATE2>, Set<DfaParityIntersectRule<LETTER, STATE1, STATE2>>> sourceMap;
+	private Set<DfaParityIntersectState<STATE1, STATE2>> initialStates;
 
-	public DfaBuchiIntersectAutomaton(INestedWordAutomaton<LETTER, STATE1> dfa,
+	public DfaParityIntersectAutomaton(INestedWordAutomaton<LETTER, STATE1> dfa,
 			ParityAutomaton<LETTER, STATE2> parityAut) {
 		super();
 		this.dfa = dfa;
@@ -45,24 +45,24 @@ public class DfaBuchiIntersectAutomaton<LETTER, STATE1, STATE2 extends IParitySt
 		for (OutgoingInternalTransition<LETTER, STATE1> dfaTransition : dfa.internalSuccessors(dfaState, letter)) {
 			for (OutgoingInternalTransition<LETTER, STATE2> parityTransition : parityAut.internalSuccessors(parityState,
 					letter)) {
-				if (!sourceMap.containsKey(new DfaBuchiIntersectState<>(dfaState, parityState))) {
-					sourceMap.put(new DfaBuchiIntersectState<>(dfaState, parityState), new HashSet<>());
+				if (!sourceMap.containsKey(new DfaParityIntersectState<>(dfaState, parityState))) {
+					sourceMap.put(new DfaParityIntersectState<>(dfaState, parityState), new HashSet<>());
 				}
-				sourceMap.get(new DfaBuchiIntersectState<>(dfaState, parityState))
-						.add(new DfaBuchiIntersectRule<>(new DfaBuchiIntersectState<>(dfaState, parityState),
-								new DfaBuchiIntersectState<>(dfaTransition.getSucc(), parityTransition.getSucc()),
+				sourceMap.get(new DfaParityIntersectState<>(dfaState, parityState))
+						.add(new DfaParityIntersectRule<>(new DfaParityIntersectState<>(dfaState, parityState),
+								new DfaParityIntersectState<>(dfaTransition.getSucc(), parityTransition.getSucc()),
 								letter));
 			}
 		}
 	}
 
-	public Set<DfaBuchiIntersectRule<LETTER, STATE1, STATE2>> internalSuccessors(
-			DfaBuchiIntersectState<STATE1, STATE2> state) {
+	public Set<DfaParityIntersectRule<LETTER, STATE1, STATE2>> internalSuccessors(
+			DfaParityIntersectState<STATE1, STATE2> state) {
 		return sourceMap.get(state);
 
 	}
 
-	public boolean isFinal(DfaBuchiIntersectState<STATE1, STATE2> state) {
+	public boolean isFinal(DfaParityIntersectState<STATE1, STATE2> state) {
 		return dfa.isFinal(state.state1);
 	}
 
@@ -70,12 +70,12 @@ public class DfaBuchiIntersectAutomaton<LETTER, STATE1, STATE2 extends IParitySt
 		this.initialStates = new HashSet<>();
 		for (STATE1 state1 : dfa.getInitialStates()) {
 			for (STATE2 state2 : parityAut.getInitialStates()) {
-				this.initialStates.add(new DfaBuchiIntersectState<STATE1, STATE2>(state1, state2));
+				this.initialStates.add(new DfaParityIntersectState<STATE1, STATE2>(state1, state2));
 			}
 		}
 	}
 
-	public Set<DfaBuchiIntersectState<STATE1, STATE2>> getInitialStates() {
+	public Set<DfaParityIntersectState<STATE1, STATE2>> getInitialStates() {
 		return initialStates;
 	}
 }

@@ -2,12 +2,12 @@ package cgsynt.dfa.parity.intersect;
 
 import cgsynt.tree.parity.IParityState;
 
-public class DfaBuchiIntersectState<STATE1, STATE2 extends IParityState> {
+public class DfaParityIntersectState<STATE1, STATE2 extends IParityState> {
 
 	public final STATE1 state1;
 	public final STATE2 state2;
 
-	public DfaBuchiIntersectState(STATE1 state1, STATE2 state2) {
+	public DfaParityIntersectState(STATE1 state1, STATE2 state2) {
 		super();
 		this.state1 = state1;
 		this.state2 = state2;
@@ -30,7 +30,7 @@ public class DfaBuchiIntersectState<STATE1, STATE2 extends IParityState> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DfaBuchiIntersectState other = (DfaBuchiIntersectState) obj;
+		DfaParityIntersectState other = (DfaParityIntersectState) obj;
 		if (state1 == null) {
 			if (other.state1 != null)
 				return false;
