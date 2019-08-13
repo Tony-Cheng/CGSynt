@@ -1,4 +1,4 @@
-package cgsynt.nfa.operations;
+package cgsynt.dfa.operations;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,12 +12,12 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.Incom
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.IEmptyStackStateFactory;
 
-public class NFAInfConversion<LETTER, STATE> {
+public class DfaInfConversion<LETTER, STATE> {
 
 	private NestedWordAutomaton<LETTER, STATE> result;
 	private boolean resultComputed;
 
-	public NFAInfConversion(INestedWordAutomaton<LETTER, STATE> aut, final AutomataLibraryServices services,
+	public DfaInfConversion(INestedWordAutomaton<LETTER, STATE> aut, final AutomataLibraryServices services,
 			final VpAlphabet<LETTER> vpAlphabet, final IEmptyStackStateFactory<STATE> emptyStateFactory) {
 		this.result = copy(aut, services, vpAlphabet, emptyStateFactory);
 		this.resultComputed = false;
