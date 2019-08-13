@@ -9,6 +9,7 @@ import java.util.Map;
 import cgsynt.interpol.IStatement;
 import cgsynt.nfa.GeneralizeStateFactory;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
@@ -20,15 +21,15 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.debug
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
-public class DfaLetterConverter<LETTER extends IStatement> {
-	private NestedWordAutomaton<LETTER, IPredicate> mInAut;
+public class DfaLetterConverter {
+	private INestedWordAutomaton<IStatement, IPredicate> mInAut;
 
 	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> mOutAut;
 	private IcfgEdgeFactory mFactory;
 	
 	private List<IcfgInternalTransition> mIcfgTransitionLetters;
  	
-	public DfaLetterConverter(NestedWordAutomaton<LETTER, IPredicate> inAut, AutomataLibraryServices autServices, BasicPredicateFactory bpf) {
+	public DfaLetterConverter(INestedWordAutomaton<IStatement, IPredicate> inAut, AutomataLibraryServices autServices, BasicPredicateFactory bpf) {
 		this.mInAut = inAut;
 		this.mFactory = new IcfgEdgeFactory(OmegaRefiner.SERIAL_PROVIDER);
 		
@@ -37,6 +38,8 @@ public class DfaLetterConverter<LETTER extends IStatement> {
 		
 		this.mOutAut = new NestedWordAutomaton<>(autServices, alphabet, 
 				new GeneralizeStateFactory(bpf));
+		
+		this.computeResult();
 	}
 	
 	private void computeResult() {
@@ -54,9 +57,9 @@ public class DfaLetterConverter<LETTER extends IStatement> {
 				createLetterMapping(new ArrayList<>(this.mInAut.getAlphabet()), mIcfgTransitionLetters);
 		
 		for (IPredicate source : mInAut.getStates()) {
-			Iterable<OutgoingInternalTransition<LETTER, IPredicate>> transitions = mInAut.internalSuccessors(source);
+			Iterable<OutgoingInternalTransition<IStatement, IPredicate>> transitions = mInAut.internalSuccessors(source);
 			
-			for (OutgoingInternalTransition<LETTER, IPredicate> transition : transitions)
+			for (OutgoingInternalTransition<IStatement, IPredicate> transition : transitions)
 				this.mOutAut.addInternalTransition(source, mapping.get(transition.getLetter()), transition.getSucc());
 		}
 	}
