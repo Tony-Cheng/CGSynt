@@ -16,7 +16,7 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
  * @param <STATE1>
  * @param <STATE2>
  */
-public class BuchiParityIntersectRule<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
+public class BuchiHybridParityIntersectRule<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
 	@Override
 	public String toString() {
 		return "BuchiParityIntersectRule [source=" + source + ", dests=" + dests + "]";
@@ -25,21 +25,21 @@ public class BuchiParityIntersectRule<LETTER extends IRankedLetter, STATE1, STAT
 	/**
 	 * The source state of this rule.
 	 */
-	private BuchiParityIntersectState<STATE1, STATE2> source;
+	private BuchiParityHybridIntersectState<STATE1, STATE2> source;
 
 	/**
 	 * The destination of this rule.
 	 */
-	private List<BuchiParityIntersectState<STATE1, STATE2>> dests;
+	private List<BuchiParityHybridIntersectState<STATE1, STATE2>> dests;
 	
 	private LETTER mLetter;
 
-	public BuchiParityIntersectRule(BuchiTreeAutomatonRule<LETTER, STATE1> rule1,
+	public BuchiHybridParityIntersectRule(BuchiTreeAutomatonRule<LETTER, STATE1> rule1,
 			ParityTreeAutomatonRule<LETTER, STATE2> rule2) {
-		this.source = new BuchiParityIntersectState<>(rule1.getSource(), rule2.getSource());
+		this.source = new BuchiParityHybridIntersectState<>(rule1.getSource(), rule2.getSource());
 		this.dests = new ArrayList<>();
 		for (int i = 0; i < rule1.getDest().size(); i++) {
-			dests.add(new BuchiParityIntersectState<>(rule1.getDest().get(i), rule2.getDest().get(i)));
+			dests.add(new BuchiParityHybridIntersectState<>(rule1.getDest().get(i), rule2.getDest().get(i)));
 		}
 		
 		this.mLetter = rule1.getLetter();
@@ -54,7 +54,7 @@ public class BuchiParityIntersectRule<LETTER extends IRankedLetter, STATE1, STAT
 	 * 
 	 * @return
 	 */
-	public BuchiParityIntersectState<STATE1, STATE2> getSource() {
+	public BuchiParityHybridIntersectState<STATE1, STATE2> getSource() {
 		return source;
 	}
 
@@ -63,7 +63,7 @@ public class BuchiParityIntersectRule<LETTER extends IRankedLetter, STATE1, STAT
 	 * 
 	 * @return
 	 */
-	public List<BuchiParityIntersectState<STATE1, STATE2>> getDests() {
+	public List<BuchiParityHybridIntersectState<STATE1, STATE2>> getDests() {
 		return dests;
 	}
 

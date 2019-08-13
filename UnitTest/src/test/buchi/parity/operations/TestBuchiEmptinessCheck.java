@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.EmptinessCheck;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
 import cgsynt.tree.buchi.parity.operations.BuchiParityEmptinessCheck;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityTreeAutomaton;
@@ -55,7 +55,7 @@ public class TestBuchiEmptinessCheck {
 		aut2.addRule(prule3);
 		aut2.addInitState(q0);
 
-		BuchiParityIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				single, aut2);
 
 		BuchiParityEmptinessCheck<RankedLetter, String, ParityState<String>> empty = new BuchiParityEmptinessCheck<>(
@@ -95,7 +95,7 @@ public class TestBuchiEmptinessCheck {
 		aut2.addRule(prule3);
 		aut2.addInitState(q0);
 
-		BuchiParityIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut, aut2);
 
 		BuchiParityEmptinessCheck<RankedLetter, String, ParityState<String>> empty = new BuchiParityEmptinessCheck<>(
@@ -126,7 +126,7 @@ public class TestBuchiEmptinessCheck {
 		aut2.addRule(prule3);
 		aut2.addInitState(q0);
 
-		BuchiParityIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut, aut2);
 
 		BuchiParityEmptinessCheck<RankedLetter, String, ParityState<String>> empty = new BuchiParityEmptinessCheck<>(
@@ -157,7 +157,7 @@ public class TestBuchiEmptinessCheck {
 		aut2.addRule(prule3);
 		aut2.addInitState(q0);
 
-		BuchiParityIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				machine, aut2);
 
 		BuchiParityEmptinessCheck<RankedLetter, String, ParityState<String>> empty = new BuchiParityEmptinessCheck<>(
@@ -187,7 +187,7 @@ public class TestBuchiEmptinessCheck {
 		aut2.addRule(prule3);
 		aut2.addInitState(q0);
 
-		BuchiParityIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut, aut2);
 
 		BuchiParityEmptinessCheck<RankedLetter, String, ParityState<String>> empty = new BuchiParityEmptinessCheck<>(
@@ -218,7 +218,7 @@ public class TestBuchiEmptinessCheck {
 		aut2.addRule(prule3);
 		aut2.addInitState(q0);
 
-		BuchiParityIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut, aut2);
 
 		BuchiParityEmptinessCheck<RankedLetter, String, ParityState<String>> empty = new BuchiParityEmptinessCheck<>(
@@ -308,7 +308,7 @@ public class TestBuchiEmptinessCheck {
 		aut2.addRule(prule3);
 		aut2.addInitState(q0);
 
-		BuchiParityIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedLetter, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				machine, aut2);
 
 		BuchiParityEmptinessCheck<RankedLetter, String, ParityState<String>> empty = new BuchiParityEmptinessCheck<>(

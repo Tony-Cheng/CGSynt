@@ -11,9 +11,9 @@ import cgsynt.interpol.IStatement;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.IntersectState;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectRule;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiHybridParityIntersectRule;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectState;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
@@ -27,17 +27,17 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPre
 public class TerminatingProgramExtraction<LETTER extends IRankedLetter, STATE extends IParityState> {
 
 	private IStatement[] statements;
-	private BuchiParityIntersectAutomaton<LETTER, IntersectState<IPredicate, IPredicate>, STATE> tree;
-	private Set<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> visitedStates;
-	private Set<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> repeatedStates;
+	private BuchiParityHybridIntersectAutomaton<LETTER, IntersectState<IPredicate, IPredicate>, STATE> tree;
+	private Set<BuchiParityHybridIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> visitedStates;
+	private Set<BuchiParityHybridIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> repeatedStates;
 	private List<String> currentStatements;
-	private Map<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>, BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE>> goodProgram;
+	private Map<BuchiParityHybridIntersectState<IntersectState<IPredicate, IPredicate>, STATE>, BuchiHybridParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE>> goodProgram;
 	private boolean resultComputed;
 
 	public TerminatingProgramExtraction(
-			BuchiParityIntersectAutomaton<LETTER, IntersectState<IPredicate, IPredicate>, STATE> tree,
+			BuchiParityHybridIntersectAutomaton<LETTER, IntersectState<IPredicate, IPredicate>, STATE> tree,
 			IStatement[] statements,
-			Map<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>, BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE>> goodProgram) {
+			Map<BuchiParityHybridIntersectState<IntersectState<IPredicate, IPredicate>, STATE>, BuchiHybridParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE>> goodProgram) {
 		this.statements = statements;
 		this.tree = tree;
 		this.visitedStates = new HashSet<>();
@@ -51,7 +51,7 @@ public class TerminatingProgramExtraction<LETTER extends IRankedLetter, STATE ex
 		if (resultComputed)
 			return;
 		resultComputed = true;
-		for (BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE> initial : tree.getInitStates()) {
+		for (BuchiParityHybridIntersectState<IntersectState<IPredicate, IPredicate>, STATE> initial : tree.getInitStates()) {
 			retrieveProgram(initial);
 			return;
 		}
@@ -64,18 +64,18 @@ public class TerminatingProgramExtraction<LETTER extends IRankedLetter, STATE ex
 		return null;
 	}
 
-	private void retrieveProgram(BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE> state) {
+	private void retrieveProgram(BuchiParityHybridIntersectState<IntersectState<IPredicate, IPredicate>, STATE> state) {
 		if (visitedStates.contains(state)) {
 			repeatedStates.add(state);
 			return;
 		}
-		for (BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE> transition : tree
+		for (BuchiHybridParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE> transition : tree
 				.getRulesBySource(state)) {
 			if (!goodProgram.get(state).equals(transition))
 				continue;
 			Object[] retrievalResult = retrieveValidStatements(transition);
 			@SuppressWarnings("unchecked")
-			List<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> validProgramStatements = (List<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>>) retrievalResult[0];
+			List<BuchiParityHybridIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> validProgramStatements = (List<BuchiParityHybridIntersectState<IntersectState<IPredicate, IPredicate>, STATE>>) retrievalResult[0];
 			@SuppressWarnings("unchecked")
 			List<String> validStatementStrings = (List<String>) retrievalResult[1];
 			if (validProgramStatements.size() == 0) {
@@ -108,8 +108,8 @@ public class TerminatingProgramExtraction<LETTER extends IRankedLetter, STATE ex
 	}
 
 	public Object[] retrieveValidStatements(
-			BuchiParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE> transition) {
-		List<BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> validProgramStatements = new ArrayList<>();
+			BuchiHybridParityIntersectRule<LETTER, IntersectState<IPredicate, IPredicate>, STATE> transition) {
+		List<BuchiParityHybridIntersectState<IntersectState<IPredicate, IPredicate>, STATE>> validProgramStatements = new ArrayList<>();
 		List<String> validStatementStrings = new ArrayList<>();
 		validProgramStatements.add(null);
 		validProgramStatements.add(null);

@@ -29,18 +29,18 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
  * @param <STATE1>
  * @param <STATE2>
  */
-public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
+public class BuchiParityHybridIntersectAutomaton<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState> {
 
-	private final Map<BuchiParityIntersectState<STATE1, STATE2>, Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>>> mSourceMap;
-	private final Set<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> mRules;
-	private final Map<BuchiParityIntersectState<STATE1, STATE2>, Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>>> mChildMap;
-	private final Set<BuchiParityIntersectState<STATE1, STATE2>> mStates;
-	private final Set<BuchiParityIntersectState<STATE1, STATE2>> mAltStates;
-	private final Set<BuchiParityIntersectState<STATE1, STATE2>> mInitStates;
+	private final Map<BuchiParityHybridIntersectState<STATE1, STATE2>, Collection<BuchiHybridParityIntersectRule<LETTER, STATE1, STATE2>>> mSourceMap;
+	private final Set<BuchiHybridParityIntersectRule<LETTER, STATE1, STATE2>> mRules;
+	private final Map<BuchiParityHybridIntersectState<STATE1, STATE2>, Collection<BuchiHybridParityIntersectRule<LETTER, STATE1, STATE2>>> mChildMap;
+	private final Set<BuchiParityHybridIntersectState<STATE1, STATE2>> mStates;
+	private final Set<BuchiParityHybridIntersectState<STATE1, STATE2>> mAltStates;
+	private final Set<BuchiParityHybridIntersectState<STATE1, STATE2>> mInitStates;
 	private final Set<STATE1> mFinalStates;
 	private Set<LETTER> mAlphabet;
 
-	public BuchiParityIntersectAutomaton(BuchiTreeAutomaton<LETTER, STATE1> tree1,
+	public BuchiParityHybridIntersectAutomaton(BuchiTreeAutomaton<LETTER, STATE1> tree1,
 			ParityTreeAutomaton<LETTER, STATE2> tree2) {
 		this.mSourceMap = new HashMap<>();
 		this.mRules = new HashSet<>();
@@ -60,7 +60,7 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 	 * 
 	 * @param state
 	 */
-	private void addState(BuchiParityIntersectState<STATE1, STATE2> state) {
+	private void addState(BuchiParityHybridIntersectState<STATE1, STATE2> state) {
 		if (mStates.contains(state))
 			return;
 		mStates.add(state);
@@ -78,7 +78,7 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 	private void initializeStates(Set<STATE1> states1, Set<STATE2> states2) {
 		for (STATE1 state1 : states1) {
 			for (STATE2 state2 : states2) {
-				BuchiParityIntersectState<STATE1, STATE2> intersectState = new BuchiParityIntersectState<>(state1,
+				BuchiParityHybridIntersectState<STATE1, STATE2> intersectState = new BuchiParityHybridIntersectState<>(state1,
 						state2);
 				addState(intersectState);
 				addAltState(intersectState.copy(false, false));
@@ -94,7 +94,7 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 	 * 
 	 * @param state
 	 */
-	private void addAltState(BuchiParityIntersectState<STATE1, STATE2> state) {
+	private void addAltState(BuchiParityHybridIntersectState<STATE1, STATE2> state) {
 		if (mAltStates.contains(state))
 			return;
 		mAltStates.add(state);
@@ -111,7 +111,7 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 	private void initializeInitStates(Set<STATE1> init1, Set<STATE2> init2) {
 		for (STATE1 state1 : init1) {
 			for (STATE2 state2 : init2) {
-				BuchiParityIntersectState<STATE1, STATE2> intersectState = new BuchiParityIntersectState<>(state1,
+				BuchiParityHybridIntersectState<STATE1, STATE2> intersectState = new BuchiParityHybridIntersectState<>(state1,
 						state2);
 				mInitStates.add(intersectState);
 			}
@@ -147,12 +147,12 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 	private void addRule(BuchiTreeAutomatonRule<LETTER, STATE1> rule1, ParityTreeAutomatonRule<LETTER, STATE2> rule2) {
 		STATE1 src1 = rule1.getSource();
 		STATE2 src2 = rule2.getSource();
-		BuchiParityIntersectState<STATE1, STATE2> intersectSrc = new BuchiParityIntersectState<>(src1, src2);
-		BuchiParityIntersectRule<LETTER, STATE1, STATE2> intersectRule = new BuchiParityIntersectRule<>(rule1, rule2);
+		BuchiParityHybridIntersectState<STATE1, STATE2> intersectSrc = new BuchiParityHybridIntersectState<>(src1, src2);
+		BuchiHybridParityIntersectRule<LETTER, STATE1, STATE2> intersectRule = new BuchiHybridParityIntersectRule<>(rule1, rule2);
 		mSourceMap.get(intersectSrc).add(intersectRule);
 		mRules.add(intersectRule);
 		for (int i = 0; i < rule1.getDest().size(); i++) {
-			BuchiParityIntersectState<STATE1, STATE2> intersectDest = new BuchiParityIntersectState<>(
+			BuchiParityHybridIntersectState<STATE1, STATE2> intersectDest = new BuchiParityHybridIntersectState<>(
 					rule1.getDest().get(i), rule2.getDest().get(i));
 			mChildMap.get(intersectDest).add(intersectRule);
 
@@ -160,60 +160,60 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 
 	}
 
-	public Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> getForSourceMap(
-			BuchiParityIntersectState<STATE1, STATE2> intersectState) {
+	public Collection<BuchiHybridParityIntersectRule<LETTER, STATE1, STATE2>> getForSourceMap(
+			BuchiParityHybridIntersectState<STATE1, STATE2> intersectState) {
 		return mSourceMap.get(intersectState.getGoodIntersectState());
 	}
 	
-	public Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> getRulesBySource(
-			BuchiParityIntersectState<STATE1, STATE2> intersectState) {
+	public Collection<BuchiHybridParityIntersectRule<LETTER, STATE1, STATE2>> getRulesBySource(
+			BuchiParityHybridIntersectState<STATE1, STATE2> intersectState) {
 		return getForSourceMap(intersectState);
 	}
 
-	public Collection<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> getForChildMap(
-			BuchiParityIntersectState<STATE1, STATE2> intersectState) {
+	public Collection<BuchiHybridParityIntersectRule<LETTER, STATE1, STATE2>> getForChildMap(
+			BuchiParityHybridIntersectState<STATE1, STATE2> intersectState) {
 		return mChildMap.get(intersectState.getGoodIntersectState());
 	}
 
-	public Set<BuchiParityIntersectState<STATE1, STATE2>> getStates() {
+	public Set<BuchiParityHybridIntersectState<STATE1, STATE2>> getStates() {
 		return mStates;
 	}
 
-	public Set<BuchiParityIntersectState<STATE1, STATE2>> getAltStates() {
+	public Set<BuchiParityHybridIntersectState<STATE1, STATE2>> getAltStates() {
 		return mAltStates;
 	}
 
-	public Set<BuchiParityIntersectRule<LETTER, STATE1, STATE2>> getRules() {
+	public Set<BuchiHybridParityIntersectRule<LETTER, STATE1, STATE2>> getRules() {
 		return mRules;
 	}
 
-	public boolean isFinal(BuchiParityIntersectState<STATE1, STATE2> state) {
+	public boolean isFinal(BuchiParityHybridIntersectState<STATE1, STATE2> state) {
 		return mFinalStates.contains(state.getState1());
 	}
 
-	public boolean isEven(BuchiParityIntersectState<STATE1, STATE2> state) {
+	public boolean isEven(BuchiParityHybridIntersectState<STATE1, STATE2> state) {
 		return state.getState2().getRank() % 2 == 0;
 	}
 
-	public Set<BuchiParityIntersectState<STATE1, STATE2>> getInitStates() {
+	public Set<BuchiParityHybridIntersectState<STATE1, STATE2>> getInitStates() {
 		return mInitStates;
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		RepCondenser<BuchiParityIntersectState<STATE1, STATE2>> condenser = new RepCondenser<>(new ArrayList<>(this.mStates));
+		RepCondenser<BuchiParityHybridIntersectState<STATE1, STATE2>> condenser = new RepCondenser<>(new ArrayList<>(this.mStates));
 		Map<String, String> map = condenser.getMapping();
 		
 		result.append("States:\n");
-		for (BuchiParityIntersectState<STATE1, STATE2> state : mStates) {
+		for (BuchiParityHybridIntersectState<STATE1, STATE2> state : mStates) {
 			result.append(map.get(state.toString()));
 			result.append("\n");
 		}
 		result.append("\n");
 
 		result.append("Initial States:\n");
-		for (BuchiParityIntersectState<STATE1, STATE2> state : mInitStates) {
+		for (BuchiParityHybridIntersectState<STATE1, STATE2> state : mInitStates) {
 			result.append(map.get(state.toString()));
 			result.append("\n");
 		}
@@ -227,7 +227,7 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 		result.append("\n");
 
 		result.append("Transitions:\n");
-		for (BuchiParityIntersectRule<LETTER, STATE1, STATE2> rule : mRules) {
+		for (BuchiHybridParityIntersectRule<LETTER, STATE1, STATE2> rule : mRules) {
 			String dests = "";
 			for (int i = 0; i < rule.getDests().size(); i++) {
 				dests += map.get(rule.getDests().get(i).toString()) + " ";

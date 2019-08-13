@@ -32,9 +32,9 @@ import cgsynt.tree.buchi.IntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.BuchiIntersection;
 import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectRule;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiHybridParityIntersectRule;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectState;
 import cgsynt.tree.buchi.parity.operations.BuchiParityEmptinessCheck;
 import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityState;
@@ -66,7 +66,7 @@ public class SynthesisLoopWithTermination {
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
-	private BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> mResult;
+	private BuchiParityHybridIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> mResult;
 	private Set<List<IStatement>> mVisitedCounterexamples;
 
 	private boolean mResultComputed;
@@ -258,7 +258,7 @@ public class SynthesisLoopWithTermination {
 		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> intersectedAut = intersection
 				.computeResult();
 			
-		BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityHybridIntersectAutomaton<>(
 				intersectedAut, termTree);
 
 		BuchiParityEmptinessCheck<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -309,7 +309,7 @@ public class SynthesisLoopWithTermination {
 	 * 
 	 * @return
 	 */
-	public BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> getResult() {
+	public BuchiParityHybridIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> getResult() {
 		return mResult;
 	}
 

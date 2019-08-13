@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;

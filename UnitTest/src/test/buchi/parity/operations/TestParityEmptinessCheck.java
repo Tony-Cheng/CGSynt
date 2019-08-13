@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
 import cgsynt.tree.buchi.parity.operations.BuchiParityEmptinessCheck;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityTreeAutomaton;
@@ -45,7 +45,7 @@ public class TestParityEmptinessCheck {
 		blist1.add(bs1);
 		BuchiTreeAutomatonRule<RankedBool, String> brule1 = new BuchiTreeAutomatonRule<>(RankedBool.TRUE, bs1, blist1);
 		aut1.addRule(brule1);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -79,7 +79,7 @@ public class TestParityEmptinessCheck {
 		blist1.add(bs1);
 		BuchiTreeAutomatonRule<RankedBool, String> brule1 = new BuchiTreeAutomatonRule<>(RankedBool.TRUE, bs1, blist1);
 		aut1.addRule(brule1);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -122,7 +122,7 @@ public class TestParityEmptinessCheck {
 		blist1.add(bs1);
 		BuchiTreeAutomatonRule<RankedBool, String> brule1 = new BuchiTreeAutomatonRule<>(RankedBool.TRUE, bs1, blist1);
 		aut1.addRule(brule1);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -165,7 +165,7 @@ public class TestParityEmptinessCheck {
 		blist1.add(bs1);
 		BuchiTreeAutomatonRule<RankedBool, String> brule1 = new BuchiTreeAutomatonRule<>(RankedBool.TRUE, bs1, blist1);
 		aut1.addRule(brule1);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -218,7 +218,7 @@ public class TestParityEmptinessCheck {
 		BuchiTreeAutomatonRule<RankedBool, String> brule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
 		aut1.addRule(brule2);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -271,7 +271,7 @@ public class TestParityEmptinessCheck {
 		BuchiTreeAutomatonRule<RankedBool, String> brule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
 		aut1.addRule(brule2);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -324,7 +324,7 @@ public class TestParityEmptinessCheck {
 		BuchiTreeAutomatonRule<RankedBool, String> brule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
 		aut1.addRule(brule2);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -377,7 +377,7 @@ public class TestParityEmptinessCheck {
 		BuchiTreeAutomatonRule<RankedBool, String> brule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
 		aut1.addRule(brule2);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -429,7 +429,7 @@ public class TestParityEmptinessCheck {
 		BuchiTreeAutomatonRule<RankedBool, String> brule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
 		aut1.addRule(brule2);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -490,7 +490,7 @@ public class TestParityEmptinessCheck {
 		BuchiTreeAutomatonRule<RankedBool, String> brule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
 		aut1.addRule(brule2);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -543,7 +543,7 @@ public class TestParityEmptinessCheck {
 		BuchiTreeAutomatonRule<RankedBool, String> brule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
 		aut1.addRule(brule2);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -604,7 +604,7 @@ public class TestParityEmptinessCheck {
 		BuchiTreeAutomatonRule<RankedBool, String> brule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
 		aut1.addRule(brule2);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -651,7 +651,7 @@ public class TestParityEmptinessCheck {
 		BuchiTreeAutomatonRule<RankedBool, String> brule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
 		aut1.addRule(brule2);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(
@@ -686,7 +686,7 @@ public class TestParityEmptinessCheck {
 		BuchiTreeAutomatonRule<RankedBool, String> brule2 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
 		aut1.addRule(brule1);
 		aut1.addRule(brule2);
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut);
 
 		BuchiParityEmptinessCheck<RankedBool, String, ParityState<String>> emptinessCheck = new BuchiParityEmptinessCheck<>(

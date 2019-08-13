@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
@@ -42,7 +42,7 @@ public class TestBuchiParityIntersection {
 		aut1.addRule(brule1);
 		aut2.addRule(prule1);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		System.out.println("Test 1");
@@ -78,7 +78,7 @@ public class TestBuchiParityIntersection {
 		aut1.addRule(brule1);
 		aut2.addRule(prule1);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		System.out.println("Test 2");
@@ -123,7 +123,7 @@ public class TestBuchiParityIntersection {
 		aut1.addRule(brule2);
 		aut2.addRule(prule1);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		System.out.println("Test 3");
@@ -169,7 +169,7 @@ public class TestBuchiParityIntersection {
 		aut2.addRule(prule0);
 		aut2.addRule(prule1);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		System.out.println("Test 4");
@@ -215,7 +215,7 @@ public class TestBuchiParityIntersection {
 		aut2.addRule(prule0);
 		aut2.addRule(prule1);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		System.out.println("Test 5");
@@ -275,7 +275,7 @@ public class TestBuchiParityIntersection {
 		aut2.addRule(prule1);
 		aut2.addRule(prule2);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		System.out.println("Test 6");
@@ -339,7 +339,7 @@ public class TestBuchiParityIntersection {
 		aut2.addRule(prule1);
 		aut2.addRule(prule2);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		System.out.println("Test 7");
@@ -441,7 +441,7 @@ public class TestBuchiParityIntersection {
 		aut2.addRule(prule4);
 		aut2.addRule(prule2p);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		System.out.println("Test 8");
@@ -543,7 +543,7 @@ public class TestBuchiParityIntersection {
 		aut2.addRule(prule4);
 		aut2.addRule(prule2p);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		System.out.println("Test 8");

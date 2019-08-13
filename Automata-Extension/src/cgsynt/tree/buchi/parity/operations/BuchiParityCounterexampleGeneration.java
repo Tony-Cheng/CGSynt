@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectRule;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiHybridParityIntersectRule;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectState;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
@@ -23,14 +23,14 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
  */
 public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState, TransitionLETTER> {
 
-	private BuchiParityIntersectAutomaton<LETTER, STATE1, STATE2> tree;
+	private BuchiParityHybridIntersectAutomaton<LETTER, STATE1, STATE2> tree;
 	int maxLength;
 	private List<TransitionLETTER> transitionAlphabet;
-	private Set<BuchiParityIntersectState<STATE1, STATE2>> visitedStates;
+	private Set<BuchiParityHybridIntersectState<STATE1, STATE2>> visitedStates;
 	private List<Triplet<STATE1, STATE2, TransitionLETTER>> result;
 	private boolean resultComputed;
 
-	public BuchiParityCounterexampleGeneration(BuchiParityIntersectAutomaton<LETTER, STATE1, STATE2> tree,
+	public BuchiParityCounterexampleGeneration(BuchiParityHybridIntersectAutomaton<LETTER, STATE1, STATE2> tree,
 			int maxLength, List<TransitionLETTER> transitionAlphabet) {
 		this.tree = tree;
 		this.maxLength = maxLength;
@@ -45,7 +45,7 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 		if (resultComputed)
 			return;
 		List<Triplet<STATE1, STATE2, TransitionLETTER>> tripletCounterexamples = new ArrayList<>();
-		for (BuchiParityIntersectState<STATE1, STATE2> initialState : tree.getInitStates()) {
+		for (BuchiParityHybridIntersectState<STATE1, STATE2> initialState : tree.getInitStates()) {
 			tripletCounterexamples.addAll(generateCounterexamples(initialState, maxLength));
 		}
 		result = tripletCounterexamples;
@@ -72,10 +72,10 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 	 * 
 	 * @return
 	 */
-	public List<Stack<BuchiParityIntersectState<STATE1, STATE2>>> getResultStates() {
+	public List<Stack<BuchiParityHybridIntersectState<STATE1, STATE2>>> getResultStates() {
 		if (!resultComputed)
 			return null;
-		List<Stack<BuchiParityIntersectState<STATE1, STATE2>>> resultStates = new ArrayList<>();
+		List<Stack<BuchiParityHybridIntersectState<STATE1, STATE2>>> resultStates = new ArrayList<>();
 		for (int i = 0; i < result.size(); i++) {
 			resultStates.add(result.get(i).states);
 		}
@@ -91,7 +91,7 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 	 * @return
 	 */
 	private List<Triplet<STATE1, STATE2, TransitionLETTER>> generateCounterexamples(
-			BuchiParityIntersectState<STATE1, STATE2> state, int len) {
+			BuchiParityHybridIntersectState<STATE1, STATE2> state, int len) {
 		if (len == 0) {
 			return null;
 		}
@@ -103,8 +103,8 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 		}
 		visitedStates.add(state);
 		List<Triplet<STATE1, STATE2, TransitionLETTER>> allTriplets = new ArrayList<>();
-		for (BuchiParityIntersectRule<LETTER, STATE1, STATE2> transition : tree.getForSourceMap(state)) {
-			List<BuchiParityIntersectState<STATE1, STATE2>> dests = transition.getDests();
+		for (BuchiHybridParityIntersectRule<LETTER, STATE1, STATE2> transition : tree.getForSourceMap(state)) {
+			List<BuchiParityHybridIntersectState<STATE1, STATE2>> dests = transition.getDests();
 			for (int i = 0; i < transitionAlphabet.size(); i++) {
 				List<Triplet<STATE1, STATE2, TransitionLETTER>> triplets = generateCounterexamples(dests.get(i),
 						len - 1);
@@ -128,17 +128,17 @@ public class BuchiParityCounterexampleGeneration<LETTER extends IRankedLetter, S
 
 class Triplet<STATE1, STATE2 extends IParityState, TransitionLETTER> {
 	public final Stack<TransitionLETTER> transitions;
-	public final BuchiParityIntersectState<STATE1, STATE2> repeatedState;
-	public final Stack<BuchiParityIntersectState<STATE1, STATE2>> states;
+	public final BuchiParityHybridIntersectState<STATE1, STATE2> repeatedState;
+	public final Stack<BuchiParityHybridIntersectState<STATE1, STATE2>> states;
 
-	public Triplet(BuchiParityIntersectState<STATE1, STATE2> repeatedState) {
+	public Triplet(BuchiParityHybridIntersectState<STATE1, STATE2> repeatedState) {
 		this.transitions = new Stack<>();
 		this.states = new Stack<>();
 		this.repeatedState = repeatedState;
 	}
 
-	public Triplet(Stack<TransitionLETTER> transitions, Stack<BuchiParityIntersectState<STATE1, STATE2>> states,
-			BuchiParityIntersectState<STATE1, STATE2> repeatedState) {
+	public Triplet(Stack<TransitionLETTER> transitions, Stack<BuchiParityHybridIntersectState<STATE1, STATE2>> states,
+			BuchiParityHybridIntersectState<STATE1, STATE2> repeatedState) {
 		this.transitions = transitions;
 		this.states = states;
 		this.repeatedState = repeatedState;

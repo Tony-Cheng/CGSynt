@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectState;
 import cgsynt.tree.buchi.parity.operations.BuchiParityCounterexampleGeneration;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityTreeAutomaton;
@@ -46,7 +46,7 @@ public class TestCounterexampleGeneration {
 		aut1.addRule(brule1);
 		aut2.addRule(prule1);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		List<String> transitionAlphabet = new ArrayList<>();
@@ -57,13 +57,13 @@ public class TestCounterexampleGeneration {
 				aut3, 4, transitionAlphabet);
 		counterexampleGeneration.computeResult();
 		List<Stack<String>> transitions = counterexampleGeneration.getResultTransition();
-		List<Stack<BuchiParityIntersectState<String, ParityState<String>>>> states = counterexampleGeneration
+		List<Stack<BuchiParityHybridIntersectState<String, ParityState<String>>>> states = counterexampleGeneration
 				.getResultStates();
 		System.out.println("Test 1");
 		for (int i = 0; i < transitions.size(); i++) {
 			System.out.println("Iteration " + i);
 			Stack<String> transition = transitions.get(i);
-			Stack<BuchiParityIntersectState<String, ParityState<String>>> state = states.get(i);
+			Stack<BuchiParityHybridIntersectState<String, ParityState<String>>> state = states.get(i);
 			while(transition.size() > 0) {
 				System.out.println("State: " + state.pop() + " Transition: " + transition.pop());
 			}
@@ -105,7 +105,7 @@ public class TestCounterexampleGeneration {
 		aut1.addRule(brule2);
 		aut2.addRule(prule1);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		List<String> transitionAlphabet = new ArrayList<>();
@@ -116,13 +116,13 @@ public class TestCounterexampleGeneration {
 				aut3, 4, transitionAlphabet);
 		counterexampleGeneration.computeResult();
 		List<Stack<String>> transitions = counterexampleGeneration.getResultTransition();
-		List<Stack<BuchiParityIntersectState<String, ParityState<String>>>> states = counterexampleGeneration
+		List<Stack<BuchiParityHybridIntersectState<String, ParityState<String>>>> states = counterexampleGeneration
 				.getResultStates();
 		System.out.println("Test 2");
 		for (int i = 0; i < transitions.size(); i++) {
 			System.out.println("Iteration " + i);
 			Stack<String> transition = transitions.get(i);
-			Stack<BuchiParityIntersectState<String, ParityState<String>>> state = states.get(i);
+			Stack<BuchiParityHybridIntersectState<String, ParityState<String>>> state = states.get(i);
 			while(transition.size() > 0) {
 				System.out.println("State: " + state.pop() + " Transition: " + transition.pop());
 			}
@@ -169,7 +169,7 @@ public class TestCounterexampleGeneration {
 		aut2.addRule(prule1);
 		aut2.addRule(prule2);
 
-		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
+		BuchiParityHybridIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityHybridIntersectAutomaton<>(
 				aut1, aut2);
 
 		List<String> transitionAlphabet = new ArrayList<>();
@@ -180,13 +180,13 @@ public class TestCounterexampleGeneration {
 				aut3, 4, transitionAlphabet);
 		counterexampleGeneration.computeResult();
 		List<Stack<String>> transitions = counterexampleGeneration.getResultTransition();
-		List<Stack<BuchiParityIntersectState<String, ParityState<String>>>> states = counterexampleGeneration
+		List<Stack<BuchiParityHybridIntersectState<String, ParityState<String>>>> states = counterexampleGeneration
 				.getResultStates();
 		System.out.println("Test 3");
 		for (int i = 0; i < transitions.size(); i++) {
 			System.out.println("Iteration " + i);
 			Stack<String> transition = transitions.get(i);
-			Stack<BuchiParityIntersectState<String, ParityState<String>>> state = states.get(i);
+			Stack<BuchiParityHybridIntersectState<String, ParityState<String>>> state = states.get(i);
 			while(transition.size() > 0) {
 				System.out.println("State: " + state.pop() + " Transition: " + transition.pop());
 			}

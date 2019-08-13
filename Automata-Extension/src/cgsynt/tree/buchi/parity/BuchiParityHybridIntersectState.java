@@ -9,7 +9,7 @@ import cgsynt.tree.parity.IParityState;
  * @param <STATE1>
  * @param <STATE2>
  */
-public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> {
+public class BuchiParityHybridIntersectState<STATE1, STATE2 extends IParityState> {
 	@Override
 	public String toString() {
 		return "BuchiParityIntersectState [state1=" + state1 + ", state2=" + state2 + ", isGood1=" + isGood1
@@ -36,14 +36,14 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> {
 	 */
 	private final boolean isGood2;
 
-	public BuchiParityIntersectState(STATE1 state1, STATE2 state2) {
+	public BuchiParityHybridIntersectState(STATE1 state1, STATE2 state2) {
 		this.state1 = state1;
 		this.state2 = state2;
 		this.isGood1 = true;
 		this.isGood2 = true;
 	}
 
-	public BuchiParityIntersectState(STATE1 state1, STATE2 state2, boolean isGood1, boolean isGood2) {
+	public BuchiParityHybridIntersectState(STATE1 state1, STATE2 state2, boolean isGood1, boolean isGood2) {
 		this.state1 = state1;
 		this.state2 = state2;
 		this.isGood1 = isGood1;
@@ -55,8 +55,8 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> {
 	 * 
 	 * @return
 	 */
-	public BuchiParityIntersectState<STATE1, STATE2> getGoodIntersectState() {
-		return new BuchiParityIntersectState<STATE1, STATE2>(state1, state2);
+	public BuchiParityHybridIntersectState<STATE1, STATE2> getGoodIntersectState() {
+		return new BuchiParityHybridIntersectState<STATE1, STATE2>(state1, state2);
 	}
 
 	/**
@@ -66,8 +66,8 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> {
 	 * @param isGood2
 	 * @return
 	 */
-	public BuchiParityIntersectState<STATE1, STATE2> copy(boolean isGood1, boolean isGood2) {
-		return new BuchiParityIntersectState<STATE1, STATE2>(state1, state2, isGood1, isGood2);
+	public BuchiParityHybridIntersectState<STATE1, STATE2> copy(boolean isGood1, boolean isGood2) {
+		return new BuchiParityHybridIntersectState<STATE1, STATE2>(state1, state2, isGood1, isGood2);
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BuchiParityIntersectState other = (BuchiParityIntersectState) obj;
+		BuchiParityHybridIntersectState other = (BuchiParityHybridIntersectState) obj;
 		if (isGood1 != other.isGood1)
 			return false;
 		if (isGood2 != other.isGood2)
