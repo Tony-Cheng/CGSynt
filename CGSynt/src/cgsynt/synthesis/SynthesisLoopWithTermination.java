@@ -66,31 +66,32 @@ public class SynthesisLoopWithTermination {
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
-	private BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> result;
-	private Set<List<IStatement>> visitedCounterexamples;
+	private BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> mResult;
+	private Set<List<IStatement>> mVisitedCounterexamples;
 
 	private boolean mResultComputed;
 	private boolean mIsCorrect;
-	private List<String> logs;
-	private boolean printLogs;
-	private int printedLogsSize;
-	private TraceGlobalVariables globalVars;
+	private boolean mPrintLogs;
+	private List<String> mLogs;
+	private int mPrintedLogsSize;
+	
+	private TraceGlobalVariables mGlobalVars;
 	private OmegaRefiner mOmegaRefiner;
 
 	public SynthesisLoopWithTermination(List<IStatement> transitionAlphabet, IPredicate preconditions,
 			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
-		this.globalVars = globalVars;
-		assert globalVars.getService() instanceof CustomServiceProvider;
+		this.mGlobalVars = globalVars;
+		assert this.mGlobalVars.getService() instanceof CustomServiceProvider;
 
 		RankedBool.setRank(transitionAlphabet.size());
-		globalVars.getTraceInterpolator().setPreconditions(preconditions);
-		globalVars.getTraceInterpolator().setPostconditions(postconditions);
-		preconditions = globalVars.getTraceInterpolator().getPreconditions();
-		postconditions = globalVars.getTraceInterpolator().getPostconditions();
-		this.mService = globalVars.getService();
+		this.mGlobalVars.getTraceInterpolator().setPreconditions(preconditions);
+		this.mGlobalVars.getTraceInterpolator().setPostconditions(postconditions);
+		preconditions = this.mGlobalVars.getTraceInterpolator().getPreconditions();
+		postconditions = this.mGlobalVars.getTraceInterpolator().getPostconditions();
+		this.mService = this.mGlobalVars.getService();
 		this.mAutService = new AutomataLibraryServices(mService);
 		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet),
-				globalVars.getPredicateFactory());
+				this.mGlobalVars.getPredicateFactory());
 		construction.computeResult();
 		RankedBool.setRank(construction.getAlphabet().size());
 		this.mPrograms = construction.getResult();
@@ -103,11 +104,11 @@ public class SynthesisLoopWithTermination {
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
 		this.mOmega = createOmega(preconditions);
-		this.visitedCounterexamples = new HashSet<>();
-		this.logs = new ArrayList<>();
-		this.printLogs = false;
-		this.printedLogsSize = 0;
-		this.mOmegaRefiner = new OmegaRefiner(this.globalVars, this.mOmega);
+		this.mVisitedCounterexamples = new HashSet<>();
+		this.mLogs = new ArrayList<>();
+		this.mPrintLogs = false;
+		this.mPrintedLogsSize = 0;
+		this.mOmegaRefiner = new OmegaRefiner(this.mGlobalVars, this.mOmega);
 	}
 
 	public SynthesisLoopWithTermination(Specification spec) throws Exception {
@@ -116,17 +117,17 @@ public class SynthesisLoopWithTermination {
 		IPredicate postconditions = spec.getPostconditions();
 		TraceGlobalVariables globalVars = spec.getGlobalVars();
 
-		this.globalVars = globalVars;
+		this.mGlobalVars = globalVars;
 		RankedBool.setRank(transitionAlphabet.size());
 
-		globalVars.getTraceInterpolator().setPreconditions(preconditions);
-		globalVars.getTraceInterpolator().setPostconditions(postconditions);
-		preconditions = globalVars.getTraceInterpolator().getPreconditions();
-		postconditions = globalVars.getTraceInterpolator().getPostconditions();
-		this.mService = globalVars.getService();
+		this.mGlobalVars.getTraceInterpolator().setPreconditions(preconditions);
+		this.mGlobalVars.getTraceInterpolator().setPostconditions(postconditions);
+		preconditions = this.mGlobalVars.getTraceInterpolator().getPreconditions();
+		postconditions = this.mGlobalVars.getTraceInterpolator().getPostconditions();
+		this.mService = this.mGlobalVars.getService();
 		this.mAutService = new AutomataLibraryServices(mService);
 		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet),
-				globalVars.getPredicateFactory());
+				this.mGlobalVars.getPredicateFactory());
 		construction.computeResult();
 		RankedBool.setRank(construction.getAlphabet().size());
 		this.mPrograms = construction.getResult();
@@ -139,15 +140,15 @@ public class SynthesisLoopWithTermination {
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
 		this.mOmega = createOmega(preconditions);
-		this.visitedCounterexamples = new HashSet<>();
-		this.logs = new ArrayList<>();
-		this.printLogs = false;
-		this.printedLogsSize = 0;
-		this.mOmegaRefiner = new OmegaRefiner(this.globalVars, this.mOmega);
+		this.mVisitedCounterexamples = new HashSet<>();
+		this.mLogs = new ArrayList<>();
+		this.mPrintLogs = false;
+		this.mPrintedLogsSize = 0;
+		this.mOmegaRefiner = new OmegaRefiner(this.mGlobalVars, this.mOmega);
 	}
 
 	public void setPrintLogs(boolean printLogs) {
-		this.printLogs = printLogs;
+		this.mPrintLogs = printLogs;
 	}
 
 	public List<IcfgInternalTransition> createIcfgTransitionAlphabet(List<IStatement> alphabet) {
@@ -178,7 +179,7 @@ public class SynthesisLoopWithTermination {
 		Set<IStatement> letters = new HashSet<>(mTransitionAlphabet);
 		VpAlphabet<IStatement> alpha = new VpAlphabet<>(letters);
 		NestedWordAutomaton<IStatement, IPredicate> pi = new NestedWordAutomaton<>(mAutService, alpha,
-				new GeneralizeStateFactory(globalVars.getPredicateFactory()));
+				new GeneralizeStateFactory(mGlobalVars.getPredicateFactory()));
 		if (!prePred.equals(postPred)) {
 			pi.addState(true, false, prePred);
 			pi.addState(false, true, postPred);
@@ -186,7 +187,7 @@ public class SynthesisLoopWithTermination {
 			pi.addState(true, true, prePred);
 		}
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(new HashSet<>(),
-				mAllInterpolants, new HashSet<>(mTransitionAlphabet), pi, globalVars.getTraceInterpolator());
+				mAllInterpolants, new HashSet<>(mTransitionAlphabet), pi, mGlobalVars.getTraceInterpolator());
 		pi = generalization.getResult();
 		return pi;
 	}
@@ -197,7 +198,7 @@ public class SynthesisLoopWithTermination {
 		VpAlphabet<IcfgInternalTransition> alphabet = new VpAlphabet<>(letters);
 
 		NestedWordAutomaton<IcfgInternalTransition, IPredicate> omega = new NestedWordAutomaton<>(mAutService, alphabet,
-				new GeneralizeStateFactory(globalVars.getPredicateFactory()));
+				new GeneralizeStateFactory(mGlobalVars.getPredicateFactory()));
 
 		omega.addState(true, false, precondition);
 
@@ -215,15 +216,15 @@ public class SynthesisLoopWithTermination {
 	 */
 	private void computeOneIteration(int k, int bs) throws Exception {
 		// Dead states
-		IPredicate deadPredicateState = globalVars.getPredicateFactory().newDebugPredicate("deadState");
+		IPredicate deadPredicateState = mGlobalVars.getPredicateFactory().newDebugPredicate("deadState");
 		IParityState deadParityState = new ParityState<>(deadPredicateState, 1);
 		
 		// Shutdown State
-		IPredicate shutdownPredicateState = globalVars.getPredicateFactory().newDebugPredicate("shutdownState");
+		IPredicate shutdownPredicateState = mGlobalVars.getPredicateFactory().newDebugPredicate("shutdownState");
 		IParityState shutdownParityState = new ParityState<>(shutdownPredicateState, 1);
 
 		// Off State
-		IPredicate offPredicateState = globalVars.getPredicateFactory().newDebugPredicate("offState");
+		IPredicate offPredicateState = mGlobalVars.getPredicateFactory().newDebugPredicate("offState");
 		IParityState offParityState = new ParityState<>(offPredicateState, 2);
 		
 		////////////////////////////////////////////////
@@ -240,9 +241,9 @@ public class SynthesisLoopWithTermination {
 		ParityTreeAutomaton<RankedBool, IParityState> termTree = parityOmegaToParityTreeOmega.getResult();
 		////////////////////////////////////////////////
 
-		// Determinize the String state version of PI.
+		// Determinize PI
 		Determinize<IStatement, IPredicate> determinize = new Determinize<>(mAutService,
-				new PDeterminizeStateFactory(globalVars.getPredicateFactory()), mPI);
+				new PDeterminizeStateFactory(mGlobalVars.getPredicateFactory()), mPI);
 
 		INestedWordAutomaton<IStatement, IPredicate> dfaPI = determinize.getResult();
 
@@ -256,22 +257,7 @@ public class SynthesisLoopWithTermination {
 				powerSet);
 		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> intersectedAut = intersection
 				.computeResult();
-
-		parityOmega.toString();
-		
-		/*
-		BuchiTreeAutomaton<RankedBool, String> aut1 = new BuchiTreeAutomaton<>(2);
-		String bs1 = "buchi state 1";
-		aut1.addInitState(bs1);
-		aut1.addFinalState(bs1);
-		List<String> blist1 = new ArrayList<>();
-		blist1.add(bs1);
-		blist1.add(bs1);
-		BuchiTreeAutomatonRule<RankedBool, String> brule1 = new BuchiTreeAutomatonRule<>(RankedBool.FALSE, bs1, blist1);
-		aut1.addRule(brule1);
-		*/
-		
-		
+			
 		BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomaton<>(
 				intersectedAut, termTree);
 
@@ -279,36 +265,24 @@ public class SynthesisLoopWithTermination {
 				buchiParityIntersectedAut);
 		emptinessCheck.computeResult();
 		
-		
-		
-		// BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate,
-		// IPredicate>, IParityState> buchiParityIntersectedAut = new
-		// BuchiParityIntersectAutomaton<>(
-		// intersectedAut, termTree);
-		//
-		// BuchiParityEmptinessCheck<RankedBool, IntersectState<IPredicate, IPredicate>,
-		// IParityState> emptinessCheck = new BuchiParityEmptinessCheck<>(
-		// buchiParityIntersectedAut);
-		// emptinessCheck.computeResult();
 		if (!emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
-			// result = buchiParityIntersectedAut;
-			
-			System.out.println("Probably Wrong");
+
 			return;
 		}
+		
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
-				k * dfaPI.getStates().size(), visitedCounterexamples, bs, this.mTransitionAlphabet);
+				k * dfaPI.getStates().size(), mVisitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples,
-				globalVars.getTraceInterpolator());
+				mGlobalVars.getTraceInterpolator());
 		counterExampleToInterpolants.computeResult();
 
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI,
-				globalVars.getTraceInterpolator());
+				mGlobalVars.getTraceInterpolator());
 		mPI = generalization.getResult();
 
 		// Change the set of interpolants after the old and new ones have been used to
@@ -325,12 +299,9 @@ public class SynthesisLoopWithTermination {
 		List<ParityCounterexample<IcfgInternalTransition, IParityState>> omegaCounterexamples = omegaCounterexampleGenerator
 				.getResult();
 
-		// Refinement
-		for (int i = 0; i < omegaCounterexamples.size(); i++) {
+		// Omega Refinement
+		for (int i = 0; i < omegaCounterexamples.size(); i++)
 			mOmegaRefiner.certifyCE(omegaCounterexamples.get(i));
-		}
-
-		// System.out.println(termTree);
 	}
 
 	/**
@@ -339,7 +310,7 @@ public class SynthesisLoopWithTermination {
 	 * @return
 	 */
 	public BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> getResult() {
-		return result;
+		return mResult;
 	}
 
 	private Set<IPredicate> flatten(List<Set<IPredicate>> interpolants) {
@@ -364,25 +335,25 @@ public class SynthesisLoopWithTermination {
 	public void computeMainLoop() throws Exception {
 		int i = 0;
 		while (!mResultComputed) {
-			logs.add("Iteration: " + i);
+			mLogs.add("Iteration: " + i);
 			computeOneIteration(i + 1, -1);
-			logs.add("Number of interpolants: " + this.mAllInterpolants.size());
+			mLogs.add("Number of interpolants: " + this.mAllInterpolants.size());
 			i++;
-			if (this.printLogs)
+			if (this.mPrintLogs)
 				printLogsIteration();
 		}
 	}
 
 	public void printLogs() {
-		for (String log : logs)
+		for (String log : mLogs)
 			System.out.println(log);
 	}
 
 	private void printLogsIteration() {
-		for (int i = this.printedLogsSize; i < logs.size(); i++) {
-			System.out.println(logs.get(i));
+		for (int i = this.mPrintedLogsSize; i < mLogs.size(); i++) {
+			System.out.println(mLogs.get(i));
 		}
-		this.printedLogsSize = logs.size();
+		this.mPrintedLogsSize = mLogs.size();
 	}
 
 	public void printAllInterpolants() {

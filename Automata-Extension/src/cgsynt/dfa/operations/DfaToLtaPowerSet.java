@@ -5,14 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import cgsynt.interpol.IStatement;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
-public class DfaToLtaPowerSet<LETTER extends IStatement, STATE> {
+public class DfaToLtaPowerSet<LETTER, STATE> {
 	private final INestedWordAutomaton<LETTER, STATE> mDfa;
 	private final BuchiTreeAutomaton<RankedBool, STATE> mResult;
 	private final List<LETTER> mAllLetterOrdering;
