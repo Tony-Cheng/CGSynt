@@ -2,11 +2,9 @@ package cgsynt.termination;
 
 import java.util.ArrayList;
 
-import cgsynt.dfa.parity.operations.ParityCounterexample;
-import cgsynt.interpol.IStatement;
+import cgsynt.dfa.parity.intersect.operations.DfaParityCounterexample;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
-import cgsynt.interpol.VariableFactory;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedRun;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
@@ -15,7 +13,6 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLasso
 import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
-import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.BasicIcfg;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.CfgSmtToolkit;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgEdgeFactory;
@@ -86,10 +83,10 @@ public class OmegaRefiner {
 		mBenchmarker = new BuchiCegarLoopBenchmarkGenerator();
 	}
 	
-	public void certifyCE(ParityCounterexample<IcfgInternalTransition, IParityState> ce) throws Exception {
+	public void certifyCE(DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState> ce) throws Exception {
 		
 		BasicIcfg<IcfgLocation> icfg = new BasicIcfg<>("certify", mTTI.getCfgSmtToolkit(), IcfgLocation.class);
-		ParityCounterexample<IcfgInternalTransition, IParityState> trace = ce.makeCopy();
+		DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState> trace = ce.makeCopy();
 		
 		TransitionStatePackage[] packages = getTransitionStatePackages(trace, icfg);
 		
@@ -176,7 +173,7 @@ public class OmegaRefiner {
 		return refinementFactory;
 	}
 	
-	private TransitionStatePackage[] getTransitionStatePackages(ParityCounterexample<IcfgInternalTransition, IParityState> trace, BasicIcfg<IcfgLocation> icfg) {
+	private TransitionStatePackage[] getTransitionStatePackages(DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState> trace, BasicIcfg<IcfgLocation> icfg) {
 		
 		int stemStatesSize = trace.stemStates.size(); 
 		
