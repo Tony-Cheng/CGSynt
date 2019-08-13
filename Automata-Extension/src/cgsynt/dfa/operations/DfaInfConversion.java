@@ -18,8 +18,8 @@ public class DfaInfConversion<LETTER, STATE> {
 	private boolean resultComputed;
 
 	public DfaInfConversion(INestedWordAutomaton<LETTER, STATE> aut, final AutomataLibraryServices services,
-			final VpAlphabet<LETTER> vpAlphabet, final IEmptyStackStateFactory<STATE> emptyStateFactory) {
-		this.result = copy(aut, services, vpAlphabet, emptyStateFactory);
+			final IEmptyStackStateFactory<STATE> emptyStateFactory) {
+		this.result = copy(aut, services, emptyStateFactory);
 		this.resultComputed = false;
 	}
 
@@ -64,9 +64,9 @@ public class DfaInfConversion<LETTER, STATE> {
 	}
 
 	private NestedWordAutomaton<LETTER, STATE> copy(INestedWordAutomaton<LETTER, STATE> aut,
-			final AutomataLibraryServices services, final VpAlphabet<LETTER> vpAlphabet,
+			final AutomataLibraryServices services,
 			final IEmptyStackStateFactory<STATE> emptyStateFactory) {
-		NestedWordAutomaton<LETTER, STATE> copy = new NestedWordAutomaton<LETTER, STATE>(services, vpAlphabet,
+		NestedWordAutomaton<LETTER, STATE> copy = new NestedWordAutomaton<LETTER, STATE>(services, aut.getVpAlphabet(),
 				emptyStateFactory);
 		for (STATE state : aut.getStates()) {
 			copy.addState(aut.isInitial(state), aut.isFinal(state), state);
