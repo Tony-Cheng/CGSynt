@@ -1,9 +1,6 @@
 package cgsynt.termination;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 import cgsynt.interpol.IStatement;
@@ -25,16 +22,15 @@ public class DfaLetterConverter {
 	private INestedWordAutomaton<IStatement, IPredicate> mInAut;
 
 	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> mOutAut;
-	private IcfgEdgeFactory mFactory;
 	
-	private List<IcfgInternalTransition> mIcfgTransitionLetters;
+	private Map<IStatement, IcfgInternalTransition> mIcfgTransitionMap;
  	
-	public DfaLetterConverter(INestedWordAutomaton<IStatement, IPredicate> inAut, AutomataLibraryServices autServices, BasicPredicateFactory bpf) {
+	public DfaLetterConverter(INestedWordAutomaton<IStatement, IPredicate> inAut, AutomataLibraryServices autServices, 
+			BasicPredicateFactory bpf, Map<IStatement, IcfgInternalTransition> icfgTransitionMap) {
 		this.mInAut = inAut;
-		this.mFactory = new IcfgEdgeFactory(OmegaRefiner.SERIAL_PROVIDER);
+		this.mIcfgTransitionMap = icfgTransitionMap;
 		
-		mIcfgTransitionLetters = createIcfgAlphabetList(new ArrayList<>(this.mInAut.getAlphabet()));
-		VpAlphabet<IcfgInternalTransition> alphabet = new VpAlphabet<>(new HashSet<>(mIcfgTransitionLetters));
+		VpAlphabet<IcfgInternalTransition> alphabet = new VpAlphabet<>(new HashSet<>(mIcfgTransitionMap.values()));
 		
 		this.mOutAut = new NestedWordAutomaton<>(autServices, alphabet, 
 				new GeneralizeStateFactory(bpf));
@@ -52,45 +48,16 @@ public class DfaLetterConverter {
 			mOutAut.addState(this.mInAut.isInitial(state), this.mInAut.isFinal(state), state);
 	}
 	
-	private void computeTransitions() {
-		Map<IStatement, IcfgInternalTransition> mapping = 
-				createLetterMapping(new ArrayList<>(this.mInAut.getAlphabet()), mIcfgTransitionLetters);
-		
+	private void computeTransitions() {		
 		for (IPredicate source : mInAut.getStates()) {
 			Iterable<OutgoingInternalTransition<IStatement, IPredicate>> transitions = mInAut.internalSuccessors(source);
 			
 			for (OutgoingInternalTransition<IStatement, IPredicate> transition : transitions)
-				this.mOutAut.addInternalTransition(source, mapping.get(transition.getLetter()), transition.getSucc());
+				this.mOutAut.addInternalTransition(source, this.mIcfgTransitionMap.get(transition.getLetter()), transition.getSucc());
 		}
 	}
 	
 	public NestedWordAutomaton<IcfgInternalTransition, IPredicate> getResult(){
 		return mOutAut;
-	}
-	
-	public List<IcfgInternalTransition> createIcfgAlphabetList(List<IStatement> oldAlphabetList){
-		List<IcfgInternalTransition> transitionList = new ArrayList<>();
-		
-		IcfgLocation location = new IcfgLocation(new StringDebugIdentifier("0"), "p1");
-
-		for (IStatement statement : oldAlphabetList) {
-			IcfgInternalTransition trans = mFactory.createInternalTransition(location, location, new Payload(),
-					statement.getTransFormula());
-			transitionList.add(trans);
-		}
-		
-		return transitionList;
-	}
-	
-	public Map<IStatement, IcfgInternalTransition> createLetterMapping(List<IStatement> oldLetters, List<IcfgInternalTransition> newLetters){
-		Map<IStatement, IcfgInternalTransition> mapping = new HashMap<>();
-		
-		int i = 0;
-		for (IStatement statement : oldLetters) {
-			mapping.put(statement, newLetters.get(i));
-			i++;
-		}
-		
-		return mapping;
 	}
 }
