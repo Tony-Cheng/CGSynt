@@ -82,7 +82,7 @@ import de.uni_freiburg.informatik.ultimate.util.datastructures.SerialProvider;
 
 public class TestLassoCheck {
 	
-	@Test
+	//@Test
 	public void testTerm() throws Exception {
 		CustomServiceProvider serviceProvider = new CustomServiceProvider(LogLevel.OFF);
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +125,7 @@ public class TestLassoCheck {
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_NONLINEAR_CONSTRAINTS_IN_PATHINVARIANTS, true);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_UNSAT_CORES_IN_PATHINVARIANTS, true);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_WEAKEST_PRECONDITION_IN_PATHINVARIANTS, true);
-	    taPref.put(TraceAbstractionPreferenceInitializer.LABEL_COMPUTE_COUNTEREXAMPLE, true);
+	    taPref.put(TraceAbstractionPreferenceInitializer.LABEL_COMPUTE_COUNTEREXAMPLE, false);
 		taPref.put(TraceAbstractionPreferenceInitializer.LABEL_USE_PREDICATE_TRIE_BASED_PREDICATE_UNIFIER, true);
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1145,4 +1145,253 @@ public class TestLassoCheck {
 		TerminationArgument termArg = bspm.getTerminationArgument();
 		System.out.println(termArg.getRankingFunction());
 	}
+	
+	@SuppressWarnings("rawtypes")
+	@Test
+	public void test5() throws Exception{
+		CustomServiceProvider serviceProvider = new CustomServiceProvider(LogLevel.OFF);
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Setting up the TAPreferences
+		
+		RcpPreferenceProvider taPref = new RcpPreferenceProvider(TraceAbstraction.class.getPackage().getName());
+		taPref.put(InitWrapper.LABEL_INTERPROCEDUTAL, InitWrapper.DEF_INTERPROCEDUTAL);
+		taPref.put(InitWrapper.LABEL_USERLIMIT_ITERATIONS, 1_000_000);
+		taPref.put(InitWrapper.LABEL_WATCHITERATION, 100);
+		taPref.put(InitWrapper.LABEL_ARTIFACT, Artifact.INTERPOLANT_AUTOMATON);
+		taPref.put(InitWrapper.LABEL_HOARE, false);
+		taPref.put(InitWrapper.LABEL_HOARE_POSITIONS, HoareAnnotationPositions.All);
+		taPref.put(InitWrapper.LABEL_INTERPOLATED_LOCS, InterpolationTechnique.Craig_NestedInterpolation);
+		taPref.put(InitWrapper.LABEL_INTERPOLANT_AUTOMATON, InterpolantAutomaton.CANONICAL);
+		taPref.put(InitWrapper.LABEL_DUMPAUTOMATA, false);
+		taPref.put(InitWrapper.LABEL_AUTOMATAFORMAT, Format.ATS);
+		taPref.put(InitWrapper.LABEL_DUMPPATH, "label");
+		taPref.put(InitWrapper.LABEL_DUMP_ONLY_REUSE, false);
+		taPref.put(InitWrapper.LABEL_INTERPOLANT_AUTOMATON_ENHANCEMENT, InterpolantAutomatonEnhancement.PREDICATE_ABSTRACTION);
+		taPref.put(InitWrapper.LABEL_HOARE_TRIPLE_CHECKS, HoareTripleChecks.MONOLITHIC);
+		taPref.put(InitWrapper.LABEL_MINIMIZE, Minimization.FAIR_DIRECT_SIMULATION);
+		taPref.put(InitWrapper.LABEL_CONCURRENCY, Concurrency.FINITE_AUTOMATA);
+		taPref.put(InitWrapper.LABEL_USERLIMIT_TRACE_HISTOGRAM, 100);
+		taPref.put(InitWrapper.LABEL_USERLIMIT_TIME, 1000);
+		taPref.put(InitWrapper.LABEL_USERLIMIT_PATH_PROGRAM, 1000);
+		taPref.put(InitWrapper.LABEL_COMPUTE_INTERPOLANT_SEQUENCE_STATISTICS, false);
+		taPref.put(InitWrapper.LABEL_ABSINT_MODE, AbstractInterpretationMode.USE_CANONICAL);
+		taPref.put(InitWrapper.LABEL_SIMPLIFICATION_TECHNIQUE, SimplificationTechnique.SIMPLIFY_BDD_FIRST_ORDER);
+		taPref.put(InitWrapper.LABEL_XNF_CONVERSION_TECHNIQUE, XnfConversionTechnique.BDD_BASED);
+		taPref.put(InitWrapper.LABEL_REFINEMENT_STRATEGY, RefinementStrategy.MAMMOTH);
+		taPref.put(RcfgPreferenceInitializer.LABEL_SOLVER, SolverMode.Internal_SMTInterpol);
+		taPref.put(InitWrapper.LABEL_REFINEMENT_STRATEGY_EXCEPTION_BLACKLIST, 
+				RefinementStrategyExceptionBlacklist.NONE);
+		taPref.put(InitWrapper.LABEL_ASSERT_CODEBLOCKS_INCREMENTALLY, 
+				AssertCodeBlockOrder.MIX_INSIDE_OUTSIDE);
+		
+		taPref.put(InitWrapper.LABEL_UNSAT_CORES, UnsatCores.IGNORE);
+		taPref.put(InitWrapper.LABEL_LIVE_VARIABLES, false);
+		taPref.put(InitWrapper.LABEL_ABSTRACT_INTERPRETATION_FOR_PATH_INVARIANTS, false);
+		taPref.put(InitWrapper.LABEL_INTERPOLANTS_CONSOLIDATION, false);
+		taPref.put(InitWrapper.LABEL_NONLINEAR_CONSTRAINTS_IN_PATHINVARIANTS, false);
+		taPref.put(InitWrapper.LABEL_UNSAT_CORES_IN_PATHINVARIANTS, false);
+		taPref.put(InitWrapper.LABEL_WEAKEST_PRECONDITION_IN_PATHINVARIANTS, false);
+	    taPref.put(InitWrapper.LABEL_COMPUTE_COUNTEREXAMPLE, false);
+		taPref.put(InitWrapper.LABEL_USE_PREDICATE_TRIE_BASED_PREDICATE_UNIFIER, false);
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Setting up the BuchiAutomizer Preferences
+		RcpPreferenceProvider buchiPref = new RcpPreferenceProvider(BuchiAutomizer.class.getPackage().getName());
+		
+		buchiPref.put("Rank analysis", AnalysisType.LINEAR);
+		buchiPref.put("GNTA analysis", AnalysisType.LINEAR);
+		buchiPref.put("Number of GNTA directions", 10);
+		buchiPref.put("Template benchmark mode", false);
+		buchiPref.put("Try to simplify termination arguments", false);
+		buchiPref.put("Try twofold refinement", true);
+		
+		PreferenceLayer taLayer = new PreferenceLayer(taPref, this.getClass());
+		PreferenceLayer buchiLayer = new PreferenceLayer(buchiPref, this.getClass());
+		
+		serviceProvider.addPreferenceProvider(taLayer, TraceAbstraction.class.getPackage().getName());
+		serviceProvider.addPreferenceProvider(buchiLayer, BuchiAutomizer.class.getPackage().getName());
+
+		TraceGlobalVariables globalVars = new TraceGlobalVariables(serviceProvider);
+		
+		ILogger logger = new ConsoleLogger(LogLevel.ERROR);
+		
+		ManagedScript mScript = globalVars.getManagedScript();
+		VariableFactory vf = globalVars.getVariableFactory();
+		
+		Set<String> procs = new HashSet<>();
+		procs.add("p0");
+	
+		TraceToInterpolants tti = new TraceToInterpolants(mScript, serviceProvider, vf.getSymbolTable(), procs);
+		
+		PredicateFactory oldPredicateFactory = globalVars.getPredicateFactory();
+		
+		/////////////////////////////////////////////////////////////////////////////////////
+		// Build the ICFG
+		/////////////////////////////////////////////////////////////////////////////////////
+		Script script = globalVars.getManagedScript().getScript();
+
+		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
+		BoogieNonOldVar j = vf.constructVariable("j", VariableFactory.INT);
+
+		ScriptAssumptionStatement igz = new ScriptAssumptionStatement(i, script.numeral("0"), ">", mScript, vf.getSymbolTable());
+		IStatement jeo = new ScriptAssignmentStatement(j, script.numeral("1"),
+				mScript, vf.getSymbolTable());
+		ScriptAssumptionStatement jli = new ScriptAssumptionStatement(j, i.getTerm(), "<", mScript, vf.getSymbolTable());
+		IStatement jpp = new ScriptAssignmentStatement(j, script.term("+", j.getTerm(), script.numeral("1")), mScript, vf.getSymbolTable());
+		
+		IcfgEdgeFactory edgeFactory = new IcfgEdgeFactory(new SerialProvider());
+		
+		BasicIcfg<IcfgLocation> icfg = new BasicIcfg<>("test", tti.getCfgSmtToolkit(), IcfgLocation.class);
+		IcfgLocation l1 = new IcfgLocation(new StringDebugIdentifier("0"), "p0");
+		IcfgLocation l2 = new IcfgLocation(new StringDebugIdentifier("0"), "p0");
+		IcfgLocation l3 = new IcfgLocation(new StringDebugIdentifier("0"), "p0");
+		IcfgLocation l4 = new IcfgLocation(new StringDebugIdentifier("0"), "p0");
+		
+		icfg.addLocation(l1, true, false, true, false, false);
+		icfg.addLocation(l2, false, false, false, false, false);
+		icfg.addLocation(l3, false, false, false, false, true);
+		icfg.addLocation(l4, false, false, false, false, false);
+		
+		IcfgInternalTransition e1 = edgeFactory.createInternalTransition(l1, l2, new Payload(), igz.getTransFormula(false));
+		IcfgInternalTransition e2 = edgeFactory.createInternalTransition(l2, l3, new Payload(), jeo.getTransFormula());
+		IcfgInternalTransition e3 = edgeFactory.createInternalTransition(l3, l4, new Payload(), jli.getTransFormula(false));
+		IcfgInternalTransition e4 = edgeFactory.createInternalTransition(l4, l3, new Payload(), jpp.getTransFormula());
+		
+		HoareAnnotation node1 = oldPredicateFactory.getNewHoareAnnotation(l1, tti.getModifiableGlobalsTable());
+		HoareAnnotation node2 = oldPredicateFactory.getNewHoareAnnotation(l2, tti.getModifiableGlobalsTable());
+		HoareAnnotation node3 = oldPredicateFactory.getNewHoareAnnotation(l3, tti.getModifiableGlobalsTable());
+		HoareAnnotation node4 = oldPredicateFactory.getNewHoareAnnotation(l4, tti.getModifiableGlobalsTable());
+		
+		IcfgInternalTransition[] stemLetters = new IcfgInternalTransition[2];
+		int[] stemNestingRelation = new int[2];
+		stemLetters[0] = e1;
+		stemLetters[1] = e2;
+		stemNestingRelation[0] = NestedWord.INTERNAL_POSITION;
+		stemNestingRelation[1] = NestedWord.INTERNAL_POSITION;
+		
+		NestedWord<IcfgInternalTransition> stemWord = new NestedWord<>(stemLetters, stemNestingRelation);
+		ArrayList<IPredicate> stemStates = new ArrayList<>();
+		stemStates.add(node1);
+		stemStates.add(node2);
+		stemStates.add(node3);
+		
+		IcfgInternalTransition[] loopLetters = new IcfgInternalTransition[2];
+		int[] loopNestingRelation = new int[2];
+		loopLetters[0] = e3;
+		loopLetters[1] = e4;
+		loopNestingRelation[0] = NestedWord.INTERNAL_POSITION;
+		loopNestingRelation[1] = NestedWord.INTERNAL_POSITION;
+		
+		NestedWord<IcfgInternalTransition> loopWord = new NestedWord<>(loopLetters, loopNestingRelation);
+		ArrayList<IPredicate> loopStates = new ArrayList<>();
+		loopStates.add(node3);
+		loopStates.add(node4);
+		loopStates.add(node3);
+		
+		NestedRun<IcfgInternalTransition, IPredicate> stem = new NestedRun<>(stemWord, stemStates);
+		
+		NestedRun<IcfgInternalTransition, IPredicate> loop = new NestedRun<>(loopWord, loopStates);
+		
+		NestedLassoRun<IcfgInternalTransition, IPredicate> counterexample = new NestedLassoRun<>(stem, loop);
+		
+		/////////////////////////////////////////////////////////////////////////////////////
+		
+		RankVarConstructor rankVarConstructor = new RankVarConstructor(tti.getCfgSmtToolkit());
+		
+		PredicateFactory predicateFactory = new PredicateFactory(serviceProvider, mScript, 
+				rankVarConstructor.getCsToolkitWithRankVariables().getSymbolTable(),
+				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
+		
+		CfgSmtToolkit csToolkitWithRankVars = rankVarConstructor.getCsToolkitWithRankVariables();
+		
+		BinaryStatePredicateManager bspm = new BinaryStatePredicateManager(csToolkitWithRankVars,
+				predicateFactory, rankVarConstructor.getUnseededVariable(), 
+				rankVarConstructor.getOldRankVariables(), serviceProvider,
+				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
+		
+		TAPreferences taPrefs = new TAPreferences(serviceProvider);
+		
+		PathProgramCache<IcfgInternalTransition> pathProgramCache = new PathProgramCache<>(logger);
+		BuchiCegarLoopBenchmarkGenerator benchmarker = new BuchiCegarLoopBenchmarkGenerator();
+		
+		CegarAbsIntRunner<IcfgInternalTransition> absIntRunner =
+				new CegarAbsIntRunner<>(serviceProvider, benchmarker, icfg, SimplificationTechnique.NONE,
+						XnfConversionTechnique.BDD_BASED, tti.getCfgSmtToolkit(), pathProgramCache, taPrefs);
+		
+		PredicateFactoryForInterpolantAutomata stateFactory = new PredicateFactoryForInterpolantAutomata(csToolkitWithRankVars.getManagedScript(),
+				predicateFactory, taPrefs.computeHoareAnnotation());
+		
+		InterpolantAutomatonBuilderFactory<IcfgInternalTransition> interpolantAutomatonBuilderFactory =
+				new InterpolantAutomatonBuilderFactory<>(serviceProvider, tti.getCfgSmtToolkit(), stateFactory,
+						icfg, absIntRunner, taPrefs, InterpolationTechnique.Craig_NestedInterpolation, taPrefs.interpolantAutomaton(),
+						benchmarker);
+		
+		final TaCheckAndRefinementPreferences<IcfgInternalTransition> taCheckAndRefinementPrefs =
+				new TaCheckAndRefinementPreferences<>(serviceProvider, taPrefs, InterpolationTechnique.Craig_NestedInterpolation,
+						SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED,
+						tti.getCfgSmtToolkit(), predicateFactory, icfg,
+						interpolantAutomatonBuilderFactory);
+		
+		RefinementStrategyFactory<IcfgInternalTransition> refinementFactory = new RefinementStrategyFactory<>(
+				logger, serviceProvider, taPrefs, taCheckAndRefinementPrefs, absIntRunner, icfg, predicateFactory,
+				pathProgramCache);
+		
+		Collection<IcfgLocation> allNodes = new HashSet<>();
+		for (final Map<DebugIdentifier, ? extends IcfgLocation> prog2pp : icfg.getProgramPoints().values())
+			allNodes.addAll(prog2pp.values());
+		
+		/*INestedWordAutomaton<IcfgInternalTransition, IPredicate> omega = CFG2NestedWordAutomaton.constructAutomatonWithSPredicates(
+				serviceProvider, icfg, stateFactory, allNodes,
+				taPrefs.interprocedural(), predicateFactory);
+		*/
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Omega Construction
+		AutomataLibraryServices autLib = new AutomataLibraryServices(serviceProvider);
+		
+		Set<IcfgInternalTransition> letters = new HashSet<>();
+		letters.add(e1);
+		letters.add(e2);
+		letters.add(e3);
+		letters.add(e4);
+		VpAlphabet<IcfgInternalTransition> alphabet = new VpAlphabet<>(letters);
+		
+		NestedWordAutomaton<IcfgInternalTransition, IPredicate> omega = new NestedWordAutomaton<>(autLib, alphabet, 
+				new PDeterminizeStateFactory(predicateFactory));
+		omega.addState(true, false, node1);
+		omega.addState(false, false, node2);
+		omega.addState(false, true, node3);
+		omega.addState(false, false, node4);
+		omega.addInternalTransition(node1, e1, node2);
+		omega.addInternalTransition(node2, e2, node3);
+		omega.addInternalTransition(node3, e3, node4);
+		omega.addInternalTransition(node4, e4, node3);
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		String before = omega.toString();
+	
+		TaskIdentifier taskIdentifier = new SubtaskFileIdentifier(null, icfg.getIdentifier());
+		
+		LassoCheck<IcfgInternalTransition> check = new LassoCheck<>(
+				InterpolationTechnique.Craig_NestedInterpolation,
+				tti.getCfgSmtToolkit(), 
+				predicateFactory,
+				csToolkitWithRankVars.getSymbolTable(),
+				tti.getCfgSmtToolkit().getModifiableGlobalsTable(),
+				tti.getCfgSmtToolkit().getSmtSymbols(),
+				bspm, counterexample, 
+				"Test", serviceProvider,
+				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED,
+				refinementFactory,
+				omega,
+				taskIdentifier,
+				benchmarker);
+		
+		//TerminationArgument termArg = bspm.getTerminationArgument();
+		//System.out.println(termArg.getRankingFunction());
+		String after = omega.toString();
+		
+		System.out.println(after.equals(before));
+	} 
 }

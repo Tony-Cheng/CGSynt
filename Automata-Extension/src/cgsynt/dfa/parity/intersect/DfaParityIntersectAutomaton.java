@@ -1,6 +1,7 @@
 package cgsynt.dfa.parity.intersect;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ public class DfaParityIntersectAutomaton<LETTER, STATE1, STATE2 extends IParityS
 		super();
 		this.dfa = dfa;
 		this.parityAut = parityAut;
+		this.sourceMap = new HashMap<>();
 		computeSourceMap();
 		computeInitialStates();
 	}

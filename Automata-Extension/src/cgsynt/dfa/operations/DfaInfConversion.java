@@ -21,9 +21,11 @@ public class DfaInfConversion<LETTER, STATE> {
 			final IEmptyStackStateFactory<STATE> emptyStateFactory) {
 		this.result = copy(aut, services, emptyStateFactory);
 		this.resultComputed = false;
+		
+		computeResult();
 	}
 
-	public void computeResult() {
+	private void computeResult() {
 		if (resultComputed)
 			return;
 		Set<STATE> visited = new HashSet<>();

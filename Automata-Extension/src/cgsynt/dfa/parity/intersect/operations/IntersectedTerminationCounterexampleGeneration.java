@@ -12,48 +12,50 @@ import cgsynt.tree.parity.IParityState;
 
 public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STATE2 extends IParityState> {
 
-	private DfaParityIntersectAutomaton<LETTER, STATE1, STATE2> aut;
-	private boolean resultComputed;
-	private int maxLen;
-	private Map<DfaParityIntersectState<STATE1, STATE2>, Integer> visitedStates;
-	private List<DfaParityCounterexample<LETTER, STATE1, STATE2>> result;
+	private DfaParityIntersectAutomaton<LETTER, STATE1, STATE2> mInAut;
+	private boolean mResultComputed;
+	private int mMaxLen;
+	private Map<DfaParityIntersectState<STATE1, STATE2>, Integer> mVisitedStates;
+	private List<DfaParityCounterexample<LETTER, STATE1, STATE2>> mResult;
 
 	public IntersectedTerminationCounterexampleGeneration(DfaParityIntersectAutomaton<LETTER, STATE1, STATE2> aut,
 			int maxLen) {
-		this.aut = aut;
-		this.resultComputed = false;
-		this.maxLen = maxLen;
+		this.mInAut = aut;
+		this.mResultComputed = false;
+		this.mMaxLen = maxLen;
+		
+		computeResult();
 	}
 
-	public void computeResult() {
-		if (resultComputed) {
+	private void computeResult() {
+		if (mResultComputed) {
 			return;
 		}
-		this.visitedStates = new HashMap<>();
-		this.result = new ArrayList<>();
-		for (DfaParityIntersectState<STATE1, STATE2> initialState : aut.getInitialStates()) {
+		this.mVisitedStates = new HashMap<>();
+		this.mResult = new ArrayList<>();
+		for (DfaParityIntersectState<STATE1, STATE2> initialState : mInAut.getInitialStates()) {
 			List<DfaParityCounterexample<LETTER, STATE1, STATE2>> counterexamples = generateCounterexamples(initialState,
-					maxLen);
+					mMaxLen);
 			for (int i = counterexamples.size() - 1; i >= 0; i--) {
 				if (counterexamples.get(i).repeatedState != null) {
 					counterexamples.remove(i);
 				}
 			}
-			result.addAll(counterexamples);
+			mResult.addAll(counterexamples);
 		}
-		resultComputed = true;
+		mResultComputed = true;
 	}
 
 	public List<DfaParityCounterexample<LETTER, STATE1, STATE2>> getResult() {
-		if (!resultComputed)
+		if (!mResultComputed)
 			return null;
-		return result;
+		return mResult;
 	}
 
 	private List<DfaParityCounterexample<LETTER, STATE1, STATE2>> generateCounterexamples(
 			DfaParityIntersectState<STATE1, STATE2> state, int len) {
 		List<DfaParityCounterexample<LETTER, STATE1, STATE2>> counterexamples = new ArrayList<>();
-		if (visitedStates.containsKey(state) && visitedStates.get(state) > 0 && aut.isFinal(state)) {
+		if (mVisitedStates.containsKey(state) && mVisitedStates.get(state) > 0 && mInAut.isFinal(state)) {
 			DfaParityCounterexample<LETTER, STATE1, STATE2> counterexample = new DfaParityCounterexample<>(
 					state.getRank());
 			counterexample.repeatedState = state;
@@ -63,11 +65,11 @@ public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STAT
 		if (len == 0) {
 			return counterexamples;
 		}
-		if (!visitedStates.containsKey(state)) {
-			visitedStates.put(state, 0);
+		if (!mVisitedStates.containsKey(state)) {
+			mVisitedStates.put(state, 0);
 		}
-		visitedStates.put(state, visitedStates.get(state) + 1);
-		for (DfaParityIntersectRule<LETTER, STATE1, STATE2> transition : aut.internalSuccessors(state)) {
+		mVisitedStates.put(state, mVisitedStates.get(state) + 1);
+		for (DfaParityIntersectRule<LETTER, STATE1, STATE2> transition : mInAut.internalSuccessors(state)) {
 			List<DfaParityCounterexample<LETTER, STATE1, STATE2>> destCounterexamples = generateCounterexamples(
 					transition.getSucc(), len - 1);
 			for (int i = 0; i < destCounterexamples.size(); i++) {
@@ -80,7 +82,7 @@ public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STAT
 					copy.stemStates.push(state);
 					counterexamples.add(copy);
 				}
-				if (!state.equals(destCounterexamples.get(i).repeatedState) || visitedStates.get(state) > 1) {
+				if (!state.equals(destCounterexamples.get(i).repeatedState) || mVisitedStates.get(state) > 1) {
 					destCounterexamples.get(i).maxRepeatingNumber = Math
 							.max(destCounterexamples.get(i).maxRepeatingNumber, state.getRank());
 
@@ -96,7 +98,7 @@ public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STAT
 				}
 			}
 		}
-		visitedStates.put(state, visitedStates.get(state) - 1);
+		mVisitedStates.put(state, mVisitedStates.get(state) - 1);
 		return counterexamples;
 	}
 }

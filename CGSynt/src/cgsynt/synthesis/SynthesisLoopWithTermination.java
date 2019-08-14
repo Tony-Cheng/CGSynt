@@ -274,7 +274,7 @@ public class SynthesisLoopWithTermination {
 			mIsCorrect = true;
 			mResultComputed = true;
 
-			return;
+			//return;
 		}
 		
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
