@@ -73,9 +73,9 @@ public class ParityAutomaton<LETTER, STATE extends IParityState> extends NestedW
 				
 				STATE dest = new ArrayList<>(finalLayer.keySet()).get(0);
 				
-				rep += "(" + stateMapping.get(source.toString()) + " | "
+				rep += "(" + stateMapping.get(source.toString()) + ": " + source.getRank() + " | "
 				+ "LETTER " + letterMapping.get(letter.toString()).toLowerCase() + " | "
-				+ stateMapping.get(dest.toString()) + ")\n";
+				+ stateMapping.get(dest.toString()) + ": " + dest.getRank() + ")\n";
 			}
 		}
 		
