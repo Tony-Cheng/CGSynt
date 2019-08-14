@@ -1,6 +1,7 @@
 package cgsynt.synthesis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,7 @@ public class SynthesisLoopWithTermination {
 	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> mOmega;
 
 	private List<IStatement> mTransitionAlphabet;
-	private List<IcfgInternalTransition> mIcfgTransitionAlphabet;
+	private Map<IStatement, IcfgInternalTransition> mIcfgTransitionMap;
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
@@ -84,6 +85,20 @@ public class SynthesisLoopWithTermination {
 	private OmegaRefiner mOmegaRefiner;
 
 	public SynthesisLoopWithTermination(List<IStatement> transitionAlphabet, IPredicate preconditions,
+			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
+		this.init(transitionAlphabet, preconditions, postconditions, globalVars);
+	}
+
+	public SynthesisLoopWithTermination(Specification spec) throws Exception {
+		List<IStatement> transitionAlphabet = spec.getTransitionAlphabet();
+		IPredicate preconditions = spec.getPreconditions();
+		IPredicate postconditions = spec.getPostconditions();
+		TraceGlobalVariables globalVars = spec.getGlobalVars();
+
+		this.init(transitionAlphabet, preconditions, postconditions, globalVars);
+	}
+
+	private void init(List<IStatement> transitionAlphabet, IPredicate preconditions,
 			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
 		this.mGlobalVars = globalVars;
 		assert this.mGlobalVars.getService() instanceof CustomServiceProvider;
@@ -102,7 +117,7 @@ public class SynthesisLoopWithTermination {
 		this.mPrograms = construction.getResult();
 		this.mResultComputed = false;
 		this.mTransitionAlphabet = construction.getAlphabet();
-		this.mIcfgTransitionAlphabet = createIcfgTransitionAlphabet(mTransitionAlphabet);
+		this.mIcfgTransitionMap = createIcfgTransitionMap(mTransitionAlphabet);
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
 		this.mAllInterpolants.add(preconditions);
@@ -115,49 +130,13 @@ public class SynthesisLoopWithTermination {
 		this.mPrintedLogsSize = 0;
 		this.mOmegaRefiner = new OmegaRefiner(this.mGlobalVars, this.mOmega);
 	}
-
-	public SynthesisLoopWithTermination(Specification spec) throws Exception {
-		List<IStatement> transitionAlphabet = spec.getTransitionAlphabet();
-		IPredicate preconditions = spec.getPreconditions();
-		IPredicate postconditions = spec.getPostconditions();
-		TraceGlobalVariables globalVars = spec.getGlobalVars();
-
-		this.mGlobalVars = globalVars;
-		RankedBool.setRank(transitionAlphabet.size());
-
-		this.mGlobalVars.getTraceInterpolator().setPreconditions(preconditions);
-		this.mGlobalVars.getTraceInterpolator().setPostconditions(postconditions);
-		preconditions = this.mGlobalVars.getTraceInterpolator().getPreconditions();
-		postconditions = this.mGlobalVars.getTraceInterpolator().getPostconditions();
-		this.mService = this.mGlobalVars.getService();
-		this.mAutService = new AutomataLibraryServices(mService);
-		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet),
-				this.mGlobalVars.getPredicateFactory());
-		construction.computeResult();
-		RankedBool.setRank(construction.getAlphabet().size());
-		this.mPrograms = construction.getResult();
-		this.mResultComputed = false;
-		this.mTransitionAlphabet = construction.getAlphabet();
-		this.mIcfgTransitionAlphabet = createIcfgTransitionAlphabet(mTransitionAlphabet);
-		this.mAllInterpolants = new HashSet<>();
-		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
-		this.mAllInterpolants.add(preconditions);
-		this.mAllInterpolants.add(postconditions);
-		this.mPI = createPI(preconditions, postconditions);
-		this.mOmega = createOmega(preconditions);
-		this.mVisitedCounterexamples = new HashSet<>();
-		this.mLogs = new ArrayList<>();
-		this.mPrintLogs = false;
-		this.mPrintedLogsSize = 0;
-		this.mOmegaRefiner = new OmegaRefiner(this.mGlobalVars, this.mOmega);
-	}
-
+	
 	public void setPrintLogs(boolean printLogs) {
 		this.mPrintLogs = printLogs;
 	}
 
-	public List<IcfgInternalTransition> createIcfgTransitionAlphabet(List<IStatement> alphabet) {
-		List<IcfgInternalTransition> icfgAlphabet = new ArrayList<>();
+	public Map<IStatement, IcfgInternalTransition> createIcfgTransitionMap(List<IStatement> alphabet) {
+		Map<IStatement, IcfgInternalTransition> icfgAlphabetMap = new HashMap<>();
 
 		IcfgEdgeFactory factory = new IcfgEdgeFactory(OmegaRefiner.SERIAL_PROVIDER);
 		IcfgLocation location = new IcfgLocation(new StringDebugIdentifier("0"), "p1");
@@ -165,10 +144,10 @@ public class SynthesisLoopWithTermination {
 		for (IStatement statement : alphabet) {
 			IcfgInternalTransition trans = factory.createInternalTransition(location, location, new Payload(),
 					statement.getTransFormula());
-			icfgAlphabet.add(trans);
+			icfgAlphabetMap.put(statement, trans);
 		}
 
-		return icfgAlphabet;
+		return icfgAlphabetMap;
 	}
 
 	/**
@@ -198,7 +177,7 @@ public class SynthesisLoopWithTermination {
 	}
 
 	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> createOmega(IPredicate precondition) {
-		Set<IcfgInternalTransition> letters = new HashSet<>(this.mIcfgTransitionAlphabet);
+		Set<IcfgInternalTransition> letters = new HashSet<>(this.mIcfgTransitionMap.values());
 
 		VpAlphabet<IcfgInternalTransition> alphabet = new VpAlphabet<>(letters);
 
@@ -241,7 +220,7 @@ public class SynthesisLoopWithTermination {
 		ParityAutomaton<IcfgInternalTransition, IParityState> parityOmega = determinizeBuchi.getResult();
 
 		ParityAutomatonToTree<IcfgInternalTransition, IParityState> parityOmegaToParityTreeOmega = new ParityAutomatonToTree<>(
-				parityOmega, mIcfgTransitionAlphabet, shutdownParityState, offParityState, deadParityState);
+				parityOmega, new ArrayList<>(mIcfgTransitionMap.values()), shutdownParityState, offParityState, deadParityState);
 
 		ParityTreeAutomaton<RankedBool, IParityState> termTree = parityOmegaToParityTreeOmega.getResult();
 		////////////////////////////////////////////////
@@ -297,7 +276,7 @@ public class SynthesisLoopWithTermination {
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		// Omega Refinement Process
 		int minOmegaLen = Math.min(mOmega.size(), parityOmega.size());
-		DfaLetterConverter letterConverter = new DfaLetterConverter(dfaPI, this.mAutService, mGlobalVars.getPredicateFactory());
+		DfaLetterConverter letterConverter = new DfaLetterConverter(dfaPI, this.mAutService, mGlobalVars.getPredicateFactory(), this.mIcfgTransitionMap);
 		INestedWordAutomaton<IcfgInternalTransition, IPredicate> convertedDfaPi = letterConverter.getResult();
 		
 		DfaInfConversion<IcfgInternalTransition, IPredicate> infConverter = new DfaInfConversion<>(
