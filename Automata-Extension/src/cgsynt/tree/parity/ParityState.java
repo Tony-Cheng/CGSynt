@@ -5,13 +5,13 @@ package cgsynt.tree.parity;
  *
  * @param <STATE>
  */
-public class ParityState<STATE> implements IParityState {
-	private STATE state;
-	private int rank;
+public class ParityState<STATE> implements IExtendedParityState {
+	private STATE mState;
+	private int mRank;
 
 	public ParityState(STATE state, int rank) {
-		this.state = state;
-		this.rank = rank;
+		this.mState = state;
+		this.mRank = rank;
 	}
 
 	/**
@@ -20,15 +20,15 @@ public class ParityState<STATE> implements IParityState {
 	 * @return
 	 */
 	public STATE getState() {
-		return state;
+		return mState;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + rank;
-		result = prime * result + ((state == null) ? 0 : state.hashCode());
+		result = prime * result + mRank;
+		result = prime * result + ((mState == null) ? 0 : mState.hashCode());
 		return result;
 	}
 
@@ -42,23 +42,37 @@ public class ParityState<STATE> implements IParityState {
 			return false;
 		@SuppressWarnings("unchecked")
 		ParityState<STATE> other = (ParityState<STATE>) obj;
-		if (rank != other.rank)
+		if (mRank != other.mRank)
 			return false;
-		if (state == null) {
-			if (other.state != null)
+		if (mState == null) {
+			if (other.mState != null)
 				return false;
-		} else if (!state.equals(other.state))
+		} else if (!mState.equals(other.mState))
 			return false;
 		return true;
 	}
 
 	@Override
 	public int getRank() {
-		return rank;
+		return mRank;
 	}
 
 	@Override
 	public String toString() {
-		return state + ": " + rank;
+		return mState + ": " + mRank;
+	}
+
+	@Override
+	public void setRank(int newRank) {
+		this.mRank = newRank;
+	}
+
+	public IParityState makeCpy() {
+		return new ParityState<STATE>(this.mState, this.mRank);
+	}
+
+	@Override
+	public IParityState getSimpleRepresentation() {
+		return this.makeCpy();
 	}
 }

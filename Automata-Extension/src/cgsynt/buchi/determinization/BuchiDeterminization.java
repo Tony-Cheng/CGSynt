@@ -40,6 +40,7 @@ public class BuchiDeterminization<LETTER, STATE> {
 		this.emptyStateFactory = emptyStateFactory;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void computeResult() {
 		if (resultComputed)
 			return;
@@ -53,7 +54,7 @@ public class BuchiDeterminization<LETTER, STATE> {
 		while (!toVisitStates.isEmpty()) {
 			SafraTree<STATE> next = toVisitStates.pop();
 			for (LETTER letter : buchiAut.getAlphabet()) {
-				SafraTree<STATE> copy = next.copy();
+				SafraTree<STATE> copy = (SafraTree<STATE>)next.makeCpy();
 				reset(copy);
 				step1(copy, letter);
 				step2(copy);

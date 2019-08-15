@@ -2,10 +2,12 @@ package cgsynt.buchi.determinization;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import cgsynt.tree.parity.IParityState;
+import cgsynt.tree.parity.ParityState;
 
 /**
  * An implementation of a compact Safra tree described in the paper below:
@@ -14,81 +16,87 @@ import cgsynt.tree.parity.IParityState;
  */
 public class SafraTree<STATE> implements IParityState {
 
-	private Set<Integer> states;
-	private Map<Integer, Integer> nameMap;
-	private int root;
-	private Map<Integer, Integer> parentMap;
-	private Map<Integer, Set<Integer>> childrenMap;
-	private Map<Integer, Set<STATE>> labelMap;
-	private Set<Integer> rem;
-	private Set<STATE> initialStates;
-	private int e;
-	private int f;
-	private int numBuchiStates;
-	private int greatestName;
+	private Set<Integer> mStates;
+	private Map<Integer, Integer> mNameMap;
+	private int mRoot;
+	private Map<Integer, Integer> mParentMap;
+	private Map<Integer, Set<Integer>> mChildrenMap;
+	private Map<Integer, Set<STATE>> mLabelMap;
+	private Set<Integer> mRem;
+	private Set<STATE> mInitialStates;
+	private int mE;
+	private int mF;
+	private int mNumBuchiStates;
+	private int mGreatestName;
+	
+	private boolean mInitializeRoot;
+	
+	private static final boolean DEBUG = false;
 
 	public SafraTree(Set<STATE> initialStates, int numBuchiStates, boolean initializeRoot) {
-		this.initialStates = initialStates;
-		this.states = new HashSet<>();
-		this.nameMap = new HashMap<>();
-		this.root = 1;
-		this.parentMap = new HashMap<>();
-		this.childrenMap = new HashMap<>();
-		this.labelMap = new HashMap<>();
-		this.rem = new HashSet<>();
-		this.greatestName = 0;
-		this.e = 2;
-		this.f = 1;
-		this.numBuchiStates = numBuchiStates;
-		if (initializeRoot)
+		this.mInitialStates = initialStates;
+		this.mStates = new HashSet<>();
+		this.mNameMap = new HashMap<>();
+		this.mRoot = 1;
+		this.mParentMap = new HashMap<>();
+		this.mChildrenMap = new HashMap<>();
+		this.mLabelMap = new HashMap<>();
+		this.mRem = new HashSet<>();
+		this.mGreatestName = 0;
+		this.mE = 2;
+		this.mF = 1;
+		this.mNumBuchiStates = numBuchiStates;
+		this.mInitializeRoot = initializeRoot;
+		
+		if (this.mInitializeRoot)
 			addRoot(initialStates);
 	}
 
 	private void addRoot(Set<STATE> initialStates) {
-		states.add(root);
-		nameMap.put(root, 1);
-		childrenMap.put(root, new HashSet<>());
-		parentMap.put(root, null);
-		labelMap.put(root, initialStates);
-		this.greatestName++;
+		mStates.add(mRoot);
+		mNameMap.put(mRoot, 1);
+		mChildrenMap.put(mRoot, new HashSet<>());
+		mParentMap.put(mRoot, null);
+		mLabelMap.put(mRoot, initialStates);
+		this.mGreatestName++;
 	}
 
 	public Set<Integer> getStates() {
-		return this.states;
+		return this.mStates;
 	}
 
 	public Integer addNode(Integer parent, Set<STATE> label) {
-		Integer next = greatestName + 1;
-		greatestName += 1;
-		states.add(next);
-		nameMap.put(next, next);
-		parentMap.put(next, parent);
-		childrenMap.put(next, new HashSet<>());
-		childrenMap.get(parent).add(next);
-		labelMap.put(next, label);
+		Integer next = mGreatestName + 1;
+		mGreatestName += 1;
+		mStates.add(next);
+		mNameMap.put(next, next);
+		mParentMap.put(next, parent);
+		mChildrenMap.put(next, new HashSet<>());
+		mChildrenMap.get(parent).add(next);
+		mLabelMap.put(next, label);
 		return next;
 	}
 
 	public Set<Integer> getSiblings(Integer node) {
-		if (parentMap.get(node) != null) {
-			Integer parent = parentMap.get(node);
-			return childrenMap.get(parent);
+		if (mParentMap.get(node) != null) {
+			Integer parent = mParentMap.get(node);
+			return mChildrenMap.get(parent);
 		}
 		return null;
 	}
 
 	public Set<STATE> getLabels(Integer node) {
-		return labelMap.get(node);
+		return mLabelMap.get(node);
 	}
 
 	public void setLabels(Integer node, Set<STATE> labels) {
-		this.labelMap.put(node, labels);
+		this.mLabelMap.put(node, labels);
 	}
 
 	public void removeLabel(Integer node, STATE label) {
-		if (labelMap.get(node).contains(label)) {
-			labelMap.get(node).remove(label);
-			for (Integer child : childrenMap.get(node)) {
+		if (mLabelMap.get(node).contains(label)) {
+			mLabelMap.get(node).remove(label);
+			for (Integer child : mChildrenMap.get(node)) {
 				removeLabel(child, label);
 			}
 		}
@@ -96,42 +104,44 @@ public class SafraTree<STATE> implements IParityState {
 
 	public boolean checkUnionOfChildren(Integer node) {
 		Set<STATE> union = new HashSet<>();
-		for (Integer child : childrenMap.get(node)) {
-			union.addAll(labelMap.get(child));
+		for (Integer child : mChildrenMap.get(node)) {
+			union.addAll(mLabelMap.get(child));
 		}
-		return union.equals(labelMap.get(node));
+		return union.equals(mLabelMap.get(node));
 	}
 
 	public int getName(Integer node) {
-		return nameMap.get(node);
+		return mNameMap.get(node);
 	}
 
 	public void setGreenNode(Integer node) {
-		if (!states.contains(node))
+		if (!mStates.contains(node))
 			return;
-		f = Math.min(f, node);
-		for (Integer child : childrenMap.get(node)) {
+		mF = Math.min(mF, node);
+		for (Integer child : mChildrenMap.get(node)) {
 			removeSubtree(child);
 		}
-		childrenMap.get(node).clear();
+		mChildrenMap.get(node).clear();
 	}
 
 	@Override
 	public String toString() {
-		return "SafraTree [states=" + states + ", nameMap=" + nameMap + ", root=" + root + ", parentMap=" + parentMap
-				+ ", childrenMap=" + childrenMap + ", labelMap=" + labelMap + ", rem=" + rem + ", initialStates="
-				+ initialStates + ", e=" + e + ", f=" + f + ", numBuchiStates=" + numBuchiStates + ", greatestName="
-				+ greatestName + ", rank=" + getRank() + "]";
+		if (DEBUG)
+			return "SafraTree [states=" + mStates + ", nameMap=" + mNameMap + ", root=" + mRoot + ", parentMap=" + mParentMap
+				+ ", childrenMap=" + mChildrenMap + ", labelMap=" + mLabelMap + ", rem=" + mRem + ", initialStates="
+				+ mInitialStates + ", e=" + mE + ", f=" + mF + ", numBuchiStates=" + mNumBuchiStates + ", greatestName="
+				+ mGreatestName + ", rank=" + getRank() + "]";
+		else return "SafraTree: " + mNameMap + ", rank: " + getRank();
 	}
 
 	public Set<Integer> getChildren(Integer node) {
-		return childrenMap.get(node);
+		return mChildrenMap.get(node);
 	}
 
 	public void removeNode(Integer node) {
-		if (!states.contains(node))
+		if (!mStates.contains(node))
 			return;
-		e = Math.min(e, node);
+		mE = Math.min(mE, node);
 		removeSubtree(node);
 		// states.remove(node);
 		// nameMap.remove(node);
@@ -144,91 +154,70 @@ public class SafraTree<STATE> implements IParityState {
 	}
 
 	private void removeSubtree(Integer node) {
-		if (!states.contains(node))
+		if (!mStates.contains(node))
 			return;
-		Set<Integer> children = childrenMap.get(node);
-		states.remove(node);
-		parentMap.remove(node);
-		labelMap.remove(node);
-		nameMap.remove(node);
+		Set<Integer> children = mChildrenMap.get(node);
+		mStates.remove(node);
+		mParentMap.remove(node);
+		mLabelMap.remove(node);
+		mNameMap.remove(node);
 		for (Integer child : children) {
 			removeSubtree(child);
 		}
-		childrenMap.remove(node);
-		rem.add(node);
-	}
-
-	public SafraTree<STATE> copy() {
-		SafraTree<STATE> tree = new SafraTree<>(initialStates, this.numBuchiStates, false);
-		tree.states.addAll(states);
-		tree.nameMap.putAll(nameMap);
-		tree.root = root;
-		tree.parentMap.putAll(parentMap);
-		for (Integer key : this.childrenMap.keySet()) {
-			tree.childrenMap.put(key, new HashSet<>());
-			tree.childrenMap.get(key).addAll(this.childrenMap.get(key));
-		}
-		for (Integer key : this.labelMap.keySet()) {
-			tree.labelMap.put(key, new HashSet<>());
-			tree.labelMap.get(key).addAll(this.labelMap.get(key));
-		}
-		tree.rem.addAll(rem);
-		tree.e = e;
-		tree.f = f;
-		tree.greatestName = this.greatestName;
-		return tree;
+		mChildrenMap.remove(node);
+		mRem.add(node);
 	}
 
 	public void compressTree() {
 		int sum = 0;
-		for (int i = 1; i <= this.greatestName; i++) {
-			if (rem.contains(i)) {
+		for (int i = 1; i <= this.mGreatestName; i++) {
+			if (mRem.contains(i)) {
 				sum++;
 			} else if (sum > 0) {
-				states.add(i - sum);
-				states.remove(i);
-				nameMap.put(i - sum, nameMap.get(i) - sum);
-				nameMap.remove(i);
-				for (Integer child : childrenMap.get(i)) {
-					parentMap.put(child, i - sum);
+				mStates.add(i - sum);
+				mStates.remove(i);
+				mNameMap.put(i - sum, mNameMap.get(i) - sum);
+				mNameMap.remove(i);
+				for (Integer child : mChildrenMap.get(i)) {
+					mParentMap.put(child, i - sum);
 				}
-				childrenMap.put(i - sum, childrenMap.get(i));
-				childrenMap.remove(i);
-				if (parentMap.get(i) != null) {
-					childrenMap.get(parentMap.get(i)).remove(i);
-					childrenMap.get(parentMap.get(i)).add(i- sum);
+				mChildrenMap.put(i - sum, mChildrenMap.get(i));
+				mChildrenMap.remove(i);
+				if (mParentMap.get(i) != null) {
+					mChildrenMap.get(mParentMap.get(i)).remove(i);
+					mChildrenMap.get(mParentMap.get(i)).add(i- sum);
 				}
-				parentMap.put(i - sum, parentMap.get(i));
-				parentMap.remove(i);
-				labelMap.put(i - sum, labelMap.get(i));
-				labelMap.remove(i);
+				mParentMap.put(i - sum, mParentMap.get(i));
+				mParentMap.remove(i);
+				mLabelMap.put(i - sum, mLabelMap.get(i));
+				mLabelMap.remove(i);
 			}
 		}
-		greatestName = greatestName - sum;
-		rem.clear();
+		mGreatestName = mGreatestName - sum;
+		mRem.clear();
 	}
 
 	public void resetEF() {
-		e = this.numBuchiStates + 1;
-		f = this.numBuchiStates + 1;
+		mE = this.mNumBuchiStates + 1;
+		mF = this.mNumBuchiStates + 1;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((childrenMap == null) ? 0 : childrenMap.hashCode());
-		result = prime * result + e;
-		result = prime * result + f;
-		result = prime * result + greatestName;
-		result = prime * result + ((initialStates == null) ? 0 : initialStates.hashCode());
-		result = prime * result + ((labelMap == null) ? 0 : labelMap.hashCode());
-		result = prime * result + ((nameMap == null) ? 0 : nameMap.hashCode());
-		result = prime * result + numBuchiStates;
-		result = prime * result + ((parentMap == null) ? 0 : parentMap.hashCode());
-		result = prime * result + ((rem == null) ? 0 : rem.hashCode());
-		result = prime * result + root;
-		result = prime * result + ((states == null) ? 0 : states.hashCode());
+		result = prime * result + ((mChildrenMap == null) ? 0 : mChildrenMap.hashCode());
+		result = prime * result + mE;
+		result = prime * result + mF;
+		result = prime * result + mGreatestName;
+		result = prime * result + ((mInitialStates == null) ? 0 : mInitialStates.hashCode());
+		result = prime * result + ((mLabelMap == null) ? 0 : mLabelMap.hashCode());
+		result = prime * result + ((mNameMap == null) ? 0 : mNameMap.hashCode());
+		result = prime * result + mNumBuchiStates;
+		result = prime * result + ((mParentMap == null) ? 0 : mParentMap.hashCode());
+		result = prime * result + ((mRem == null) ? 0 : mRem.hashCode());
+		result = prime * result + mRoot;
+		result = prime * result + ((mStates == null) ? 0 : mStates.hashCode());
 		return result;
 	}
 
@@ -241,50 +230,50 @@ public class SafraTree<STATE> implements IParityState {
 		if (getClass() != obj.getClass())
 			return false;
 		SafraTree other = (SafraTree) obj;
-		if (childrenMap == null) {
-			if (other.childrenMap != null)
+		if (mChildrenMap == null) {
+			if (other.mChildrenMap != null)
 				return false;
-		} else if (!childrenMap.equals(other.childrenMap))
+		} else if (!mChildrenMap.equals(other.mChildrenMap))
 			return false;
-		if (e != other.e)
+		if (mE != other.mE)
 			return false;
-		if (f != other.f)
+		if (mF != other.mF)
 			return false;
-		if (greatestName != other.greatestName)
+		if (mGreatestName != other.mGreatestName)
 			return false;
-		if (initialStates == null) {
-			if (other.initialStates != null)
+		if (mInitialStates == null) {
+			if (other.mInitialStates != null)
 				return false;
-		} else if (!initialStates.equals(other.initialStates))
+		} else if (!mInitialStates.equals(other.mInitialStates))
 			return false;
-		if (labelMap == null) {
-			if (other.labelMap != null)
+		if (mLabelMap == null) {
+			if (other.mLabelMap != null)
 				return false;
-		} else if (!labelMap.equals(other.labelMap))
+		} else if (!mLabelMap.equals(other.mLabelMap))
 			return false;
-		if (nameMap == null) {
-			if (other.nameMap != null)
+		if (mNameMap == null) {
+			if (other.mNameMap != null)
 				return false;
-		} else if (!nameMap.equals(other.nameMap))
+		} else if (!mNameMap.equals(other.mNameMap))
 			return false;
-		if (numBuchiStates != other.numBuchiStates)
+		if (mNumBuchiStates != other.mNumBuchiStates)
 			return false;
-		if (parentMap == null) {
-			if (other.parentMap != null)
+		if (mParentMap == null) {
+			if (other.mParentMap != null)
 				return false;
-		} else if (!parentMap.equals(other.parentMap))
+		} else if (!mParentMap.equals(other.mParentMap))
 			return false;
-		if (rem == null) {
-			if (other.rem != null)
+		if (mRem == null) {
+			if (other.mRem != null)
 				return false;
-		} else if (!rem.equals(other.rem))
+		} else if (!mRem.equals(other.mRem))
 			return false;
-		if (root != other.root)
+		if (mRoot != other.mRoot)
 			return false;
-		if (states == null) {
-			if (other.states != null)
+		if (mStates == null) {
+			if (other.mStates != null)
 				return false;
-		} else if (!states.equals(other.states))
+		} else if (!mStates.equals(other.mStates))
 			return false;
 		return true;
 	}
@@ -292,18 +281,60 @@ public class SafraTree<STATE> implements IParityState {
 	@Override
 	public int getRank() {
 		int invertedPriority;
-		if (e == 1) {
-			invertedPriority = 2 * this.numBuchiStates - 1;
-		} else if (f == 1 && e > 1) {
+		if (mE == 1) {
+			invertedPriority = 2 * this.mNumBuchiStates - 1;
+		} else if (mF == 1 && mE > 1) {
 			invertedPriority = 0;
-		} else if (f >= e) {
-			int i = e - 2;
+		} else if (mF >= mE) {
+			int i = mE - 2;
 			invertedPriority = 2 * i + 1;
 		} else {
-			int i = f - 2;
+			int i = mF - 2;
 			invertedPriority = 2 * i + 2;
 		}
-		return this.numBuchiStates * 2 - invertedPriority;
+		return this.mNumBuchiStates * 2 - invertedPriority;
 	}
 
+	public IParityState makeCpy() {
+		SafraTree<STATE> tree = new SafraTree<>(mInitialStates, this.mNumBuchiStates, false);
+		tree.mStates.addAll(mStates);
+		tree.mNameMap.putAll(mNameMap);
+		tree.mRoot = mRoot;
+		tree.mParentMap.putAll(mParentMap);
+		for (Integer key : this.mChildrenMap.keySet()) {
+			tree.mChildrenMap.put(key, new HashSet<>());
+			tree.mChildrenMap.get(key).addAll(this.mChildrenMap.get(key));
+		}
+		for (Integer key : this.mLabelMap.keySet()) {
+			tree.mLabelMap.put(key, new HashSet<>());
+			tree.mLabelMap.get(key).addAll(this.mLabelMap.get(key));
+		}
+		tree.mRem.addAll(mRem);
+		tree.mE = mE;
+		tree.mF = mF;
+		tree.mGreatestName = this.mGreatestName;
+		return tree;
+	}
+
+	public Set<STATE> getInitialStates(){
+		return this.mInitialStates;
+	}
+	
+	public int getNumBuchiStates() {
+		return this.mNumBuchiStates;
+	}
+	
+	public boolean getInitializeRoot() {
+		return this.mInitializeRoot;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public IParityState getSimpleRepresentation() {
+		SafraTree<STATE> cpy = (SafraTree<STATE>)this.makeCpy();
+		
+		Iterator<STATE> it = cpy.mInitialStates.iterator();
+		IParityState rep = new ParityState<STATE>(it.next(), cpy.getRank());
+		
+		return rep;
+	}
 }
