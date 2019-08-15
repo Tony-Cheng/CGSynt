@@ -1,7 +1,10 @@
 package cgsynt.tree.buchi.parity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
@@ -22,32 +25,44 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 
 	private void computeRules(BuchiTreeAutomaton<LETTER, STATE1> buchiAut,
 			ParityTreeAutomaton<LETTER, STATE2> parityAut) {
-		int k = buchiAut.getStates().size() * parityAut.getStates().size();
-		for (LETTER letter : buchiAut.getAlphabet()) {
-			if (!parityAut.getAlphabet().contains(letter))
-				continue;
-			for (BuchiTreeAutomatonRule<LETTER, STATE1> buchiRule : buchiAut.getSuccessors(letter)) {
-				for (ParityTreeAutomatonRule<LETTER, STATE2> parityRule : parityAut.getSuccessors(letter)) {
-					for (int i = 0; i < k; i++) {
-						if (buchiAut.isFinalState(buchiRule.getSource())) {
-							BuchiParityIntersectState<STATE1, STATE2> source = new BuchiParityIntersectState<STATE1, STATE2>(
-									buchiRule.getSource(), parityRule.getSource(), k);
-							List<BuchiParityIntersectState<STATE1, STATE2>> dests = new ArrayList<>();
-							for (int j = 0; j < buchiRule.getDest().size(); j++) {
-								dests.add(new BuchiParityIntersectState<STATE1, STATE2>(buchiRule.getDest().get(j),
-										parityRule.getDest().get(j), 0));
-							}
-							this.addRule(new BuchiParityIntersectRule<>(source, dests, letter));
-						} else {
-							BuchiParityIntersectState<STATE1, STATE2> source = new BuchiParityIntersectState<STATE1, STATE2>(
-									buchiRule.getSource(), parityRule.getSource(), k);
-							List<BuchiParityIntersectState<STATE1, STATE2>> dests = new ArrayList<>();
-							for (int j = 0; j < buchiRule.getDest().size(); j++) {
-								dests.add(new BuchiParityIntersectState<STATE1, STATE2>(buchiRule.getDest().get(j),
-										parityRule.getDest().get(j), k + 1));
-							}
-							this.addRule(new BuchiParityIntersectRule<>(source, dests, letter));
+		Stack<BuchiParityIntersectState<STATE1, STATE2>> toVisit = new Stack<>();
+		Set<BuchiParityIntersectState<STATE1, STATE2>> visited = new HashSet<>();
+		toVisit.addAll(this.getInitStates());
+		visited.addAll(this.getInitStates());
+		while (!toVisit.isEmpty()) {
+			BuchiParityIntersectState<STATE1, STATE2> next = toVisit.pop();
+			for (BuchiTreeAutomatonRule<LETTER, STATE1> buchiRule : buchiAut
+					.getRulesBySource(next.getState().getState1())) {
+				for (ParityTreeAutomatonRule<LETTER, STATE2> parityRule : parityAut
+						.getRulesBySource(next.getState().getState2())) {
+					if (!buchiRule.getLetter().equals(parityRule.getLetter())) {
+						continue;
+					}
+					List<BuchiParityIntersectState<STATE1, STATE2>> dests = new ArrayList<>();
+					boolean isGoodTransition = true;
+					for (int i = 0; i < buchiRule.getDest().size(); i++) {
+						BuchiParityPair<STATE1, STATE2> pair = new BuchiParityPair<>(buchiRule.getDest().get(i),
+								parityRule.getDest().get(i));
+						BuchiParityIntersectState<STATE1, STATE2> dest = null;
+						if (buchiAut.isFinalState(pair.getState1())) {
+							dest = new BuchiParityIntersectState<>(pair);
+						} else if (next.getVisitedStates().containsKey(pair)
+								&& next.getVisitedStates().get(pair) < next.getK()) {
+							dest = next.nextState(pair, next.getK());
+						} else if (!next.getVisitedStates().containsKey(pair)) {
+							dest = next.nextState(pair, next.getK());
 						}
+						if (dest != null && !visited.contains(dest)) {
+							visited.add(dest);
+							toVisit.push(dest);
+						}
+						if (dest == null) {
+							isGoodTransition = false;
+						}
+						dests.add(dest);
+					}
+					if (isGoodTransition) {
+						this.addRule(new ParityTreeAutomatonRule<>(buchiRule.getLetter(), next, dests));
 					}
 				}
 			}
@@ -59,7 +74,7 @@ public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1,
 		for (STATE1 buchiState : buchiAut.getInitStates()) {
 			for (STATE2 parityState : parityAut.getInitStates()) {
 				BuchiParityIntersectState<STATE1, STATE2> initialState = new BuchiParityIntersectState<STATE1, STATE2>(
-						buchiState, parityState, 0);
+						new BuchiParityPair<STATE1, STATE2>(buchiState, parityState));
 				this.addInitState(initialState);
 			}
 		}

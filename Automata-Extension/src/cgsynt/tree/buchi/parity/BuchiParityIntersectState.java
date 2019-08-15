@@ -1,25 +1,43 @@
 package cgsynt.tree.buchi.parity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import cgsynt.tree.parity.IParityState;
 
 public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> implements IParityState {
-	private final STATE1 state1;
-	private final STATE2 state2;
+	private final BuchiParityPair<STATE1, STATE2> state;
 	private final int k;
+	private final Map<BuchiParityPair<STATE1, STATE2>, Integer> visitedStates;
 
-	public BuchiParityIntersectState(STATE1 state1, STATE2 state2, int k) {
+	public BuchiParityIntersectState(BuchiParityPair<STATE1, STATE2> state) {
 		super();
-		this.state1 = state1;
-		this.state2 = state2;
+		this.state = state;
+		this.k = state.getState2().getRank();
+		this.visitedStates = new HashMap<>();
+	}
+
+	private BuchiParityIntersectState(BuchiParityPair<STATE1, STATE2> state, int k) {
+		super();
+		this.state = state;
 		this.k = k;
+		this.visitedStates = new HashMap<>();
 	}
 
-	public STATE1 getState1() {
-		return state1;
+	public BuchiParityIntersectState<STATE1, STATE2> nextState(BuchiParityPair<STATE1, STATE2> state, int k) {
+		BuchiParityIntersectState<STATE1, STATE2> nextState = new BuchiParityIntersectState<>(state,
+				Math.max(k, this.k));
+		nextState.visitedStates.putAll(visitedStates);
+		nextState.visitedStates.put(state, nextState.k);
+		return nextState;
 	}
 
-	public STATE2 getState2() {
-		return state2;
+	public Map<BuchiParityPair<STATE1, STATE2>, Integer> getVisitedStates() {
+		return visitedStates;
+	}
+
+	public BuchiParityPair<STATE1, STATE2> getState() {
+		return state;
 	}
 
 	public int getK() {
@@ -27,7 +45,7 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> impl
 	}
 
 	public int getRank() {
-		return state2.getRank();
+		return state.getState2().getRank();
 	}
 
 	@Override
@@ -35,8 +53,8 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> impl
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + k;
-		result = prime * result + ((state1 == null) ? 0 : state1.hashCode());
-		result = prime * result + ((state2 == null) ? 0 : state2.hashCode());
+		result = prime * result + ((state == null) ? 0 : state.hashCode());
+		result = prime * result + ((visitedStates == null) ? 0 : visitedStates.hashCode());
 		return result;
 	}
 
@@ -51,17 +69,23 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> impl
 		BuchiParityIntersectState other = (BuchiParityIntersectState) obj;
 		if (k != other.k)
 			return false;
-		if (state1 == null) {
-			if (other.state1 != null)
+		if (state == null) {
+			if (other.state != null)
 				return false;
-		} else if (!state1.equals(other.state1))
+		} else if (!state.equals(other.state))
 			return false;
-		if (state2 == null) {
-			if (other.state2 != null)
+		if (visitedStates == null) {
+			if (other.visitedStates != null)
 				return false;
-		} else if (!state2.equals(other.state2))
+		} else if (!visitedStates.equals(other.visitedStates))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "BuchiParityIntersectState [state=" + state + ", k=" + k + ", \nvisitedStates=" + visitedStates
+				+ "]";
 	}
 
 }
