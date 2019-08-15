@@ -30,8 +30,6 @@ public class SafraTree<STATE> implements IParityState {
 	private int mGreatestName;
 	
 	private boolean mInitializeRoot;
-	
-	private static final boolean DEBUG = false;
 
 	public SafraTree(Set<STATE> initialStates, int numBuchiStates, boolean initializeRoot) {
 		this.mInitialStates = initialStates;
@@ -126,12 +124,10 @@ public class SafraTree<STATE> implements IParityState {
 
 	@Override
 	public String toString() {
-		if (DEBUG)
-			return "SafraTree [states=" + mStates + ", nameMap=" + mNameMap + ", root=" + mRoot + ", parentMap=" + mParentMap
-				+ ", childrenMap=" + mChildrenMap + ", labelMap=" + mLabelMap + ", rem=" + mRem + ", initialStates="
-				+ mInitialStates + ", e=" + mE + ", f=" + mF + ", numBuchiStates=" + mNumBuchiStates + ", greatestName="
-				+ mGreatestName + ", rank=" + getRank() + "]";
-		else return "SafraTree: " + mNameMap + ", rank: " + getRank();
+		return "SafraTree [states=" + mStates + ", nameMap=" + mNameMap + ", root=" + mRoot + ", parentMap=" + mParentMap
+			+ ", childrenMap=" + mChildrenMap + ", labelMap=" + mLabelMap + ", rem=" + mRem + ", initialStates="
+			+ mInitialStates + ", e=" + mE + ", f=" + mF + ", numBuchiStates=" + mNumBuchiStates + ", greatestName="
+			+ mGreatestName + ", rank=" + getRank() + "]";
 	}
 
 	public Set<Integer> getChildren(Integer node) {

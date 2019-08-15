@@ -6,7 +6,7 @@ public class ParityStateFactory implements IEmptyStackStateFactory<ParityState<S
 
 	@Override
 	public ParityState<String> createEmptyStackState() {
-		System.out.println("ParitStateFactory: EmptyState used!");
+		System.out.println("ParityStateFactory: EmptyState used!");
 		return new ParityState<>("EmptyState", 1);
 	}
 

@@ -6,12 +6,16 @@ package cgsynt.tree.parity;
  * @param <STATE>
  */
 public class ParityState<STATE> implements IExtendedParityState {
+	private static int LABEL = 0;
+	
 	private STATE mState;
 	private int mRank;
+	private int mStateLabel;
 
 	public ParityState(STATE state, int rank) {
 		this.mState = state;
 		this.mRank = rank;
+		this.mStateLabel = LABEL++;
 	}
 
 	/**
@@ -29,6 +33,7 @@ public class ParityState<STATE> implements IExtendedParityState {
 		int result = 1;
 		result = prime * result + mRank;
 		result = prime * result + ((mState == null) ? 0 : mState.hashCode());
+		result = prime * result + mStateLabel;
 		return result;
 	}
 
@@ -59,7 +64,7 @@ public class ParityState<STATE> implements IExtendedParityState {
 
 	@Override
 	public String toString() {
-		return mState + ": " + mRank;
+		return mState + ": " + mRank + ":" + mStateLabel;
 	}
 
 	@Override

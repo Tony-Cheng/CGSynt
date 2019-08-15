@@ -8,15 +8,19 @@ import cgsynt.tree.parity.IExtendedParityState;
 import cgsynt.tree.parity.IParityState;
 
 public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> implements IExtendedParityState {	
+	private static int LABEL = 0;
+	
 	private final BuchiParityPair<STATE1, STATE2> mState;
 	private final int mK;
 	private final Map<BuchiParityPair<STATE1, STATE2>, Integer> visitedStates;
+	private int mStateLabel;
 
 	public BuchiParityIntersectState(BuchiParityPair<STATE1, STATE2> state) {
 		super();
 		this.mState = state;
 		this.mK = state.getState2().getRank();
 		this.visitedStates = new HashMap<>();
+		this.mStateLabel = LABEL++;
 	}
 	
 	private BuchiParityIntersectState(BuchiParityPair<STATE1, STATE2> state, int k) {
@@ -57,6 +61,7 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> impl
 		result = prime * result + mK;
 		result = prime * result + ((mState == null) ? 0 : mState.hashCode());
 		result = prime * result + ((visitedStates == null) ? 0 : visitedStates.hashCode());
+		result = prime * result + mStateLabel;
 		return result;
 	}
 
