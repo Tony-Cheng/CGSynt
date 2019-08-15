@@ -14,33 +14,25 @@ import cgsynt.core.service.CustomServiceProvider;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaInfConversion;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
-import cgsynt.dfa.operations.FiniteTracesAcceptanceConversion;
 import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.dfa.parity.intersect.DfaParityIntersectAutomaton;
 import cgsynt.dfa.parity.intersect.operations.DfaParityCounterexample;
 import cgsynt.dfa.parity.intersect.operations.IntersectedTerminationCounterexampleGeneration;
 import cgsynt.dfa.parity.operations.ParityAutomatonToTree;
-import cgsynt.dfa.parity.operations.ParityComplementAndCounterexampleGeneration;
-import cgsynt.dfa.parity.operations.ParityCounterexample;
+import cgsynt.dfa.parity.operations.ParityComplement;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.operations.CounterExamplesToInterpolants;
-import cgsynt.operations.ProgramRetrieval;
-import cgsynt.operations.TerminatingProgramExtraction;
-import cgsynt.probability.ConfidenceIntervalCalculator;
 import cgsynt.termination.DfaLetterConverter;
 import cgsynt.termination.OmegaRefiner;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
-import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.IntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.BuchiIntersection;
 import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
 import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
-import cgsynt.tree.buchi.parity.BuchiHybridParityIntersectRule;
-import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectState;
 import cgsynt.tree.buchi.parity.operations.BuchiParityEmptinessCheck;
 import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityState;
@@ -52,9 +44,9 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutoma
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
-import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
+import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgEdgeFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgInternalTransition;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
@@ -283,8 +275,16 @@ public class SynthesisLoopWithTermination {
 				convertedDfaPi, this.mAutService, new GeneralizeStateFactory(this.mGlobalVars.getPredicateFactory()));
 		INestedWordAutomaton<IcfgInternalTransition, IPredicate> infPI = infConverter.getResult();
 		
+		//Complement
+		Set<IcfgInternalTransition> letterSet = new HashSet<>(this.mIcfgTransitionMap.values());
+		VpAlphabet<IcfgInternalTransition> alphabet = new VpAlphabet<>(letterSet);
+		ParityComplement<IcfgInternalTransition, IParityState> complementation = new ParityComplement<>(parityOmega, 
+				this.mAutService, alphabet, new ParityStateFactory());
+		
+		ParityAutomaton<IcfgInternalTransition, IParityState> complementedOmega = complementation.getResult();
+ 		
 		DfaParityIntersectAutomaton<IcfgInternalTransition, IPredicate, IParityState> terminationTraceBank = 
-				new DfaParityIntersectAutomaton<>(infPI, parityOmega);
+				new DfaParityIntersectAutomaton<>(infPI, complementedOmega);
 		
 		IntersectedTerminationCounterexampleGeneration<IcfgInternalTransition, IPredicate, IParityState> counterExampleGenerator = 
 				new IntersectedTerminationCounterexampleGeneration<>(terminationTraceBank, k * minOmegaLen);
