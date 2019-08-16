@@ -287,7 +287,7 @@ public class SynthesisLoopWithTermination {
 				new DfaParityIntersectAutomaton<>(infPI, complementedOmega);
 		
 		IntersectedTerminationCounterexampleGeneration<IcfgInternalTransition, IPredicate, IParityState> counterExampleGenerator = 
-				new IntersectedTerminationCounterexampleGeneration<>(terminationTraceBank, k * minOmegaLen);
+				new IntersectedTerminationCounterexampleGeneration<>(terminationTraceBank, 10/*k * minOmegaLen*/);
 
 		List<DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState>> omegaCounterexamples = counterExampleGenerator.getResult();
 		
