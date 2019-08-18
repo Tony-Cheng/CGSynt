@@ -32,8 +32,8 @@ public class OmegaCEGenMock<LETTER, STATE1, STATE2 extends IParityState> {
 		this.visitedStates = new HashMap<>();
 		this.result = new ArrayList<>();
 		for (IParityState initialState : aut.getInitialStates()) {
-			List<DfaParityCounterexample<LETTER, STATE1, STATE2>> counterexamples = generateCounterexamples(initialState,
-					maxLen);
+			List<DfaParityCounterexample<LETTER, STATE1, STATE2>> counterexamples = generateCounterexamples(
+					initialState, maxLen);
 			for (int i = counterexamples.size() - 1; i >= 0; i--) {
 				if (counterexamples.get(i).repeatedState != null) {
 					counterexamples.remove(i);
@@ -50,10 +50,12 @@ public class OmegaCEGenMock<LETTER, STATE1, STATE2 extends IParityState> {
 		return result;
 	}
 
-	private List<DfaParityCounterexample<LETTER, STATE1, STATE2>> generateCounterexamples(DfaParityIntersectState<STATE1, STATE2> state, int len) {
+	private List<DfaParityCounterexample<LETTER, STATE1, STATE2>> generateCounterexamples(
+			DfaParityIntersectState<STATE1, STATE2> state, int len) {
 		List<DfaParityCounterexample<LETTER, STATE1, STATE2>> counterexamples = new ArrayList<>();
 		if (visitedStates.containsKey(state) && visitedStates.get(state) > 0) {
-			DfaParityCounterexample<LETTER, STATE1, STATE2> counterexample = new DfaParityCounterexample<>(state.getRank());
+			DfaParityCounterexample<LETTER, STATE1, STATE2> counterexample = new DfaParityCounterexample<>(
+					state.getRank());
 			counterexample.repeatedState = state;
 			// counterexample.loopStates.push(state);
 			counterexamples.add(counterexample);

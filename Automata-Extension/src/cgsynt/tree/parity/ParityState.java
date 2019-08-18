@@ -5,7 +5,7 @@ package cgsynt.tree.parity;
  *
  * @param <STATE>
  */
-public class ParityState<STATE> implements IExtendedParityState {
+public class ParityState<STATE> implements IParityState {
 	private static int LABEL = 0;
 	
 	private STATE mState;
@@ -65,11 +65,6 @@ public class ParityState<STATE> implements IExtendedParityState {
 	@Override
 	public String toString() {
 		return mState + ": " + mRank + ":" + mStateLabel;
-	}
-
-	@Override
-	public void setRank(int newRank) {
-		this.mRank = newRank;
 	}
 
 	public IParityState makeCpy() {
