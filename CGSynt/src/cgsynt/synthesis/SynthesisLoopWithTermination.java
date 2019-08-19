@@ -12,20 +12,18 @@ import cgsynt.buchi.determinization.BuchiDeterminization;
 import cgsynt.core.Specification;
 import cgsynt.core.service.CustomServiceProvider;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
-import cgsynt.dfa.operations.DfaInfConversion;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.dfa.parity.intersect.DfaParityIntersectAutomaton;
 import cgsynt.dfa.parity.intersect.operations.DfaParityCounterexample;
 import cgsynt.dfa.parity.intersect.operations.DfaParityCounterexampleGeneration;
+import cgsynt.dfa.parity.operations.MockIntersection;
 import cgsynt.dfa.parity.operations.ParityAutomatonToTree;
-import cgsynt.dfa.parity.operations.ParityComplement;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.operations.CounterExamplesToInterpolants;
-import cgsynt.termination.DfaLetterConverter;
 import cgsynt.termination.OmegaRefiner;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.IntersectState;
@@ -268,6 +266,8 @@ public class SynthesisLoopWithTermination {
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		// Omega Refinement Process
 		int minOmegaLen = Math.min(mOmega.size(), parityOmega.size());
+		
+		/*
 		DfaLetterConverter letterConverter = new DfaLetterConverter(dfaPI, this.mAutService, mGlobalVars.getPredicateFactory(), this.mIcfgTransitionMap);
 		INestedWordAutomaton<IcfgInternalTransition, IPredicate> convertedDfaPi = letterConverter.getResult();
 		
@@ -283,8 +283,18 @@ public class SynthesisLoopWithTermination {
 		
 		ParityAutomaton<IcfgInternalTransition, IParityState> complementedOmega = complementation.getResult();
  		
+ 		
 		DfaParityIntersectAutomaton<IcfgInternalTransition, IPredicate, IParityState> terminationTraceBank = 
 				new DfaParityIntersectAutomaton<>(infPI, complementedOmega);
+		*/
+		
+		MockIntersection<IcfgInternalTransition, IPredicate, IParityState> mockIntersect =
+				new MockIntersection<>(parityOmega, 
+						this.mGlobalVars.getPredicateFactory().newDebugPredicate("Dummy"),
+						this.mGlobalVars.getPredicateFactory().newDebugPredicate("Empty"),
+						this.mAutService, new HashSet<>(this.mIcfgTransitionMap.values()));
+		DfaParityIntersectAutomaton<IcfgInternalTransition, IPredicate, IParityState> terminationTraceBank =
+				mockIntersect.getResult();
 		
 		DfaParityCounterexampleGeneration<IcfgInternalTransition, IPredicate, IParityState> counterExampleGenerator = 
 				new DfaParityCounterexampleGeneration<>(terminationTraceBank, 10/*k * minOmegaLen*/);

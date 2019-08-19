@@ -137,7 +137,7 @@ public class OmegaRefiner {
 				mTTI.getCfgSmtToolkit().getSmtSymbols(),
 				mBspm, counterexample,
 				"LassoCheck", mServiceProvider,
-				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED,
+				SimplificationTechnique.NONE, XnfConversionTechnique.BOTTOM_UP_WITH_LOCAL_SIMPLIFICATION,
 				setUpRefinementFactory(icfg),
 				mOmega,
 				taskIdentifier, mBenchmarker);

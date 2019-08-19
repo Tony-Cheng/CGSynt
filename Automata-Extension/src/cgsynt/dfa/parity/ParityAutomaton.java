@@ -56,10 +56,6 @@ public class ParityAutomaton<LETTER, STATE extends IParityState> extends NestedW
 		for (STATE initState : this.getInitialStates())
 			rep += stateMapping.get(initState.toString()) + "\n";
 		
-		rep += "\nFinal States:\n";
-		for (STATE finalState : this.getFinalStates())
-			rep += stateMapping.get(finalState.toString()) + "\n";
-		
 		rep += "\nAlphabet:\n";
 		for (String key : letterMapping.keySet())
 			rep += "LETTER " + letterMapping.get(key).toLowerCase() + "\n";
