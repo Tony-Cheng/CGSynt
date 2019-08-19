@@ -646,7 +646,7 @@ public class TestTraceCheckConstructor {
 		UnmodifiableTransFormula formula3 = ExtendedTransFormulaBuilder.constructAssignment(lhs3, rhs3, symbolTable,
 				managedScript);
 		UnmodifiableTransFormula formula4 = ExtendedTransFormulaBuilder.constructAssumption(lhs4, rhs4, symbolTable,
-				managedScript, ">");
+				managedScript, ">", false);
 		
 		BasicInternalAction basicAction0 = new BasicInternalAction(p0, p1, formula0);
 		BasicInternalAction basicAction1 = new BasicInternalAction(p1, p2, formula1);
