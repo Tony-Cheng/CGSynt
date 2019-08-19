@@ -33,7 +33,7 @@ public class MockIntersection<LETTER, STATE1, STATE2 extends IParityState> {
 		VpAlphabet<LETTER> alphabet = new VpAlphabet<>(this.mLetters);
 		
 		NestedWordAutomaton<LETTER, STATE1> dummyAut = new NestedWordAutomaton<>(this.mAutServices, 
-				alphabet, new TempStateFactory(this.mEmptyState));
+				alphabet, new TempStateFactory<>(this.mEmptyState));
 		dummyAut.addState(true, true, mDummyState);
 		
 		for (LETTER letter : this.mLetters) {

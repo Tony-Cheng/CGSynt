@@ -292,7 +292,7 @@ public class SynthesisLoopWithTermination {
 				new MockIntersection<>(parityOmega, 
 						this.mGlobalVars.getPredicateFactory().newDebugPredicate("Dummy"),
 						this.mGlobalVars.getPredicateFactory().newDebugPredicate("Empty"),
-						this.mAutService, this.mIcfgTransitionMap.values());
+						this.mAutService, new HashSet<>(this.mIcfgTransitionMap.values()));
 		DfaParityIntersectAutomaton<IcfgInternalTransition, IPredicate, IParityState> terminationTraceBank =
 				mockIntersect.getResult();
 		
