@@ -10,7 +10,7 @@ import cgsynt.dfa.parity.intersect.DfaParityIntersectRule;
 import cgsynt.dfa.parity.intersect.DfaParityIntersectState;
 import cgsynt.tree.parity.IParityState;
 
-public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STATE2 extends IParityState> {
+public class DfaParityCounterexampleGeneration<LETTER, STATE1, STATE2 extends IParityState> {
 
 	private DfaParityIntersectAutomaton<LETTER, STATE1, STATE2> mInAut;
 	private boolean mResultComputed;
@@ -18,7 +18,7 @@ public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STAT
 	private Map<DfaParityIntersectState<STATE1, STATE2>, Integer> mVisitedStates;
 	private List<DfaParityCounterexample<LETTER, STATE1, STATE2>> mResult;
 
-	public IntersectedTerminationCounterexampleGeneration(DfaParityIntersectAutomaton<LETTER, STATE1, STATE2> aut,
+	public DfaParityCounterexampleGeneration(DfaParityIntersectAutomaton<LETTER, STATE1, STATE2> aut,
 			int maxLen) {
 		this.mInAut = aut;
 		this.mResultComputed = false;
@@ -27,7 +27,7 @@ public class IntersectedTerminationCounterexampleGeneration<LETTER, STATE1, STAT
 		computeResult();
 	}
 
-	private void computeResult() {
+	public void computeResult() {
 		if (mResultComputed) {
 			return;
 		}

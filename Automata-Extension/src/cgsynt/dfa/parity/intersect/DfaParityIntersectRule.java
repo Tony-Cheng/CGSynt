@@ -24,4 +24,10 @@ public class DfaParityIntersectRule<LETTER, STATE1, STATE2 extends IParityState>
 		return letter;
 	}
 
+	@Override
+	public String toString() {
+		return "DfaParityIntersectRule [source=" + source + ", dest=" + dest + ", letter=" + letter + "]";
+	}
+
+	
 }

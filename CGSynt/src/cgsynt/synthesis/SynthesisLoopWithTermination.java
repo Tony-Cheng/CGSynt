@@ -17,7 +17,7 @@ import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.dfa.parity.intersect.DfaParityIntersectAutomaton;
 import cgsynt.dfa.parity.intersect.operations.DfaParityCounterexample;
-import cgsynt.dfa.parity.intersect.operations.IntersectedTerminationCounterexampleGeneration;
+import cgsynt.dfa.parity.intersect.operations.DfaParityCounterexampleGeneration;
 import cgsynt.dfa.parity.operations.ParityAutomatonToTree;
 import cgsynt.dfa.parity.operations.ParityComplement;
 import cgsynt.interpol.IStatement;
@@ -286,8 +286,8 @@ public class SynthesisLoopWithTermination {
 		DfaParityIntersectAutomaton<IcfgInternalTransition, IPredicate, IParityState> terminationTraceBank = 
 				new DfaParityIntersectAutomaton<>(infPI, complementedOmega);
 		
-		IntersectedTerminationCounterexampleGeneration<IcfgInternalTransition, IPredicate, IParityState> counterExampleGenerator = 
-				new IntersectedTerminationCounterexampleGeneration<>(terminationTraceBank, 10/*k * minOmegaLen*/);
+		DfaParityCounterexampleGeneration<IcfgInternalTransition, IPredicate, IParityState> counterExampleGenerator = 
+				new DfaParityCounterexampleGeneration<>(terminationTraceBank, 10/*k * minOmegaLen*/);
 
 		List<DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState>> omegaCounterexamples = counterExampleGenerator.getResult();
 		

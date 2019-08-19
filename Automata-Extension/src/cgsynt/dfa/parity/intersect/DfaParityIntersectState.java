@@ -48,4 +48,10 @@ public class DfaParityIntersectState<STATE1, STATE2 extends IParityState> {
 		return state2.getRank();
 	}
 
+	@Override
+	public String toString() {
+		return "DfaParityIntersectState [state1=" + state1 + ", state2=" + state2 + "]";
+	}
+
+	
 }
