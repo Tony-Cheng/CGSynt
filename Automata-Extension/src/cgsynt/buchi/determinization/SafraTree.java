@@ -291,7 +291,7 @@ public class SafraTree<STATE> implements IParityState {
 		return this.mNumBuchiStates * 2 - invertedPriority;
 	}
 
-	public IParityState makeCpy() {
+	public IParityState makeCopy() {
 		SafraTree<STATE> tree = new SafraTree<>(mInitialStates, this.mNumBuchiStates, false);
 		tree.mStates.addAll(mStates);
 		tree.mNameMap.putAll(mNameMap);
@@ -326,7 +326,7 @@ public class SafraTree<STATE> implements IParityState {
 	
 	@SuppressWarnings("unchecked")
 	public IParityState getSimpleRepresentation() {
-		SafraTree<STATE> cpy = (SafraTree<STATE>)this.makeCpy();
+		SafraTree<STATE> cpy = (SafraTree<STATE>)this.makeCopy();
 		
 		Iterator<STATE> it = cpy.mInitialStates.iterator();
 		IParityState rep = new ParityState<STATE>(it.next(), cpy.getRank());

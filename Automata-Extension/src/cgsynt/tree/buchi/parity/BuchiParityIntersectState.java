@@ -96,13 +96,8 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> impl
 		((IExtendedParityState)mState).setRank(newRank);
 	}
 
-	public IParityState makeCpy() {
+	public IParityState makeCopy() {
 		return new BuchiParityIntersectState<STATE1, STATE2>(this.mState);
-	}
-
-	@Override
-	public IParityState getSimpleRepresentation() {
- 		return this.makeCpy();
 	}
 
 	@Override

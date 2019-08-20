@@ -7,7 +7,7 @@ package cgsynt.tree.parity;
  */
 public class ParityState<STATE> implements IParityState {
 	private static int LABEL = 0;
-	
+
 	private STATE mState;
 	private int mRank;
 	private int mStateLabel;
@@ -67,12 +67,7 @@ public class ParityState<STATE> implements IParityState {
 		return mState + ": " + mRank + ":" + mStateLabel;
 	}
 
-	public IParityState makeCpy() {
+	public IParityState makeCopy() {
 		return new ParityState<STATE>(this.mState, this.mRank);
-	}
-
-	@Override
-	public IParityState getSimpleRepresentation() {
-		return this.makeCpy();
 	}
 }

@@ -38,6 +38,7 @@ public class AlternatingParityEmptinessCheck<LETTER extends IRankedLetter, STATE
 				result = true;
 			}
 		}
+		this.resultComputed = true;
 	}
 	
 	private List<Set<STATE>> computeFinalList() {
