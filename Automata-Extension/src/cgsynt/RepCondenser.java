@@ -1,6 +1,6 @@
 package cgsynt;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +13,7 @@ public class RepCondenser<VERBOSE> {
 	}
 	
 	public Map<String, String> getMapping(){
-		Map<String, String> map = new HashMap<>();
+		Map<String, String> map = new LinkedHashMap<>();
 		
 		for (VERBOSE verbose : mVerbose) {
 			if (!map.containsKey(verbose.toString())) {
