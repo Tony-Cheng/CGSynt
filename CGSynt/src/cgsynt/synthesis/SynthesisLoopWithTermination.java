@@ -53,6 +53,7 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgI
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.debugidentifiers.StringDebugIdentifier;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.BuchiAutomizer;
 
 public class SynthesisLoopWithTermination {
 
@@ -122,6 +123,8 @@ public class SynthesisLoopWithTermination {
 		this.mPrintLogs = false;
 		this.mPrintedLogsSize = 0;
 		this.mOmegaRefiner = new OmegaRefiner(this.mGlobalVars, this.mOmega);
+		
+		this.mService.getLoggingService().getLogger(BuchiAutomizer.class.getPackage().getName()).setLevel(LogLevel.OFF);
 	}
 	
 	public void setPrintLogs(boolean printLogs) {
@@ -307,9 +310,20 @@ public class SynthesisLoopWithTermination {
 
 		List<DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState>> omegaCounterexamples = counterExampleGenerator.getResult();
 		
+		String before = mOmega.toString();
+		
 		// Omega Refinement
-		for (int i = 0; i < omegaCounterexamples.size(); i++)
+		for (int i = 0; i < omegaCounterexamples.size(); i++) 
 			mOmegaRefiner.certifyCE(omegaCounterexamples.get(i));
+				
+		System.out.println("BEFORE:");
+		System.out.println(before);
+		
+		System.out.println("=============================================");
+		
+		System.out.println("AFTER:");
+		System.out.println(mOmega);
+		System.exit(0);
 	}
 
 	/**
