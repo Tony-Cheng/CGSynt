@@ -8,6 +8,13 @@ import java.util.Set;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
+/**
+ * Extract counter examples from the proof of correctness PI.
+ * @author tcheng
+ *
+ * @param <LETTER> The letter type of the automaton from which counterexamples are extracted.
+ * @param <STATE> The state type of the automaton from which counterexamples are extracted.
+ */
 public class CounterexamplesGeneration<LETTER, STATE> {
 
 	private INestedWordAutomaton<LETTER, STATE> nwa;
@@ -18,6 +25,13 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 	private int bs;
 	private List<LETTER> alphabet;
 
+	/**
+	 * Constructor
+	 * @param nwa The dfa from which correctness counterexamples can be drawn.
+	 * @param k The maximum length of the counterexamples to get.
+	 * @param visited The set of counterexamples which have already been tried but have been shown to be incorrect.
+	 * @param alphabet The alphabet of the automaton from which counterexamples are drawn.
+	 */
 	public CounterexamplesGeneration(INestedWordAutomaton<LETTER, STATE> nwa, int k, Set<List<LETTER>> visited,
 			List<LETTER> alphabet) {
 		this.nwa = nwa;
@@ -47,6 +61,9 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 		this.alphabet = alphabet;
 	}
 
+	/**
+	 * Compute the all the counterexamples for the given proof automaton (PI).
+	 */
 	public void computeResult() {
 		if (resultComputed)
 			return;
@@ -57,10 +74,20 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 		resultComputed = true;
 	}
 
+	/**
+	 * Get the set of generated counterexamples.
+	 * @return The set of counterexamples.
+	 */
 	public Set<List<LETTER>> getResult() {
 		return result;
 	}
 
+	/**
+	 * Find counterexamples of a specific length given an initial state.
+	 * @param state The initial state from where a counterexample is to start.
+	 * @param len The required length of the counterexample.
+	 * @param counterexample The running List of counterexamples calculated so far.
+	 */
 	private void findCounterexamples(STATE state, int len, List<LETTER> counterexample) {
 		if (bs > 0 && result.size() >= bs)
 			return;
@@ -87,6 +114,11 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 		}
 	}
 
+	/**
+	 * Find a counterexamples of a specific length starting from an arbitrary state.
+	 * @param len The length of the counterexample to be found.
+	 * @param counterexample The running List of counterexamples calculated so far.
+	 */
 	private void findCounterexamples(int len, List<LETTER> counterexample) {
 		if (bs > 0 && result.size() >= bs)
 			return;
@@ -104,6 +136,11 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 		}
 	}
 
+	/**
+	 * Find counterexamples of a specific length randomly.
+	 * @param len The target length for the counterexamples.
+	 * @param counterexample The running List of counterexamples computed so far.
+	 */
 	private void findCounterexamplesRandom(int len, List<LETTER> counterexample) {
 		if (len == 0)
 			return;
@@ -118,6 +155,9 @@ public class CounterexamplesGeneration<LETTER, STATE> {
 		findCounterexamplesRandom(len - 1, counterexample);
 	}
 
+	/**
+	 * Compute a List of counterexamples randomly.
+	 */
 	public void computeRandomly() {
 		if (resultComputed)
 			return;

@@ -9,6 +9,10 @@ import de.uni_freiburg.informatik.ultimate.automata.statefactory.IDeterminizeSta
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
+/**
+ * Parity determinization state factory.
+ * @author weiszben
+ */
 public class PDeterminizeStateFactory implements IDeterminizeStateFactory<IPredicate>{
 
 	private BasicPredicateFactory mPredicateFactory;

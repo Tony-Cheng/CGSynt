@@ -12,32 +12,42 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.Incom
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.IEmptyStackStateFactory;
 
+/**
+ * Convert a proof DFA into a Buchi automaton which accepts the inf of the DFA.
+ * @author tcheng
+ *
+ * @param <LETTER> The letter type of the input DFA.
+ * @param <STATE> The state type of the input DFA.
+ */
 public class DfaInfConversion<LETTER, STATE> {
 
-	private NestedWordAutomaton<LETTER, STATE> result;
-	private boolean resultComputed;
+	private NestedWordAutomaton<LETTER, STATE> mResult;
+	private boolean mResultComputed;
 
 	public DfaInfConversion(INestedWordAutomaton<LETTER, STATE> aut, final AutomataLibraryServices services,
 			final IEmptyStackStateFactory<STATE> emptyStateFactory) {
-		this.result = copy(aut, services, emptyStateFactory);
-		this.resultComputed = false;
+		this.mResult = copy(aut, services, emptyStateFactory);
+		this.mResultComputed = false;
 		
 		computeResult();
 	}
 
+	/**
+	 * Compute the result of the DFA to inf(DFA) representation conversion.
+	 */
 	private void computeResult() {
-		if (resultComputed)
+		if (mResultComputed)
 			return;
 		Set<STATE> visited = new HashSet<>();
 		Stack<STATE> toVisit = new Stack<>();
-		for (STATE finalState : result.getFinalStates()) {
+		for (STATE finalState : mResult.getFinalStates()) {
 			toVisit.push(finalState);
 			visited.add(finalState);
 		}
 
 		while (!toVisit.isEmpty()) {
 			STATE next = toVisit.pop();
-			for (IncomingInternalTransition<LETTER, STATE> transition : result.internalPredecessors(next)) {
+			for (IncomingInternalTransition<LETTER, STATE> transition : mResult.internalPredecessors(next)) {
 				if (!visited.contains(transition.getPred())) {
 					toVisit.add(transition.getPred());
 					visited.add(transition.getPred());
@@ -45,26 +55,37 @@ public class DfaInfConversion<LETTER, STATE> {
 			}
 		}
 		Set<STATE> toRemove = new HashSet<>();
-		for (STATE state : result.getStates()) {
+		for (STATE state : mResult.getStates()) {
 			if (!visited.contains(state)) {
 				toRemove.add(state);
 			}
 		}
 
 		for (STATE state : toRemove) {
-			result.removeState(state);
+			mResult.removeState(state);
 		}
 
-		this.resultComputed = true;
+		this.mResultComputed = true;
 	}
 
+	/**
+	 * Get the resulting inf(DFA) from this class.
+	 * @return The Buchi representing the inf(DFA).
+	 */
 	public NestedWordAutomaton<LETTER, STATE> getResult() {
-		if (!resultComputed) {
+		if (!mResultComputed) {
 			return null;
 		}
-		return result;
+		return mResult;
 	}
 
+	/**
+	 * Make a copy of the input DFA.
+	 * @param aut The input DFA.
+	 * @param services The AutomataLibraryServices.
+	 * @param emptyStateFactory An implementation of IEmptyStateFactory.
+	 * @return A copy of the input DFA.
+	 */
 	private NestedWordAutomaton<LETTER, STATE> copy(INestedWordAutomaton<LETTER, STATE> aut,
 			final AutomataLibraryServices services,
 			final IEmptyStackStateFactory<STATE> emptyStateFactory) {

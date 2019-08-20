@@ -11,6 +11,13 @@ import cgsynt.tree.buchi.lta.RankedBool;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 
+/**
+ * Generate an LTA which accepts the exact language of the input DFA.
+ * @author weiszben
+ *
+ * @param <LETTER> The letter type of the input DFA.
+ * @param <STATE> The state type of the input DFA.
+ */
 public class DfaToLtaLanguage<LETTER, STATE> {
 	private final NestedWordAutomaton<LETTER, STATE> mDfa;
 	private final BuchiTreeAutomaton<RankedBool, STATE> mResult;
