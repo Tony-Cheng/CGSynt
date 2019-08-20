@@ -82,6 +82,10 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		return mStates.size();
 	}
 
+	public Map<STATE, Map<LETTER, Collection<ParityTreeAutomatonRule<LETTER, STATE>>>> getParentsMap() {
+		return this.mParentsMap;
+	}
+
 	/**
 	 * Add rules to this automaton.
 	 * 
@@ -296,7 +300,7 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		StringBuilder result = new StringBuilder();
 		RepCondenser<STATE> condenser = new RepCondenser<>(new ArrayList<>(this.mStates));
 		Map<String, String> map = condenser.getMapping();
-		
+
 		result.append("States:\n");
 		for (STATE state : mStates) {
 			result.append(map.get(state.toString()));
@@ -322,10 +326,12 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : mRules) {
 			String dests = "";
 			for (int i = 0; i < rule.getDest().size(); i++) {
-				dests += "(" + map.get(rule.getDest().get(i).toString()) + ": " + rule.getDest().get(i).getRank() + ") ";
+				dests += "(" + map.get(rule.getDest().get(i).toString()) + ": " + rule.getDest().get(i).getRank()
+						+ ") ";
 			}
-		
-			result.append("((" + map.get(rule.getSource().toString()) + ": " + rule.getSource().getRank() + ") | " + rule.getLetter().toString() + " | " + dests + ")");
+
+			result.append("((" + map.get(rule.getSource().toString()) + ": " + rule.getSource().getRank() + ") | "
+					+ rule.getLetter().toString() + " | " + dests + ")");
 			result.append("\n");
 		}
 		result.append("\n");
@@ -335,17 +341,17 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 		result.append("Mappings:\n");
 		for (String value : values) {
 			String matchingKey = "";
-		    for (Entry<String, String> entry : map.entrySet()) {
-		        if (Objects.equals(value, entry.getValue())) {
-		        	matchingKey = entry.getKey();
-		        }
-		    }
-		    
-		    result.append(value + " = " + matchingKey + "\n");
+			for (Entry<String, String> entry : map.entrySet()) {
+				if (Objects.equals(value, entry.getValue())) {
+					matchingKey = entry.getKey();
+				}
+			}
+
+			result.append(value + " = " + matchingKey + "\n");
 		}
-		
+
 		result.append("\n");
-		
+
 		return result.toString();
 	}
 
