@@ -61,6 +61,38 @@ public class BuchiParityIntersectStateV2<STATE1, STATE2 extends IParityState> im
 				this.mState, mN, isFinal);
 		return newState;
 	}
+	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (isFinal ? 1231 : 1237);
+		result = prime * result + mN;
+		result = prime * result + ((mState == null) ? 0 : mState.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BuchiParityIntersectStateV2 other = (BuchiParityIntersectStateV2) obj;
+		if (isFinal != other.isFinal)
+			return false;
+		if (mN != other.mN)
+			return false;
+		if (mState == null) {
+			if (other.mState != null)
+				return false;
+		} else if (!mState.equals(other.mState))
+			return false;
+		return true;
+	}
 
 	@Override
 	public String toString() {
