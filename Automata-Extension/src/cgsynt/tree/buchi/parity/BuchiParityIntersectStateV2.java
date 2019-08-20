@@ -14,7 +14,14 @@ public class BuchiParityIntersectStateV2<STATE1, STATE2 extends IParityState> im
 	private int mStateLabel;
 	private boolean isFinal;
 
-	public BuchiParityIntersectStateV2(BuchiParityPair<STATE1, STATE2> state, int n, boolean isFinal) {
+	public BuchiParityIntersectStateV2(BuchiParityPair<STATE1, STATE2> state, boolean isFinal) {
+		super();
+		this.mState = state;
+		this.mN = state.getState2().getRank();
+		this.isFinal = isFinal;
+	}
+
+	private BuchiParityIntersectStateV2(BuchiParityPair<STATE1, STATE2> state, int n, boolean isFinal) {
 		super();
 		this.mState = state;
 		this.mN = n;
