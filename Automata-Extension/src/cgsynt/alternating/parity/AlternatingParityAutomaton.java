@@ -30,6 +30,7 @@ public class AlternatingParityAutomaton<LETTER extends IRankedLetter, STATE exte
 		this.rules = new HashSet<>();
 		this.sourceMap = new HashMap<>();
 		this.parentMap = new HashMap<>();
+		this.letterMap = new HashMap<>();
 		for (STATE state : treeAut.getStates()) {
 			sourceMap.put(state, new HashSet<>());
 			parentMap.put(state, new HashMap<>());
@@ -56,5 +57,11 @@ public class AlternatingParityAutomaton<LETTER extends IRankedLetter, STATE exte
 		}
 	}
 	
+	public Set<STATE> getStates() {
+		return states;
+	}
 	
+	public Set<STATE> getInitialStates() {
+		return initialStates;
+	}
 }
