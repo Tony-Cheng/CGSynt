@@ -1,11 +1,13 @@
 package cgsynt.termination;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import cgsynt.dfa.parity.intersect.operations.DfaParityCounterexample;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.tree.parity.IParityState;
+import de.uni_freiburg.informatik.ultimate.automata.AutomatonDefinitionPrinter.Format;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedRun;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
@@ -29,13 +31,18 @@ import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.Bina
 import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.BuchiCegarLoopBenchmarkGenerator;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.LassoCheck;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.RankVarConstructor;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.RefineBuchi;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.preferences.BuchiAutomizerPreferenceInitializer.NcsbImplementation;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.CegarAbsIntRunner;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.HoareAnnotation;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.PathProgramCache;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.PredicateFactoryForInterpolantAutomata;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.PredicateFactoryRefinement;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.TraceAbstraction;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.interpolantautomata.builders.InterpolantAutomatonBuilderFactory;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TAPreferences;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.InterpolationTechnique;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.tracehandling.RefinementStrategyFactory;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.tracehandling.TaCheckAndRefinementPreferences;
@@ -44,7 +51,6 @@ import de.uni_freiburg.informatik.ultimate.util.datastructures.SerialProvider;
 public class OmegaRefiner {
 	public static final SerialProvider SERIAL_PROVIDER = new SerialProvider();
 	
-	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> mOmega;
 	private TraceGlobalVariables mGlobalVars;
 	
 	private ILogger mLogger;
@@ -56,10 +62,10 @@ public class OmegaRefiner {
 	private CfgSmtToolkit mCsToolkitWithRankVars;
 	private BinaryStatePredicateManager mBspm;
 	private BuchiCegarLoopBenchmarkGenerator mBenchmarker;
+	private RankVarConstructor mRankVarConstructor;
 	
-	public OmegaRefiner(TraceGlobalVariables globalVars, NestedWordAutomaton<IcfgInternalTransition, IPredicate> omega) {
+	public OmegaRefiner(TraceGlobalVariables globalVars) {
 		mGlobalVars = globalVars;
-		mOmega = omega;
 		
 		mServiceProvider = globalVars.getService();
 		mLogger = mGlobalVars.getLogger();
@@ -68,22 +74,25 @@ public class OmegaRefiner {
 		mOldPredicateFactory = mGlobalVars.getPredicateFactory();
 		mEdgeFactory = new IcfgEdgeFactory(SERIAL_PROVIDER);
 		
-		RankVarConstructor rankVarConstructor = new RankVarConstructor(mTTI.getCfgSmtToolkit());
+		mRankVarConstructor = new RankVarConstructor(mTTI.getCfgSmtToolkit());
 		mPredicateFactory = new PredicateFactory(mServiceProvider, mMScript, 
-				rankVarConstructor.getCsToolkitWithRankVariables().getSymbolTable(),
+				mRankVarConstructor.getCsToolkitWithRankVariables().getSymbolTable(),
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		
-		mCsToolkitWithRankVars = rankVarConstructor.getCsToolkitWithRankVariables();
+		mCsToolkitWithRankVars = mRankVarConstructor.getCsToolkitWithRankVariables();
 		
 		mBspm = new BinaryStatePredicateManager(mCsToolkitWithRankVars,
-				mPredicateFactory, rankVarConstructor.getUnseededVariable(), 
-				rankVarConstructor.getOldRankVariables(), mServiceProvider,
+				mPredicateFactory, mRankVarConstructor.getUnseededVariable(), 
+				mRankVarConstructor.getOldRankVariables(), mServiceProvider,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
 		
 		mBenchmarker = new BuchiCegarLoopBenchmarkGenerator();
 	}
 	
-	public void certifyCE(DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState> ce) throws Exception {
+	public NestedWordAutomaton<IcfgInternalTransition, IPredicate> certifyCE(
+			DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState> ce,
+			NestedWordAutomaton<IcfgInternalTransition, IPredicate> omega,
+			int curNumOmegaRefinementIterations) throws Exception {
 		
 		BasicIcfg<IcfgLocation> icfg = new BasicIcfg<>("certify", mTTI.getCfgSmtToolkit(), IcfgLocation.class);
 		DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState> trace = ce.makeCopy();
@@ -139,8 +148,30 @@ public class OmegaRefiner {
 				"LassoCheck", mServiceProvider,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BOTTOM_UP_WITH_LOCAL_SIMPLIFICATION,
 				setUpRefinementFactory(icfg),
-				mOmega,
+				omega,
 				taskIdentifier, mBenchmarker);
+		
+		//Refinement portion
+		PredicateFactoryForInterpolantAutomata defaultStateFactory = 
+				new PredicateFactoryForInterpolantAutomata(this.mCsToolkitWithRankVars.getManagedScript(), 
+						this.mPredicateFactory, false);
+		
+		PredicateFactoryRefinement stateFactoryForRefinement = new PredicateFactoryRefinement(this.mServiceProvider,
+				mCsToolkitWithRankVars.getManagedScript(), this.mPredicateFactory, false, Collections.emptySet());
+		
+		RefineBuchi<IcfgInternalTransition> refiner = new RefineBuchi<>(
+				icfg, this.mCsToolkitWithRankVars, this.mPredicateFactory,
+				false, true, defaultStateFactory, stateFactoryForRefinement,
+				true, "", Format.ATS_NUMERATE, 
+				InterpolationTechnique.ForwardPredicates, this.mServiceProvider,
+				mLogger, SimplificationTechnique.SIMPLIFY_BDD_FIRST_ORDER,
+				XnfConversionTechnique.BDD_BASED, NcsbImplementation.ORIGINAL);
+		
+		// Some parameters still need to be filled out
+		// Examples of how to call refineBuchi can be found in BuchiCegarLoop.java
+		
+		//return refiner.refineBuchi(omega, counterexample, curNumOmegaRefinementIterations, setting, bspm, modifiableGlobalsTable, interpolation, benchmarkGenerator, complementationConstruction);
+		return null;
 	}
 	
 	private RefinementStrategyFactory<IcfgInternalTransition> setUpRefinementFactory(BasicIcfg<IcfgLocation> icfg){
