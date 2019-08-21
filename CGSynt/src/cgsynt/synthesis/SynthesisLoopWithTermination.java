@@ -74,6 +74,7 @@ public class SynthesisLoopWithTermination {
 	private boolean mPrintLogs;
 	private List<String> mLogs;
 	private int mPrintedLogsSize;
+	private int mOmegaRefinementIterations;
 	
 	private TraceGlobalVariables mGlobalVars;
 	private OmegaRefiner mOmegaRefiner;
@@ -122,7 +123,8 @@ public class SynthesisLoopWithTermination {
 		this.mLogs = new ArrayList<>();
 		this.mPrintLogs = false;
 		this.mPrintedLogsSize = 0;
-		this.mOmegaRefiner = new OmegaRefiner(this.mGlobalVars, this.mOmega);
+		this.mOmegaRefinementIterations = 0;
+		this.mOmegaRefiner = new OmegaRefiner(this.mGlobalVars);
 		
 		this.mService.getLoggingService().getLogger(BuchiAutomizer.class.getPackage().getName()).setLevel(LogLevel.OFF);
 	}
@@ -313,8 +315,10 @@ public class SynthesisLoopWithTermination {
 		String before = mOmega.toString();
 		
 		// Omega Refinement
-		for (int i = 0; i < omegaCounterexamples.size(); i++) 
-			mOmegaRefiner.certifyCE(omegaCounterexamples.get(i));
+		for (int i = 0; i < omegaCounterexamples.size(); i++) {
+			mOmegaRefiner.certifyCE(omegaCounterexamples.get(i), mOmega, this.mOmegaRefinementIterations);
+			this.mOmegaRefinementIterations++;
+		}
 				
 		System.out.println("BEFORE:");
 		System.out.println(before);
