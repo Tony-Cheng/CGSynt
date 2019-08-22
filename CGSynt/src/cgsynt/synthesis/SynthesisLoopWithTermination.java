@@ -25,7 +25,10 @@ import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
+import cgsynt.nfa.PIUnionStateFactory;
 import cgsynt.operations.CounterExamplesToInterpolants;
+import cgsynt.operations.NWAIStatementToIcfg;
+import cgsynt.operations.NWAIcfgToIStatement;
 import cgsynt.parity.games.IParityGameState;
 import cgsynt.parity.games.ParityGame;
 import cgsynt.parity.games.ParityGameProgramExtraction;
@@ -50,6 +53,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutoma
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Union;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
@@ -64,11 +68,13 @@ import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.Buch
 public class SynthesisLoopWithTermination {
 
 	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
-	private NestedWordAutomaton<IStatement, IPredicate> mPI;
-	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> mOmega;
+	private INestedWordAutomaton<IStatement, IPredicate> mPI;
+	private INestedWordAutomaton<IcfgInternalTransition, IPredicate> mOmega;
 
 	private List<IStatement> mTransitionAlphabet;
 	private Map<IStatement, IcfgInternalTransition> mIcfgTransitionMap;
+	private Map<IcfgInternalTransition, IStatement> mIStatementMap;
+
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
@@ -121,6 +127,7 @@ public class SynthesisLoopWithTermination {
 		this.mPrograms = construction.getResult();
 		this.mResultComputed = false;
 		this.mTransitionAlphabet = construction.getAlphabet();
+		this.mIStatementMap = new HashMap<>();
 		this.mIcfgTransitionMap = createIcfgTransitionMap(mTransitionAlphabet);
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
@@ -152,6 +159,7 @@ public class SynthesisLoopWithTermination {
 			IcfgInternalTransition trans = factory.createInternalTransition(location, location, new Payload(),
 					statement.getTransFormula());
 			icfgAlphabetMap.put(statement, trans);
+			this.mIStatementMap.put(trans, statement);
 		}
 
 		return icfgAlphabetMap;
@@ -252,7 +260,7 @@ public class SynthesisLoopWithTermination {
 
 		BuchiParityIntersectAutomatonV2<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomatonV2<>(
 				intersectedAut, termTree);
-		
+
 		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
 				buchiParityIntersectedAut);
 
@@ -276,7 +284,6 @@ public class SynthesisLoopWithTermination {
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI,
 				mGlobalVars.getTraceInterpolator());
 		mPI = generalization.getResult();
-
 
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
@@ -318,7 +325,7 @@ public class SynthesisLoopWithTermination {
 		// mockIntersect.getResult();
 
 		DfaParityCounterexampleGeneration<IcfgInternalTransition, IPredicate, IParityState> counterExampleGenerator = new DfaParityCounterexampleGeneration<>(
-				terminationTraceBank,  k * minOmegaLen);
+				terminationTraceBank, k * minOmegaLen);
 		counterExampleGenerator.computeResult();
 		List<DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState>> omegaCounterexamples = counterExampleGenerator
 				.getResult();
@@ -327,7 +334,15 @@ public class SynthesisLoopWithTermination {
 
 		// Omega Refinement
 		for (int i = 0; i < omegaCounterexamples.size(); i++) {
-			mOmegaRefiner.certifyCE(omegaCounterexamples.get(i), mOmega, this.mOmegaRefinementIterations);
+			NestedWordAutomaton<IcfgInternalTransition, IPredicate> result = mOmegaRefiner
+					.certifyCE(omegaCounterexamples.get(i), mOmega, this.mOmegaRefinementIterations);
+			if (result != null) {
+				Union<IcfgInternalTransition, IPredicate> omegaUnion = new Union<IcfgInternalTransition, IPredicate>(
+						mAutService, new PIUnionStateFactory(mGlobalVars.getManagedScript().getScript(),
+								mGlobalVars.getVariableFactory(), mGlobalVars.getPredicateFactory()),
+						this.mOmega, result);
+				this.mOmega = omegaUnion.getResult();
+			}
 			this.mOmegaRefinementIterations++;
 		}
 

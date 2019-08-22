@@ -8,6 +8,7 @@ import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.interpol.TraceToInterpolants;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.AutomatonDefinitionPrinter.Format;
+import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedRun;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
@@ -15,6 +16,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.buchi.NestedLasso
 import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.logic.Script.LBool;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.BasicIcfg;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.CfgSmtToolkit;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgEdgeFactory;
@@ -90,7 +92,7 @@ public class OmegaRefiner {
 
 	public NestedWordAutomaton<IcfgInternalTransition, IPredicate> certifyCE(
 			DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState> ce,
-			NestedWordAutomaton<IcfgInternalTransition, IPredicate> omega, int curNumOmegaRefinementIterations)
+			INestedWordAutomaton<IcfgInternalTransition, IPredicate> mOmega, int curNumOmegaRefinementIterations)
 			throws Exception {
 
 		BasicIcfg<IcfgLocation> icfg = new BasicIcfg<>("certify", mTTI.getCfgSmtToolkit(), IcfgLocation.class);
@@ -143,25 +145,35 @@ public class OmegaRefiner {
 				mTTI.getCfgSmtToolkit(), mPredicateFactory, mCsToolkitWithRankVars.getSymbolTable(),
 				mTTI.getCfgSmtToolkit().getModifiableGlobalsTable(), mTTI.getCfgSmtToolkit().getSmtSymbols(), mBspm,
 				counterexample, "LassoCheck", mServiceProvider, SimplificationTechnique.NONE,
-				XnfConversionTechnique.BOTTOM_UP_WITH_LOCAL_SIMPLIFICATION, setUpRefinementFactory(icfg), omega,
+				XnfConversionTechnique.BOTTOM_UP_WITH_LOCAL_SIMPLIFICATION, setUpRefinementFactory(icfg), mOmega,
 				taskIdentifier, mBenchmarker);
 
-		System.out.println("In certify ce");
-		System.out.println(check.getConcatCheck().getInfeasibilityProof());
+		if (check.getConcatCheck() != null && check.getConcatCheck().getCounterexampleFeasibility() == LBool.UNSAT) {
+			return check.getConcatCheck().getInfeasibilityProof();
+		}
 
 		// Refinement portion
-		PredicateFactoryForInterpolantAutomata defaultStateFactory = new PredicateFactoryForInterpolantAutomata(
-				this.mCsToolkitWithRankVars.getManagedScript(), this.mPredicateFactory, false);
-
-		PredicateFactoryRefinement stateFactoryForRefinement = new PredicateFactoryRefinement(this.mServiceProvider,
-				mCsToolkitWithRankVars.getManagedScript(), this.mPredicateFactory, false, Collections.emptySet());
-
-		RefineBuchi<IcfgInternalTransition> refiner = new RefineBuchi<>(icfg, this.mCsToolkitWithRankVars,
-				this.mPredicateFactory, false, true, defaultStateFactory, stateFactoryForRefinement, true, "",
-				Format.ATS_NUMERATE, InterpolationTechnique.ForwardPredicates, this.mServiceProvider, mLogger,
-				SimplificationTechnique.SIMPLIFY_BDD_FIRST_ORDER, XnfConversionTechnique.BDD_BASED,
-				NcsbImplementation.ORIGINAL);
-		System.out.println(refiner.getInterpolAutomatonUsedInRefinement());
+		
+		// PredicateFactoryForInterpolantAutomata defaultStateFactory = new
+		// PredicateFactoryForInterpolantAutomata(
+		// this.mCsToolkitWithRankVars.getManagedScript(), this.mPredicateFactory,
+		// false);
+		//
+		// PredicateFactoryRefinement stateFactoryForRefinement = new
+		// PredicateFactoryRefinement(this.mServiceProvider,
+		// mCsToolkitWithRankVars.getManagedScript(), this.mPredicateFactory, false,
+		// Collections.emptySet());
+		//
+		// RefineBuchi<IcfgInternalTransition> refiner = new RefineBuchi<>(icfg,
+		// this.mCsToolkitWithRankVars,
+		// this.mPredicateFactory, false, true, defaultStateFactory,
+		// stateFactoryForRefinement, true, "",
+		// Format.ATS_NUMERATE, InterpolationTechnique.ForwardPredicates,
+		// this.mServiceProvider, mLogger,
+		// SimplificationTechnique.SIMPLIFY_BDD_FIRST_ORDER,
+		// XnfConversionTechnique.BDD_BASED,
+		// NcsbImplementation.ORIGINAL);
+		
 		// Some parameters still need to be filled out
 		// Examples of how to call refineBuchi can be found in BuchiCegarLoop.java
 
@@ -230,8 +242,10 @@ public class OmegaRefiner {
 			HoareAnnotation annot = mOldPredicateFactory.getNewHoareAnnotation(curLocation,
 					mTTI.getModifiableGlobalsTable());
 
-			stemTransitions[stemCount - 1] = mEdgeFactory.createInternalTransition(prevLocation, curLocation,
-					new Payload(), trace.stemTransitions.pop().getTransformula());
+			// stemTransitions[stemCount - 1] =
+			// mEdgeFactory.createInternalTransition(prevLocation, curLocation,
+			// new Payload(), trace.stemTransitions.pop().getTransformula());
+			stemTransitions[stemCount - 1] = trace.stemTransitions.pop();
 			stemPredicates[stemCount] = annot;
 
 			prevLocation = curLocation;
@@ -253,8 +267,10 @@ public class OmegaRefiner {
 			HoareAnnotation annot = mOldPredicateFactory.getNewHoareAnnotation(curLocation,
 					mTTI.getModifiableGlobalsTable());
 
-			loopTransitions[loopCount - 1] = mEdgeFactory.createInternalTransition(prevLocation, curLocation,
-					new Payload(), trace.loopTransitions.pop().getTransformula());
+			// loopTransitions[loopCount - 1] =
+			// mEdgeFactory.createInternalTransition(prevLocation, curLocation,
+			// new Payload(), trace.loopTransitions.pop().getTransformula());
+			loopTransitions[loopCount - 1] = trace.loopTransitions.pop();
 			loopPredicates[loopCount] = annot;
 
 			prevLocation = curLocation;
@@ -263,8 +279,9 @@ public class OmegaRefiner {
 		}
 
 		// Add final transition
-		loopTransitions[loopCount - 1] = mEdgeFactory.createInternalTransition(prevLocation, loopLocation,
-				new Payload(), trace.loopTransitions.pop().getTransformula());
+		loopTransitions[loopCount - 1] = trace.loopTransitions.pop();
+//		loopTransitions[loopCount - 1] = mEdgeFactory.createInternalTransition(prevLocation, loopLocation,
+//				new Payload(), trace.loopTransitions.pop().getTransformula());
 		loopPredicates[loopCount] = loopPredicates[0];
 
 		// Add last transition
