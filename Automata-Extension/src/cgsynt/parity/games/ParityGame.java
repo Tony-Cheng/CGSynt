@@ -17,8 +17,13 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 	private Set<IParityGameState> states;
 	private Set<IParityGameState> initialStates;
 	private Map<IParityGameState, Set<IParityGameState>> transitions;
+	private Map<IParityGameState, IParityGameState> nonEmptyTree;
+	private IParityGameState nonEMptyTreeSource;
 
 	public ParityGame(ParityTreeAutomaton<LETTER, STATE> aut) {
+		this.states = new HashSet<>();
+		this.initialStates = new HashSet<>();
+		this.transitions = new HashMap<>();
 		this.addAdamStates(aut);
 		this.addEvaStates(aut);
 		this.addTransitions(aut);
@@ -68,7 +73,10 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 		for (IParityGameState state : initialStates) {
 			Map<IParityGameState, Integer> visitedStates = new HashMap<>();
 			List<Integer> visitedRanks = new ArrayList<>();
-			if (!isEmptyAdam(visitedStates, visitedRanks, state)) {
+			Map<IParityGameState, IParityGameState> nonEmptyTree = new HashMap<>();
+			if (!isEmptyAdam(visitedStates, visitedRanks, state, nonEmptyTree)) {
+				this.nonEmptyTree = nonEmptyTree;
+				this.nonEMptyTreeSource = state;
 				return false;
 			}
 		}
@@ -76,7 +84,7 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 	}
 
 	private boolean isEmptyEva(Map<IParityGameState, Integer> visitedStates, List<Integer> visitedRanks,
-			IParityGameState state) {
+			IParityGameState state, Map<IParityGameState, IParityGameState> nonEmptyTree) {
 		if (visitedStates.containsKey(state)) {
 			int maxRank = visitedRanks.get(visitedStates.get(state));
 			for (int i = visitedStates.get(state) + 1; i < visitedRanks.size(); i++) {
@@ -91,25 +99,35 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 		}
 		visitedStates.put(state, visitedRanks.size());
 		visitedRanks.add(state.getRank());
-		boolean isEmpty = true;
+		boolean isEmpty = false;
 		for (IParityGameState nextState : transitions.get(state)) {
-			if (!isEmptyAdam(visitedStates, visitedRanks, nextState)) {
-				isEmpty = false;
+			if (isEmptyAdam(visitedStates, visitedRanks, nextState, nonEmptyTree)) {
+				isEmpty = true;
 			}
 		}
 		visitedStates.remove(state);
-		visitedRanks.remove(visitedRanks.size());
+		visitedRanks.remove(visitedRanks.size() - 1);
 		return isEmpty;
 	}
 
 	private boolean isEmptyAdam(Map<IParityGameState, Integer> visitedStates, List<Integer> visitedRanks,
-			IParityGameState state) {
-		boolean isEmpty = false;
+			IParityGameState state, Map<IParityGameState, IParityGameState> nonEmptyTree) {
+		boolean isEmpty = true;
 		for (IParityGameState nextState : transitions.get(state)) {
-			if (isEmptyEva(visitedStates, visitedRanks, nextState)) {
-				isEmpty = true;
+			if (!isEmptyEva(visitedStates, visitedRanks, nextState, nonEmptyTree)) {
+				isEmpty = false;
+				nonEmptyTree.put(state, nextState);
 			}
 		}
 		return isEmpty;
 	}
+
+	public Map<IParityGameState, IParityGameState> getNonEmptyTree() {
+		return nonEmptyTree;
+	}
+
+	public IParityGameState getNonEmptyTreeSource() {
+		return nonEMptyTreeSource;
+	}
+
 }
