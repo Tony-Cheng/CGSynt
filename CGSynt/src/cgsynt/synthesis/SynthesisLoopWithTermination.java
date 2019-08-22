@@ -252,17 +252,17 @@ public class SynthesisLoopWithTermination {
 
 		BuchiParityIntersectAutomatonV2<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomatonV2<>(
 				intersectedAut, termTree);
-
+		
 		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
 				buchiParityIntersectedAut);
 
-		if (!parityGame.isEmpty()) {
-			mIsCorrect = true;
-			mResultComputed = true;
-			this.nonEmptyTree = parityGame.getNonEmptyTree();
-			this.source = parityGame.getNonEmptyTreeSource();
-			return;
-		}
+		// if (!parityGame.isEmpty()) {
+		// mIsCorrect = true;
+		// mResultComputed = true;
+		// this.nonEmptyTree = parityGame.getNonEmptyTree();
+		// this.source = parityGame.getNonEmptyTreeSource();
+		// return;
+		// }
 
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
 				k * dfaPI.getStates().size(), mVisitedCounterexamples, bs, this.mTransitionAlphabet);
@@ -276,6 +276,7 @@ public class SynthesisLoopWithTermination {
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI,
 				mGlobalVars.getTraceInterpolator());
 		mPI = generalization.getResult();
+
 
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
@@ -317,8 +318,8 @@ public class SynthesisLoopWithTermination {
 		// mockIntersect.getResult();
 
 		DfaParityCounterexampleGeneration<IcfgInternalTransition, IPredicate, IParityState> counterExampleGenerator = new DfaParityCounterexampleGeneration<>(
-				terminationTraceBank, 10/* k * minOmegaLen */);
-
+				terminationTraceBank,  k * minOmegaLen);
+		counterExampleGenerator.computeResult();
 		List<DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState>> omegaCounterexamples = counterExampleGenerator
 				.getResult();
 
@@ -337,7 +338,6 @@ public class SynthesisLoopWithTermination {
 
 		System.out.println("AFTER:");
 		System.out.println(mOmega);
-		System.exit(0);
 	}
 
 	/**
