@@ -9,9 +9,11 @@ import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
+import cgsynt.tree.parity.ParityTreeRemoveAllLeaves;
 
 public class TestBuchiParityIntersection {
 
@@ -46,8 +48,14 @@ public class TestBuchiParityIntersection {
 		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
 				aut1, aut2);
 
+		ParityTreeRemoveAllLeaves<RankedBool, BuchiParityIntersectState<String, ParityState<String>>> refinedAut = new ParityTreeRemoveAllLeaves<>(
+				aut3);
+		refinedAut.computeResult();
+
 		System.out.println("Test 1");
 		System.out.print(aut3);
+		System.out.println("After refinement");
+		System.out.println(refinedAut.getResult());
 
 	}
 
@@ -81,10 +89,15 @@ public class TestBuchiParityIntersection {
 
 		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
 				aut1, aut2);
+		
+		ParityTreeRemoveAllLeaves<RankedBool, BuchiParityIntersectState<String, ParityState<String>>> refinedAut = new ParityTreeRemoveAllLeaves<>(
+				aut3);
+		refinedAut.computeResult();
 
 		System.out.println("Test 2");
 		System.out.print(aut3);
-
+		System.out.println("After refinement");
+		System.out.println(refinedAut.getResult());
 	}
 
 	@Test
@@ -126,9 +139,15 @@ public class TestBuchiParityIntersection {
 
 		BuchiParityIntersectAutomaton<RankedBool, String, ParityState<String>> aut3 = new BuchiParityIntersectAutomaton<>(
 				aut1, aut2);
+		
+		ParityTreeRemoveAllLeaves<RankedBool, BuchiParityIntersectState<String, ParityState<String>>> refinedAut = new ParityTreeRemoveAllLeaves<>(
+				aut3);
+		refinedAut.computeResult();
 
 		System.out.println("Test 3");
 		System.out.print(aut3);
+		System.out.println("After refinement");
+		System.out.println(refinedAut.getResult());
 
 	}
 }
