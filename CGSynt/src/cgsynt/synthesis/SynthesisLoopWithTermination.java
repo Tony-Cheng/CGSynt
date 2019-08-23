@@ -40,13 +40,16 @@ import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.BuchiIntersection;
 import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
 import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
+import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomatonV2;
+import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectStateV2;
 import cgsynt.tree.buchi.parity.operations.BuchiParityEmptinessCheck;
 import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityStateFactory;
 import cgsynt.tree.parity.ParityTreeAutomaton;
+import cgsynt.tree.parity.ParityTreeRemoveAllLeaves;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.LibraryIdentifiers;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
@@ -261,16 +264,35 @@ public class SynthesisLoopWithTermination {
 		BuchiParityIntersectAutomatonV2<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomatonV2<>(
 				intersectedAut, termTree);
 
-		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
-				buchiParityIntersectedAut);
+		 ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate,
+		 IPredicate>, IParityState>> parityGame = new ParityGame<>(
+		 buchiParityIntersectedAut);
 
-		// if (!parityGame.isEmpty()) {
-		// mIsCorrect = true;
-		// mResultComputed = true;
-		// this.nonEmptyTree = parityGame.getNonEmptyTree();
-		// this.source = parityGame.getNonEmptyTreeSource();
-		// return;
-		// }
+		// BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate,
+		// IPredicate>, IParityState> buchiParityIntersectedAut = new
+		// BuchiParityIntersectAutomaton<>(
+		// intersectedAut, termTree);
+		//
+		// ParityTreeRemoveAllLeaves<RankedBool,
+		// BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>,
+		// IParityState>> refineAut = new ParityTreeRemoveAllLeaves<>(
+		// buchiParityIntersectedAut);
+		//
+		// System.out.println(buchiParityIntersectedAut.getStates().size());
+
+		// ParityGame<RankedBool, BuchiParityIntersectState<IntersectState<IPredicate,
+		// IPredicate>, IParityState>> parityGame = new ParityGame<>(
+		// refineAut.getResult());
+		//
+		// System.out.println(refineAut.getResult().getStates().size());
+
+		if (!parityGame.isEmpty()) {
+			mIsCorrect = true;
+			mResultComputed = true;
+			this.nonEmptyTree = parityGame.getNonEmptyTree();
+			this.source = parityGame.getNonEmptyTreeSource();
+			return;
+		}
 
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
 				k * dfaPI.getStates().size(), mVisitedCounterexamples, bs, this.mTransitionAlphabet);
@@ -338,7 +360,8 @@ public class SynthesisLoopWithTermination {
 					.certifyCE(omegaCounterexamples.get(i), mOmega, this.mOmegaRefinementIterations);
 			if (result != null) {
 				Union<IcfgInternalTransition, IPredicate> omegaUnion = new Union<IcfgInternalTransition, IPredicate>(
-						mAutService, new PIUnionStateFactory(mGlobalVars.getManagedScript().getScript(),
+						mAutService,
+						new PIUnionStateFactory(mGlobalVars.getManagedScript().getScript(),
 								mGlobalVars.getVariableFactory(), mGlobalVars.getPredicateFactory()),
 						this.mOmega, result);
 				this.mOmega = omegaUnion.getResult();
