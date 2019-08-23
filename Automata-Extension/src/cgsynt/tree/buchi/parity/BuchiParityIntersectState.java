@@ -52,6 +52,8 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> impl
 	public int getRank() {
 		return mState.getState2().getRank();
 	}
+	
+	
 
 	@Override
 	public int hashCode() {
@@ -59,6 +61,7 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> impl
 		int result = 1;
 		result = prime * result + mK;
 		result = prime * result + ((mState == null) ? 0 : mState.hashCode());
+		result = prime * result + ((visitedStates == null) ? 0 : visitedStates.hashCode());
 		return result;
 	}
 
@@ -70,7 +73,7 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> impl
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BuchiParityIntersectState<STATE1, STATE2> other = (BuchiParityIntersectState<STATE1, STATE2>) obj;
+		BuchiParityIntersectState other = (BuchiParityIntersectState) obj;
 		if (mK != other.mK)
 			return false;
 		if (mState == null) {
@@ -81,18 +84,8 @@ public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> impl
 		if (visitedStates == null) {
 			if (other.visitedStates != null)
 				return false;
-		}
-		if (!other.visitedStates.keySet().containsAll(visitedStates.keySet())) {
+		} else if (!visitedStates.equals(other.visitedStates))
 			return false;
-		}
-		if (other.visitedStates.keySet().size() != visitedStates.keySet().size()) {
-			return false;
-		}
-		for (BuchiParityPair<STATE1, STATE2> pair : visitedStates.keySet()) {
-			if (other.visitedStates.get(pair) != visitedStates.get(pair)) {
-				return false;
-			}
-		}
 		return true;
 	}
 
