@@ -277,7 +277,7 @@ public class ParityTreeAutomaton<LETTER extends IRankedLetter, STATE extends IPa
 	 * 
 	 * @return
 	 */
-	public ParityTreeAutomaton<LETTER, STATE> mkcpy() {
+	public ParityTreeAutomaton<LETTER, STATE> copy() {
 		ParityTreeAutomaton<LETTER, STATE> copy = new ParityTreeAutomaton<>(rank);
 		copy.mChildrenMap.putAll(mChildrenMap);
 		copy.mParentsMap.putAll(mParentsMap);
