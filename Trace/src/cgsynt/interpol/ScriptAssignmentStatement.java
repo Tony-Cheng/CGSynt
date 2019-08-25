@@ -15,6 +15,10 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.Unm
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 
+/**
+ * An assignment statement in the trace.
+ *
+ */
 public class ScriptAssignmentStatement implements IStatement {
 
 	private BoogieNonOldVar lhs;
@@ -74,5 +78,16 @@ public class ScriptAssignmentStatement implements IStatement {
 	@Override
 	public boolean isAssumption() {
 		return false;
+	}
+
+	@Override
+	public UnmodifiableTransFormula getTransFormula() {
+		List<IProgramVar> lhs = new ArrayList<>();
+		List<Term> rhs = new ArrayList<>();
+		lhs.add(this.lhs);
+		rhs.add(this.rhs);
+		UnmodifiableTransFormula formula = TransFormulaBuilder.constructAssignment(lhs, rhs, symbolTable,
+				managedScript);
+		return formula;
 	}
 }

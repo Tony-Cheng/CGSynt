@@ -13,6 +13,10 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.Unm
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 
+/**
+ * An assumption statement in the trace.
+ *
+ */
 public class ScriptAssumptionStatement implements IAssumption {
 
 	private BoogieNonOldVar lhs;
@@ -45,10 +49,20 @@ public class ScriptAssumptionStatement implements IAssumption {
 		return getFormulaInternal(false);
 	}
 
+	/**
+	 * Return the negated trace that consists of only the statement that this object
+	 * represents.
+	 * 
+	 * @return
+	 */
 	public NestedWord<IAction> getNegatedTrace() {
 		return getTraceInternal(true);
 	}
 
+	/**
+	 * Return the negated formula.
+	 * @return
+	 */
 	public IAction getNegatedFormula() {
 		if (negated)
 			return getFormulaInternal(false);
@@ -109,5 +123,29 @@ public class ScriptAssumptionStatement implements IAssumption {
 		ScriptAssumptionStatement copy = new ScriptAssumptionStatement(lhs, rhs, type, managedScript, symbolTable);
 		copy.negated = negated;
 		return copy;
+	}
+
+	@Override
+	public UnmodifiableTransFormula getTransFormula(boolean negated) {
+		List<IProgramVar> lhs = new ArrayList<>();
+		List<Term> rhs = new ArrayList<>();
+		lhs.add(this.lhs);
+		rhs.add(this.rhs);
+		UnmodifiableTransFormula formula = ExtendedTransFormulaBuilder.constructAssumption(lhs, rhs, symbolTable,
+				managedScript, type, negated);
+		return formula;
+	}
+
+	@Override
+	public UnmodifiableTransFormula getTransFormula() {
+		try {
+			return getTransFormula(false);
+			// throw new Exception();
+		} catch (Exception e) {
+			System.err.println(
+					"ScriptAssumptionStatement.getTrasnFormula: For assumption statements you must use the version of the method that takes one parameter!");
+			System.exit(1);
+		}
+		return null;
 	}
 }

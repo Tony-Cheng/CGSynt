@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import cgsynt.interpol.IStatement;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.lta.RankedBool;
@@ -15,7 +14,7 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.Outgo
 public class DfaToLtaPowerSet<LETTER, STATE> {
 	private final INestedWordAutomaton<LETTER, STATE> mDfa;
 	private final BuchiTreeAutomaton<RankedBool, STATE> mResult;
-	private final List<IStatement> mAllStateOrdering;
+	private final List<LETTER> mAllLetterOrdering;
 
 	private final int mArity;
 	private final STATE mDeadState;
@@ -26,12 +25,12 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 	 * @param dfa
 	 *            The DFA to Convert
 	 */
-	public DfaToLtaPowerSet(final INestedWordAutomaton<LETTER, STATE> dfa, final List<IStatement> allStateOrdering,
+	public DfaToLtaPowerSet(final INestedWordAutomaton<LETTER, STATE> dfa, final List<LETTER> allLetterOrdering,
 			final STATE deadState) {
 		this.mDfa = dfa;
-		this.mAllStateOrdering = allStateOrdering;
+		this.mAllLetterOrdering = allLetterOrdering;
 
-		this.mArity = allStateOrdering.size();
+		this.mArity = allLetterOrdering.size();
 		this.mDeadState = deadState;
 
 		this.mResult = new BuchiTreeAutomaton<RankedBool, STATE>(mArity);
@@ -81,9 +80,9 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 		}
 		
 		List<STATE> destStates = new ArrayList<>();
-		for (int i = 0; i < this.mAllStateOrdering.size(); i++) {
+		for (int i = 0; i < this.mAllLetterOrdering.size(); i++)
 			destStates.add(mDeadState);
-		}
+			
 		final BuchiTreeAutomatonRule<RankedBool, STATE> falseRule = new BuchiTreeAutomatonRule<>(RankedBool.FALSE,
 				this.mDeadState, destStates);
 		this.mResult.addRule(falseRule);
@@ -102,15 +101,15 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 		}
 	}
 
-	/*
-	 * Order the input states in the same order as the allStateOrdering. If a state
-	 * is missing in the states list, then add the dead state in to fill the missing
-	 * states spot.
+	/**
+	 * Order the input letters in the same order as the mAllLetterOrdering. If a letter
+	 * is missing in the letter list, then add the dead state in to fill the missing
+	 * state's spot.
 	 */
 	private List<STATE> orderStates(STATE state) {
 		List<STATE> orderedStates = new ArrayList<>();
 
-		for (IStatement statementToLookFor : this.mAllStateOrdering) {
+		for (LETTER letterToLookFor : this.mAllLetterOrdering) {
 			Iterator<OutgoingInternalTransition<LETTER, STATE>> transitions = this.mDfa.internalSuccessors(state)
 					.iterator();
 
@@ -118,7 +117,7 @@ public class DfaToLtaPowerSet<LETTER, STATE> {
 
 			while (transitions.hasNext()) {
 				OutgoingInternalTransition<LETTER, STATE> transition = transitions.next();
-				if (transition.getLetter().equals(statementToLookFor)) {
+				if (transition.getLetter().equals(letterToLookFor)) {
 					orderedStates.add(transition.getSucc());
 					found = true;
 					break;

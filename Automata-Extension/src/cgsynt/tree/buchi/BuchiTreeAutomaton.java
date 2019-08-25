@@ -1,12 +1,17 @@
 package cgsynt.tree.buchi;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
+import cgsynt.RepCondenser;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataOperationCanceledException;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
@@ -318,6 +323,10 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	public boolean isFinalState(STATE state) {
 		return mFinalStates.contains(state);
 	}
+	
+	public boolean isInitState(STATE state) {
+		return mInitStates.contains(state);
+	}
 
 	/**
 	 * Add a state the set of final states.
@@ -441,24 +450,26 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
+		RepCondenser<STATE> condenser = new RepCondenser<>(new ArrayList<>(this.mStates));
+		Map<String, String> map = condenser.getMapping();
 
 		result.append("States:\n");
 		for (STATE state : mStates) {
-			result.append(state.toString());
+			result.append(map.get(state.toString()));
 			result.append("\n");
 		}
 		result.append("\n");
 
 		result.append("Initial States:\n");
 		for (STATE state : mInitStates) {
-			result.append(state.toString());
+			result.append(map.get(state.toString()));
 			result.append("\n");
 		}
 		result.append("\n");
 
 		result.append("Final States:\n");
 		for (STATE state : mFinalStates) {
-			result.append(state.toString());
+			result.append(map.get(state.toString()));
 			result.append("\n");
 		}
 		result.append("\n");
@@ -469,16 +480,35 @@ public class BuchiTreeAutomaton<LETTER extends IRankedLetter, STATE> implements 
 			result.append("\n");
 		}
 		result.append("\n");
-
+		
 		result.append("Transitions:\n");
 		for (BuchiTreeAutomatonRule<LETTER, STATE> rule : mRules) {
-			result.append(rule.toString());
+			String dests = "";
+			for (int i = 0; i < rule.getDest().size(); i++) {
+				dests += map.get(rule.getDest().get(i).toString()) + " ";
+			}
+		
+			result.append("(" + map.get(rule.getSource().toString()) + " | " + rule.getLetter().toString() + " | " + dests + ")");
 			result.append("\n");
 		}
 		result.append("\n");
 
+		List<String> values = new ArrayList<>(map.values());
+		Collections.sort(values);
+		result.append("Mappings:\n");
+		for (String value : values) {
+			String matchingKey = "";
+		    for (Entry<String, String> entry : map.entrySet()) {
+		        if (Objects.equals(value, entry.getValue())) {
+		        	matchingKey = entry.getKey();
+		        }
+		    }
+		    
+		    result.append(value + " = " + matchingKey + "\n");
+		}
+		
 		result.append("\n");
+		
 		return result.toString();
-
 	}
 }

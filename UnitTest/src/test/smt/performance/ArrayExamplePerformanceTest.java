@@ -12,7 +12,6 @@ import java.util.TreeMap;
 
 import org.junit.jupiter.api.Test;
 
-import cgsynt.Verification.MainVerificationLoop;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.ScriptAssumptionStatement;

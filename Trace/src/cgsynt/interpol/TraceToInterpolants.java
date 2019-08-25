@@ -37,6 +37,7 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.Basi
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.PredicateUnifier;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.tracecheck.ITraceCheckPreferences.AssertCodeBlockOrder;
+import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.preferences.TraceAbstractionPreferenceInitializer.InterpolationTechnique;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.singletracecheck.InterpolatingTraceCheckCraig;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.singletracecheck.TraceCheck;
@@ -57,7 +58,7 @@ public class TraceToInterpolants implements IInterpol {
 	private SmtSymbols smtSymbols;
 	private CfgSmtToolkit toolkit;
 	private SortedMap<Integer, IPredicate> pendingContexts;
-	private BasicPredicateFactory predicateFactory;
+	private PredicateFactory predicateFactory;
 	private PredicateUnifier pUnifier;
 	private IPredicate preconditions;
 	private IPredicate postconditions;
@@ -85,7 +86,38 @@ public class TraceToInterpolants implements IInterpol {
 		toolkit = new CfgSmtToolkit(modifiableGlobalsTable, managedScript, symbolTable, procedures, inParams, outParams,
 				icfgEdgeFactory, concurInfo, smtSymbols);
 		pendingContexts = new TreeMap<>();
-		predicateFactory = new BasicPredicateFactory(service, managedScript, symbolTable, SimplificationTechnique.NONE,
+		predicateFactory = new PredicateFactory(service, managedScript, symbolTable, SimplificationTechnique.NONE,
+				XnfConversionTechnique.BDD_BASED);
+		pUnifier = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
+				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
+		postconditions = pUnifier.getTruePredicate();
+		postconditions = pUnifier.getTruePredicate();
+		this.totaltime = 0;
+		this.numSamples = 0;
+	}
+	
+	public TraceToInterpolants(ManagedScript managedScript, IUltimateServiceProvider service,
+			DefaultIcfgSymbolTable symbolTable, Set<String> procs) throws Exception {
+		ILogger logger = new ConsoleLogger();
+		logger.setLevel(LogLevel.OFF);
+		this.managedScript = managedScript;
+		this.service = service;
+		this.symbolTable = symbolTable;
+		procedures = procs;
+		HashRelation<String, IProgramNonOldVar> mProc2Globals = new HashRelation<>();
+		modifiableGlobalsTable = new ModifiableGlobalsTable(mProc2Globals);
+		inParams = new HashMap<>();
+		outParams = new HashMap<>();
+		icfgEdgeFactory = new IcfgEdgeFactory(new SerialProvider());
+		Map<IIcfgForkTransitionThreadCurrent<IcfgLocation>, ThreadInstance> threadInstanceMap = new HashMap<>();
+		Collection<IIcfgJoinTransitionThreadCurrent<IcfgLocation>> joinTransitions = new ArrayList<>();
+		concurInfo = new ConcurrencyInformation(threadInstanceMap, joinTransitions);
+		smtSymbols = new SmtSymbols(managedScript.getScript());
+
+		toolkit = new CfgSmtToolkit(modifiableGlobalsTable, managedScript, symbolTable, procedures, inParams, outParams,
+				icfgEdgeFactory, concurInfo, smtSymbols);
+		pendingContexts = new TreeMap<>();
+		predicateFactory = new PredicateFactory(service, managedScript, symbolTable, SimplificationTechnique.NONE,
 				XnfConversionTechnique.BDD_BASED);
 		pUnifier = new PredicateUnifier(logger, service, managedScript, predicateFactory, symbolTable,
 				SimplificationTechnique.NONE, XnfConversionTechnique.BDD_BASED);
@@ -95,6 +127,12 @@ public class TraceToInterpolants implements IInterpol {
 		this.numSamples = 0;
 	}
 
+	/**
+	 * Create a nested word that is used to represent a trace.
+	 * 
+	 * @param statements
+	 * @return
+	 */
 	private NestedWord<IAction> buildTrace(List<IStatement> statements) {
 		int len = statements.size();
 		IAction[] word = new IAction[len];
@@ -107,6 +145,12 @@ public class TraceToInterpolants implements IInterpol {
 		return new NestedWord<>(word, nestingRelation);
 	}
 
+	/**
+	 * Generate the control location sequence that is required for the trace check.
+	 * 
+	 * @param n
+	 * @return
+	 */
 	private List<Object> generateControlLocationSequence(int n) {
 		List<Object> controlLocationSequence = new ArrayList<>();
 		for (int i = 0; i < n; i++) {
@@ -147,6 +191,11 @@ public class TraceToInterpolants implements IInterpol {
 		return pUnifier.getTruePredicate();
 	}
 
+	/**
+	 * Get the predicate unifier.
+	 * 
+	 * @return
+	 */
 	public PredicateUnifier getPUnifier() {
 		return this.pUnifier;
 	}
@@ -156,10 +205,21 @@ public class TraceToInterpolants implements IInterpol {
 		return pUnifier.getFalsePredicate();
 	}
 
+	/**
+	 * Return the preconditions.
+	 * 
+	 * @return
+	 */
 	public IPredicate getPreconditions() {
 		return preconditions;
 	}
 
+	/**
+	 * Set the preconditions.
+	 * 
+	 * @param preconditions
+	 * @throws Exception
+	 */
 	public void setPreconditions(IPredicate preconditions) throws Exception {
 		if (preconditions == null)
 			this.preconditions = pUnifier.getTruePredicate();
@@ -167,10 +227,25 @@ public class TraceToInterpolants implements IInterpol {
 			this.preconditions = pUnifier.getOrConstructPredicate(preconditions);
 	}
 
+	/**
+	 * Return the postconditions.
+	 * 
+	 * @return
+	 */
 	public IPredicate getPostconditions() {
 		return postconditions;
 	}
 
+	public CfgSmtToolkit getCfgSmtToolkit() {
+		return this.toolkit;
+	}
+
+	/**
+	 * Return a list of statements representing the trace.
+	 * 
+	 * @param statement
+	 * @return
+	 */
 	private List<IStatement> buildStatementList(IStatement statement) {
 		List<IStatement> statements = new ArrayList<>();
 		statements.add(statement);
@@ -188,6 +263,12 @@ public class TraceToInterpolants implements IInterpol {
 		return interpolate.isCorrect() == LBool.UNSAT;
 	}
 
+	/**
+	 * Set the postconditions.
+	 * 
+	 * @param postconditions
+	 * @throws Exception
+	 */
 	public void setPostconditions(IPredicate postconditions) throws Exception {
 		if (postconditions == null)
 			this.postconditions = pUnifier.getTruePredicate();
@@ -195,8 +276,16 @@ public class TraceToInterpolants implements IInterpol {
 			this.postconditions = pUnifier.getOrConstructPredicate(postconditions);
 	}
 
-	public BasicPredicateFactory getPredicateFactory() {
+	/**
+	 * Return the predicate factory.
+	 * 
+	 * @return
+	 */
+	public PredicateFactory getPredicateFactory() {
 		return predicateFactory;
 	}
 
+	public ModifiableGlobalsTable getModifiableGlobalsTable() {
+		return modifiableGlobalsTable;
+	}
 }

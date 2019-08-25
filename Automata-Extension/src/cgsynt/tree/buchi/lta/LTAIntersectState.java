@@ -1,18 +1,41 @@
 package cgsynt.tree.buchi.lta;
 
+/**
+ * A state of the intersection between two LTAs.
+ *
+ * @param <STATE1>
+ * @param <STATE2>
+ */
 public class LTAIntersectState<STATE1, STATE2> {
 	@Override
 	public String toString() {
 		return "LTAIntersectState [state1=" + state1 + ", state2=" + state2 + "]";
 	}
 
+	/**
+	 * A state in one of the LTAs.
+	 */
 	private final STATE1 state1;
+
+	/**
+	 * A state in the other LTA.
+	 */
 	private final STATE2 state2;
 
+	/**
+	 * Return the state in one of the LTAs.
+	 * 
+	 * @return
+	 */
 	public STATE1 getState1() {
 		return state1;
 	}
 
+	/**
+	 * Return the state in the other LTA.
+	 * 
+	 * @return
+	 */
 	public STATE2 getState2() {
 		return state2;
 	}

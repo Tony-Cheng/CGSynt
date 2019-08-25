@@ -1,15 +1,23 @@
 package cgsynt.interpol;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWord;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.BasicInternalAction;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IAction;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.TransFormulaBuilder;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.transitions.UnmodifiableTransFormula;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.variables.IProgramVar;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.managedscript.ManagedScript;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicateFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.traceabstraction.predicates.PredicateFactory;
 
+/**
+ * An assumption statement in hte trace.
+ */
 public class ScriptPredicateAssumptionStatement implements IAssumption {
 	IPredicate predicate;
 	private ManagedScript managedScript;
@@ -71,5 +79,25 @@ public class ScriptPredicateAssumptionStatement implements IAssumption {
 	@Override
 	public String toString() {
 		return predicate.getFormula().toString();
+	}
+
+	@Override
+	public UnmodifiableTransFormula getTransFormula(boolean negated) {
+		UnmodifiableTransFormula formula = TransFormulaBuilder.constructTransFormulaFromPredicate(predicate,
+				managedScript);
+		return formula;
+	}
+
+	@Override
+	public UnmodifiableTransFormula getTransFormula() {
+		try {
+			return getTransFormula(false);
+			// throw new Exception();
+		} catch (Exception e) {
+			System.err.println(
+					"For assumption statements you must use the version of the method that takes one parameter!");
+			System.exit(1);
+		}
+		return null;
 	}
 }

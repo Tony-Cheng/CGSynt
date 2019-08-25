@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import cgsynt.Operations.CounterExamplesToInterpolants;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceToInterpolants;
+import cgsynt.operations.CounterExamplesToInterpolants;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.transitions.OutgoingInternalTransition;
 

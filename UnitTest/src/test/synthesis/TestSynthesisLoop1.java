@@ -22,6 +22,7 @@ public class TestSynthesisLoop1 {
 
 	@Test
 	void test1() throws Exception {
+		// i++; i++
 		TraceGlobalVariables globalVars = new TraceGlobalVariables();
 		VariableFactory vf = globalVars.getVariableFactory();
 		Script script = globalVars.getManagedScript().getScript();
@@ -43,10 +44,12 @@ public class TestSynthesisLoop1 {
 		synthesis.computeMainLoop();
 		System.out.println("Test 1");
 		System.out.println(synthesis.isCorrect());
+		synthesis.printProgram();
 	}
 
 	@Test
 	void test2() throws Exception {
+		// while i < n, i++
 		TraceGlobalVariables globalVars = new TraceGlobalVariables();
 		VariableFactory vf = globalVars.getVariableFactory();
 		Script script = globalVars.getManagedScript().getScript();
@@ -68,11 +71,13 @@ public class TestSynthesisLoop1 {
 		synthesis.computeMainLoop();
 		System.out.println("Test 2");
 		System.out.println(synthesis.isCorrect());
+		synthesis.printProgram();
 
 	}
 
 	@Test
 	void test3() throws Exception {
+		// find max in an array
 		TraceGlobalVariables globalVars = new TraceGlobalVariables();
 		VariableFactory vf = globalVars.getVariableFactory();
 		Script script = globalVars.getManagedScript().getScript();
@@ -115,6 +120,39 @@ public class TestSynthesisLoop1 {
 		synthesis.computeMainLoop();
 		System.out.println("Test 3");
 		System.out.println(synthesis.isCorrect());
+		// synthesis.printProgram();
+	}
 
+	@Test
+	void test4() throws Exception {
+		// i++; i++
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
+		VariableFactory vf = globalVars.getVariableFactory();
+		Script script = globalVars.getManagedScript().getScript();
+		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
+
+		BasicPredicateFactory predicateFactory = globalVars.getPredicateFactory();
+
+		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("6")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement ipp2 = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("2")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement imm = new ScriptAssignmentStatement(i, script.term("-", i.getTerm(), script.numeral("3")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+		IStatement imm2 = new ScriptAssignmentStatement(i, script.term("-", i.getTerm(), script.numeral("9")),
+				globalVars.getManagedScript(), vf.getSymbolTable());
+
+		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("13")));
+		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("67")));
+		List<IStatement> transitionAlphabet = new ArrayList<>();
+		transitionAlphabet.add(ipp);
+		transitionAlphabet.add(imm);
+		transitionAlphabet.add(ipp2);
+		transitionAlphabet.add(imm2);
+		SynthesisLoop synthesis = new SynthesisLoop(transitionAlphabet, preconditions, postconditions, globalVars);
+		synthesis.computeMainLoop();
+		System.out.println("Test 4");
+		System.out.println(synthesis.isCorrect());
+		synthesis.printProgram();
 	}
 }
