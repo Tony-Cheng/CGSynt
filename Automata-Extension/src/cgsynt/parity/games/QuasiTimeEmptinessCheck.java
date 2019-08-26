@@ -14,7 +14,7 @@ public class QuasiTimeEmptinessCheck<LETTER extends IRankedLetter, STATE extends
 	private boolean result;
 
 	public QuasiTimeEmptinessCheck(ParityGame<LETTER, STATE> parityGame) {
-		this.parityGame = parityGame;
+		this.parityGame = parityGame.copy();
 		this.resultComputed = false;
 	}
 
@@ -28,10 +28,18 @@ public class QuasiTimeEmptinessCheck<LETTER extends IRankedLetter, STATE extends
 				lowestEvenRank = state.getRank();
 			}
 		}
+		
 		if (lowestEvenRank == Integer.MAX_VALUE) {
 			this.result = true;
 			return;
 		}
+		Set<IParityGameState> ignoreStates = new HashSet<>();
+		for (IParityGameState state : parityGame.getStates()) {
+			if (state.getRank() < lowestEvenRank) {
+				ignoreStates.add(state);
+			}
+		}
+		this.parityGame.removeStates(ignoreStates);
 		Set<IParityGameState> winningStates = solveE(parityGame, lowestEvenRank, parityGame.getStates().size(),
 				parityGame.getStates().size());
 		this.result = true;
