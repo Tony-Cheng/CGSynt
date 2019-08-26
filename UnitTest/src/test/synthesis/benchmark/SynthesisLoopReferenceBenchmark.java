@@ -63,8 +63,6 @@ public class SynthesisLoopReferenceBenchmark {
 				.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), j.getTerm())));
 		SynthesisLoopReference synthesis = new SynthesisLoopReference(transitionAlphabet, preconditions, postconditions,
 				globalVars);
-		long time = System.currentTimeMillis();
-		synthesis.computeMainLoop(4);
-		System.out.println("Time: " + (System.currentTimeMillis() - time));
+		synthesis.computeMainLoop(6);
 	}
 }

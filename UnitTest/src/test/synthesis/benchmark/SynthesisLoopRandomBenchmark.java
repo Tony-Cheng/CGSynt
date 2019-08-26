@@ -63,6 +63,6 @@ public class SynthesisLoopRandomBenchmark {
 				.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), j.getTerm())));
 		SynthesisLoopRandom synthesis = new SynthesisLoopRandom(transitionAlphabet, preconditions, postconditions,
 				globalVars);
-		synthesis.computeMainLoop(4);
+		synthesis.computeMainLoop(6);
 	}
 }

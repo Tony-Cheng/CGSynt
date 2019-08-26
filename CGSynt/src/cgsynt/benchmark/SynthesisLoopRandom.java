@@ -180,11 +180,6 @@ public class SynthesisLoopRandom {
 				globalVars.getTraceInterpolator());
 		counterExampleToInterpolants.computeResult();
 
-		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
-				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI,
-				globalVars.getTraceInterpolator());
-		mPI = generalization.getResult();
-
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
