@@ -9,20 +9,15 @@ import java.util.Set;
 import cgsynt.automaton.factory.PDeterminizeStateFactory;
 import cgsynt.core.Specification;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
-import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.operations.CounterExamplesToInterpolants;
-import cgsynt.operations.ProgramRetrieval;
-import cgsynt.probability.ConfidenceIntervalCalculator;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
 import cgsynt.tree.buchi.IntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
-import cgsynt.tree.buchi.operations.BuchiIntersection;
-import cgsynt.tree.buchi.operations.EmptinessCheck;
 import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.LibraryIdentifiers;
@@ -34,7 +29,7 @@ import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceP
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
-public class SynthesisLoopReference {
+public class SynthesisLoopRandom {
 
 	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
 	private NestedWordAutomaton<IStatement, IPredicate> mPI;
@@ -44,21 +39,16 @@ public class SynthesisLoopReference {
 	private AutomataLibraryServices mAutService;
 	private BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> result;
 	private Set<List<IStatement>> visitedCounterexamples;
-	private int prevSize;
 
 	// For probability testing
 	private INestedWordAutomaton<IStatement, String> dfa;
 
-	private boolean mResultComputed;
 	private boolean mIsCorrect;
-	private List<String> logs;
-	private boolean printLogs;
-	private int printedLogsSize;
 	private TraceGlobalVariables globalVars;
 	private Map<IntersectState<IPredicate, IPredicate>, BuchiTreeAutomatonRule<RankedBool, IntersectState<IPredicate, IPredicate>>> goodProgram;
 
-	public SynthesisLoopReference(List<IStatement> transitionAlphabet, IPredicate preconditions,
-			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
+	public SynthesisLoopRandom(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions,
+			TraceGlobalVariables globalVars) throws Exception {
 		this.globalVars = globalVars;
 		RankedBool.setRank(transitionAlphabet.size());
 		globalVars.getTraceInterpolator().setPreconditions(preconditions);
@@ -72,7 +62,6 @@ public class SynthesisLoopReference {
 		construction.computeResult();
 		RankedBool.setRank(construction.getAlphabet().size());
 		this.mPrograms = construction.getResult();
-		this.mResultComputed = false;
 		this.mTransitionAlphabet = construction.getAlphabet();
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
@@ -80,12 +69,9 @@ public class SynthesisLoopReference {
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
 		this.visitedCounterexamples = new HashSet<>();
-		this.logs = new ArrayList<>();
-		this.printLogs = true;
-		this.printedLogsSize = 0;
 	}
 
-	public SynthesisLoopReference(Specification spec) throws Exception {
+	public SynthesisLoopRandom(Specification spec) throws Exception {
 		List<IStatement> transitionAlphabet = spec.getTransitionAlphabet();
 		IPredicate preconditions = spec.getPreconditions();
 		IPredicate postconditions = spec.getPostconditions();
@@ -105,7 +91,6 @@ public class SynthesisLoopReference {
 		construction.computeResult();
 		RankedBool.setRank(construction.getAlphabet().size());
 		this.mPrograms = construction.getResult();
-		this.mResultComputed = false;
 		this.mTransitionAlphabet = construction.getAlphabet();
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
@@ -113,13 +98,7 @@ public class SynthesisLoopReference {
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
 		this.visitedCounterexamples = new HashSet<>();
-		this.logs = new ArrayList<>();
-		this.printLogs = false;
-		this.printedLogsSize = 0;
-	}
 
-	public void setPrintLogs(boolean printLogs) {
-		this.printLogs = printLogs;
 	}
 
 	/**
@@ -166,21 +145,26 @@ public class SynthesisLoopReference {
 																						// String>)determinize.getResult());
 
 		// Dead State
-		IPredicate deadState = globalVars.getPredicateFactory().newDebugPredicate("deadState");
+		// IPredicate deadState =
+		// globalVars.getPredicateFactory().newDebugPredicate("deadState");
 
 		// Transform the DFA into an LTA
-		DfaToLtaPowerSet<IStatement, IPredicate> dfaToLta = new DfaToLtaPowerSet<>(dfaPI, mTransitionAlphabet,
-				deadState);
+		// DfaToLtaPowerSet<IStatement, IPredicate> dfaToLta = new
+		// DfaToLtaPowerSet<>(dfaPI, mTransitionAlphabet,
+		// deadState);
 
-		BuchiTreeAutomaton<RankedBool, IPredicate> powerSet = dfaToLta.getResult();
+		// BuchiTreeAutomaton<RankedBool, IPredicate> powerSet = dfaToLta.getResult();
 
-		BuchiIntersection<RankedBool, IPredicate, IPredicate> intersection = new BuchiIntersection<>(mPrograms,
-				powerSet);
-		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> intersectedAut = intersection
-				.computeResult();
-		EmptinessCheck<RankedBool, IntersectState<IPredicate, IPredicate>> emptinessCheck = new EmptinessCheck<>(
-				intersectedAut);
-		emptinessCheck.computeResult();
+		// BuchiIntersection<RankedBool, IPredicate, IPredicate> intersection = new
+		// BuchiIntersection<>(mPrograms,
+		// powerSet);
+		// BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>>
+		// intersectedAut = intersection
+		// .computeResult();
+		// EmptinessCheck<RankedBool, IntersectState<IPredicate, IPredicate>>
+		// emptinessCheck = new EmptinessCheck<>(
+		// intersectedAut);
+		// emptinessCheck.computeResult();
 		// if (!emptinessCheck.getResult()) {
 		// mIsCorrect = true;
 		// mResultComputed = true;
@@ -188,9 +172,9 @@ public class SynthesisLoopReference {
 		// this.goodProgram = emptinessCheck.getGoodProgram();
 		// return;
 		// }
-		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
-				k, visitedCounterexamples, bs, this.mTransitionAlphabet);
-		generator.computeResult();
+		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI, k,
+				visitedCounterexamples, bs, this.mTransitionAlphabet);
+		generator.computeRandomly();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples,
 				globalVars.getTraceInterpolator());
@@ -206,15 +190,6 @@ public class SynthesisLoopReference {
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
 	}
 
-	/**
-	 * Return an automaton that contains a correct program.
-	 * 
-	 * @return
-	 */
-	public BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> getResult() {
-		return result;
-	}
-
 	private Set<IPredicate> flatten(List<Set<IPredicate>> interpolants) {
 		Set<IPredicate> flattenedInterpolants = new HashSet<>();
 
@@ -225,60 +200,21 @@ public class SynthesisLoopReference {
 		return flattenedInterpolants;
 	}
 
-	public boolean isCorrect() {
-		return mIsCorrect;
-	}
-
 	/**
 	 * Compute the main loop until a correct program is found.
 	 * 
 	 * @throws Exception
 	 */
 	public void computeMainLoop(int k) throws Exception {
-		computeOneIteration(k, 1);
-		logs.add("Number of interpolants: " + this.mAllInterpolants.size());
-		if (this.printLogs)
-			printLogsIteration();
-	}
-
-	public void printRootConfidenceInterval() throws Exception {
-		ConfidenceIntervalCalculator calc = new ConfidenceIntervalCalculator(this.dfa, this.prevSize, 3000,
-				this.mTransitionAlphabet, globalVars.getTraceInterpolator());
-		double[] traceInterval = calc.calculate95TraceConfIntervals();
-		double[] piInterval = calc.calculate95PiConfIntervals();
-		System.out.println("Size: " + prevSize);
-		System.out.println("Trace conf interval: (" + traceInterval[0] + ", " + traceInterval[1] + ")");
-		System.out.println("PI conf interval: (" + piInterval[0] + ", " + piInterval[1] + ")");
-
-	}
-
-	public void printLogs() {
-		for (String log : logs)
-			System.out.println(log);
-	}
-
-	private void printLogsIteration() {
-		for (int i = this.printedLogsSize; i < logs.size(); i++) {
-			System.out.println(logs.get(i));
-		}
-		this.printedLogsSize = logs.size();
-	}
-
-	public void printAllInterpolants() {
-		for (IPredicate interpol : this.mAllInterpolants) {
-			System.out.println(interpol);
-		}
-	}
-
-	public void printProgram() {
-		IStatement[] statements = new IStatement[mTransitionAlphabet.size()];
-		for (int i = 0; i < statements.length; i++) {
-			statements[i] = mTransitionAlphabet.get(i);
-		}
-		ProgramRetrieval<RankedBool> retrieve = new ProgramRetrieval<>(result, statements, goodProgram);
-		retrieve.computeResult();
-		for (String statement : retrieve.getResult()) {
-			System.out.println(statement);
+		long time = System.currentTimeMillis();
+		int prevSize = this.mAllInterpolants.size();
+		while (true) {
+			computeOneIteration(k, 10);
+			if (this.mAllInterpolants.size() > prevSize) {
+				prevSize = this.mAllInterpolants.size();
+				System.out.println(this.mAllInterpolants.size());
+				System.out.println("Time: " + (System.currentTimeMillis() - time));
+			}
 		}
 	}
 }
