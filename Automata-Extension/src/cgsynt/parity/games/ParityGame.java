@@ -17,11 +17,13 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 	private Set<IParityGameState> states;
 	private Set<IParityGameState> initialStates;
 	private Map<IParityGameState, Set<IParityGameState>> transitions;
+	private Map<IParityGameState, Set<IParityGameState>> inverseTransitions;
 
 	public ParityGame(ParityTreeAutomaton<LETTER, STATE> aut) {
 		this.states = new HashSet<>();
 		this.initialStates = new HashSet<>();
 		this.transitions = new HashMap<>();
+		this.inverseTransitions = new HashMap<>();
 		this.addAdamStates(aut);
 		this.addEvaStates(aut);
 		this.addTransitions(aut);
@@ -45,6 +47,9 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 	private void addTransitions(ParityTreeAutomaton<LETTER, STATE> aut) {
 		for (IParityGameState state : states) {
 			transitions.put(state, new HashSet<>());
+			inverseTransitions.put(state, new HashSet<>());
+		}
+		for (IParityGameState state : states) {
 			if (state.isEva()) {
 				this.addEvaTransitions(state);
 			} else {
@@ -56,17 +61,20 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 	private void addEvaTransitions(IParityGameState state) {
 		EvaState<LETTER, STATE> evaState = (EvaState) state;
 		for (STATE dest : evaState.getRule().getDest()) {
-			transitions.get(evaState).add(new AdamState<STATE>(dest));
+			AdamState<STATE> adamDest = new AdamState<STATE>(dest);
+			transitions.get(evaState).add(adamDest);
+			inverseTransitions.get(adamDest).add(evaState);
 		}
 	}
 
 	private void addAdamTransitions(ParityTreeAutomaton<LETTER, STATE> aut, IParityGameState state) {
 		AdamState<STATE> adamState = (AdamState) state;
 		for (ParityTreeAutomatonRule<LETTER, STATE> rule : aut.getRulesBySource(adamState.getState())) {
-			transitions.get(adamState).add(new EvaState<LETTER, STATE>(rule));
+			EvaState<LETTER, STATE> evaState = new EvaState<LETTER, STATE>(rule);
+			transitions.get(adamState).add(evaState);
+			inverseTransitions.get(evaState).add(adamState);
 		}
 	}
-
 
 	public Set<IParityGameState> getStates() {
 		return states;
@@ -78,6 +86,47 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 
 	public Map<IParityGameState, Set<IParityGameState>> getTransitions() {
 		return transitions;
+	}
+
+	public Map<IParityGameState, Set<IParityGameState>> getInverseTransitions() {
+		return inverseTransitions;
+	}
+
+	private ParityGame() {
+		this.states = new HashSet<>();
+		this.initialStates = new HashSet<>();
+		this.transitions = new HashMap<>();
+		this.inverseTransitions = new HashMap<>();
+	}
+
+	public ParityGame<LETTER, STATE> copy() {
+		ParityGame<LETTER, STATE> parityGame = new ParityGame<>();
+		parityGame.states.addAll(this.states);
+		parityGame.initialStates.addAll(this.initialStates);
+		parityGame.transitions.putAll(this.transitions);
+		parityGame.inverseTransitions.putAll(this.inverseTransitions);
+		return parityGame;
+	}
+
+	public void removeStates(Set<IParityGameState> states) {
+		this.states.removeAll(states);
+		this.initialStates.removeAll(states);
+		Set<IParityGameState> dests = new HashSet<>();
+		Set<IParityGameState> sources = new HashSet<>();
+		for (IParityGameState state : states) {
+			dests.addAll(transitions.get(state));
+			sources.addAll(inverseTransitions.get(state));
+		}
+		for (IParityGameState state : dests) {
+			inverseTransitions.get(state).removeAll(states);
+		}
+		for (IParityGameState state : sources) {
+			transitions.get(state).removeAll(states);
+		}
+		for (IParityGameState state : states) {
+			transitions.remove(state);
+			inverseTransitions.remove(state);
+		}
 	}
 
 }
