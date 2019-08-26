@@ -31,6 +31,7 @@ import cgsynt.operations.NWAIStatementToIcfg;
 import cgsynt.operations.NWAIcfgToIStatement;
 import cgsynt.parity.games.IParityGameState;
 import cgsynt.parity.games.ParityGame;
+import cgsynt.parity.games.ParityGameEmptinessCheck;
 import cgsynt.parity.games.ParityGameProgramExtraction;
 import cgsynt.termination.DfaLetterConverter;
 import cgsynt.termination.OmegaRefiner;
@@ -264,9 +265,11 @@ public class SynthesisLoopWithTermination {
 		BuchiParityIntersectAutomatonV2<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomatonV2<>(
 				intersectedAut, termTree);
 
-		 ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate,
-		 IPredicate>, IParityState>> parityGame = new ParityGame<>(
-		 buchiParityIntersectedAut);
+		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
+				buchiParityIntersectedAut);
+		ParityGameEmptinessCheck<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
 
 		// BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate,
 		// IPredicate>, IParityState> buchiParityIntersectedAut = new
@@ -286,11 +289,11 @@ public class SynthesisLoopWithTermination {
 		//
 		// System.out.println(refineAut.getResult().getStates().size());
 
-		if (!parityGame.isEmpty()) {
+		if (!emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
-			this.nonEmptyTree = parityGame.getNonEmptyTree();
-			this.source = parityGame.getNonEmptyTreeSource();
+			this.nonEmptyTree = emptinessCheck.getNonEmptyTree();
+			this.source = emptinessCheck.getNonEmptyTreeSource();
 			return;
 		}
 

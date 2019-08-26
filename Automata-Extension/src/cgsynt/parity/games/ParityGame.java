@@ -17,8 +17,6 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 	private Set<IParityGameState> states;
 	private Set<IParityGameState> initialStates;
 	private Map<IParityGameState, Set<IParityGameState>> transitions;
-	private Map<IParityGameState, IParityGameState> nonEmptyTree;
-	private IParityGameState nonEMptyTreeSource;
 
 	public ParityGame(ParityTreeAutomaton<LETTER, STATE> aut) {
 		this.states = new HashSet<>();
@@ -69,65 +67,17 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 		}
 	}
 
-	public boolean isEmpty() {
-		for (IParityGameState state : initialStates) {
-			Map<IParityGameState, Integer> visitedStates = new HashMap<>();
-			List<Integer> visitedRanks = new ArrayList<>();
-			Map<IParityGameState, IParityGameState> nonEmptyTree = new HashMap<>();
-			if (!isEmptyAdam(visitedStates, visitedRanks, state, nonEmptyTree)) {
-				this.nonEmptyTree = nonEmptyTree;
-				this.nonEMptyTreeSource = state;
-				return false;
-			}
-		}
-		return true;
+
+	public Set<IParityGameState> getStates() {
+		return states;
 	}
 
-	private boolean isEmptyEva(Map<IParityGameState, Integer> visitedStates, List<Integer> visitedRanks,
-			IParityGameState state, Map<IParityGameState, IParityGameState> nonEmptyTree) {
-		if (visitedStates.containsKey(state)) {
-			int maxRank = visitedRanks.get(visitedStates.get(state));
-			for (int i = visitedStates.get(state) + 1; i < visitedRanks.size(); i++) {
-				if (visitedRanks.get(i) > maxRank) {
-					maxRank = visitedRanks.get(i);
-				}
-			}
-			if (maxRank % 2 == 0) {
-				return false;
-			}
-			return true;
-		}
-		visitedStates.put(state, visitedRanks.size());
-		visitedRanks.add(state.getRank());
-		boolean isEmpty = false;
-		for (IParityGameState nextState : transitions.get(state)) {
-			if (isEmptyAdam(visitedStates, visitedRanks, nextState, nonEmptyTree)) {
-				isEmpty = true;
-			}
-		}
-		visitedStates.remove(state);
-		visitedRanks.remove(visitedRanks.size() - 1);
-		return isEmpty;
+	public Set<IParityGameState> getInitialStates() {
+		return initialStates;
 	}
 
-	private boolean isEmptyAdam(Map<IParityGameState, Integer> visitedStates, List<Integer> visitedRanks,
-			IParityGameState state, Map<IParityGameState, IParityGameState> nonEmptyTree) {
-		boolean isEmpty = true;
-		for (IParityGameState nextState : transitions.get(state)) {
-			if (!isEmptyEva(visitedStates, visitedRanks, nextState, nonEmptyTree)) {
-				isEmpty = false;
-				nonEmptyTree.put(state, nextState);
-			}
-		}
-		return isEmpty;
-	}
-
-	public Map<IParityGameState, IParityGameState> getNonEmptyTree() {
-		return nonEmptyTree;
-	}
-
-	public IParityGameState getNonEmptyTreeSource() {
-		return nonEMptyTreeSource;
+	public Map<IParityGameState, Set<IParityGameState>> getTransitions() {
+		return transitions;
 	}
 
 }

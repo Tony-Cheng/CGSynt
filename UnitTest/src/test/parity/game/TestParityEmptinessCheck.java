@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cgsynt.parity.games.ParityGame;
+import cgsynt.parity.games.ParityGameEmptinessCheck;
 import cgsynt.parity.games.ParityGameProgramExtraction;
 import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.parity.ParityState;
@@ -34,15 +35,18 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q0);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertFalse(parityGame.isEmpty());
-		
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+
 		List<String> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add("transition 1");
 		transitionAlphabet.add("transition 2");
-		
+
 		System.out.println("Test 1");
 		ParityGameProgramExtraction<RankedBool> programPrinter = new ParityGameProgramExtraction<RankedBool>(
-				parityGame.getNonEmptyTreeSource(), parityGame.getNonEmptyTree(), transitionAlphabet);
+				emptinessCheck.getNonEmptyTreeSource(), emptinessCheck.getNonEmptyTree(), transitionAlphabet);
 		programPrinter.printProgram();
 	}
 
@@ -64,7 +68,10 @@ public class TestParityEmptinessCheck {
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
 
-		assertTrue(parityGame.isEmpty());
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertTrue(emptinessCheck.getResult());
 	}
 
 	@Test
@@ -93,15 +100,18 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q1);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertFalse(parityGame.isEmpty());
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
 
 		List<String> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add("transition 1");
 		transitionAlphabet.add("transition 2");
-		
+
 		System.out.println("Test 3");
 		ParityGameProgramExtraction<RankedBool> programPrinter = new ParityGameProgramExtraction<RankedBool>(
-				parityGame.getNonEmptyTreeSource(), parityGame.getNonEmptyTree(), transitionAlphabet);
+				emptinessCheck.getNonEmptyTreeSource(), emptinessCheck.getNonEmptyTree(), transitionAlphabet);
 		programPrinter.printProgram();
 	}
 
@@ -131,7 +141,10 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q1);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertTrue(parityGame.isEmpty());
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertTrue(emptinessCheck.getResult());
 	}
 
 	@Test
@@ -168,15 +181,18 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q3);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertFalse(parityGame.isEmpty());
-		
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+
 		List<String> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add("transition 1");
 		transitionAlphabet.add("transition 2");
-		
+
 		System.out.println("Test 5");
 		ParityGameProgramExtraction<RankedBool> programPrinter = new ParityGameProgramExtraction<RankedBool>(
-				parityGame.getNonEmptyTreeSource(), parityGame.getNonEmptyTree(), transitionAlphabet);
+				emptinessCheck.getNonEmptyTreeSource(), emptinessCheck.getNonEmptyTree(), transitionAlphabet);
 		programPrinter.printProgram();
 	}
 
@@ -214,7 +230,10 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q3);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertTrue(parityGame.isEmpty());
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertTrue(emptinessCheck.getResult());
 	}
 
 	@Test
@@ -251,15 +270,18 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q1);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertFalse(parityGame.isEmpty());
-		
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+
 		List<String> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add("transition 1");
 		transitionAlphabet.add("transition 2");
-		
+
 		System.out.println("Test 7");
 		ParityGameProgramExtraction<RankedBool> programPrinter = new ParityGameProgramExtraction<RankedBool>(
-				parityGame.getNonEmptyTreeSource(), parityGame.getNonEmptyTree(), transitionAlphabet);
+				emptinessCheck.getNonEmptyTreeSource(), emptinessCheck.getNonEmptyTree(), transitionAlphabet);
 		programPrinter.printProgram();
 	}
 
@@ -297,7 +319,10 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q1);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertTrue(parityGame.isEmpty());
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertTrue(emptinessCheck.getResult());
 	}
 
 	@Test
@@ -334,15 +359,18 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q1);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertFalse(parityGame.isEmpty());
-		
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+
 		List<String> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add("transition 1");
 		transitionAlphabet.add("transition 2");
-		
+
 		System.out.println("Test 9");
 		ParityGameProgramExtraction<RankedBool> programPrinter = new ParityGameProgramExtraction<RankedBool>(
-				parityGame.getNonEmptyTreeSource(), parityGame.getNonEmptyTree(), transitionAlphabet);
+				emptinessCheck.getNonEmptyTreeSource(), emptinessCheck.getNonEmptyTree(), transitionAlphabet);
 		programPrinter.printProgram();
 	}
 
@@ -388,15 +416,18 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q3);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertFalse(parityGame.isEmpty());
-		
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+
 		List<String> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add("transition 1");
 		transitionAlphabet.add("transition 2");
-		
+
 		System.out.println("Test 10");
 		ParityGameProgramExtraction<RankedBool> programPrinter = new ParityGameProgramExtraction<RankedBool>(
-				parityGame.getNonEmptyTreeSource(), parityGame.getNonEmptyTree(), transitionAlphabet);
+				emptinessCheck.getNonEmptyTreeSource(), emptinessCheck.getNonEmptyTree(), transitionAlphabet);
 		programPrinter.printProgram();
 	}
 
@@ -434,15 +465,18 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q2);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertFalse(parityGame.isEmpty());
-		
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+
 		List<String> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add("transition 1");
 		transitionAlphabet.add("transition 2");
-		
+
 		System.out.println("Test 11");
 		ParityGameProgramExtraction<RankedBool> programPrinter = new ParityGameProgramExtraction<RankedBool>(
-				parityGame.getNonEmptyTreeSource(), parityGame.getNonEmptyTree(), transitionAlphabet);
+				emptinessCheck.getNonEmptyTreeSource(), emptinessCheck.getNonEmptyTree(), transitionAlphabet);
 		programPrinter.printProgram();
 	}
 
@@ -488,15 +522,18 @@ public class TestParityEmptinessCheck {
 		aut.addInitState(q2);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertFalse(parityGame.isEmpty());
-		
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
+
 		List<String> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add("transition 1");
 		transitionAlphabet.add("transition 2");
-		
+
 		System.out.println("Test 12");
 		ParityGameProgramExtraction<RankedBool> programPrinter = new ParityGameProgramExtraction<RankedBool>(
-				parityGame.getNonEmptyTreeSource(), parityGame.getNonEmptyTree(), transitionAlphabet);
+				emptinessCheck.getNonEmptyTreeSource(), emptinessCheck.getNonEmptyTree(), transitionAlphabet);
 		programPrinter.printProgram();
 	}
 
@@ -528,7 +565,10 @@ public class TestParityEmptinessCheck {
 		aut.addRule(prule1);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertTrue(parityGame.isEmpty());
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertTrue(emptinessCheck.getResult());
 	}
 
 	public void test14() {
@@ -547,15 +587,18 @@ public class TestParityEmptinessCheck {
 		aut.addRule(rule);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		assertFalse(parityGame.isEmpty());
+		ParityGameEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new ParityGameEmptinessCheck<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertFalse(emptinessCheck.getResult());
 
 		List<String> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add("transition 1");
 		transitionAlphabet.add("transition 2");
-		
+
 		System.out.println("Test 14");
 		ParityGameProgramExtraction<RankedBool> programPrinter = new ParityGameProgramExtraction<RankedBool>(
-				parityGame.getNonEmptyTreeSource(), parityGame.getNonEmptyTree(), transitionAlphabet);
+				emptinessCheck.getNonEmptyTreeSource(), emptinessCheck.getNonEmptyTree(), transitionAlphabet);
 		programPrinter.printProgram();
 	}
 }
