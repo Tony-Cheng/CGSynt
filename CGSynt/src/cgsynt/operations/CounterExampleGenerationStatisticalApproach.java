@@ -27,9 +27,8 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 	private List<IStatement> alphabet;
 	private Set<IPredicate> interpolants;
 
-	public CounterExampleGenerationStatisticalApproach(INestedWordAutomaton<IStatement, STATE> dfa, int k, int bs,
-			double pValue, TraceToInterpolants interpolator, List<IStatement> alphabet) {
-		this.dfa = dfa;
+	public CounterExampleGenerationStatisticalApproach(int k, int bs, double pValue, TraceToInterpolants interpolator,
+			List<IStatement> alphabet) {
 		this.k = k;
 		this.bs = bs;
 		this.pValue = pValue;
