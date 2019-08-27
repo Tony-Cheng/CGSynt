@@ -33,6 +33,7 @@ import cgsynt.parity.games.IParityGameState;
 import cgsynt.parity.games.ParityGame;
 import cgsynt.parity.games.ParityGameEmptinessCheck;
 import cgsynt.parity.games.ParityGameProgramExtraction;
+import cgsynt.parity.games.QuasiTimeEmptinessCheck;
 import cgsynt.termination.DfaLetterConverter;
 import cgsynt.termination.OmegaRefiner;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
@@ -267,7 +268,7 @@ public class SynthesisLoopWithTermination {
 
 		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
 				buchiParityIntersectedAut);
-		ParityGameEmptinessCheck<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new ParityGameEmptinessCheck<>(
+		QuasiTimeEmptinessCheck<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheck<>(
 				parityGame);
 		emptinessCheck.computeResult();
 
@@ -292,11 +293,9 @@ public class SynthesisLoopWithTermination {
 		if (!emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
-			this.nonEmptyTree = emptinessCheck.getNonEmptyTree();
-			this.source = emptinessCheck.getNonEmptyTreeSource();
 			return;
 		}
-
+		System.out.println("Here");
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
 				k * dfaPI.getStates().size(), mVisitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
