@@ -103,8 +103,14 @@ public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState
 		ParityGame<LETTER, STATE> parityGame = new ParityGame<>();
 		parityGame.states.addAll(this.states);
 		parityGame.initialStates.addAll(this.initialStates);
-		parityGame.transitions.putAll(this.transitions);
-		parityGame.inverseTransitions.putAll(this.inverseTransitions);
+		for (IParityGameState state : this.transitions.keySet()) {
+			parityGame.transitions.put(state, new HashSet<>());
+			parityGame.transitions.get(state).addAll(transitions.get(state));
+		}
+		for (IParityGameState state : this.inverseTransitions.keySet()) {
+			parityGame.inverseTransitions.put(state, new HashSet<>());
+			parityGame.inverseTransitions.get(state).addAll(inverseTransitions.get(state));
+		}
 		return parityGame;
 	}
 

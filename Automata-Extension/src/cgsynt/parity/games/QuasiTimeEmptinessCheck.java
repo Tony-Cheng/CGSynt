@@ -22,32 +22,54 @@ public class QuasiTimeEmptinessCheck<LETTER extends IRankedLetter, STATE extends
 		if (resultComputed)
 			return;
 		this.resultComputed = true;
-		int lowestEvenRank = Integer.MAX_VALUE;
+		int highestRank = Integer.MIN_VALUE;
 		for (IParityGameState state : parityGame.getStates()) {
-			if (state.getRank() % 2 == 0 && state.getRank() < lowestEvenRank) {
-				lowestEvenRank = state.getRank();
+			if (state.getRank() % 2 == 0 && state.getRank() > highestRank) {
+				highestRank = state.getRank();
+			} else if (state.getRank() % 2 == 1 && state.getRank() > highestRank) {
+				highestRank = state.getRank();
 			}
 		}
-		
-		if (lowestEvenRank == Integer.MAX_VALUE) {
+
+		if (highestRank == Integer.MIN_VALUE) {
 			this.result = true;
 			return;
 		}
-		Set<IParityGameState> ignoreStates = new HashSet<>();
-		for (IParityGameState state : parityGame.getStates()) {
-			if (state.getRank() < lowestEvenRank) {
-				ignoreStates.add(state);
-			}
+		int highestEvenRank = highestRank;
+		int highestOddRank = highestRank;
+		if (highestRank % 2 == 0) {
+			highestOddRank += 1;
+		} else {
+			highestEvenRank += 1;
 		}
-		this.parityGame.removeStates(ignoreStates);
-		Set<IParityGameState> winningStates = solveE(parityGame, lowestEvenRank, parityGame.getStates().size(),
+		Set<IParityGameState> winningStates = solveE(parityGame.copy(), highestEvenRank, parityGame.getStates().size(),
 				parityGame.getStates().size());
 		this.result = true;
-		for (IParityGameState state : winningStates) {
-			if (parityGame.getInitialStates().contains(state)) {
+		Set<IParityGameState> notWinningStates = solveO(parityGame.copy(), highestOddRank,
+				parityGame.getStates().size(), parityGame.getStates().size());
+		this.result = true;
+		for (IParityGameState state : parityGame.getInitialStates()) {
+			if (state.getRank() % 2 == 0 && winningStates.contains(state)) {
+				this.result = false;
+			}
+			if (state.getRank() % 2 == 1 && !notWinningStates.contains(state)) {
 				this.result = false;
 			}
 		}
+
+	}
+
+	private ParityGame<LETTER, STATE> removeHighPriorityStates(ParityGame<LETTER, STATE> parityGame,
+			int highestPriority) {
+		ParityGame<LETTER, STATE> result = parityGame.copy();
+		Set<IParityGameState> toRemove = new HashSet<>();
+		for (IParityGameState state : parityGame.getStates()) {
+			if (state.getRank() > highestPriority) {
+				toRemove.add(state);
+			}
+		}
+		result.removeStates(toRemove);
+		return result;
 	}
 
 	private Set<IParityGameState> solveE(ParityGame<LETTER, STATE> G, int h, int pe, int po) {
@@ -58,30 +80,30 @@ public class QuasiTimeEmptinessCheck<LETTER extends IRankedLetter, STATE extends
 		Set<IParityGameState> Wo;
 		ParityGame<LETTER, STATE> H;
 		do {
-			Nh = computeNh(h);
+			Nh = computeNh(G, h);
 			H = G.copy();
 			H.removeStates(ATR(G, Nh));
-			Wo = solveO(H, h + 1, po / 2, pe);
+			Wo = solveO(H, h - 1, po / 2, pe);
 			G.removeStates(ATR(G, Wo));
 		} while (!Wo.isEmpty());
-		Nh = computeNh(h);
+		Nh = computeNh(G, h);
 		H = G.copy();
 		H.removeStates(ATR(G, Nh));
-		Wo = solveO(H, h + 1, po, pe);
+		Wo = solveO(H, h - 1, po, pe);
 		G.removeStates(ATR(G, Wo));
 		while (!Wo.isEmpty()) {
-			Nh = computeNh(h);
+			Nh = computeNh(G, h);
 			H = G.copy();
 			H.removeStates(ATR(G, Nh));
-			Wo = solveO(H, h + 1, po / 2, pe);
+			Wo = solveO(H, h - 1, po / 2, pe);
 			G.removeStates(ATR(G, Wo));
 		}
 		return G.getStates();
 	}
 
-	private Set<IParityGameState> computeNh(int h) {
+	private Set<IParityGameState> computeNh(ParityGame<LETTER, STATE> G, int h) {
 		Set<IParityGameState> Nh = new HashSet<>();
-		for (IParityGameState state : parityGame.getStates()) {
+		for (IParityGameState state : G.getStates()) {
 			if (state.getRank() == h) {
 				Nh.add(state);
 			}
@@ -97,22 +119,22 @@ public class QuasiTimeEmptinessCheck<LETTER extends IRankedLetter, STATE extends
 		Set<IParityGameState> We;
 		ParityGame<LETTER, STATE> H;
 		do {
-			Nh = computeNh(h);
+			Nh = computeNh(G, h);
 			H = G.copy();
 			H.removeStates(ATR(G, Nh));
-			We = solveE(H, h + 1, pe / 2, po);
+			We = solveE(H, h - 1, pe / 2, po);
 			G.removeStates(ATR(G, We));
 		} while (!We.isEmpty());
-		Nh = computeNh(h);
+		Nh = computeNh(G, h);
 		H = G.copy();
 		H.removeStates(ATR(G, Nh));
-		We = solveE(H, h + 1, pe, po);
+		We = solveE(H, h - 1, pe, po);
 		G.removeStates(ATR(G, We));
 		while (!We.isEmpty()) {
-			Nh = computeNh(h);
+			Nh = computeNh(G, h);
 			H = G.copy();
 			H.removeStates(ATR(G, Nh));
-			We = solveE(H, h + 1, pe / 2, po);
+			We = solveE(H, h - 1, pe / 2, po);
 			G.removeStates(ATR(G, We));
 		}
 		return G.getStates();
@@ -129,10 +151,10 @@ public class QuasiTimeEmptinessCheck<LETTER extends IRankedLetter, STATE extends
 		while (!toVisit.isEmpty()) {
 			IParityGameState next = toVisit.pop();
 			if (opponent.contains(next)) {
-				for (IParityGameState v : parityGame.getInverseTransitions().get(next)) {
+				for (IParityGameState v : G.getInverseTransitions().get(next)) {
 					if (!notOpponent.contains(v)) {
 						boolean nonEmptyIntersect = false;
-						for (IParityGameState state : parityGame.getTransitions().get(v)) {
+						for (IParityGameState state : G.getTransitions().get(v)) {
 							if (opponent.contains(state)) {
 								nonEmptyIntersect = true;
 								break;
@@ -146,8 +168,8 @@ public class QuasiTimeEmptinessCheck<LETTER extends IRankedLetter, STATE extends
 					}
 				}
 			} else if (notOpponent.contains(next)) {
-				for (IParityGameState v : parityGame.getInverseTransitions().get(next)) {
-					if (!opponent.contains(v) && notOpponent.containsAll(parityGame.getTransitions().get(v))) {
+				for (IParityGameState v : G.getInverseTransitions().get(next)) {
+					if (!opponent.contains(v) && notOpponent.containsAll(G.getTransitions().get(v))) {
 						opponent.add(v);
 						atr.add(v);
 						toVisit.push(v);
