@@ -3,6 +3,7 @@ package cgsynt.operations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,18 +27,22 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 	private TraceToInterpolants interpolator;
 	private List<IStatement> alphabet;
 	private Set<IPredicate> interpolants;
+	private int maxBs;
+	private int totalBs;
 
-	public CounterExampleGenerationStatisticalApproach(int k, int bs, double pValue, TraceToInterpolants interpolator,
+	public CounterExampleGenerationStatisticalApproach(int k, int bs, int maxBs, double pValue, TraceToInterpolants interpolator,
 			List<IStatement> alphabet) {
 		this.k = k;
 		this.bs = bs;
 		this.pValue = pValue;
 		this.alphabet = alphabet;
+		this.interpolants = new HashSet<>();
 		this.numTraceSamples = new HashMap<>();
 		this.numInfeasibleTraceSamples = new HashMap<>();
 		this.numPiSamples = new HashMap<>();
 		this.numInfeasiblePiSamples = new HashMap<>();
 		this.interpolator = interpolator;
+		this.maxBs = maxBs;
 	}
 
 	private void computeTraceStatistics(long root, long size, int num) throws Exception {
@@ -76,7 +81,7 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 		for (int i = 0; i < num; i++) {
 			long path = root * size + (long) (Math.random() * size) + 1;
 			boolean isFinal = isFinalState(this.dfa.getInitialStates().iterator().next(), path);
-			if (this.numPiSamples.containsKey(path)) {
+			if (!this.numPiSamples.containsKey(path)) {
 				this.numPiSamples.put(path, (long) 0);
 				this.numInfeasiblePiSamples.put(path, (long) 0);
 			}
@@ -103,16 +108,18 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 
 	public Set<IPredicate> computeInterpolants(INestedWordAutomaton<IStatement, STATE> dfa) throws Exception {
 		this.dfa = dfa;
+		this.totalBs = 0;
 		computeNode(0, (long) Math.round((Math.pow(alphabet.size(), k)) - 1));
 		return this.interpolants;
 	}
 
 	private void computeNode(long currentPath, long size) throws Exception {
-		if (size == 0) {
+		if (size == 0 || totalBs > maxBs) {
 			return;
 		}
 		computeTraceStatistics(currentPath, size, bs);
 		computePiStatistics(currentPath, size, bs);
+		totalBs += bs;		
 		for (int i = 0; i < alphabet.size(); i++) {
 			long next = alphabet.size() * currentPath + (i + 1);
 			if (computeMeanDifference(next) >= 0.05) {
