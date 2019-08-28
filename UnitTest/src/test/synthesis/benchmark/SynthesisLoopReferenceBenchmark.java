@@ -63,6 +63,6 @@ public class SynthesisLoopReferenceBenchmark {
 				.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), j.getTerm())));
 		SynthesisLoopReference synthesis = new SynthesisLoopReference(transitionAlphabet, preconditions, postconditions,
 				globalVars);
-		synthesis.computeMainLoop(4);
+		synthesis.computeMainLoop(7);
 	}
 }
