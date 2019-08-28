@@ -137,7 +137,7 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 	public Set<IPredicate> computeInterpolants(INestedWordAutomaton<IStatement, STATE> dfa) throws Exception {
 		this.dfa = dfa;
 		this.totalBs = 0;
-		computeNode(0, (long) Math.round((Math.pow(alphabet.size(), k + 1)) - 1));
+		computeNode(0, (long) Math.round((Math.pow(alphabet.size(), k)) - 1));
 		return this.interpolants;
 	}
 

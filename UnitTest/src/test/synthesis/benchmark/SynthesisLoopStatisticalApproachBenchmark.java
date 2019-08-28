@@ -63,6 +63,6 @@ public class SynthesisLoopStatisticalApproachBenchmark {
 				.newPredicate(script.term(">=", m.getTerm(), script.term("select", A.getTerm(), j.getTerm())));
 		SynthesisLoopStatisticalApproach synthesis = new SynthesisLoopStatisticalApproach(transitionAlphabet,
 				preconditions, postconditions, globalVars);
-		synthesis.computeMainLoop(3);
+		synthesis.computeMainLoop(4);
 	}
 }
