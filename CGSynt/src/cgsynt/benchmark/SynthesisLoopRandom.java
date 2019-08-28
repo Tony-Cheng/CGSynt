@@ -157,6 +157,7 @@ public class SynthesisLoopRandom {
 
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants, interpolants,
 				new HashSet<>(mTransitionAlphabet), dummyPi, globalVars.getTraceInterpolator());
+		dummyPi = generalization.getResult();
 
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
