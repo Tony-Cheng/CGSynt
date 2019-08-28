@@ -161,7 +161,7 @@ public class SynthesisLoopStatisticalApproach {
 	public void computeMainLoop(int k) throws Exception {
 		long time = System.currentTimeMillis();
 		int prevSize = this.mAllInterpolants.size();
-		generator = new CounterExampleGenerationStatisticalApproach<>(k, 10, 100, 1.0,
+		generator = new CounterExampleGenerationStatisticalApproach<>(k, 20, 100, 1.0,
 				this.globalVars.getTraceInterpolator(), this.mTransitionAlphabet);
 		while (true) {
 			computeOneIteration(k, 1);

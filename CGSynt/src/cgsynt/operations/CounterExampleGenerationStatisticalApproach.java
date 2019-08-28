@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceToInterpolants;
@@ -30,8 +31,8 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 	private int maxBs;
 	private int totalBs;
 
-	public CounterExampleGenerationStatisticalApproach(int k, int bs, int maxBs, double pValue, TraceToInterpolants interpolator,
-			List<IStatement> alphabet) {
+	public CounterExampleGenerationStatisticalApproach(int k, int bs, int maxBs, double pValue,
+			TraceToInterpolants interpolator, List<IStatement> alphabet) {
 		this.k = k;
 		this.bs = bs;
 		this.pValue = pValue;
@@ -47,9 +48,10 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 
 	private void computeTraceStatistics(long root, long size, int num) throws Exception {
 		for (int i = 0; i < num; i++) {
-			long path = root * size + (long) (Math.random() * size) + 1;
+			long path = root * size + (long) (Math.random() * size);
 			List<IStatement> trace = new ArrayList<>();
-			trace.addAll(findTrace(path));
+			Stack<Integer> pathStack = computePath(path);
+			trace.addAll(findTrace(pathStack));
 			IPredicate[] interpolants = interpolator.computeInterpolants(trace);
 			if (!this.numTraceSamples.containsKey(path)) {
 				this.numTraceSamples.put(path, (long) 0);
@@ -65,22 +67,23 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 		}
 	}
 
-	private List<IStatement> findTrace(long path) {
+	private List<IStatement> findTrace(Stack<Integer> pathStack) {
 		List<IStatement> trace = new ArrayList<>();
-		if (path == 0) {
+		if (pathStack.isEmpty()) {
 			return trace;
 		}
-		path -= 1;
-		trace.add(alphabet.get((int) (path % alphabet.size())));
-		trace.addAll(findTrace(path / alphabet.size()));
+		int next = pathStack.pop();
+		trace.add(alphabet.get(next));
+		trace.addAll(findTrace(pathStack));
 		return trace;
 
 	}
 
 	private void computePiStatistics(long root, long size, int num) {
 		for (int i = 0; i < num; i++) {
-			long path = root * size + (long) (Math.random() * size) + 1;
-			boolean isFinal = isFinalState(this.dfa.getInitialStates().iterator().next(), path);
+			long path = root * size + (long) (Math.random() * size);
+			Stack<Integer> pathStack = computePath(path);
+			boolean isFinal = isFinalState(this.dfa.getInitialStates().iterator().next(), pathStack);
 			if (!this.numPiSamples.containsKey(path)) {
 				this.numPiSamples.put(path, (long) 0);
 				this.numInfeasiblePiSamples.put(path, (long) 0);
@@ -94,14 +97,14 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 		}
 	}
 
-	private boolean isFinalState(STATE state, long path) {
-		if (path == 0) {
+	private boolean isFinalState(STATE state, Stack<Integer> pathStack) {
+		if (pathStack.isEmpty()) {
 			return dfa.isFinal(state);
 		}
-		path -= 1;
+		int next = pathStack.pop();
 		for (OutgoingInternalTransition<IStatement, STATE> transition : dfa.internalSuccessors(state,
-				alphabet.get((int) (path % alphabet.size())))) {
-			return isFinalState(transition.getSucc(), path / alphabet.size());
+				alphabet.get(next))) {
+			return isFinalState(transition.getSucc(), pathStack);
 		}
 		return false;
 	}
@@ -109,7 +112,7 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 	public Set<IPredicate> computeInterpolants(INestedWordAutomaton<IStatement, STATE> dfa) throws Exception {
 		this.dfa = dfa;
 		this.totalBs = 0;
-		computeNode(0, (long) Math.round((Math.pow(alphabet.size(), k)) - 1));
+		computeNode(0, (long) Math.round((Math.pow(alphabet.size(), k + 1)) - 1));
 		return this.interpolants;
 	}
 
@@ -119,9 +122,9 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 		}
 		computeTraceStatistics(currentPath, size, bs);
 		computePiStatistics(currentPath, size, bs);
-		totalBs += bs;		
+		totalBs += bs;
 		for (int i = 0; i < alphabet.size(); i++) {
-			long next = alphabet.size() * currentPath + (i + 1);
+			long next = alphabet.size() * currentPath + 1 + i;
 			if (computeMeanDifference(next) >= 0.05) {
 				computeNode(next, size / alphabet.size());
 			}
@@ -132,9 +135,19 @@ public class CounterExampleGenerationStatisticalApproach<STATE> {
 		if (!numTraceSamples.containsKey(path) || !numPiSamples.containsKey(path)) {
 			return 1;
 		}
-		double meanTraceSample = numInfeasibleTraceSamples.get(path) / numTraceSamples.get(path);
-		double meanPiSample = numInfeasiblePiSamples.get(path) / numPiSamples.get(path);
-		return Math.abs(meanTraceSample - meanPiSample);
+		double meanTraceSample = 1.0 * numInfeasibleTraceSamples.get(path) / numTraceSamples.get(path);
+		double meanPiSample = 1.0 * numInfeasiblePiSamples.get(path) / numPiSamples.get(path);
+		// System.out.println(numInfeasibleTraceSamples.get(path) + " " + numInfeasiblePiSamples.get(path));
+		return meanTraceSample - meanPiSample;
 	}
 
+	private Stack<Integer> computePath(long path) {
+		Stack<Integer> pathStack = new Stack<>();
+		while (path != 0) {
+			path -= 1;
+			pathStack.push((int) (path % alphabet.size()));
+			path /= alphabet.size();
+		}
+		return pathStack;
+	}
 }
