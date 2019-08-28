@@ -38,6 +38,8 @@ public class SynthesisLoopReference {
 
 	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
 	private NestedWordAutomaton<IStatement, IPredicate> mPI;
+	private NestedWordAutomaton<IStatement, IPredicate> dummyPi;
+
 	private List<IStatement> mTransitionAlphabet;
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
@@ -49,11 +51,7 @@ public class SynthesisLoopReference {
 	// For probability testing
 	private INestedWordAutomaton<IStatement, String> dfa;
 
-	private boolean mResultComputed;
 	private boolean mIsCorrect;
-	private List<String> logs;
-	private boolean printLogs;
-	private int printedLogsSize;
 	private TraceGlobalVariables globalVars;
 	private Map<IntersectState<IPredicate, IPredicate>, BuchiTreeAutomatonRule<RankedBool, IntersectState<IPredicate, IPredicate>>> goodProgram;
 
@@ -72,54 +70,14 @@ public class SynthesisLoopReference {
 		construction.computeResult();
 		RankedBool.setRank(construction.getAlphabet().size());
 		this.mPrograms = construction.getResult();
-		this.mResultComputed = false;
 		this.mTransitionAlphabet = construction.getAlphabet();
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
 		this.mAllInterpolants.add(preconditions);
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
+		this.dummyPi = createPI(preconditions, postconditions);
 		this.visitedCounterexamples = new HashSet<>();
-		this.logs = new ArrayList<>();
-		this.printLogs = true;
-		this.printedLogsSize = 0;
-	}
-
-	public SynthesisLoopReference(Specification spec) throws Exception {
-		List<IStatement> transitionAlphabet = spec.getTransitionAlphabet();
-		IPredicate preconditions = spec.getPreconditions();
-		IPredicate postconditions = spec.getPostconditions();
-		TraceGlobalVariables globalVars = spec.getGlobalVars();
-
-		this.globalVars = globalVars;
-		RankedBool.setRank(transitionAlphabet.size());
-
-		globalVars.getTraceInterpolator().setPreconditions(preconditions);
-		globalVars.getTraceInterpolator().setPostconditions(postconditions);
-		preconditions = globalVars.getTraceInterpolator().getPreconditions();
-		postconditions = globalVars.getTraceInterpolator().getPostconditions();
-		this.mService = globalVars.getService();
-		this.mAutService = new AutomataLibraryServices(mService);
-		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet),
-				globalVars.getPredicateFactory());
-		construction.computeResult();
-		RankedBool.setRank(construction.getAlphabet().size());
-		this.mPrograms = construction.getResult();
-		this.mResultComputed = false;
-		this.mTransitionAlphabet = construction.getAlphabet();
-		this.mAllInterpolants = new HashSet<>();
-		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
-		this.mAllInterpolants.add(preconditions);
-		this.mAllInterpolants.add(postconditions);
-		this.mPI = createPI(preconditions, postconditions);
-		this.visitedCounterexamples = new HashSet<>();
-		this.logs = new ArrayList<>();
-		this.printLogs = false;
-		this.printedLogsSize = 0;
-	}
-
-	public void setPrintLogs(boolean printLogs) {
-		this.printLogs = printLogs;
 	}
 
 	/**
@@ -165,19 +123,24 @@ public class SynthesisLoopReference {
 		INestedWordAutomaton<IStatement, IPredicate> dfaPI = determinize.getResult();// addDeadStates((NestedWordAutomaton<IStatement,
 																						// String>)determinize.getResult());
 
-
 		// Transform the DFA into an LTA
-		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
-				k, visitedCounterexamples, bs, this.mTransitionAlphabet);
+		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI, k,
+				visitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples,
 				globalVars.getTraceInterpolator());
 		counterExampleToInterpolants.computeResult();
 
+		Set<IPredicate> interpolants = flatten(counterExampleToInterpolants.getInterpolants());
+
+		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants, interpolants,
+				new HashSet<>(mTransitionAlphabet), dummyPi, globalVars.getTraceInterpolator());
+		dummyPi = generalization.getResult();
+
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
-		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
+		this.mAllInterpolants.addAll(interpolants);
 	}
 
 	/**

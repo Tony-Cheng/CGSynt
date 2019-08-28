@@ -1,18 +1,17 @@
 package cgsynt.benchmark;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import cgsynt.automaton.factory.PDeterminizeStateFactory;
-import cgsynt.core.Specification;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
+import cgsynt.operations.CounterExampleGenerationStatisticalApproach;
 import cgsynt.operations.CounterExamplesToInterpolants;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.BuchiTreeAutomatonRule;
@@ -29,28 +28,19 @@ import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceP
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 
-public class SynthesisLoopRandom {
+public class SynthesisLoopStatisticalApproach {
 
 	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
 	private NestedWordAutomaton<IStatement, IPredicate> mPI;
-	private NestedWordAutomaton<IStatement, IPredicate> dummyPi;
-
 	private List<IStatement> mTransitionAlphabet;
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
-	private BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> result;
-	private Set<List<IStatement>> visitedCounterexamples;
-
-	// For probability testing
-	private INestedWordAutomaton<IStatement, String> dfa;
-
-	private boolean mIsCorrect;
+	private CounterExampleGenerationStatisticalApproach<IPredicate> generator;
 	private TraceGlobalVariables globalVars;
-	private Map<IntersectState<IPredicate, IPredicate>, BuchiTreeAutomatonRule<RankedBool, IntersectState<IPredicate, IPredicate>>> goodProgram;
 
-	public SynthesisLoopRandom(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions,
-			TraceGlobalVariables globalVars) throws Exception {
+	public SynthesisLoopStatisticalApproach(List<IStatement> transitionAlphabet, IPredicate preconditions,
+			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
 		this.globalVars = globalVars;
 		RankedBool.setRank(transitionAlphabet.size());
 		globalVars.getTraceInterpolator().setPreconditions(preconditions);
@@ -70,8 +60,6 @@ public class SynthesisLoopRandom {
 		this.mAllInterpolants.add(preconditions);
 		this.mAllInterpolants.add(postconditions);
 		this.mPI = createPI(preconditions, postconditions);
-		this.dummyPi = createPI(preconditions, postconditions);
-		this.visitedCounterexamples = new HashSet<>();
 	}
 
 	/**
@@ -145,21 +133,13 @@ public class SynthesisLoopRandom {
 		// this.goodProgram = emptinessCheck.getGoodProgram();
 		// return;
 		// }
-		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI, k,
-				visitedCounterexamples, bs, this.mTransitionAlphabet);
-		generator.computeRandomly();
-		Set<List<IStatement>> counterExamples = generator.getResult();
-		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples,
-				globalVars.getTraceInterpolator());
-		counterExampleToInterpolants.computeResult();
-		
-		Set<IPredicate> interpolants = flatten(counterExampleToInterpolants.getInterpolants());
-
-		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants, interpolants,
-				new HashSet<>(mTransitionAlphabet), dummyPi, globalVars.getTraceInterpolator());
 
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
+		Set<IPredicate> interpolants = generator.computeInterpolants(dfaPI);
+		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants, interpolants,
+				new HashSet<>(mTransitionAlphabet), mPI, globalVars.getTraceInterpolator());
+		mPI = generalization.getResult();
 		this.mAllInterpolants.addAll(interpolants);
 	}
 
@@ -181,8 +161,10 @@ public class SynthesisLoopRandom {
 	public void computeMainLoop(int k) throws Exception {
 		long time = System.currentTimeMillis();
 		int prevSize = this.mAllInterpolants.size();
+		generator = new CounterExampleGenerationStatisticalApproach<>(k, 20, 100, 1.0,
+				this.globalVars.getTraceInterpolator(), this.mTransitionAlphabet);
 		while (true) {
-			computeOneIteration(k, 10);
+			computeOneIteration(k, 1);
 			if (this.mAllInterpolants.size() > prevSize) {
 				prevSize = this.mAllInterpolants.size();
 				System.out.println(this.mAllInterpolants.size());
