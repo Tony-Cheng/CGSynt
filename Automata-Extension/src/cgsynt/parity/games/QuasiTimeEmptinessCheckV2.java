@@ -24,9 +24,7 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 		this.resultComputed = true;
 		int highestRank = Integer.MIN_VALUE;
 		for (IParityGameState state : parityGame.getStates()) {
-			if (state.getRank() % 2 == 0 && state.getRank() > highestRank) {
-				highestRank = state.getRank();
-			} else if (state.getRank() % 2 == 1 && state.getRank() > highestRank) {
+			if (state.getRank() > highestRank) {
 				highestRank = state.getRank();
 			}
 		}
@@ -35,23 +33,15 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 			this.result = true;
 			return;
 		}
-		int highestEvenRank = highestRank;
-		int highestOddRank = highestRank;
-		if (highestRank % 2 == 0) {
-			highestOddRank += 1;
-		} else {
-			highestEvenRank += 1;
+		if (highestRank % 2 == 1) {
+			highestRank += 1;
 		}
-		Set<IParityGameState> winningStates = solveE(parityGame.copy(), highestEvenRank, parityGame.getStates().size(),
+		Set<IParityGameState> winningStates = solveE(parityGame.copy(), highestRank, parityGame.getStates().size(),
 				parityGame.getStates().size());
-		Set<IParityGameState> notWinningStates = solveO(parityGame.copy(), highestOddRank,
-				parityGame.getStates().size(), parityGame.getStates().size());
+
 		this.result = true;
 		for (IParityGameState state : parityGame.getInitialStates()) {
-			if (state.getRank() % 2 == 0 && winningStates.contains(state)) {
-				this.result = false;
-			}
-			if (state.getRank() % 2 == 1 && !notWinningStates.contains(state)) {
+			if (winningStates.contains(state)) {
 				this.result = false;
 			}
 		}
@@ -68,21 +58,21 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 		do {
 			Nh = computeNh(G, h);
 			H = G.copy();
-			H.removeStates(ATR(G, Nh, true));
+			H.removeStates(ATR(G, Nh, false));
 			Wo = solveO(H, h - 1, po / 2, pe);
-			G.removeStates(ATR(G, Wo, false));
+			G.removeStates(ATR(G, Wo, true));
 		} while (!Wo.isEmpty());
 		Nh = computeNh(G, h);
 		H = G.copy();
-		H.removeStates(ATR(G, Nh, true));
+		H.removeStates(ATR(G, Nh, false));
 		Wo = solveO(H, h - 1, po, pe);
-		G.removeStates(ATR(G, Wo, false));
+		G.removeStates(ATR(G, Wo, true));
 		while (!Wo.isEmpty()) {
 			Nh = computeNh(G, h);
 			H = G.copy();
-			H.removeStates(ATR(G, Nh, true));
+			H.removeStates(ATR(G, Nh, false));
 			Wo = solveO(H, h - 1, po / 2, pe);
-			G.removeStates(ATR(G, Wo, false));
+			G.removeStates(ATR(G, Wo, true));
 		}
 		return G.getStates();
 	}
@@ -107,21 +97,21 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 		do {
 			Nh = computeNh(G, h);
 			H = G.copy();
-			H.removeStates(ATR(G, Nh, false));
+			H.removeStates(ATR(G, Nh, true));
 			We = solveE(H, h - 1, pe / 2, po);
-			G.removeStates(ATR(G, We, true));
+			G.removeStates(ATR(G, We, false));
 		} while (!We.isEmpty());
 		Nh = computeNh(G, h);
 		H = G.copy();
-		H.removeStates(ATR(G, Nh, false));
+		H.removeStates(ATR(G, Nh, true));
 		We = solveE(H, h - 1, pe, po);
-		G.removeStates(ATR(G, We, true));
+		G.removeStates(ATR(G, We, false));
 		while (!We.isEmpty()) {
 			Nh = computeNh(G, h);
 			H = G.copy();
-			H.removeStates(ATR(G, Nh, false));
+			H.removeStates(ATR(G, Nh, true));
 			We = solveE(H, h - 1, pe / 2, po);
-			G.removeStates(ATR(G, We, true));
+			G.removeStates(ATR(G, We, false));
 		}
 		return G.getStates();
 	}
@@ -168,43 +158,29 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 
 	private Set<IParityGameState> ATR(ParityGame<LETTER, STATE> G, Set<IParityGameState> N, boolean isEva) {
 		Set<IParityGameState> atr = new HashSet<>();
-		atr.addAll(N);
-		Set<IParityGameState> notOpponent = new HashSet<>();
-		Set<IParityGameState> opponent = new HashSet<>();
 		Stack<IParityGameState> toVisit = new Stack<>();
 		for (IParityGameState state : N) {
-			if (isEva && state instanceof EvaState) {
-				toVisit.push(state);
-				notOpponent.add(state);
-			}
-			else if (!isEva && state instanceof AdamState) {
-				toVisit.push(state);
-				notOpponent.add(state);
+			if ((isEva && state.isEva()) || (!isEva && !state.isEva())) {
+				atr.add(state);
+				toVisit.add(state);
 			}
 		}
 		while (!toVisit.isEmpty()) {
 			IParityGameState next = toVisit.pop();
-			if (opponent.contains(next)) {
-				for (IParityGameState v : G.getInverseTransitions().get(next)) {
-					if (!notOpponent.contains(v)) {
-						boolean nonEmptyIntersect = false;
-						for (IParityGameState state : G.getTransitions().get(v)) {
-							if (opponent.contains(state)) {
-								nonEmptyIntersect = true;
-								break;
-							}
-						}
-						if (nonEmptyIntersect) {
-							notOpponent.add(v);
-							atr.add(v);
-							toVisit.push(v);
+			for (IParityGameState v : G.getInverseTransitions().get(next)) {
+				if ((isEva && v.isEva()) || (!isEva && !v.isEva())) {
+					if (!atr.contains(v)) {
+						toVisit.push(v);
+						atr.add(v);
+					}
+				} else {
+					boolean isInATR = true;
+					for (IParityGameState dest : G.getTransitions().get(v)) {
+						if (!atr.contains(dest)) {
+							isInATR = false;
 						}
 					}
-				}
-			} else if (notOpponent.contains(next)) {
-				for (IParityGameState v : G.getInverseTransitions().get(next)) {
-					if (!opponent.contains(v) && notOpponent.containsAll(G.getTransitions().get(v))) {
-						opponent.add(v);
+					if (isInATR && !atr.contains(v)) {
 						atr.add(v);
 						toVisit.push(v);
 					}
