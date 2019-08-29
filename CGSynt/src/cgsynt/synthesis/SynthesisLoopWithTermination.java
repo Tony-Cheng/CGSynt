@@ -264,12 +264,12 @@ public class SynthesisLoopWithTermination {
 		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>> intersectedAut = intersection
 				.computeResult();
 
-		BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomaton<>(
+		BuchiParityIntersectAutomatonV2<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomatonV2<>(
 				intersectedAut, termTree);
 		System.out.println(buchiParityIntersectedAut);
-		ParityGame<RankedBool, BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
+		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
 				buchiParityIntersectedAut);
-		QuasiTimeEmptinessCheckV2<RankedBool, BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
+		QuasiTimeEmptinessCheckV2<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
 				parityGame);
 		emptinessCheck.computeResult();
 
