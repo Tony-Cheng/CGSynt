@@ -42,10 +42,10 @@ public class ParityGameProgramExtraction<LETTER extends IRankedLetter> {
 		}
 	}
 
-	private IParityGameState printProgramAdam(IParityGameState state) {
-		printProgramEva(nonEmptyTree.get(state));
-		return nonEmptyTree.get(state);
-	}
+	 private IParityGameState printProgramAdam(IParityGameState state) {
+	 printProgramEva(nonEmptyTree.get(state));
+	 return nonEmptyTree.get(state);
+	 }
 
 	private void printProgramEva(IParityGameState state) {
 		if (visited.contains(state)) {

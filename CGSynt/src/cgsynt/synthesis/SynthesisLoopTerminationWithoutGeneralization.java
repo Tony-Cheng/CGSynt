@@ -90,7 +90,6 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 	private void init(List<IStatement> transitionAlphabet, IPredicate preconditions, IPredicate postconditions,
 			TraceGlobalVariables globalVars) throws Exception {
 		this.mGlobalVars = globalVars;
-		assert this.mGlobalVars.getService() instanceof CustomServiceProvider;
 
 		RankedBool.setRank(transitionAlphabet.size());
 		this.mGlobalVars.getTraceInterpolator().setPreconditions(preconditions);
