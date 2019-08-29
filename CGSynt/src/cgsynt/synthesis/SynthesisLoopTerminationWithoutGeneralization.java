@@ -9,33 +9,20 @@ import java.util.Set;
 
 import cgsynt.automaton.factory.PDeterminizeStateFactory;
 import cgsynt.buchi.determinization.BuchiDeterminization;
-import cgsynt.core.Specification;
 import cgsynt.core.service.CustomServiceProvider;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
-import cgsynt.dfa.operations.DfaInfConversion;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.dfa.parity.ParityAutomaton;
-import cgsynt.dfa.parity.intersect.DfaParityIntersectAutomaton;
-import cgsynt.dfa.parity.intersect.operations.DfaParityCounterexample;
-import cgsynt.dfa.parity.intersect.operations.DfaParityCounterexampleGeneration;
-import cgsynt.dfa.parity.operations.MockIntersection;
 import cgsynt.dfa.parity.operations.ParityAutomatonToTree;
-import cgsynt.dfa.parity.operations.ParityComplement;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
-import cgsynt.nfa.PIUnionStateFactory;
 import cgsynt.operations.CounterExamplesToInterpolants;
-import cgsynt.operations.NWAIStatementToIcfg;
-import cgsynt.operations.NWAIcfgToIStatement;
 import cgsynt.parity.games.IParityGameState;
 import cgsynt.parity.games.ParityGame;
-import cgsynt.parity.games.ParityGameEmptinessCheck;
 import cgsynt.parity.games.ParityGameProgramExtraction;
 import cgsynt.parity.games.QuasiTimeEmptinessCheck;
-import cgsynt.parity.games.QuasiTimeEmptinessCheckV2;
-import cgsynt.termination.DfaLetterConverter;
 import cgsynt.termination.OmegaRefiner;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.IntersectState;
@@ -43,23 +30,18 @@ import cgsynt.tree.buchi.lta.RankedBool;
 import cgsynt.tree.buchi.operations.BuchiIntersection;
 import cgsynt.tree.buchi.operations.ProgramAutomatonConstruction;
 import cgsynt.tree.buchi.parity.BuchiParityHybridIntersectAutomaton;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomaton;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectAutomatonV2;
-import cgsynt.tree.buchi.parity.BuchiParityIntersectState;
 import cgsynt.tree.buchi.parity.BuchiParityIntersectStateV2;
-import cgsynt.tree.buchi.parity.operations.BuchiParityEmptinessCheck;
 import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityState;
 import cgsynt.tree.parity.ParityStateFactory;
 import cgsynt.tree.parity.ParityTreeAutomaton;
-import cgsynt.tree.parity.ParityTreeRemoveAllLeaves;
 import de.uni_freiburg.informatik.ultimate.automata.AutomataLibraryServices;
 import de.uni_freiburg.informatik.ultimate.automata.LibraryIdentifiers;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.INestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomaton;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
-import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Union;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
@@ -68,14 +50,15 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgE
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgInternalTransition;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.debugidentifiers.StringDebugIdentifier;
+import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicate;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.BuchiAutomizer;
 
-public class SynthesisLoopWithTermination {
+public class SynthesisLoopTerminationWithoutGeneralization {
 
 	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
 	private INestedWordAutomaton<IStatement, IPredicate> mPI;
-	private INestedWordAutomaton<IcfgInternalTransition, IPredicate> mOmega;
+	private NestedWordAutomaton<IcfgInternalTransition, IPredicate> mOmega;
 
 	private List<IStatement> mTransitionAlphabet;
 	private Map<IStatement, IcfgInternalTransition> mIcfgTransitionMap;
@@ -92,25 +75,14 @@ public class SynthesisLoopWithTermination {
 	private boolean mPrintLogs;
 	private List<String> mLogs;
 	private int mPrintedLogsSize;
-	private int mOmegaRefinementIterations;
 
 	private TraceGlobalVariables mGlobalVars;
-	private OmegaRefiner mOmegaRefiner;
 
 	private IParityGameState source;
 	private Map<IParityGameState, IParityGameState> nonEmptyTree;
 
-	public SynthesisLoopWithTermination(List<IStatement> transitionAlphabet, IPredicate preconditions,
+	public SynthesisLoopTerminationWithoutGeneralization(List<IStatement> transitionAlphabet, IPredicate preconditions,
 			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
-		this.init(transitionAlphabet, preconditions, postconditions, globalVars);
-	}
-
-	public SynthesisLoopWithTermination(Specification spec) throws Exception {
-		List<IStatement> transitionAlphabet = spec.getTransitionAlphabet();
-		IPredicate preconditions = spec.getPreconditions();
-		IPredicate postconditions = spec.getPostconditions();
-		TraceGlobalVariables globalVars = spec.getGlobalVars();
-
 		this.init(transitionAlphabet, preconditions, postconditions, globalVars);
 	}
 
@@ -145,8 +117,6 @@ public class SynthesisLoopWithTermination {
 		this.mLogs = new ArrayList<>();
 		this.mPrintLogs = false;
 		this.mPrintedLogsSize = 0;
-		this.mOmegaRefinementIterations = 0;
-		this.mOmegaRefiner = new OmegaRefiner(this.mGlobalVars);
 
 		this.mService.getLoggingService().getLogger(BuchiAutomizer.class.getPackage().getName()).setLevel(LogLevel.OFF);
 	}
@@ -204,8 +174,6 @@ public class SynthesisLoopWithTermination {
 
 		NestedWordAutomaton<IcfgInternalTransition, IPredicate> omega = new NestedWordAutomaton<>(mAutService, alphabet,
 				new GeneralizeStateFactory(mGlobalVars.getPredicateFactory()));
-
-		omega.addState(true, false, precondition);
 
 		return omega;
 	}
@@ -266,35 +234,19 @@ public class SynthesisLoopWithTermination {
 
 		BuchiParityIntersectAutomatonV2<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomatonV2<>(
 				intersectedAut, termTree);
+
 		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
 				buchiParityIntersectedAut);
-		QuasiTimeEmptinessCheckV2<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
+		QuasiTimeEmptinessCheck<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheck<>(
 				parityGame);
 		emptinessCheck.computeResult();
-
-		// BuchiParityIntersectAutomaton<RankedBool, IntersectState<IPredicate,
-		// IPredicate>, IParityState> buchiParityIntersectedAut = new
-		// BuchiParityIntersectAutomaton<>(
-		// intersectedAut, termTree);
-		//
-		// ParityTreeRemoveAllLeaves<RankedBool,
-		// BuchiParityIntersectState<IntersectState<IPredicate, IPredicate>,
-		// IParityState>> refineAut = new ParityTreeRemoveAllLeaves<>(
-		// buchiParityIntersectedAut);
-		//
-		// System.out.println(buchiParityIntersectedAut.getStates().size());
-
-		// ParityGame<RankedBool, BuchiParityIntersectState<IntersectState<IPredicate,
-		// IPredicate>, IParityState>> parityGame = new ParityGame<>(
-		// refineAut.getResult());
-		//
-		// System.out.println(refineAut.getResult().getStates().size());
 
 		if (!emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
 			return;
 		}
+		System.out.println("Here");
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
 				k * dfaPI.getStates().size(), mVisitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
@@ -311,72 +263,6 @@ public class SynthesisLoopWithTermination {
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
-
-		///////////////////////////////////////////////////////////////////////////////////////////////
-		// Omega Refinement Process
-		int minOmegaLen = Math.min(mOmega.size(), parityOmega.size());
-
-		DfaLetterConverter letterConverter = new DfaLetterConverter(dfaPI, this.mAutService,
-				mGlobalVars.getPredicateFactory(), this.mIcfgTransitionMap);
-		INestedWordAutomaton<IcfgInternalTransition, IPredicate> convertedDfaPi = letterConverter.getResult();
-
-		DfaInfConversion<IcfgInternalTransition, IPredicate> infConverter = new DfaInfConversion<>(convertedDfaPi,
-				this.mAutService, new GeneralizeStateFactory(this.mGlobalVars.getPredicateFactory()));
-		INestedWordAutomaton<IcfgInternalTransition, IPredicate> infPI = infConverter.getResult();
-
-		// Complement
-		Set<IcfgInternalTransition> letterSet = new HashSet<>(this.mIcfgTransitionMap.values());
-		VpAlphabet<IcfgInternalTransition> alphabet = new VpAlphabet<>(letterSet);
-		// ParityComplement<IcfgInternalTransition, IParityState> complementation = new
-		// ParityComplement<>(parityOmega,
-		// this.mAutService, alphabet, new ParityStateFactory());
-
-		// ParityAutomaton<IcfgInternalTransition, IParityState> complementedOmega =
-		// complementation.getResult();
-
-		DfaParityIntersectAutomaton<IcfgInternalTransition, IPredicate, IParityState> terminationTraceBank = new DfaParityIntersectAutomaton<>(
-				infPI, parityOmega);
-
-		// MockIntersection<IcfgInternalTransition, IPredicate, IParityState>
-		// mockIntersect =
-		// new MockIntersection<>(parityOmega,
-		// this.mGlobalVars.getPredicateFactory().newDebugPredicate("Dummy"),
-		// this.mGlobalVars.getPredicateFactory().newDebugPredicate("Empty"),
-		// this.mAutService, new HashSet<>(this.mIcfgTransitionMap.values()));
-		// DfaParityIntersectAutomaton<IcfgInternalTransition, IPredicate, IParityState>
-		// terminationTraceBank =
-		// mockIntersect.getResult();
-
-		DfaParityCounterexampleGeneration<IcfgInternalTransition, IPredicate, IParityState> counterExampleGenerator = new DfaParityCounterexampleGeneration<>(
-				terminationTraceBank, k * minOmegaLen);
-		counterExampleGenerator.computeResult();
-		List<DfaParityCounterexample<IcfgInternalTransition, IPredicate, IParityState>> omegaCounterexamples = counterExampleGenerator
-				.getResult();
-
-		String before = mOmega.toString();
-
-		// Omega Refinement
-		for (int i = 0; i < omegaCounterexamples.size(); i++) {
-			NestedWordAutomaton<IcfgInternalTransition, IPredicate> result = mOmegaRefiner
-					.certifyCE(omegaCounterexamples.get(i), mOmega, this.mOmegaRefinementIterations);
-			if (result != null) {
-				Union<IcfgInternalTransition, IPredicate> omegaUnion = new Union<IcfgInternalTransition, IPredicate>(
-						mAutService,
-						new PIUnionStateFactory(mGlobalVars.getManagedScript().getScript(),
-								mGlobalVars.getVariableFactory(), mGlobalVars.getPredicateFactory()),
-						this.mOmega, result);
-				this.mOmega = omegaUnion.getResult();
-			}
-			this.mOmegaRefinementIterations++;
-		}
-
-		System.out.println("BEFORE:");
-		System.out.println(before);
-
-		System.out.println("=============================================");
-
-		System.out.println("AFTER:");
-		System.out.println(mOmega);
 	}
 
 	/**
@@ -450,5 +336,15 @@ public class SynthesisLoopWithTermination {
 		ParityGameProgramExtraction<IRankedLetter> programExtraction = new ParityGameProgramExtraction<>(this.source,
 				this.nonEmptyTree, stringTransitionAlphabet);
 		programExtraction.printProgram();
+	}
+
+	public void addState(int state, boolean isInitial, boolean isFinal) {
+		this.mOmega.addState(isInitial, isFinal, new BasicPredicate(state, null, null, null, null));
+	}
+
+
+	public void addRule(int source, IStatement letter, int dest) {
+		this.mOmega.addInternalTransition(new BasicPredicate(source, null, null, null, null),
+				mIcfgTransitionMap.get(letter), new BasicPredicate(dest, null, null, null, null));
 	}
 }
