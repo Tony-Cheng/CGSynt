@@ -23,6 +23,7 @@ import cgsynt.parity.games.IParityGameState;
 import cgsynt.parity.games.ParityGame;
 import cgsynt.parity.games.ParityGameProgramExtraction;
 import cgsynt.parity.games.QuasiTimeEmptinessCheck;
+import cgsynt.parity.games.QuasiTimeEmptinessCheckV2;
 import cgsynt.termination.OmegaRefiner;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.IntersectState;
@@ -237,7 +238,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 
 		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
 				buchiParityIntersectedAut);
-		QuasiTimeEmptinessCheck<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheck<>(
+		QuasiTimeEmptinessCheckV2<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
 				parityGame);
 		emptinessCheck.computeResult();
 
@@ -246,7 +247,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 			mResultComputed = true;
 			return;
 		}
-		System.out.println("Here");
+		System.out.println("Not Empty");
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
 				k * dfaPI.getStates().size(), mVisitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
@@ -341,7 +342,6 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 	public void addState(int state, boolean isInitial, boolean isFinal) {
 		this.mOmega.addState(isInitial, isFinal, new BasicPredicate(state, null, null, null, null));
 	}
-
 
 	public void addRule(int source, IStatement letter, int dest) {
 		this.mOmega.addInternalTransition(new BasicPredicate(source, null, null, null, null),

@@ -68,24 +68,21 @@ public class TestSynthesisLoopWithTermination {
 				vf.getSymbolTable());
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")),
 				globalVars.getManagedScript(), vf.getSymbolTable());
-	
-	 IPredicate preconditions = predicateFactory.newPredicate(script.term("=",
-	 i.getTerm(), script.numeral("0")));
-	 IPredicate postconditions = predicateFactory.newPredicate(script.term(">=",
-	 i.getTerm(), n.getTerm()));
-	
-	 List<IStatement> transitionAlphabet = new ArrayList<>();
-	 // transitionAlphabet.add(ipp);
-	 transitionAlphabet.add(ilen);
-	 // transitionAlphabet.add(imm);
-	 SynthesisLoopWithTermination synthesis = new
-	 SynthesisLoopWithTermination(transitionAlphabet, preconditions,
-	 postconditions, globalVars);
-	 synthesis.computeMainLoop();
-	 System.out.println("Test 2");
-	 System.out.println(synthesis.isCorrect());
-	 // synthesis.printProgram();
-	 }
+
+		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
+		IPredicate postconditions = predicateFactory.newPredicate(script.term(">=", i.getTerm(), n.getTerm()));
+
+		List<IStatement> transitionAlphabet = new ArrayList<>();
+		// transitionAlphabet.add(ipp);
+		transitionAlphabet.add(ilen);
+		// transitionAlphabet.add(imm);
+		SynthesisLoopWithTermination synthesis = new SynthesisLoopWithTermination(transitionAlphabet, preconditions,
+				postconditions, globalVars);
+		synthesis.computeMainLoop();
+		System.out.println("Test 2");
+		System.out.println(synthesis.isCorrect());
+		// synthesis.printProgram();
+	}
 
 	// @Test
 	// void test3() throws Exception {

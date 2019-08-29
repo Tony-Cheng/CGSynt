@@ -44,10 +44,12 @@ public class TestSynthesisTerminationWithoutGeneralization {
 		// transitionAlphabet.add(imm);
 		SynthesisLoopTerminationWithoutGeneralization synthesis = new SynthesisLoopTerminationWithoutGeneralization(
 				transitionAlphabet, preconditions, postconditions, globalVars);
-		synthesis.addState(1, true, false);
-		synthesis.addState(2, false, false);
+		synthesis.addState(1, true, true);
+		synthesis.addState(2, false, true);
+
 		synthesis.addRule(1, ilen, 2);
-		// synthesis.computeMainLoop();
+		synthesis.addRule(2, ipp, 1);
+		synthesis.computeMainLoop();
 		// System.out.println("Test 2");
 		// System.out.println(synthesis.isCorrect());
 		// synthesis.printProgram();
