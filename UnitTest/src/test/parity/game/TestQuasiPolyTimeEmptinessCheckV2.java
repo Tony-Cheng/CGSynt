@@ -529,4 +529,35 @@ public class TestQuasiPolyTimeEmptinessCheckV2 {
 		emptinessCheck.computeResult();
 		assertFalse(emptinessCheck.getResult());
 	}
+	
+	@Test
+	void test15() {
+		RankedBool.setRank(2);
+		ParityTreeAutomaton<RankedBool, ParityState<String>> aut = new ParityTreeAutomaton<>(2);
+		ParityState<String> q2 = new ParityState<String>("q2", 2);
+		ParityState<String> q3 = new ParityState<String>("q3", 3);
+
+		List<ParityState<String>> list2 = new ArrayList<>();
+		list2.add(q3);
+		list2.add(q3);
+		
+		List<ParityState<String>> list3 = new ArrayList<>();
+		list3.add(q2);
+		list3.add(q2);
+
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule1 = new ParityTreeAutomatonRule<>(RankedBool.TRUE,
+				q2, list2);
+		ParityTreeAutomatonRule<RankedBool, ParityState<String>> rule2 = new ParityTreeAutomatonRule<>(RankedBool.TRUE,
+				q3, list3);
+
+		aut.addRule(rule1);
+		aut.addRule(rule2);
+		aut.addInitState(q2);
+
+		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
+		QuasiTimeEmptinessCheckV2<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
+				parityGame);
+		emptinessCheck.computeResult();
+		assertTrue(emptinessCheck.getResult());
+	}
 }
