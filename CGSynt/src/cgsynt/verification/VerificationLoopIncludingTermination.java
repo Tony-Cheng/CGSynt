@@ -240,7 +240,7 @@ public class VerificationLoopIncludingTermination {
 		int i = 0;
 		while (!mResultComputed) {
 			logs.add("Iteration:" + i);
-			computeOneIteration();
+			computeOneIteration(i + 1);
 			logs.add("Number of interpolants: " + this.mAllInterpolants.size());
 			i++;
 			if (printLogs)
