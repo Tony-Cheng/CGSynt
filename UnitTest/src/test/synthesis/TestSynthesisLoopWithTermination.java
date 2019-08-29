@@ -75,7 +75,7 @@ public class TestSynthesisLoopWithTermination {
 	 i.getTerm(), n.getTerm()));
 	
 	 List<IStatement> transitionAlphabet = new ArrayList<>();
-	 transitionAlphabet.add(ipp);
+	 // transitionAlphabet.add(ipp);
 	 transitionAlphabet.add(ilen);
 	 // transitionAlphabet.add(imm);
 	 SynthesisLoopWithTermination synthesis = new
