@@ -286,7 +286,7 @@ public class TestQuasiPolyTimeEmptinessCheckV2 {
 		aut.addInitState(q1);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		QuasiTimeEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheck<>(
+		QuasiTimeEmptinessCheckV2<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
 				parityGame);
 		emptinessCheck.computeResult();
 		assertTrue(emptinessCheck.getResult());
@@ -326,7 +326,7 @@ public class TestQuasiPolyTimeEmptinessCheckV2 {
 		aut.addInitState(q1);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		QuasiTimeEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheck<>(
+		QuasiTimeEmptinessCheckV2<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
 				parityGame);
 		emptinessCheck.computeResult();
 		assertFalse(emptinessCheck.getResult());
@@ -374,7 +374,7 @@ public class TestQuasiPolyTimeEmptinessCheckV2 {
 		aut.addInitState(q3);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		QuasiTimeEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheck<>(
+		QuasiTimeEmptinessCheckV2<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
 				parityGame);
 		emptinessCheck.computeResult();
 		assertFalse(emptinessCheck.getResult());
@@ -415,7 +415,7 @@ public class TestQuasiPolyTimeEmptinessCheckV2 {
 		aut.addInitState(q2);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		QuasiTimeEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheck<>(
+		QuasiTimeEmptinessCheckV2<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
 				parityGame);
 		emptinessCheck.computeResult();
 		assertFalse(emptinessCheck.getResult());
@@ -463,7 +463,7 @@ public class TestQuasiPolyTimeEmptinessCheckV2 {
 		aut.addInitState(q2);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		QuasiTimeEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheck<>(
+		QuasiTimeEmptinessCheckV2<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
 				parityGame);
 		emptinessCheck.computeResult();
 		assertFalse(emptinessCheck.getResult());
@@ -524,7 +524,7 @@ public class TestQuasiPolyTimeEmptinessCheckV2 {
 		aut.addRule(rule);
 
 		ParityGame<RankedBool, ParityState<String>> parityGame = new ParityGame<>(aut);
-		QuasiTimeEmptinessCheck<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheck<>(
+		QuasiTimeEmptinessCheckV2<RankedBool, ParityState<String>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
 				parityGame);
 		emptinessCheck.computeResult();
 		assertFalse(emptinessCheck.getResult());

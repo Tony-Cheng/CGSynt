@@ -34,6 +34,7 @@ import cgsynt.parity.games.ParityGame;
 import cgsynt.parity.games.ParityGameEmptinessCheck;
 import cgsynt.parity.games.ParityGameProgramExtraction;
 import cgsynt.parity.games.QuasiTimeEmptinessCheck;
+import cgsynt.parity.games.QuasiTimeEmptinessCheckV2;
 import cgsynt.termination.DfaLetterConverter;
 import cgsynt.termination.OmegaRefiner;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
@@ -268,7 +269,7 @@ public class SynthesisLoopWithTermination {
 
 		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
 				buchiParityIntersectedAut);
-		QuasiTimeEmptinessCheck<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheck<>(
+		QuasiTimeEmptinessCheckV2<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
 				parityGame);
 		emptinessCheck.computeResult();
 
