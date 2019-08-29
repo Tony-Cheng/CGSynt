@@ -22,6 +22,7 @@ import cgsynt.operations.CounterExamplesToInterpolants;
 import cgsynt.parity.games.IParityGameState;
 import cgsynt.parity.games.ParityGame;
 import cgsynt.parity.games.ParityGameProgramExtraction;
+import cgsynt.parity.games.ParityGameProgramExtractionV2;
 import cgsynt.parity.games.QuasiTimeEmptinessCheck;
 import cgsynt.parity.games.QuasiTimeEmptinessCheckV2;
 import cgsynt.termination.OmegaRefiner;
@@ -81,6 +82,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 
 	private IParityGameState source;
 	private Map<IParityGameState, IParityGameState> nonEmptyTree;
+	private ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> nonEmptyParityGame;
 
 	public SynthesisLoopTerminationWithoutGeneralization(List<IStatement> transitionAlphabet, IPredicate preconditions,
 			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
@@ -244,6 +246,9 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 		if (!emptinessCheck.getResult()) {
 			mIsCorrect = true;
 			mResultComputed = true;
+			this.nonEmptyTree = emptinessCheck.getNonEmptyProof();
+			this.source = emptinessCheck.getNonEmptyProofSource();
+			this.nonEmptyParityGame = emptinessCheck.getNonEmptyParityGame();
 			return;
 		}
 		System.out.println("Not Empty");
@@ -333,8 +338,8 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 
 	public void printProgram() {
 		List<String> stringTransitionAlphabet = transAlphabetToString();
-		ParityGameProgramExtraction<IRankedLetter> programExtraction = new ParityGameProgramExtraction<>(this.source,
-				this.nonEmptyTree, stringTransitionAlphabet);
+		ParityGameProgramExtractionV2<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> programExtraction = new ParityGameProgramExtractionV2<>(
+				this.source, this.nonEmptyTree, stringTransitionAlphabet, nonEmptyParityGame);
 		programExtraction.printProgram();
 	}
 

@@ -46,6 +46,8 @@ public class TestSynthesisTerminationWithoutGeneralization {
 		synthesis.computeMainLoop();
 		System.out.println("Test 1");
 		System.out.println(synthesis.isCorrect());
+		 synthesis.printProgram();
+
 	}
 
 	@Test
@@ -78,8 +80,8 @@ public class TestSynthesisTerminationWithoutGeneralization {
 		synthesis.addRule(1, ilen, 2);
 		synthesis.addRule(2, ipp, 1);
 		synthesis.computeMainLoop();
-		// System.out.println("Test 2");
-		// System.out.println(synthesis.isCorrect());
-		// synthesis.printProgram();
+		 System.out.println("Test 2");
+		 System.out.println(synthesis.isCorrect());
+		 synthesis.printProgram();
 	}
 }

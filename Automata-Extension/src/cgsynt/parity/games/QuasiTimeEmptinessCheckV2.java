@@ -1,6 +1,8 @@
 package cgsynt.parity.games;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -12,10 +14,14 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 	private ParityGame<LETTER, STATE> parityGame;
 	private boolean resultComputed;
 	private boolean result;
+	private Map<IParityGameState, IParityGameState> nonEmptyProof;
+	private IParityGameState nonEmptyProofSource;
+	private ParityGame<LETTER, STATE> nonEmptyParityGame;
 
 	public QuasiTimeEmptinessCheckV2(ParityGame<LETTER, STATE> parityGame) {
 		this.parityGame = parityGame.copy();
 		this.resultComputed = false;
+		this.nonEmptyProof = new HashMap<>();
 	}
 
 	public void computeResult() {
@@ -43,6 +49,7 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 		for (IParityGameState state : parityGame.getInitialStates()) {
 			if (winningStates.contains(state)) {
 				this.result = false;
+				this.nonEmptyProofSource = state;
 			}
 		}
 
@@ -74,6 +81,7 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 			Wo = solveO(H, h - 1, po / 2, pe);
 			G.removeStates(ATR(G, Wo, true));
 		}
+		this.nonEmptyParityGame = G;
 		return G.getStates();
 	}
 
@@ -116,46 +124,6 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 		return G.getStates();
 	}
 
-	private Set<IParityGameState> ATR(ParityGame<LETTER, STATE> G, Set<IParityGameState> N) {
-		Set<IParityGameState> atr = new HashSet<>();
-		atr.addAll(N);
-		Set<IParityGameState> notOpponent = new HashSet<>();
-		Set<IParityGameState> opponent = new HashSet<>();
-		Stack<IParityGameState> toVisit = new Stack<>();
-		toVisit.addAll(N);
-		notOpponent.addAll(N);
-		while (!toVisit.isEmpty()) {
-			IParityGameState next = toVisit.pop();
-			if (opponent.contains(next)) {
-				for (IParityGameState v : G.getInverseTransitions().get(next)) {
-					if (!notOpponent.contains(v)) {
-						boolean nonEmptyIntersect = false;
-						for (IParityGameState state : G.getTransitions().get(v)) {
-							if (opponent.contains(state)) {
-								nonEmptyIntersect = true;
-								break;
-							}
-						}
-						if (nonEmptyIntersect) {
-							notOpponent.add(v);
-							atr.add(v);
-							toVisit.push(v);
-						}
-					}
-				}
-			} else if (notOpponent.contains(next)) {
-				for (IParityGameState v : G.getInverseTransitions().get(next)) {
-					if (!opponent.contains(v) && notOpponent.containsAll(G.getTransitions().get(v))) {
-						opponent.add(v);
-						atr.add(v);
-						toVisit.push(v);
-					}
-				}
-			}
-		}
-		return atr;
-	}
-
 	private Set<IParityGameState> ATR(ParityGame<LETTER, STATE> G, Set<IParityGameState> N, boolean isEva) {
 		Set<IParityGameState> atr = new HashSet<>();
 		Stack<IParityGameState> toVisit = new Stack<>();
@@ -172,6 +140,9 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 					if (!atr.contains(v)) {
 						toVisit.push(v);
 						atr.add(v);
+						if (!isEva) {
+							nonEmptyProof.put(v, next);
+						}
 					}
 				} else {
 					boolean isInATR = true;
@@ -192,5 +163,17 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 
 	public boolean getResult() {
 		return result;
+	}
+
+	public Map<IParityGameState, IParityGameState> getNonEmptyProof() {
+		return nonEmptyProof;
+	}
+
+	public IParityGameState getNonEmptyProofSource() {
+		return nonEmptyProofSource;
+	}
+
+	public ParityGame<LETTER, STATE> getNonEmptyParityGame() {
+		return nonEmptyParityGame;
 	}
 }
