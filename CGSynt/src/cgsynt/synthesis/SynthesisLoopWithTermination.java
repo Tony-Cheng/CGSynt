@@ -266,7 +266,6 @@ public class SynthesisLoopWithTermination {
 
 		BuchiParityIntersectAutomatonV2<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomatonV2<>(
 				intersectedAut, termTree);
-		System.out.println(buchiParityIntersectedAut);
 		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> parityGame = new ParityGame<>(
 				buchiParityIntersectedAut);
 		QuasiTimeEmptinessCheckV2<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
@@ -296,7 +295,6 @@ public class SynthesisLoopWithTermination {
 			mResultComputed = true;
 			return;
 		}
-		System.out.println("Here");
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
 				k * dfaPI.getStates().size(), mVisitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
