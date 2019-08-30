@@ -50,6 +50,16 @@ public class ParityGameProgramExtractionV2<LETTER extends IRankedLetter, STATE e
 	private IParityGameState printProgramAdam(IParityGameState state) {
 		if (!nonEmptyProof.containsKey(state) || nonEmptyProof.get(state) == null) {
 			for (IParityGameState next : nonEmptyParityGame.getTransitions().get(state)) {
+				if (idMap.containsKey(next) && deadStates.contains(next))
+					return next;
+			}
+			for (IParityGameState next : nonEmptyParityGame.getTransitions().get(state)) {
+				if (deadStates.contains(next)) {
+					printProgramEva(next);
+					return next;
+				}
+			}
+			for (IParityGameState next : nonEmptyParityGame.getTransitions().get(state)) {
 				if (idMap.containsKey(next))
 					return next;
 			}
