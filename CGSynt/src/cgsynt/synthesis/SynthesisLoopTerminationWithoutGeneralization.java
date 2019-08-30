@@ -1,15 +1,12 @@
 package cgsynt.synthesis;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cgsynt.automaton.factory.PDeterminizeStateFactory;
 import cgsynt.buchi.determinization.BuchiDeterminization;
-import cgsynt.core.service.CustomServiceProvider;
 import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.dfa.parity.ParityAutomaton;
@@ -23,11 +20,8 @@ import cgsynt.operations.CounterExamplesToInterpolants;
 import cgsynt.parity.games.EvaState;
 import cgsynt.parity.games.IParityGameState;
 import cgsynt.parity.games.ParityGame;
-import cgsynt.parity.games.ParityGameProgramExtraction;
 import cgsynt.parity.games.ParityGameProgramExtractionV2;
-import cgsynt.parity.games.QuasiTimeEmptinessCheck;
 import cgsynt.parity.games.QuasiTimeEmptinessCheckV2;
-import cgsynt.termination.OmegaRefiner;
 import cgsynt.tree.buchi.BuchiTreeAutomaton;
 import cgsynt.tree.buchi.IntersectState;
 import cgsynt.tree.buchi.lta.RankedBool;
@@ -48,15 +42,9 @@ import de.uni_freiburg.informatik.ultimate.automata.nestedword.NestedWordAutomat
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.VpAlphabet;
 import de.uni_freiburg.informatik.ultimate.automata.nestedword.operations.Determinize;
 import de.uni_freiburg.informatik.ultimate.automata.statefactory.StringFactory;
-import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
-import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgEdgeFactory;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgInternalTransition;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
-import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.debugidentifiers.StringDebugIdentifier;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.BasicPredicate;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.BuchiAutomizer;
@@ -68,8 +56,6 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 	private NestedWordAutomaton<IStatement, IPredicate> mOmega;
 
 	private List<IStatement> mTransitionAlphabet;
-	private Map<IStatement, IcfgInternalTransition> mIcfgTransitionMap;
-	private Map<IcfgInternalTransition, IStatement> mIStatementMap;
 
 	private IUltimateServiceProvider mService;
 	private Set<IPredicate> mAllInterpolants;
@@ -115,8 +101,6 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 		this.mPrograms = construction.getResult();
 		this.mResultComputed = false;
 		this.mTransitionAlphabet = construction.getAlphabet();
-		this.mIStatementMap = new HashMap<>();
-		this.mIcfgTransitionMap = createIcfgTransitionMap(mTransitionAlphabet);
 		this.mAllInterpolants = new HashSet<>();
 		this.mAutService.getLoggingService().getLogger(LibraryIdentifiers.PLUGIN_ID).setLevel(LogLevel.OFF);
 		this.mAllInterpolants.add(preconditions);
@@ -127,28 +111,11 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 		this.mLogs = new ArrayList<>();
 		this.mPrintLogs = false;
 		this.mPrintedLogsSize = 0;
-
 		this.mService.getLoggingService().getLogger(BuchiAutomizer.class.getPackage().getName()).setLevel(LogLevel.OFF);
 	}
 
 	public void setPrintLogs(boolean printLogs) {
 		this.mPrintLogs = printLogs;
-	}
-
-	public Map<IStatement, IcfgInternalTransition> createIcfgTransitionMap(List<IStatement> alphabet) {
-		Map<IStatement, IcfgInternalTransition> icfgAlphabetMap = new HashMap<>();
-
-		IcfgEdgeFactory factory = new IcfgEdgeFactory(OmegaRefiner.SERIAL_PROVIDER);
-		IcfgLocation location = new IcfgLocation(new StringDebugIdentifier("0"), "p1");
-
-		for (IStatement statement : alphabet) {
-			IcfgInternalTransition trans = factory.createInternalTransition(location, location, new Payload(),
-					statement.getTransFormula());
-			icfgAlphabetMap.put(statement, trans);
-			this.mIStatementMap.put(trans, statement);
-		}
-
-		return icfgAlphabetMap;
 	}
 
 	/**
@@ -362,6 +329,14 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 		this.mOmega.addInternalTransition(
 				new BasicPredicate(source, new String[0], trueTerm, new HashSet<>(), trueTerm), letter,
 				new BasicPredicate(dest, new String[0], trueTerm, new HashSet<>(), trueTerm));
+	}
+
+	public NestedWordAutomaton<IStatement, IPredicate> getOmega() {
+		return mOmega;
+	}
+
+	public void setOmega(NestedWordAutomaton<IStatement, IPredicate> omega) {
+		this.mOmega = omega;
 	}
 
 	public Set<IParityGameState> findAllDeadStates(Set<IParityGameState> states) {
