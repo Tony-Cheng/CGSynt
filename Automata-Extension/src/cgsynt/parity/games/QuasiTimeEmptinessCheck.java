@@ -7,6 +7,12 @@ import java.util.Stack;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * This class is now deprecated.
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class QuasiTimeEmptinessCheck<LETTER extends IRankedLetter, STATE extends IParityState> {
 
 	private ParityGame<LETTER, STATE> parityGame;

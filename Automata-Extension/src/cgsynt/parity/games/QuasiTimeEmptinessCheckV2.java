@@ -9,6 +9,15 @@ import java.util.Stack;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * The quasi-polynomial time algorithm for parity game emptiness check in the
+ * following paper: https://arxiv.org/pdf/1904.12446.pdf
+ * 
+ * This algorithm is similar to zielonka's algorithm.
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE extends IParityState> {
 
 	private ParityGame<LETTER, STATE> parityGame;

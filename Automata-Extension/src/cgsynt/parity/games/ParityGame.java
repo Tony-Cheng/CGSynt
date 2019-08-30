@@ -12,6 +12,13 @@ import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * The parity game descrived in the following paper:
+ * https://pdfs.semanticscholar.org/518d/e2ba06edf8eb09af78594946f741a38def26.pdf
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class ParityGame<LETTER extends IRankedLetter, STATE extends IParityState> {
 
 	private Set<IParityGameState> states;

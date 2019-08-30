@@ -4,6 +4,13 @@ import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * The eva staet in the paper:
+ * https://pdfs.semanticscholar.org/518d/e2ba06edf8eb09af78594946f741a38def26.pdf
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class EvaState<LETTER extends IRankedLetter, STATE extends IParityState> implements IParityGameState {
 	private ParityTreeAutomatonRule<LETTER, STATE> rule;
 
@@ -11,7 +18,7 @@ public class EvaState<LETTER extends IRankedLetter, STATE extends IParityState> 
 		super();
 		this.rule = rule;
 	}
-	
+
 	public ParityTreeAutomatonRule<LETTER, STATE> getRule() {
 		return rule;
 	}
@@ -40,8 +47,6 @@ public class EvaState<LETTER extends IRankedLetter, STATE extends IParityState> 
 			return false;
 		return true;
 	}
-
-
 
 	@Override
 	public boolean isEva() {

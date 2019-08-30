@@ -2,6 +2,12 @@ package cgsynt.parity.games;
 
 import cgsynt.tree.parity.IParityState;
 
+/**
+ * The adam state in the following paper:
+ * https://pdfs.semanticscholar.org/518d/e2ba06edf8eb09af78594946f741a38def26.pdf
+ *
+ * @param <STATE>
+ */
 public class AdamState<STATE extends IParityState> implements IParityGameState {
 	private STATE state;
 
@@ -13,7 +19,7 @@ public class AdamState<STATE extends IParityState> implements IParityGameState {
 	public STATE getState() {
 		return state;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

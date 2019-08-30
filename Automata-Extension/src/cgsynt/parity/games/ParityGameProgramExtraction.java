@@ -11,6 +11,11 @@ import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * Extract the correct program in the 
+ *
+ * @param <LETTER>
+ */
 public class ParityGameProgramExtraction<LETTER extends IRankedLetter> {
 
 	private final IParityGameState source;

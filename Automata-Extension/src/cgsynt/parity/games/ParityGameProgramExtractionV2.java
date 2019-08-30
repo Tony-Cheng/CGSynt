@@ -8,9 +8,14 @@ import java.util.Map;
 import java.util.Set;
 
 import cgsynt.tree.parity.IParityState;
-import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * Print the correct program found in QuasiTimeEmptinessCheckV2.
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class ParityGameProgramExtractionV2<LETTER extends IRankedLetter, STATE extends IParityState> {
 
 	private final IParityGameState source;

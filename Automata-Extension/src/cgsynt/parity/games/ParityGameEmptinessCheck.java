@@ -8,8 +8,17 @@ import java.util.Map;
 import cgsynt.tree.parity.IParityState;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * An emptiness check algorithm described in the following paper:
+ * https://pdfs.semanticscholar.org/518d/e2ba06edf8eb09af78594946f741a38def26.pdf
+ * 
+ * Note the worst-case time complexity for this algorithm is exponential.
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class ParityGameEmptinessCheck<LETTER extends IRankedLetter, STATE extends IParityState> {
-	
+
 	private ParityGame<LETTER, STATE> parityGame;
 	private Map<IParityGameState, IParityGameState> nonEmptyTree;
 	private IParityGameState nonEmptyTreeSource;
@@ -20,7 +29,7 @@ public class ParityGameEmptinessCheck<LETTER extends IRankedLetter, STATE extend
 		this.parityGame = parityGame;
 		this.resultComputed = false;
 	}
-	
+
 	public void computeResult() {
 		if (resultComputed)
 			return;
@@ -37,7 +46,7 @@ public class ParityGameEmptinessCheck<LETTER extends IRankedLetter, STATE extend
 			}
 		}
 	}
-	
+
 	public boolean getResult() {
 		return result;
 	}
@@ -80,7 +89,7 @@ public class ParityGameEmptinessCheck<LETTER extends IRankedLetter, STATE extend
 		}
 		return isEmpty;
 	}
-	
+
 	public Map<IParityGameState, IParityGameState> getNonEmptyTree() {
 		return nonEmptyTree;
 	}
