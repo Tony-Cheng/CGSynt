@@ -80,8 +80,15 @@ public class TestSynthesisTerminationWithoutGeneralization {
 		IAssumption igen = synthesis.getNegation().get(iln);
 		synthesis.addState(1, true, false);
 		synthesis.addState(2, false, true);
-		synthesis.addRule(1, iln, 2);
+		synthesis.addRule(1, ipp, 2);
+		synthesis.addRule(2, iln, 1);
+		synthesis.addRule(2, igen, 1);
 		synthesis.addRule(2, ipp, 1);
+		synthesis.addRule(1, iln, 1);
+		synthesis.addRule(1, igen, 1);
+		synthesis.addRule(1, ipp, 1);
+
+
 		// synthesis.addRule(1, igen, 2);
 
 		synthesis.computeMainLoop();
