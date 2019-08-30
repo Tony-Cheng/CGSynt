@@ -12,7 +12,7 @@ import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
 /**
- * Extract the correct program in the 
+ * Print the correct program found in the operation ParityGameEmptinessCheck.
  *
  * @param <LETTER>
  */

@@ -6,6 +6,12 @@ import java.util.Map;
 import cgsynt.tree.parity.IExtendedParityState;
 import cgsynt.tree.parity.IParityState;
 
+/**
+ * A state in the intersection between a buchi and a parity automaton.
+ *
+ * @param <STATE1>
+ * @param <STATE2>
+ */
 public class BuchiParityIntersectStateV2<STATE1, STATE2 extends IParityState> implements IExtendedParityState {
 	private static int LABEL = 0;
 
@@ -28,7 +34,8 @@ public class BuchiParityIntersectStateV2<STATE1, STATE2 extends IParityState> im
 		this.isFinal = isFinal;
 	}
 
-	public BuchiParityIntersectStateV2<STATE1, STATE2> nextState(BuchiParityPair<STATE1, STATE2> state, boolean isFinal) {
+	public BuchiParityIntersectStateV2<STATE1, STATE2> nextState(BuchiParityPair<STATE1, STATE2> state,
+			boolean isFinal) {
 		return new BuchiParityIntersectStateV2<>(state, Math.max(state.getState2().getRank(), this.mN), isFinal);
 	}
 

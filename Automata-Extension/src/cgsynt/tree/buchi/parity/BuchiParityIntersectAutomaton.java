@@ -13,6 +13,13 @@ import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * This class is deprecated.
+ *
+ * @param <LETTER>
+ * @param <STATE1>
+ * @param <STATE2>
+ */
 public class BuchiParityIntersectAutomaton<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState>
 		extends ParityTreeAutomaton<LETTER, BuchiParityIntersectState<STATE1, STATE2>> {
 	public BuchiParityIntersectAutomaton(BuchiTreeAutomaton<LETTER, STATE1> buchiAut,

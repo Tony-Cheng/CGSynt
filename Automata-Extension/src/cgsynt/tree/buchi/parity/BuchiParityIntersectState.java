@@ -6,6 +6,12 @@ import java.util.Map;
 import cgsynt.tree.parity.IExtendedParityState;
 import cgsynt.tree.parity.IParityState;
 
+/**
+ * This class is deprecated.
+ *
+ * @param <STATE1>
+ * @param <STATE2>
+ */
 public class BuchiParityIntersectState<STATE1, STATE2 extends IParityState> implements IExtendedParityState {
 	private static int LABEL = 0;
 

@@ -6,6 +6,13 @@ import cgsynt.tree.parity.IParityState;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * A transition in the intersection between a buchi and a parity automaton.
+ *
+ * @param <LETTER>
+ * @param <STATE1>
+ * @param <STATE2>
+ */
 public class BuchiParityIntersectRuleV2<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState>
 		extends ParityTreeAutomatonRule<LETTER, BuchiParityIntersectStateV2<STATE1, STATE2>> {
 	private final BuchiParityIntersectStateV2<STATE1, STATE2> source;

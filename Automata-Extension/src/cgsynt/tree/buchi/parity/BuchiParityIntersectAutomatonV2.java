@@ -13,6 +13,13 @@ import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * The intersection between a buchi and a parity automaton.
+ *
+ * @param <LETTER>
+ * @param <STATE1>
+ * @param <STATE2>
+ */
 public class BuchiParityIntersectAutomatonV2<LETTER extends IRankedLetter, STATE1, STATE2 extends IParityState>
 		extends ParityTreeAutomaton<LETTER, BuchiParityIntersectStateV2<STATE1, STATE2>> {
 	public BuchiParityIntersectAutomatonV2(BuchiTreeAutomaton<LETTER, STATE1> buchiAut,
