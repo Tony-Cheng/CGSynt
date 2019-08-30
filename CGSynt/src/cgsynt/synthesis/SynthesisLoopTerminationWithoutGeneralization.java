@@ -14,6 +14,7 @@ import cgsynt.dfa.operations.CounterexamplesGeneration;
 import cgsynt.dfa.operations.DfaToLtaPowerSet;
 import cgsynt.dfa.parity.ParityAutomaton;
 import cgsynt.dfa.parity.operations.ParityAutomatonToTree;
+import cgsynt.interpol.IAssumption;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
@@ -86,6 +87,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 	private Map<IParityGameState, IParityGameState> nonEmptyTree;
 	private ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> nonEmptyParityGame;
 	private IPredicate deadState;
+	private Map<IAssumption, IAssumption> negation;
 
 	public SynthesisLoopTerminationWithoutGeneralization(List<IStatement> transitionAlphabet, IPredicate preconditions,
 			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
@@ -106,6 +108,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet),
 				this.mGlobalVars.getPredicateFactory());
 		construction.computeResult();
+		this.negation = construction.getNegation();
 		this.deadState = construction.getDeadState();
 		this.mPrograms = construction.getResult();
 		this.mResultComputed = false;
@@ -370,5 +373,9 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 			}
 		}
 		return deadStates;
+	}
+
+	public Map<IAssumption, IAssumption> getNegation() {
+		return negation;
 	}
 }

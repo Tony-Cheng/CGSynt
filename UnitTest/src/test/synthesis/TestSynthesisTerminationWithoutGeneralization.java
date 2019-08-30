@@ -6,6 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import cgsynt.core.GlobalsConfigurer;
+import cgsynt.interpol.IAssumption;
 import cgsynt.interpol.IStatement;
 import cgsynt.interpol.ScriptAssignmentStatement;
 import cgsynt.interpol.ScriptAssumptionStatement;
@@ -60,7 +61,7 @@ public class TestSynthesisTerminationWithoutGeneralization {
 		BoogieNonOldVar n = vf.constructVariable("n", VariableFactory.INT);
 
 		BasicPredicateFactory predicateFactory = globalVars.getPredicateFactory();
-		IStatement ilen = new ScriptAssumptionStatement(i, n.getTerm(), "<", globalVars.getManagedScript(),
+		IAssumption iln = new ScriptAssumptionStatement(i, n.getTerm(), "<", globalVars.getManagedScript(),
 				vf.getSymbolTable());
 		IStatement ipp = new ScriptAssignmentStatement(i, script.term("+", i.getTerm(), script.numeral("1")),
 				globalVars.getManagedScript(), vf.getSymbolTable());
@@ -70,15 +71,17 @@ public class TestSynthesisTerminationWithoutGeneralization {
 
 		List<IStatement> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add(ipp);
-		transitionAlphabet.add(ilen);
+		transitionAlphabet.add(iln);
 		// transitionAlphabet.add(imm);
 		SynthesisLoopTerminationWithoutGeneralization synthesis = new SynthesisLoopTerminationWithoutGeneralization(
 				transitionAlphabet, preconditions, postconditions, globalVars);
+		IAssumption igen = synthesis.getNegation().get(iln);
 		synthesis.addState(1, true, true);
 		synthesis.addState(2, false, false);
-
-		synthesis.addRule(1, ilen, 2);
+		synthesis.addRule(1, iln, 2);
 		synthesis.addRule(2, ipp, 1);
+		synthesis.addRule(1, igen, 1);
+
 		synthesis.computeMainLoop();
 		System.out.println("Test 2");
 		System.out.println(synthesis.isCorrect());

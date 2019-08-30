@@ -32,6 +32,7 @@ public class ProgramAutomatonConstruction {
 	private Map<Pair<IAssumption, IAssumption>, Integer> assumptionsMap;
 	private BuchiTreeAutomaton<RankedBool, IPredicate> result;
 	private BasicPredicateFactory mPredicateFactory;
+	private Map<IAssumption, IAssumption> negation;
 
 	public ProgramAutomatonConstruction(Set<IStatement> statements, BasicPredicateFactory predicateFactory) {
 		this.statements = statements;
@@ -45,6 +46,7 @@ public class ProgramAutomatonConstruction {
 	public void computeResult() {
 		if (resultComputed)
 			return;
+		this.negation = new HashMap<>();
 		computeAssignmentsAndAssumptions();
 		this.result = new BuchiTreeAutomaton<>(assignments.size() + 2 * assumptions.size());
 		RankedBool.setRank(assignments.size() + 2 * assumptions.size());
@@ -66,11 +68,17 @@ public class ProgramAutomatonConstruction {
 			if (statement instanceof IAssumption) {
 				IAssumption copy = ((IAssumption) statement).copy();
 				copy.negate();
+				negation.put((IAssumption) statement, copy);
+				negation.put(copy, (IAssumption) statement);
 				assumptions.add(new Pair<>((IAssumption) statement, copy));
 			} else {
 				assignments.add(statement);
 			}
 		}
+	}
+
+	public Map<IAssumption, IAssumption> getNegation() {
+		return negation;
 	}
 
 	/**
