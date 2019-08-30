@@ -155,6 +155,10 @@ public class ProgramAutomatonConstruction {
 		result.addRule(rule);
 	}
 
+	public IPredicate getDeadState() {
+		return stateRight;
+	}
+
 	/**
 	 * Compute all the transitions coming out of the left state.
 	 */

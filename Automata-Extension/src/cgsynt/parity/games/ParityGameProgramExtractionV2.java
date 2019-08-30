@@ -20,13 +20,16 @@ public class ParityGameProgramExtractionV2<LETTER extends IRankedLetter, STATE e
 	private Map<IParityGameState, Integer> idMap;
 	private Set<IParityGameState> visited;
 	private ParityGame<LETTER, STATE> nonEmptyParityGame;
+	private Set<IParityGameState> deadStates;
 
 	public ParityGameProgramExtractionV2(IParityGameState source, Map<IParityGameState, IParityGameState> nonEmptyProof,
-			List<String> transitionAlphabet, ParityGame<LETTER, STATE> nonEmptyParityGame) {
+			List<String> transitionAlphabet, ParityGame<LETTER, STATE> nonEmptyParityGame,
+			Set<IParityGameState> deadStates) {
 		this.source = source;
 		this.nonEmptyProof = nonEmptyProof;
 		this.transitionAlphabet = transitionAlphabet;
 		this.nonEmptyParityGame = nonEmptyParityGame;
+		this.deadStates = deadStates;
 	}
 
 	public void printProgram() {
@@ -46,6 +49,10 @@ public class ParityGameProgramExtractionV2<LETTER extends IRankedLetter, STATE e
 
 	private IParityGameState printProgramAdam(IParityGameState state) {
 		if (!nonEmptyProof.containsKey(state) || nonEmptyProof.get(state) == null) {
+			for (IParityGameState next : nonEmptyParityGame.getTransitions().get(state)) {
+				if (idMap.containsKey(next))
+					return next;
+			}
 			for (IParityGameState next : nonEmptyParityGame.getTransitions().get(state)) {
 				printProgramEva(next);
 				return next;
@@ -69,9 +76,13 @@ public class ParityGameProgramExtractionV2<LETTER extends IRankedLetter, STATE e
 		for (int i = 0; i < evaState.getRule().getDest().size(); i++) {
 			destStates.add(printProgramAdam(new AdamState<>(evaState.getRule().getDest().get(i))));
 		}
-		System.out.println("state " + idMap.get(state));
-		for (int i = 0; i < transitionAlphabet.size(); i++) {
-			System.out.println("	" + transitionAlphabet.get(i) + ": state " + idMap.get(destStates.get(i)));
+		if (!deadStates.contains(state)) {
+			System.out.println("state " + idMap.get(state));
+			for (int i = 0; i < transitionAlphabet.size(); i++) {
+				if (!deadStates.contains(destStates.get(i))) {
+					System.out.println("	" + transitionAlphabet.get(i) + ": state " + idMap.get(destStates.get(i)));
+				}
+			}
 		}
 
 	}

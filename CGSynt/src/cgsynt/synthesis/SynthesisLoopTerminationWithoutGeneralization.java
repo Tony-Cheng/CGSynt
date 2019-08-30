@@ -19,6 +19,7 @@ import cgsynt.interpol.TraceGlobalVariables;
 import cgsynt.nfa.GeneralizeStateFactory;
 import cgsynt.nfa.OptimizedTraceGeneralization;
 import cgsynt.operations.CounterExamplesToInterpolants;
+import cgsynt.parity.games.EvaState;
 import cgsynt.parity.games.IParityGameState;
 import cgsynt.parity.games.ParityGame;
 import cgsynt.parity.games.ParityGameProgramExtraction;
@@ -83,6 +84,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 	private IParityGameState source;
 	private Map<IParityGameState, IParityGameState> nonEmptyTree;
 	private ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> nonEmptyParityGame;
+	private IPredicate deadState;
 
 	public SynthesisLoopTerminationWithoutGeneralization(List<IStatement> transitionAlphabet, IPredicate preconditions,
 			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
@@ -103,7 +105,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 		ProgramAutomatonConstruction construction = new ProgramAutomatonConstruction(new HashSet<>(transitionAlphabet),
 				this.mGlobalVars.getPredicateFactory());
 		construction.computeResult();
-		RankedBool.setRank(construction.getAlphabet().size());
+		this.deadState = construction.getDeadState();
 		this.mPrograms = construction.getResult();
 		this.mResultComputed = false;
 		this.mTransitionAlphabet = construction.getAlphabet();
@@ -338,8 +340,9 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 
 	public void printProgram() {
 		List<String> stringTransitionAlphabet = transAlphabetToString();
+		Set<IParityGameState> deadStates = findAllDeadStates(nonEmptyParityGame.getStates());
 		ParityGameProgramExtractionV2<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> programExtraction = new ParityGameProgramExtractionV2<>(
-				this.source, this.nonEmptyTree, stringTransitionAlphabet, nonEmptyParityGame);
+				this.source, this.nonEmptyTree, stringTransitionAlphabet, nonEmptyParityGame, deadStates);
 		programExtraction.printProgram();
 	}
 
@@ -350,5 +353,18 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 	public void addRule(int source, IStatement letter, int dest) {
 		this.mOmega.addInternalTransition(new BasicPredicate(source, null, null, null, null),
 				mIcfgTransitionMap.get(letter), new BasicPredicate(dest, null, null, null, null));
+	}
+
+	public Set<IParityGameState> findAllDeadStates(Set<IParityGameState> states) {
+		Set<IParityGameState> deadStates = new HashSet<>();
+		for (IParityGameState state : states) {
+			if (state instanceof EvaState) {
+				EvaState<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>> evaState = (EvaState<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, IPredicate>, IParityState>>) state;
+				if (evaState.getRule().getSource().getState().getState1().getState1().equals(this.deadState)) {
+					deadStates.add(state);
+				}
+			}
+		}
+		return deadStates;
 	}
 }
