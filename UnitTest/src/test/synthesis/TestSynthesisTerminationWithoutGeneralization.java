@@ -78,8 +78,8 @@ public class TestSynthesisTerminationWithoutGeneralization {
 		SynthesisLoopTerminationWithoutGeneralization synthesis = new SynthesisLoopTerminationWithoutGeneralization(
 				transitionAlphabet, preconditions, postconditions, globalVars);
 		IAssumption igen = synthesis.getNegation().get(iln);
-		synthesis.addState(1, true, true);
-		synthesis.addState(2, false, false);
+		synthesis.addState(1, true, false);
+		synthesis.addState(2, false, true);
 		synthesis.addRule(1, iln, 2);
 		synthesis.addRule(2, ipp, 1);
 		// synthesis.addRule(1, igen, 2);

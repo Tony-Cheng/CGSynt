@@ -28,8 +28,8 @@ public class BuchiParityIntersectStateV2<STATE1, STATE2 extends IParityState> im
 		this.isFinal = isFinal;
 	}
 
-	public BuchiParityIntersectStateV2<STATE1, STATE2> nextState(BuchiParityPair<STATE1, STATE2> state) {
-		return new BuchiParityIntersectStateV2<>(state, Math.max(state.getState2().getRank(), this.mN), false);
+	public BuchiParityIntersectStateV2<STATE1, STATE2> nextState(BuchiParityPair<STATE1, STATE2> state, boolean isFinal) {
+		return new BuchiParityIntersectStateV2<>(state, Math.max(state.getState2().getRank(), this.mN), isFinal);
 	}
 
 	public BuchiParityPair<STATE1, STATE2> getState() {
@@ -89,6 +89,10 @@ public class BuchiParityIntersectStateV2<STATE1, STATE2 extends IParityState> im
 		} else if (!mState.equals(other.mState))
 			return false;
 		return true;
+	}
+
+	public boolean isFinal() {
+		return isFinal;
 	}
 
 	@Override

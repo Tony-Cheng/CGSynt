@@ -43,10 +43,10 @@ public class BuchiParityIntersectAutomatonV2<LETTER extends IRankedLetter, STATE
 						BuchiParityPair<STATE1, STATE2> pair = new BuchiParityPair<>(buchiRule.getDest().get(i),
 								parityRule.getDest().get(i));
 						BuchiParityIntersectStateV2<STATE1, STATE2> dest = null;
-						if (buchiAut.isFinalState(pair.getState1())) {
-							dest = new BuchiParityIntersectStateV2<>(pair, true);
+						if (next.isFinal()) {
+							dest = new BuchiParityIntersectStateV2<>(pair, buchiAut.isFinalState(pair.getState1()));
 						} else {
-							dest = next.nextState(pair);
+							dest = next.nextState(pair, buchiAut.isFinalState(pair.getState1()));
 						}
 						if (!visited.contains(dest)) {
 							visited.add(dest);
