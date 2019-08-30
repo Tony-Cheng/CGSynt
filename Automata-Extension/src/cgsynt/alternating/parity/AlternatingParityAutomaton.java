@@ -10,6 +10,12 @@ import cgsynt.tree.parity.ParityTreeAutomaton;
 import cgsynt.tree.parity.ParityTreeAutomatonRule;
 import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 
+/**
+ * This class is deprecated.
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class AlternatingParityAutomaton<LETTER extends IRankedLetter, STATE extends IParityState> {
 	private Set<STATE> states;
 	private Set<STATE> initialStates;
@@ -56,11 +62,11 @@ public class AlternatingParityAutomaton<LETTER extends IRankedLetter, STATE exte
 			}
 		}
 	}
-	
+
 	public Set<STATE> getStates() {
 		return states;
 	}
-	
+
 	public Set<STATE> getInitialStates() {
 		return initialStates;
 	}

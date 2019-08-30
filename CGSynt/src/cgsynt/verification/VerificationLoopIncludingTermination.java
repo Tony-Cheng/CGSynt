@@ -53,6 +53,10 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgI
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.PredicateUnifier;
 
+/**
+ * This class is deprecated.
+ *
+ */
 public class VerificationLoopIncludingTermination {
 
 	private BuchiTreeAutomaton<RankedBool, String> mPrograms;

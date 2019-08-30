@@ -38,6 +38,10 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.boogie.BoogieNonOld
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.PredicateUnifier;
 
+/**
+ * Verify that a program is correct.
+ *
+ */
 public class MainVerificationLoop {
 
 	private BuchiTreeAutomaton<RankedBool, String> mPrograms;

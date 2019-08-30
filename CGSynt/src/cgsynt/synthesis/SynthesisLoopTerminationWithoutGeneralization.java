@@ -49,6 +49,11 @@ import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.Basi
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.smt.predicates.IPredicate;
 import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.BuchiAutomizer;
 
+/**
+ * Synthesize a correct and terminating program. The proof of terminating
+ * programs must be precomputed, and omega must be set to the precomputed proof.
+ *
+ */
 public class SynthesisLoopTerminationWithoutGeneralization {
 
 	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
@@ -191,8 +196,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 
 		ParityTreeAutomaton<RankedBool, IParityState> termTree = parityOmegaToParityTreeOmega.getResult();
 		////////////////////////////////////////////////
-
-		// Determinize PI
+		// Building the powerset of pi
 		ConvertToStringState<IStatement, IPredicate> automataConverter = new ConvertToStringState<>(this.mPI);
 		NestedWordAutomaton<IStatement, String> stringNFAPI = automataConverter.convert(mAutService);
 
@@ -200,11 +204,11 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 
 		INestedWordAutomaton<IStatement, String> dfaPI = determinize.getResult();
 
-		// Transform the DFA into an LTA
 		DfaToLtaPowerSet<IStatement, String> dfaToLta = new DfaToLtaPowerSet<>(dfaPI, mTransitionAlphabet, deadState);
 
 		BuchiTreeAutomaton<RankedBool, String> powerSet = dfaToLta.getResult();
 
+		// Intersect all the automatons
 		BuchiIntersection<RankedBool, IPredicate, String> intersection = new BuchiIntersection<>(mPrograms, powerSet);
 		BuchiTreeAutomaton<RankedBool, IntersectState<IPredicate, String>> intersectedAut = intersection
 				.computeResult();
@@ -212,6 +216,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 		BuchiParityIntersectAutomatonV2<RankedBool, IntersectState<IPredicate, String>, IParityState> buchiParityIntersectedAut = new BuchiParityIntersectAutomatonV2<>(
 				intersectedAut, termTree);
 
+		// Emptiness check
 		ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, String>, IParityState>> parityGame = new ParityGame<>(
 				buchiParityIntersectedAut);
 		QuasiTimeEmptinessCheckV2<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, String>, IParityState>> emptinessCheck = new QuasiTimeEmptinessCheckV2<>(
@@ -226,14 +231,19 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 			this.nonEmptyParityGame = emptinessCheck.getNonEmptyParityGame();
 			return;
 		}
+
+		// Generate counterexamples for safety
 		CounterexamplesGeneration<IStatement, String> generator = new CounterexamplesGeneration<>(dfaPI,
 				k * dfaPI.getStates().size(), mVisitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
 		Set<List<IStatement>> counterExamples = generator.getResult();
+
+		// Compute the interpolants from the counterexamples
 		CounterExamplesToInterpolants counterExampleToInterpolants = new CounterExamplesToInterpolants(counterExamples,
 				mGlobalVars.getTraceInterpolator());
 		counterExampleToInterpolants.computeResult();
 
+		// Generalize PI from the interpolants
 		OptimizedTraceGeneralization generalization = new OptimizedTraceGeneralization(mAllInterpolants,
 				flatten(counterExampleToInterpolants.getInterpolants()), new HashSet<>(mTransitionAlphabet), mPI,
 				mGlobalVars.getTraceInterpolator());
@@ -276,6 +286,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 		int i = 0;
 		while (!mResultComputed) {
 			mLogs.add("Iteration: " + i);
+			// Compute one iteration of the loop
 			computeOneIteration(i + 1, -1);
 			mLogs.add("Number of interpolants: " + this.mAllInterpolants.size());
 			i++;

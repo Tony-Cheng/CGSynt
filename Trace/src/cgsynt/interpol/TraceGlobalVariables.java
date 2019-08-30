@@ -18,6 +18,10 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
 import de.uni_freiburg.informatik.ultimate.test.mocks.ConsoleLogger;
 import de.uni_freiburg.informatik.ultimate.test.mocks.UltimateMocks;
 
+/**
+ * Store the variables used for trace interpolation.
+ *
+ */
 public class TraceGlobalVariables {
 
 	private ManagedScript mManagedScript;

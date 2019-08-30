@@ -4,6 +4,12 @@ import java.util.Set;
 
 import cgsynt.tree.parity.IParityState;
 
+/**
+ * This class is deprecated.
+ *
+ * @param <LETTER>
+ * @param <STATE>
+ */
 public class AlternatingParityAutomatonRule<LETTER, STATE extends IParityState> {
 	private STATE source;
 	private LETTER letter;

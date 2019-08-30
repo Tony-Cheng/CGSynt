@@ -68,7 +68,7 @@ public class TestSynthesisTerminationWithoutGeneralization {
 
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
 		preconditions = predicateFactory.and(preconditions,
-				predicateFactory.newPredicate(script.term(">=", n.getTerm(), script.numeral("0"))));
+				predicateFactory.newPredicate(script.term(">", n.getTerm(), script.numeral("0"))));
 		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), n.getTerm()));
 
 		List<IStatement> transitionAlphabet = new ArrayList<>();
