@@ -211,7 +211,6 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 		determinizeBuchi.computeResult();
 
 		ParityAutomaton<IcfgInternalTransition, IParityState> parityOmega = determinizeBuchi.getResult();
-
 		ParityAutomatonToTree<IcfgInternalTransition, IParityState> parityOmegaToParityTreeOmega = new ParityAutomatonToTree<>(
 				parityOmega, new ArrayList<>(mIcfgTransitionMap.values()), shutdownParityState, offParityState,
 				deadParityState);
@@ -333,7 +332,7 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 	private List<String> transAlphabetToString() {
 		List<String> stringTransitionAlphabet = new ArrayList<>();
 		for (int i = 0; i < this.mTransitionAlphabet.size(); i++) {
-			stringTransitionAlphabet.add(this.mTransitionAlphabet.toString());
+			stringTransitionAlphabet.add(this.mTransitionAlphabet.get(i).toString());
 		}
 		return stringTransitionAlphabet;
 	}
