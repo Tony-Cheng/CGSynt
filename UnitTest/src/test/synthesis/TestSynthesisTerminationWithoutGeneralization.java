@@ -54,7 +54,7 @@ public class TestSynthesisTerminationWithoutGeneralization {
 	@Test
 	void test2() throws Exception {
 		// while i < n, i++
-		TraceGlobalVariables globalVars = GlobalsConfigurer.configureForTermination();
+		TraceGlobalVariables globalVars = new TraceGlobalVariables();
 		VariableFactory vf = globalVars.getVariableFactory();
 		Script script = globalVars.getManagedScript().getScript();
 		BoogieNonOldVar i = vf.constructVariable("i", VariableFactory.INT);
@@ -67,6 +67,8 @@ public class TestSynthesisTerminationWithoutGeneralization {
 				globalVars.getManagedScript(), vf.getSymbolTable());
 
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
+		preconditions = predicateFactory.and(preconditions,
+				predicateFactory.newPredicate(script.term(">", n.getTerm(), script.numeral("0"))));
 		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), n.getTerm()));
 
 		List<IStatement> transitionAlphabet = new ArrayList<>();
@@ -80,7 +82,7 @@ public class TestSynthesisTerminationWithoutGeneralization {
 		synthesis.addState(2, false, false);
 		synthesis.addRule(1, iln, 2);
 		synthesis.addRule(2, ipp, 1);
-		synthesis.addRule(1, igen, 1);
+		// synthesis.addRule(1, igen, 2);
 
 		synthesis.computeMainLoop();
 		System.out.println("Test 2");
