@@ -148,4 +148,46 @@ public class ScriptAssumptionStatement implements IAssumption {
 		}
 		return null;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((lhs == null) ? 0 : lhs.hashCode());
+		result = prime * result + (negated ? 1231 : 1237);
+		result = prime * result + ((rhs == null) ? 0 : rhs.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ScriptAssumptionStatement other = (ScriptAssumptionStatement) obj;
+		if (lhs == null) {
+			if (other.lhs != null)
+				return false;
+		} else if (!lhs.equals(other.lhs))
+			return false;
+		if (negated != other.negated)
+			return false;
+		if (rhs == null) {
+			if (other.rhs != null)
+				return false;
+		} else if (!rhs.equals(other.rhs))
+			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
+			return false;
+		return true;
+	}
+	
+	
 }

@@ -46,7 +46,7 @@ public class TestSynthesisTerminationWithoutGeneralization {
 		synthesis.computeMainLoop();
 		System.out.println("Test 1");
 		System.out.println(synthesis.isCorrect());
-		 synthesis.printProgram();
+		synthesis.printProgram();
 
 	}
 
@@ -66,7 +66,7 @@ public class TestSynthesisTerminationWithoutGeneralization {
 				globalVars.getManagedScript(), vf.getSymbolTable());
 
 		IPredicate preconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), script.numeral("0")));
-		IPredicate postconditions = predicateFactory.newPredicate(script.term(">=", i.getTerm(), n.getTerm()));
+		IPredicate postconditions = predicateFactory.newPredicate(script.term("=", i.getTerm(), n.getTerm()));
 
 		List<IStatement> transitionAlphabet = new ArrayList<>();
 		transitionAlphabet.add(ipp);
@@ -80,8 +80,8 @@ public class TestSynthesisTerminationWithoutGeneralization {
 		synthesis.addRule(1, ilen, 2);
 		synthesis.addRule(2, ipp, 1);
 		synthesis.computeMainLoop();
-		 System.out.println("Test 2");
-		 System.out.println(synthesis.isCorrect());
-		 synthesis.printProgram();
+		System.out.println("Test 2");
+		System.out.println(synthesis.isCorrect());
+		synthesis.printProgram();
 	}
 }

@@ -49,6 +49,7 @@ import de.uni_freiburg.informatik.ultimate.automata.tree.IRankedLetter;
 import de.uni_freiburg.informatik.ultimate.core.model.models.Payload;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger.LogLevel;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgEdgeFactory;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgInternalTransition;
 import de.uni_freiburg.informatik.ultimate.modelcheckerutils.cfg.structure.IcfgLocation;
@@ -252,7 +253,6 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 			this.nonEmptyParityGame = emptinessCheck.getNonEmptyParityGame();
 			return;
 		}
-		System.out.println("Not Empty");
 		CounterexamplesGeneration<IStatement, IPredicate> generator = new CounterexamplesGeneration<>(dfaPI,
 				k * dfaPI.getStates().size(), mVisitedCounterexamples, bs, this.mTransitionAlphabet);
 		generator.computeResult();
@@ -346,12 +346,17 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 	}
 
 	public void addState(int state, boolean isInitial, boolean isFinal) {
-		this.mOmega.addState(isInitial, isFinal, new BasicPredicate(state, null, null, null, null));
+		Term trueTerm = mGlobalVars.getTraceInterpolator().getPUnifier().getTruePredicate().getFormula();
+		this.mOmega.addState(isInitial, isFinal,
+				new BasicPredicate(state, new String[0], trueTerm, new HashSet<>(), trueTerm));
 	}
 
 	public void addRule(int source, IStatement letter, int dest) {
-		this.mOmega.addInternalTransition(new BasicPredicate(source, null, null, null, null),
-				mIcfgTransitionMap.get(letter), new BasicPredicate(dest, null, null, null, null));
+		Term trueTerm = mGlobalVars.getTraceInterpolator().getPUnifier().getTruePredicate().getFormula();
+		this.mOmega.addInternalTransition(
+				new BasicPredicate(source, new String[0], trueTerm, new HashSet<>(), trueTerm),
+				mIcfgTransitionMap.get(letter),
+				new BasicPredicate(dest, new String[0], trueTerm, new HashSet<>(), trueTerm));
 	}
 
 	public Set<IParityGameState> findAllDeadStates(Set<IParityGameState> states) {

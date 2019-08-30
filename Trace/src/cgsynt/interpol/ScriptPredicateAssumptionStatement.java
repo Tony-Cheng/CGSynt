@@ -100,4 +100,34 @@ public class ScriptPredicateAssumptionStatement implements IAssumption {
 		}
 		return null;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (negated ? 1231 : 1237);
+		result = prime * result + ((predicate == null) ? 0 : predicate.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ScriptPredicateAssumptionStatement other = (ScriptPredicateAssumptionStatement) obj;
+		if (negated != other.negated)
+			return false;
+		if (predicate == null) {
+			if (other.predicate != null)
+				return false;
+		} else if (!predicate.equals(other.predicate))
+			return false;
+		return true;
+	}
+	
+	
 }
