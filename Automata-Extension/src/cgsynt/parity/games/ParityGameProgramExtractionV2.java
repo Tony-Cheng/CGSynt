@@ -42,7 +42,7 @@ public class ParityGameProgramExtractionV2<LETTER extends IRankedLetter, STATE e
 		this.idMap = new HashMap<>();
 		this.visited = new HashSet<>();
 		System.out.println("Source: state " + idMap.get(printProgramAdam(this.source)));
-		printStates();
+		// printStates();
 	}
 
 	private void printStates() {
