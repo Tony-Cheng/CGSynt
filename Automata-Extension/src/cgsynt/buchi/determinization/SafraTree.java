@@ -28,7 +28,7 @@ public class SafraTree<STATE> implements IParityState {
 	private int mF;
 	private int mNumBuchiStates;
 	private int mGreatestName;
-	
+
 	private boolean mInitializeRoot;
 
 	public SafraTree(Set<STATE> initialStates, int numBuchiStates, boolean initializeRoot) {
@@ -45,7 +45,7 @@ public class SafraTree<STATE> implements IParityState {
 		this.mF = 1;
 		this.mNumBuchiStates = numBuchiStates;
 		this.mInitializeRoot = initializeRoot;
-		
+
 		if (this.mInitializeRoot)
 			addRoot(initialStates);
 	}
@@ -126,10 +126,10 @@ public class SafraTree<STATE> implements IParityState {
 
 	@Override
 	public String toString() {
-		return "SafraTree [states=" + mStates + ", nameMap=" + mNameMap + ", root=" + mRoot + ", parentMap=" + mParentMap
-			+ ", childrenMap=" + mChildrenMap + ", labelMap=" + mLabelMap + ", rem=" + mRem + ", initialStates="
-			+ mInitialStates + ", e=" + mE + ", f=" + mF + ", numBuchiStates=" + mNumBuchiStates + ", greatestName="
-			+ mGreatestName + ", rank=" + getRank() + "]";
+		return "SafraTree [states=" + mStates + ", nameMap=" + mNameMap + ", root=" + mRoot + ", parentMap="
+				+ mParentMap + ", childrenMap=" + mChildrenMap + ", labelMap=" + mLabelMap + ", rem=" + mRem
+				+ ", initialStates=" + mInitialStates + ", e=" + mE + ", f=" + mF + ", numBuchiStates="
+				+ mNumBuchiStates + ", greatestName=" + mGreatestName + ", rank=" + getRank() + "]";
 	}
 
 	public Set<Integer> getChildren(Integer node) {
@@ -156,7 +156,8 @@ public class SafraTree<STATE> implements IParityState {
 			return;
 		Set<Integer> children = mChildrenMap.get(node);
 		mStates.remove(node);
-		mChildrenMap.get(mParentMap.get(node)).remove(node);
+		if (node != 1)
+			mChildrenMap.get(mParentMap.get(node)).remove(node);
 		mParentMap.remove(node);
 		mLabelMap.remove(node);
 		mNameMap.remove(node);
@@ -184,7 +185,7 @@ public class SafraTree<STATE> implements IParityState {
 				mChildrenMap.remove(i);
 				if (mParentMap.get(i) != null) {
 					mChildrenMap.get(mParentMap.get(i)).remove(i);
-					mChildrenMap.get(mParentMap.get(i)).add(i- sum);
+					mChildrenMap.get(mParentMap.get(i)).add(i - sum);
 				}
 				mParentMap.put(i - sum, mParentMap.get(i));
 				mParentMap.remove(i);
@@ -315,25 +316,25 @@ public class SafraTree<STATE> implements IParityState {
 		return tree;
 	}
 
-	public Set<STATE> getInitialStates(){
+	public Set<STATE> getInitialStates() {
 		return this.mInitialStates;
 	}
-	
+
 	public int getNumBuchiStates() {
 		return this.mNumBuchiStates;
 	}
-	
+
 	public boolean getInitializeRoot() {
 		return this.mInitializeRoot;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public IParityState getSimpleRepresentation() {
-		SafraTree<STATE> cpy = (SafraTree<STATE>)this.makeCopy();
-		
+		SafraTree<STATE> cpy = (SafraTree<STATE>) this.makeCopy();
+
 		Iterator<STATE> it = cpy.mInitialStates.iterator();
 		IParityState rep = new ParityState<STATE>(it.next(), cpy.getRank());
-		
+
 		return rep;
 	}
 }
