@@ -68,20 +68,32 @@ public class SynthesisLoopArrayMax {
 		IAssumption iln = synthesis.getNegation().get(igen);
 		IAssumption mgeai = synthesis.getNegation().get(mlai);
 		synthesis.addState(1, true, false);
-		synthesis.addState(2, false, true);
+		synthesis.addState(2, false, false);
+		synthesis.addState(3, false, true);
 		synthesis.addRule(1, iln, 1);
 		synthesis.addRule(1, igen, 1);
 		synthesis.addRule(1, ipp, 1);
 		synthesis.addRule(1, meai, 1);
 		synthesis.addRule(1, mlai, 1);
 		synthesis.addRule(1, mgeai, 1);
-		synthesis.addRule(1, ipp, 2);
-		synthesis.addRule(2, iln, 1);
-		synthesis.addRule(2, igen, 1);
-		synthesis.addRule(2, ipp, 1);
-		synthesis.addRule(2, meai, 1);
-		synthesis.addRule(2, mlai, 1);
-		synthesis.addRule(2, mgeai, 1);
+		
+		synthesis.addRule(1, iln, 2);
+		
+		synthesis.addRule(2, iln, 2);
+		synthesis.addRule(2, igen, 2);
+		synthesis.addRule(2, ipp, 2);
+		synthesis.addRule(2, meai, 2);
+		synthesis.addRule(2, mlai, 2);
+		synthesis.addRule(2, mgeai, 2);
+		
+		synthesis.addRule(2, ipp, 3);
+
+		synthesis.addRule(3, iln, 1);
+		synthesis.addRule(3, igen, 1);
+		synthesis.addRule(3, ipp, 1);
+		synthesis.addRule(3, meai, 1);
+		synthesis.addRule(3, mlai, 1);
+		synthesis.addRule(3, mgeai, 1);
 
 		synthesis.computeMainLoop();
 		System.out.println("Test 1");
