@@ -82,7 +82,7 @@ public class ProgramAutomatonConstruction {
 	}
 
 	/**
-	 * Compute the alphabet for the automaotn.
+	 * Compute the alphabet for the automaton.
 	 */
 	private void computeAlphabet() {
 		alphabet = new ArrayList<>();

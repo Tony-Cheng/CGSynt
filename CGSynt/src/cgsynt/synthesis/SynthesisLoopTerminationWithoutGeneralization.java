@@ -56,16 +56,38 @@ import de.uni_freiburg.informatik.ultimate.plugins.generator.buchiautomizer.Buch
  */
 public class SynthesisLoopTerminationWithoutGeneralization {
 
+	/**
+	 * The program automaton.
+	 */
 	private BuchiTreeAutomaton<RankedBool, IPredicate> mPrograms;
+
+	/**
+	 * The NFA representing a set of infeasible traces.
+	 */
 	private INestedWordAutomaton<IStatement, IPredicate> mPI;
+
+	/**
+	 * A non-deterministic buchi automaton representing a set of eventually
+	 * terminating traces.
+	 */
 	private NestedWordAutomaton<IStatement, IPredicate> mOmega;
 
+	/**
+	 * A list of program statements.
+	 */
 	private List<IStatement> mTransitionAlphabet;
 
 	private IUltimateServiceProvider mService;
+
+	/**
+	 * The interpolants generated for pi.
+	 */
 	private Set<IPredicate> mAllInterpolants;
 	private AutomataLibraryServices mAutService;
-	private BuchiParityHybridIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> mResult;
+
+	/**
+	 * A set of counterexamples that have already been checked.
+	 */
 	private Set<List<IStatement>> mVisitedCounterexamples;
 
 	private boolean mResultComputed;
@@ -76,12 +98,35 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 
 	private TraceGlobalVariables mGlobalVars;
 
+	/**
+	 * The initial state of a non-empty tree.
+	 */
 	private IParityGameState source;
+	
+	/**
+	 * A winning path in the parity game.
+	 */
 	private Map<IParityGameState, IParityGameState> nonEmptyTree;
+	
+	/**
+	 * A parity game containing a winning path.
+	 */
 	private ParityGame<RankedBool, BuchiParityIntersectStateV2<IntersectState<IPredicate, String>, IParityState>> nonEmptyParityGame;
 	private IPredicate deadState;
+	
+	/**
+	 * Maps an assumption statement to its negation.
+	 */
 	private Map<IAssumption, IAssumption> negation;
 
+	/**
+	 * Initialize the synthesis loop.
+	 * @param transitionAlphabet A list of program statements.
+	 * @param preconditions
+	 * @param postconditions
+	 * @param globalVars
+	 * @throws Exception
+	 */
 	public SynthesisLoopTerminationWithoutGeneralization(List<IStatement> transitionAlphabet, IPredicate preconditions,
 			IPredicate postconditions, TraceGlobalVariables globalVars) throws Exception {
 		this.init(transitionAlphabet, preconditions, postconditions, globalVars);
@@ -252,15 +297,6 @@ public class SynthesisLoopTerminationWithoutGeneralization {
 		// Change the set of interpolants after the old and new ones have been used to
 		// calculate the new triplets.
 		this.mAllInterpolants.addAll(flatten(counterExampleToInterpolants.getInterpolants()));
-	}
-
-	/**
-	 * Return an automaton that contains a correct program.
-	 * 
-	 * @return
-	 */
-	public BuchiParityHybridIntersectAutomaton<RankedBool, IntersectState<IPredicate, IPredicate>, IParityState> getResult() {
-		return mResult;
 	}
 
 	private Set<IPredicate> flatten(List<Set<IPredicate>> interpolants) {
