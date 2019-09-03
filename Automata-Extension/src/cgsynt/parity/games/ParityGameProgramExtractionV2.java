@@ -27,6 +27,21 @@ public class ParityGameProgramExtractionV2<LETTER extends IRankedLetter, STATE e
 	private ParityGame<LETTER, STATE> nonEmptyParityGame;
 	private Set<IParityGameState> deadStates;
 
+	/**
+	 * Initialize the program extraction class.
+	 * 
+	 * @param source
+	 *            The source state of the winning path in the parity game.
+	 * @param nonEmptyProof
+	 *            A winning path in the parity game.
+	 * @param transitionAlphabet
+	 *            A list of string representations of program statements.
+	 * @param nonEmptyParityGame
+	 *            A parity game containing a winning move.
+	 * @param deadStates
+	 *            A set of states in the parity game representing the dead states in
+	 *            the program automaton.
+	 */
 	public ParityGameProgramExtractionV2(IParityGameState source, Map<IParityGameState, IParityGameState> nonEmptyProof,
 			List<String> transitionAlphabet, ParityGame<LETTER, STATE> nonEmptyParityGame,
 			Set<IParityGameState> deadStates) {
@@ -37,6 +52,9 @@ public class ParityGameProgramExtractionV2<LETTER extends IRankedLetter, STATE e
 		this.deadStates = deadStates;
 	}
 
+	/**
+	 * Print the correct program.
+	 */
 	public void printProgram() {
 		this.id = 0;
 		this.idMap = new HashMap<>();

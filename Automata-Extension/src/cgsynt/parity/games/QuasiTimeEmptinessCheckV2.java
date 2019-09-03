@@ -64,6 +64,15 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 
 	}
 
+	/**
+	 * A set of states that are in the winning region of the even player.
+	 * 
+	 * @param G
+	 * @param h
+	 * @param pe
+	 * @param po
+	 * @return
+	 */
 	private Set<IParityGameState> solveE(ParityGame<LETTER, STATE> G, int h, int pe, int po) {
 		if (G.getStates().isEmpty() || pe <= 1) {
 			return new HashSet<>();
@@ -94,6 +103,13 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 		return G.getStates();
 	}
 
+	/**
+	 * Return a set of states with rank h.
+	 * 
+	 * @param G
+	 * @param h
+	 * @return
+	 */
 	private Set<IParityGameState> computeNh(ParityGame<LETTER, STATE> G, int h) {
 		Set<IParityGameState> Nh = new HashSet<>();
 		for (IParityGameState state : G.getStates()) {
@@ -104,6 +120,15 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 		return Nh;
 	}
 
+	/**
+	 * Return a set of states that are in the winning region of the odd player.
+	 * 
+	 * @param G
+	 * @param h
+	 * @param po
+	 * @param pe
+	 * @return
+	 */
 	private Set<IParityGameState> solveO(ParityGame<LETTER, STATE> G, int h, int po, int pe) {
 		if (G.getStates().isEmpty() || po <= 1) {
 			return new HashSet<>();
@@ -133,6 +158,14 @@ public class QuasiTimeEmptinessCheckV2<LETTER extends IRankedLetter, STATE exten
 		return G.getStates();
 	}
 
+	/**
+	 * Compute all states that can be forced to reach some state in N.
+	 * 
+	 * @param G
+	 * @param N
+	 * @param isEva
+	 * @return
+	 */
 	private Set<IParityGameState> ATR(ParityGame<LETTER, STATE> G, Set<IParityGameState> N, boolean isEva) {
 		Set<IParityGameState> atr = new HashSet<>();
 		Stack<IParityGameState> toVisit = new Stack<>();
