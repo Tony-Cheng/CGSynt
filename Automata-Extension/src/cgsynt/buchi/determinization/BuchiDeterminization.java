@@ -117,7 +117,7 @@ public class BuchiDeterminization<LETTER, STATE> {
 			Set<Integer> siblings = tree.getSiblings(node);
 			if (siblings != null) {
 				for (Integer sibling : siblings) {
-					if (!sibling.equals(sibling)) {
+					if (!node.equals(sibling)) {
 						Set<STATE> intersection = findIntersection(tree.getLabels(node), tree.getLabels(sibling));
 						for (STATE state : intersection) {
 							if (tree.getName(node) > tree.getName(sibling)) {

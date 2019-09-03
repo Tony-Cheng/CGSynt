@@ -116,7 +116,9 @@ public class SafraTree<STATE> implements IParityState {
 		if (!mStates.contains(node))
 			return;
 		mF = Math.min(mF, node);
-		for (Integer child : mChildrenMap.get(node)) {
+		Set<Integer> toRemove = new HashSet<>();
+		toRemove.addAll(mChildrenMap.get(node));
+		for (Integer child : toRemove) {
 			removeSubtree(child);
 		}
 		mChildrenMap.get(node).clear();
@@ -154,6 +156,7 @@ public class SafraTree<STATE> implements IParityState {
 			return;
 		Set<Integer> children = mChildrenMap.get(node);
 		mStates.remove(node);
+		mChildrenMap.get(mParentMap.get(node)).remove(node);
 		mParentMap.remove(node);
 		mLabelMap.remove(node);
 		mNameMap.remove(node);
